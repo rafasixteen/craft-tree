@@ -1,5 +1,5 @@
 {
-	"name": "nextjs-prisma-docker",
+	"name": "craft-tree",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
@@ -13,6 +13,8 @@
 		"docker:compose:prod": "docker-compose down && docker compose -f docker-compose.prod.yml up -d --build"
 	},
 	"dependencies": {
+		"@prisma/client": "^6.19.0",
+		"@prisma/extension-accelerate": "^2.0.2",
 		"dotenv": "^17.2.3",
 		"next": "^16.0.3",
 		"react": "^18",
@@ -26,6 +28,7 @@
 		"eslint": "^8",
 		"eslint-config-next": "14.0.4",
 		"prettier": "^3.6.2",
+		"prisma": "^6.19.0",
 		"typescript": "^5"
 	}
 }
