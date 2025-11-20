@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
-import { CreateItemSchema, GetItemsQuery } from '@lib/validation/item-schemas';
-import { handleError } from '@lib/api/handle-error';
+import { CreateItemSchema, GetItemsQuerySchema } from '@lib/validation/item-schemas';
+import { handleError } from '@/lib/validation/errors/handle-error';
 
 export async function POST(req: NextRequest)
 {
@@ -18,17 +18,19 @@ export async function POST(req: NextRequest)
 	}
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<GetItemsQuery> })
+export async function GET(req: NextRequest)
 {
 	try
 	{
-		const { page } = await params;
+		const pageParam = req.nextUrl.searchParams.get('page');
+		const { page } = GetItemsQuerySchema.parse({ page: pageParam });
+
 		const limit = 20;
 
 		const items = await prisma.item.findMany({
-			skip: page ? 1 : 0,
+			skip: page * limit,
 			take: limit,
-			orderBy: { createdAt: 'desc' },
+			orderBy: { name: 'asc' },
 		});
 
 		return NextResponse.json(items);

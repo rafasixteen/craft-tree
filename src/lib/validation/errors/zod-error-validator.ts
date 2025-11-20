@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ErrorHandler, registerErrorHandler } from '@/lib/api/handle-error';
+import { ErrorHandler, registerErrorHandler } from '@/lib/validation/errors/handle-error';
 
 const zodErrorHandler: ErrorHandler = (err: any) =>
 {
@@ -8,7 +8,7 @@ const zodErrorHandler: ErrorHandler = (err: any) =>
 	return NextResponse.json(
 		{
 			error: {
-				name: 'ValidationError',
+				name: 'ZodError',
 				message: err.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join('; '),
 			},
 		},

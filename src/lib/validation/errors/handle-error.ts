@@ -11,6 +11,8 @@ export function registerErrorHandler(handler: ErrorHandler)
 
 export function handleError(err: any)
 {
+	console.error(err);
+
 	for (const handler of errorHandlers)
 	{
 		const response = handler(err);

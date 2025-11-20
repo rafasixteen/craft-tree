@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
 import { ItemId, ItemIdSchema, PatchItemSchema } from '@/lib/validation/item-schemas';
-import { handleError } from '@/lib/api/handle-error';
+import { handleError } from '@/lib/validation/errors/handle-error';
 import { NotFoundError } from '@/lib/validation/errors/not-found-error';
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<ItemId> })

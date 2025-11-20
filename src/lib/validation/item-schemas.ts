@@ -14,9 +14,7 @@ export const PatchItemSchema = z.object({
 });
 
 export const GetItemsQuerySchema = z.object({
-	page: z.string().regex(/^\d+$/, 'Page must be a number').transform(Number).optional(),
+	page: z.coerce.number().int().nonnegative().default(0),
 });
 
 export type ItemId = z.infer<typeof ItemIdSchema>;
-
-export type GetItemsQuery = z.infer<typeof GetItemsQuerySchema>;
