@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
-import { ItemId, ItemIdSchema, UpdateItemSchema } from '@/lib/validation/item-schemas';
+import { UpdateItemSchema } from '@/lib/types/item';
 import { handleError } from '@/lib/validation/errors/handle-error';
 import { NotFoundError } from '@/lib/validation/errors/not-found-error';
+import { UuidSchema } from '@/lib/validation/common-schemas';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<ItemId> })
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> })
 {
 	try
 	{
-		const { id } = ItemIdSchema.parse(await params);
-		const item = await prisma.item.findUnique({ where: { id } });
+		const { id } = await params;
+		const parsedId = UuidSchema.parse(id);
+		const item = await prisma.item.findUnique({ where: { id: parsedId } });
 
 		if (item == null)
 		{
@@ -24,15 +26,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<ItemI
 	}
 }
 
-export async function PUT(_req: NextRequest, { params }: { params: Promise<ItemId> })
+export async function PUT(_req: NextRequest, { params }: { params: Promise<{ id: string }> })
 {
 	try
 	{
-		const { id } = ItemIdSchema.parse(await params);
+		const { id } = await params;
+		const parsedId = UuidSchema.parse(id);
 		const data = UpdateItemSchema.parse(await _req.json());
 
 		await prisma.item.update({
-			where: { id },
+			where: { id: parsedId },
 			data,
 		});
 
@@ -44,12 +47,13 @@ export async function PUT(_req: NextRequest, { params }: { params: Promise<ItemI
 	}
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<ItemId> })
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> })
 {
 	try
 	{
-		const { id } = ItemIdSchema.parse(await params);
-		await prisma.item.delete({ where: { id } });
+		const { id } = await params;
+		const parsedId = UuidSchema.parse(id);
+		await prisma.item.delete({ where: { id: parsedId } });
 		return NextResponse.json({ success: true });
 	}
 	catch (err: any)

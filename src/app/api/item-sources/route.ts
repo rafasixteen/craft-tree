@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
 import { handleError } from '@/lib/validation/errors/handle-error';
-import { CreateItemSourceSchema } from '@/lib/validation/item-source-schemas';
+import { CreateItemSourceSchema } from '@/lib/types/item-sources';
 import { NotFoundError } from '@lib/validation/errors/not-found-error';
 
 export async function POST(req: NextRequest)

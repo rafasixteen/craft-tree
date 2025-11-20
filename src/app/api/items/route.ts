@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
-import { CreateItemSchema, GetItemsQuerySchema } from '@lib/validation/item-schemas';
+import { CreateItemSchema, GetItemsQuerySchema } from '@lib/types/item';
 import { handleError } from '@/lib/validation/errors/handle-error';
 
 export async function GET(req: NextRequest)
@@ -32,7 +32,6 @@ export async function POST(req: NextRequest)
 	{
 		const data = CreateItemSchema.parse(await req.json());
 		await prisma.item.create({ data });
-
 		return NextResponse.json({ success: true });
 	}
 	catch (err: any)

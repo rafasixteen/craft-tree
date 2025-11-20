@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
 import { handleError } from '@/lib/validation/errors/handle-error';
-import { Uuid, UuidSchema } from '@/lib/validation/common-schemas';
-import { ItemSourceId, ItemSourceIdSchema, UpdateItemSourceSchema } from '@lib/validation/item-source-schemas';
+import { UuidSchema } from '@/lib/validation/common-schemas';
 import { NotFoundError } from '@/lib/validation/errors/not-found-error';
+import { UpdateItemSourceSchema } from '@/lib/types/item-sources';
+import { IngredientCreate } from '@/lib/types/ingredients';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<ItemSourceId> })
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> })
 {
 	try
 	{
-		const { id } = ItemSourceIdSchema.parse(await params);
-		const itemSource = await prisma.itemSource.findUnique({ where: { id } });
+		const { id } = await params;
+		const parsedId = UuidSchema.parse(id);
+		const itemSource = await prisma.itemSource.findUnique({ where: { id: parsedId } });
 
 		if (itemSource == null)
 		{
@@ -25,11 +27,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<ItemS
 	}
 }
 
-export async function PUT(_req: NextRequest, { params }: { params: Promise<ItemSourceId> })
+export async function PUT(_req: NextRequest, { params }: { params: Promise<{ id: string }> })
 {
 	try
 	{
-		const { id } = ItemSourceIdSchema.parse(await params);
+		const { id } = await params;
+		const parsedId = UuidSchema.parse(id);
 		const data = UpdateItemSourceSchema.parse(await _req.json());
 
 		const ingredientData = data.ingredients?.map((ingredient) => ({
@@ -38,7 +41,7 @@ export async function PUT(_req: NextRequest, { params }: { params: Promise<ItemS
 		}));
 
 		await prisma.itemSource.update({
-			where: { id },
+			where: { id: parsedId },
 			data: {
 				item: { connect: { id: data.itemId } },
 				type: data.type,
@@ -55,12 +58,13 @@ export async function PUT(_req: NextRequest, { params }: { params: Promise<ItemS
 	}
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<ItemSourceId> })
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> })
 {
 	try
 	{
-		const { id } = ItemSourceIdSchema.parse(await params);
-		await prisma.itemSource.delete({ where: { id } });
+		const { id } = await params;
+		const parsedId = UuidSchema.parse(id);
+		await prisma.itemSource.delete({ where: { id: parsedId } });
 		return NextResponse.json({ success: true });
 	}
 	catch (err: any)

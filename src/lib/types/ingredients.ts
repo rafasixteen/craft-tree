@@ -6,6 +6,8 @@ export const IngredientSchema = z.object({
 	quantity: z.number().positive('Quantity must be positive'),
 });
 
-export const IngredientCreateSchema = IngredientSchema.omit({ id: true }).array();
+export const IngredientCreateSchema = IngredientSchema.omit({ id: true });
 
 export type Ingredient = z.infer<typeof IngredientSchema>;
+
+export type IngredientCreate = z.infer<typeof IngredientCreateSchema>;
