@@ -1,43 +1,52 @@
 'use server';
 
-import { useState, useEffect } from 'react';
-import SearchBar from './_components/SearchBar';
-import Pagination from './_components/Pagination';
 import ItemsList from './_components/ItemsList';
+import Pagination from './_components/Pagination';
+import SearchBar from './_components/SearchBar';
 import { getItems } from '@/lib/api/items';
+import { redirect } from 'next/navigation';
 
-export default function ItemsPage()
+interface ItemsPageProps
 {
-	const [items, setItems] = useState<Item[]>([]);
-	const [page, setPage] = useState(0);
-	const [search, setSearch] = useState('');
-	const [hasNext, setHasNext] = useState(false);
+	page: string | undefined;
+	search: string | undefined;
+}
 
-	useEffect(() =>
+function validatePage(page?: string): number | null
+{
+	const p = parseInt(page ?? '1', 10);
+	if (isNaN(p) || p < 1) return null;
+	return p;
+}
+
+function validateSearch(search?: string): string
+{
+	if (!search || typeof search !== 'string') return '';
+	return search.slice(0, 32);
+}
+
+export default async function ItemsPage({ searchParams }: { searchParams: Promise<ItemsPageProps> })
+{
+	const params = await searchParams;
+	const page = validatePage(params.page);
+	const search = validateSearch(params.search);
+
+	if (page === null)
 	{
-		async function fetchItems()
-		{
-			try
-			{
-				const data: Item[] = await getItems(page);
-				const filtered = data.filter((i: Item) => i.name.toLowerCase().includes(search.toLowerCase()));
-				setItems(filtered);
-				setHasNext(data.length === 20);
-			}
-			catch (err)
-			{
-				console.error(err);
-			}
-		}
+		redirect(`/items?search=${encodeURIComponent(search)}&page=1`);
+	}
 
-		fetchItems();
-	}, [page, search]);
+	const { items, hasNext } = await getItems(page, search);
 
 	return (
 		<div className="p-4">
-			<SearchBar value={search} onChange={setSearch} />
-			<ItemsList items={items} />
-			<Pagination page={page} onPageChange={setPage} hasNext={hasNext} />
+			<Pagination page={page} hasNext={hasNext} />
+
+			<div className="my-6">
+				<ItemsList items={items} />
+			</div>
+
+			<SearchBar search={search} />
 		</div>
 	);
 }

@@ -1,11 +1,9 @@
+'use server';
+
 import ItemCard from './ItemCard';
+import { Item } from '@lib/types/item';
 
-interface ItemsListProps
-{
-	items: { id: string; name: string; image?: string }[];
-}
-
-export default function ItemsList({ items }: ItemsListProps)
+export default async function ItemsList({ items }: { items: Item[] })
 {
 	return (
 		<div className="grid grid-cols-6 gap-4">

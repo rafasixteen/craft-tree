@@ -1,29 +1,41 @@
 'use client';
-import { useState, useEffect } from 'react';
 
-interface SearchBarProps
-{
-	value: string;
-	onChange: (value: string) => void;
-}
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SearchBar({ value, onChange }: SearchBarProps)
+export default function SearchBar({ search }: { search: string })
 {
-	const [input, setInput] = useState(value);
+	const router = useRouter();
+	const params = useSearchParams();
+
+	const [value, setValue] = useState(search);
+	const [debouncedValue, setDebouncedValue] = useState(search);
 
 	useEffect(() =>
 	{
-		const timer = setTimeout(() => onChange(input), 300);
+		const timer = setTimeout(() => setDebouncedValue(value), 300);
 		return () => clearTimeout(timer);
-	}, [input]);
+	}, [value]);
+
+	useEffect(() =>
+	{
+		if (debouncedValue === search) return;
+
+		const newParams = new URLSearchParams(params.toString());
+		newParams.set('search', debouncedValue);
+		newParams.set('page', '1');
+
+		router.push(`?${newParams.toString()}`);
+	}, [debouncedValue, params, router, search]);
+
+	useEffect(() => setValue(search), [search]);
 
 	return (
 		<input
-			type="text"
-			value={input}
-			placeholder="Search items..."
-			onChange={(e) => setInput(e.target.value)}
-			className="border p-2 rounded w-full"
+			className="border p-2 w-full"
+			value={value}
+			onChange={(e) => setValue(e.target.value)}
+			placeholder="Search..."
 		/>
 	);
 }

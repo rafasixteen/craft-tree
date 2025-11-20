@@ -1,13 +1,11 @@
-interface ItemCardProps
-{
-	item: { id: string; name: string; image?: string };
-}
+'use server';
 
-export default function ItemCard({ item }: ItemCardProps)
+import { Item } from '@/lib/types/item';
+
+export default async function ItemCard({ item }: { item: Item })
 {
 	return (
 		<div className="border rounded p-2 flex flex-col items-center">
-			{item.image && <img src={item.image} alt={item.name} className="w-16 h-16 mb-2" />}
 			<span>{item.name}</span>
 		</div>
 	);

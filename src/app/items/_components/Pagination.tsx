@@ -1,30 +1,27 @@
 'use client';
 
-interface PaginationProps
-{
-	page: number;
-	onPageChange: (page: number) => void;
-	hasNext: boolean;
-}
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function Pagination({ page, onPageChange, hasNext }: PaginationProps)
+export default function Pagination({ page, hasNext }: { page: number; hasNext: boolean })
 {
+	const router = useRouter();
+	const params = useSearchParams();
+
+	const updatePage = (newPage: number) =>
+	{
+		const newParams = new URLSearchParams(params.toString());
+		newParams.set('page', String(newPage));
+		router.push(`?${newParams.toString()}`);
+	};
+
 	return (
-		<div className="flex justify-center gap-4 mt-4">
-			<button
-				disabled={page === 0}
-				onClick={() => onPageChange(page - 1)}
-				className="p-2 bg-gray-300 rounded disabled:opacity-50"
-			>
-				◀
+		<div className="flex gap-2">
+			<button disabled={page <= 1} onClick={() => updatePage(page - 1)}>
+				Prev
 			</button>
-			<span>Page {page + 1}</span>
-			<button
-				disabled={!hasNext}
-				onClick={() => onPageChange(page + 1)}
-				className="p-2 bg-gray-300 rounded disabled:opacity-50"
-			>
-				▶
+
+			<button disabled={!hasNext} onClick={() => updatePage(page + 1)}>
+				Next
 			</button>
 		</div>
 	);

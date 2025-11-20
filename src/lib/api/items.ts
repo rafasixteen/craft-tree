@@ -1,20 +1,25 @@
-import { CreateItemParams, UpdateItemParams } from '@lib/validation/item-schemas';
 import { Uuid } from '../validation/common-schemas';
+import { CreateItemParams, Item, UpdateItemParams } from '@lib/types/item';
+import { getOrigin } from './get-origin';
 
-export async function getItems(page = 0)
+export async function getItems(page = 0, search = ''): Promise<{ items: Item[]; hasNext: boolean }>
 {
-	const res = await fetch(`/api/items?page=${page}`, {
+	const origin = await getOrigin();
+	const safePage = Math.max(0, Math.floor(page));
+
+	const res = await fetch(`${origin}/api/items?page=${safePage}&search=${encodeURIComponent(search)}`, {
 		method: 'GET',
 		cache: 'no-store',
 	});
 
+	const json = await res.json();
+
 	if (!res.ok)
 	{
-		const message = (await res.json()) || res.statusText;
-		throw new Error(`Failed to fetch items: ${message} (status: ${res.status})`);
+		throw json;
 	}
 
-	return res.json();
+	return json;
 }
 
 export async function createItem(params: CreateItemParams)
