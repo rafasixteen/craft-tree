@@ -8,40 +8,31 @@ datasource db {
 }
 
 model Item {
-  id               String                @id @default(uuid())
-  name             String                @unique
-  requirements     Requirement[]
-  gatheredSources  GatheredItemSource[]
-  processedSources ProcessedItemSource[]
-
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  id      String       @id @default(uuid())
+  name    String       @unique
+  sources ItemSource[]
+  usedIn  Ingredient[]
 }
 
-model Requirement {
-  id                String              @id @default(uuid())
-  processedSourceId String
-  requiredItemId    String
-  quantity          Int
-  processedSource   ProcessedItemSource @relation(fields: [processedSourceId], references: [id])
-  requiredItem      Item                @relation(fields: [requiredItemId], references: [id])
+model ItemSource {
+  id          String       @id @default(uuid())
+  item        Item         @relation(fields: [itemId], references: [id])
+  itemId      String
+  type        SourceType
+  time        Float
+  ingredients Ingredient[]
 }
 
-model GatheredItemSource {
-  id     String @id @default(uuid())
-  itemId String
-  item   Item   @relation(fields: [itemId], references: [id])
-
-  @@map("gathered_item_sources")
+model Ingredient {
+  id       String     @id @default(uuid())
+  source   ItemSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  sourceId String
+  item     Item       @relation(fields: [itemId], references: [id])
+  itemId   String
+  quantity Int
 }
 
-model ProcessedItemSource {
-  id           String        @id @default(uuid())
-  itemId       String
-  type         String
-  time         Int
-  requirements Requirement[]
-  item         Item          @relation(fields: [itemId], references: [id])
-
-  @@map("processed_item_sources")
+enum SourceType {
+  Gathered
+  Processed
 }
