@@ -3,21 +3,6 @@ import prisma from '@lib/prisma';
 import { CreateItemSchema, GetItemsQuerySchema } from '@lib/validation/item-schemas';
 import { handleError } from '@/lib/validation/errors/handle-error';
 
-export async function POST(req: NextRequest)
-{
-	try
-	{
-		const data = CreateItemSchema.parse(await req.json());
-		await prisma.item.create({ data });
-
-		return NextResponse.json({ success: true });
-	}
-	catch (err: any)
-	{
-		return handleError(err);
-	}
-}
-
 export async function GET(req: NextRequest)
 {
 	try
@@ -34,6 +19,21 @@ export async function GET(req: NextRequest)
 		});
 
 		return NextResponse.json(items);
+	}
+	catch (err: any)
+	{
+		return handleError(err);
+	}
+}
+
+export async function POST(req: NextRequest)
+{
+	try
+	{
+		const data = CreateItemSchema.parse(await req.json());
+		await prisma.item.create({ data });
+
+		return NextResponse.json({ success: true });
 	}
 	catch (err: any)
 	{
