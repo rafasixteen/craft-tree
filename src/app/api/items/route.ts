@@ -12,13 +12,13 @@ export async function GET(req: NextRequest)
 		const searchParam = req.nextUrl.searchParams.get('search');
 
 		const GetItemsQuerySchema = z.object({
-			page: z.coerce.number().int().nonnegative().default(1),
+			page: z.coerce.number().int().positive().default(1),
 			search: z.string().max(32).optional(),
 		});
 
 		const { page, search } = GetItemsQuerySchema.parse({ page: pageParam, search: searchParam });
 
-		const limit = 1;
+		const limit = 16;
 		const skip = (page - 1) * limit;
 
 		const items = await prisma.item.findMany({

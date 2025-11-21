@@ -1,5 +1,6 @@
 'use server';
 
+import { z } from 'zod';
 import ItemsList from './_components/ItemsList';
 import Pagination from './_components/Pagination';
 import SearchBar from './_components/SearchBar';
@@ -12,28 +13,31 @@ interface ItemsPageProps
 	search: string | undefined;
 }
 
-function validatePage(page?: string): number | null
-{
-	const p = parseInt(page ?? '1', 10);
-	if (isNaN(p) || p < 1) return null;
-	return p;
-}
-
-function validateSearch(search?: string): string
-{
-	if (!search || typeof search !== 'string') return '';
-	return search.slice(0, 32);
-}
+const SearchParamsSchema = z.object({
+	page: z.coerce.number().positive().optional().default(1),
+	search: z.string().max(32).optional().default(''),
+});
 
 export default async function ItemsPage({ searchParams }: { searchParams: Promise<ItemsPageProps> })
 {
-	const params = await searchParams;
-	const page = validatePage(params.page);
-	const search = validateSearch(params.search);
+	let page: number = 1;
+	let search: string = '';
 
-	if (page === null)
+	try
 	{
-		redirect(`/items?search=${encodeURIComponent(search)}&page=1`);
+		const params = await searchParams;
+
+		const parsed = SearchParamsSchema.parse({
+			page: params.page,
+			search: params.search,
+		});
+
+		page = parsed.page;
+		search = parsed.search;
+	}
+	catch
+	{
+		return redirect(`/items?page=1&search=`);
 	}
 
 	const { items, hasNext } = await getItems(page, search);

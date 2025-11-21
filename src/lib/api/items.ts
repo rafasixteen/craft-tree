@@ -2,10 +2,10 @@ import { Uuid } from '../validation/common-schemas';
 import { CreateItemParams, Item, UpdateItemParams } from '@lib/types/item';
 import { getOrigin } from './get-origin';
 
-export async function getItems(page = 0, search = ''): Promise<{ items: Item[]; hasNext: boolean }>
+export async function getItems(page = 1, search = ''): Promise<{ items: Item[]; hasNext: boolean }>
 {
 	const origin = await getOrigin();
-	const safePage = Math.max(0, Math.floor(page));
+	const safePage = Math.max(1, Math.floor(page));
 
 	const res = await fetch(`${origin}/api/items?page=${safePage}&search=${encodeURIComponent(search)}`, {
 		method: 'GET',
