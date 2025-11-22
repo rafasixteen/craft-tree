@@ -1,39 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@lib/prisma';
-import { CreateItemSchema } from '@lib/types/item';
+import { CreateItemSchema, Item } from '@lib/types/item';
 import { handleError } from '@/lib/validation/errors/handle-error';
-import { z } from 'zod';
+import { ItemsQuerySchema } from '@/lib/cookies/items-query';
 
 export async function GET(req: NextRequest)
 {
 	try
 	{
-		const pageParam = req.nextUrl.searchParams.get('page');
-		const searchParam = req.nextUrl.searchParams.get('search');
-
-		const GetItemsQuerySchema = z.object({
-			page: z.coerce.number().int().positive().default(1),
-			search: z.string().max(32).optional(),
+		const { page, search, limit } = ItemsQuerySchema.parse({
+			page: req.nextUrl.searchParams.get('page') ?? undefined,
+			search: req.nextUrl.searchParams.get('search') ?? undefined,
+			limit: req.nextUrl.searchParams.get('limit') ?? undefined,
 		});
 
-		const { page, search } = GetItemsQuerySchema.parse({ page: pageParam, search: searchParam });
-
-		const limit = 16;
-		const skip = (page - 1) * limit;
-
-		const items = await prisma.item.findMany({
+		const items: Item[] = await prisma.item.findMany({
 			where: {
 				name: {
 					contains: search,
 					mode: 'insensitive',
 				},
 			},
-			skip: skip,
-			take: limit + 1,
+			skip: (page - 1) * limit,
+			take: limit,
 			orderBy: { name: 'asc' },
 		});
 
-		return NextResponse.json({ items: items.slice(0, limit), hasNext: items.length > limit });
+		const totalItems: number = await prisma.item.count({
+			where: {
+				name: { contains: search, mode: 'insensitive' },
+			},
+		});
+
+		return NextResponse.json({
+			items,
+			totalItems,
+			totalPages: Math.ceil(totalItems / limit),
+		});
 	}
 	catch (err: any)
 	{

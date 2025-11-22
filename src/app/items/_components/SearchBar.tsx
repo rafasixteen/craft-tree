@@ -1,41 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { setSearch } from '@/lib/cookies/items-query-client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function SearchBar({ search }: { search: string })
+export default function SearchBar({ defaultValue = '' })
 {
 	const router = useRouter();
-	const params = useSearchParams();
+	const [value, setValue] = useState(defaultValue);
 
-	const [value, setValue] = useState(search);
-	const [debouncedValue, setDebouncedValue] = useState(search);
+	let typingTimer: NodeJS.Timeout | null = null;
 
-	useEffect(() =>
+	function onInputChange(e: React.ChangeEvent<HTMLInputElement>)
 	{
-		const timer = setTimeout(() => setDebouncedValue(value), 300);
-		return () => clearTimeout(timer);
-	}, [value]);
+		setValue(e.target.value);
 
-	useEffect(() =>
-	{
-		if (debouncedValue === search) return;
+		if (typingTimer) clearTimeout(typingTimer);
 
-		const newParams = new URLSearchParams(params.toString());
-		newParams.set('search', debouncedValue);
-		newParams.set('page', '1');
-
-		router.push(`?${newParams.toString()}`);
-	}, [debouncedValue, params, router, search]);
-
-	useEffect(() => setValue(search), [search]);
+		typingTimer = setTimeout(() =>
+		{
+			setSearch(e.target.value).then(() =>
+			{
+				router.refresh();
+			});
+		}, 100);
+	}
 
 	return (
-		<input
-			className="border p-2 w-full"
-			value={value}
-			onChange={(e) => setValue(e.target.value)}
-			placeholder="Search..."
-		/>
+		<div>
+			<input value={value} onChange={onInputChange} />
+		</div>
 	);
 }

@@ -1,28 +1,32 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { setPage } from '@/lib/cookies/items-query-client';
+import { useRouter } from 'next/navigation';
 
-export default function Pagination({ page, hasNext }: { page: number; hasNext: boolean })
+export default function Pagination({ page }: { page: number })
 {
 	const router = useRouter();
-	const params = useSearchParams();
+	const currentPage = page;
 
-	const updatePage = (newPage: number) =>
+	async function goToPreviousPage()
 	{
-		const newParams = new URLSearchParams(params.toString());
-		newParams.set('page', String(newPage));
-		router.push(`?${newParams.toString()}`);
-	};
+		const newPage = Math.max(1, currentPage - 1);
+		await setPage(newPage);
+		router.refresh();
+	}
+
+	async function goToNextPage()
+	{
+		const newPage = currentPage + 1;
+		await setPage(newPage);
+		router.refresh();
+	}
 
 	return (
-		<div className="flex gap-2">
-			<button disabled={page <= 1} onClick={() => updatePage(page - 1)}>
-				Prev
-			</button>
-
-			<button disabled={!hasNext} onClick={() => updatePage(page + 1)}>
-				Next
-			</button>
+		<div>
+			<button onClick={goToPreviousPage}>Prev</button>
+			<span>{currentPage}</span>
+			<button onClick={goToNextPage}>Next</button>
 		</div>
 	);
 }

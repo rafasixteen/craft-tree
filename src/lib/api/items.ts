@@ -1,13 +1,22 @@
 import { Uuid } from '../validation/common-schemas';
 import { CreateItemParams, Item, UpdateItemParams } from '@lib/types/item';
 import { getOrigin } from './get-origin';
+import { ItemsQueryParams, ItemsQuerySchema } from '@/lib/cookies/items-query';
 
-export async function getItems(page = 1, search = ''): Promise<{ items: Item[]; hasNext: boolean }>
+export async function getItems(params: ItemsQueryParams): Promise<{
+	items: Item[];
+	totalItems?: number;
+	totalPages?: number;
+}>
 {
-	const origin = await getOrigin();
-	const safePage = Math.max(1, Math.floor(page));
+	const { page, limit, search } = ItemsQuerySchema.parse(params);
 
-	const res = await fetch(`${origin}/api/items?page=${safePage}&search=${encodeURIComponent(search)}`, {
+	const query = new URLSearchParams();
+	query.set('page', page.toString());
+	query.set('limit', limit.toString());
+	if (search) query.set('search', search);
+
+	const res = await fetch(`${await getOrigin()}/api/items?${query.toString()}`, {
 		method: 'GET',
 		cache: 'no-store',
 	});

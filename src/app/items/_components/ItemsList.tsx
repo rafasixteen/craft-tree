@@ -1,15 +1,14 @@
 'use server';
 
-import ItemCard from './ItemCard';
-import { Item } from '@lib/types/item';
+import { Item } from '@prisma/client';
 
 export default async function ItemsList({ items }: { items: Item[] })
 {
 	return (
-		<div className="grid grid-cols-6 gap-4">
+		<ul>
 			{items.map((item) => (
-				<ItemCard key={item.id} item={item} />
+				<li key={item.id}>{item.name}</li>
 			))}
-		</div>
+		</ul>
 	);
 }

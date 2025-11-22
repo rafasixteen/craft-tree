@@ -1,56 +1,36 @@
 'use server';
 
-import { z } from 'zod';
-import ItemsList from './_components/ItemsList';
+import PanelGroup from '../components/PanelGroup';
+import Panel from '../components/Panel';
+import styles from './page.module.css';
 import Pagination from './_components/Pagination';
+import ItemsList from './_components/ItemsList';
 import SearchBar from './_components/SearchBar';
+import { readItemsQueryParams } from '@/lib/cookies/items-query';
 import { getItems } from '@/lib/api/items';
-import { redirect } from 'next/navigation';
+import RecipeTree from './_components/RecipeTree';
 
-interface ItemsPageProps
+export default async function ItemsPage()
 {
-	page: string | undefined;
-	search: string | undefined;
-}
-
-const SearchParamsSchema = z.object({
-	page: z.coerce.number().positive().optional().default(1),
-	search: z.string().max(32).optional().default(''),
-});
-
-export default async function ItemsPage({ searchParams }: { searchParams: Promise<ItemsPageProps> })
-{
-	let page: number = 1;
-	let search: string = '';
-
-	try
-	{
-		const params = await searchParams;
-
-		const parsed = SearchParamsSchema.parse({
-			page: params.page,
-			search: params.search,
-		});
-
-		page = parsed.page;
-		search = parsed.search;
-	}
-	catch
-	{
-		return redirect(`/items?page=1&search=`);
-	}
-
-	const { items, hasNext } = await getItems(page, search);
+	const { page, limit, search } = await readItemsQueryParams();
+	const { items, totalItems, totalPages } = await getItems({ page, search, limit });
 
 	return (
-		<div className="p-4">
-			<Pagination page={page} hasNext={hasNext} />
+		<PanelGroup direction="horizontal" className={styles.panelGroup}>
+			<Panel size={70}>
+				<div className={styles['tree-view']}>
+					<RecipeTree />
+				</div>
+			</Panel>
+			<Panel size={30}>
+				<div className={styles.sidebar}>
+					<Pagination page={page} />
 
-			<div className="my-6">
-				<ItemsList items={items} />
-			</div>
+					<ItemsList items={items} />
 
-			<SearchBar search={search} />
-		</div>
+					<SearchBar defaultValue={search} />
+				</div>
+			</Panel>
+		</PanelGroup>
 	);
 }

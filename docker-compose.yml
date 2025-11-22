@@ -21,6 +21,7 @@ services:
         command: npm run docker:dev
         environment:
             - NODE_ENV=development
+            - WATCHPACK_POLLING=true
         ports:
             - 3000:3000
         env_file: .env

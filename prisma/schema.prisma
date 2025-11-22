@@ -10,29 +10,29 @@ datasource db {
 model Item {
   id      String       @id @default(uuid())
   name    String       @unique
-  sources ItemSource[]
+  recipes Recipe[]
   usedIn  Ingredient[]
+
+  @@map("Items")
 }
 
-model ItemSource {
+model Recipe {
   id          String       @id @default(uuid())
   item        Item         @relation(fields: [itemId], references: [id])
   itemId      String
-  type        SourceType
   time        Float
   ingredients Ingredient[]
+
+  @@map("Recipes")
 }
 
 model Ingredient {
-  id       String     @id @default(uuid())
-  source   ItemSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  sourceId String
-  item     Item       @relation(fields: [itemId], references: [id])
+  id       String @id @default(uuid())
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId String
+  item     Item   @relation(fields: [itemId], references: [id])
   itemId   String
   quantity Int
-}
 
-enum SourceType {
-  Gathered
-  Processed
+  @@map("Ingredients")
 }
