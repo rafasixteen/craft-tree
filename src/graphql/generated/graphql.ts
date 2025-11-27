@@ -9,239 +9,200 @@ export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' |
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+	ID: { input: string; output: string };
+	String: { input: string; output: string };
+	Boolean: { input: boolean; output: boolean };
+	Int: { input: number; output: number };
+	Float: { input: number; output: number };
 };
 
 export type CreateItemInput = {
-  name: Scalars['String']['input'];
+	name: Scalars['String']['input'];
 };
 
 export type Ingredient = {
-  __typename?: 'Ingredient';
-  id: Scalars['ID']['output'];
-  item: Item;
-  quantity: Scalars['Int']['output'];
-  recipe: Recipe;
+	__typename?: 'Ingredient';
+	id: Scalars['ID']['output'];
+	item: Item;
+	quantity: Scalars['Int']['output'];
+	recipe: Recipe;
 };
 
 export type Item = {
-  __typename?: 'Item';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  recipes?: Maybe<Array<Recipe>>;
-  usedIn?: Maybe<Array<Ingredient>>;
+	__typename?: 'Item';
+	id: Scalars['ID']['output'];
+	name: Scalars['String']['output'];
+	recipes?: Maybe<Array<Recipe>>;
+	usedIn?: Maybe<Array<Ingredient>>;
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  createItem: Item;
-  deleteItem: Item;
-  updateItem: Item;
+	__typename?: 'Mutation';
+	createItem: Item;
+	deleteItem: Item;
+	updateItem: Item;
 };
-
 
 export type MutationCreateItemArgs = {
-  data: CreateItemInput;
+	data: CreateItemInput;
 };
-
 
 export type MutationDeleteItemArgs = {
-  id: Scalars['ID']['input'];
+	id: Scalars['ID']['input'];
 };
 
-
 export type MutationUpdateItemArgs = {
-  data: UpdateItemInput;
+	data: UpdateItemInput;
 };
 
 export type Query = {
-  __typename?: 'Query';
-  itemById?: Maybe<Item>;
-  itemByName?: Maybe<Item>;
-  items: Array<Item>;
+	__typename?: 'Query';
+	itemById?: Maybe<Item>;
+	itemByName?: Maybe<Item>;
+	items: Array<Item>;
 };
-
 
 export type QueryItemByIdArgs = {
-  id: Scalars['ID']['input'];
+	id: Scalars['ID']['input'];
 };
-
 
 export type QueryItemByNameArgs = {
-  name: Scalars['String']['input'];
+	name: Scalars['String']['input'];
 };
-
 
 export type QueryItemsArgs = {
-  data: QueryItemsInput;
-};
-
-export type QueryItemsInput = {
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  take: Scalars['Int']['input'];
+	search?: InputMaybe<Scalars['String']['input']>;
+	skip: Scalars['Int']['input'];
+	take: Scalars['Int']['input'];
 };
 
 export type Recipe = {
-  __typename?: 'Recipe';
-  id: Scalars['ID']['output'];
-  ingredients: Array<Ingredient>;
-  item: Item;
-  quantity: Scalars['Int']['output'];
-  time: Scalars['Int']['output'];
+	__typename?: 'Recipe';
+	id: Scalars['ID']['output'];
+	ingredients: Array<Ingredient>;
+	item: Item;
+	quantity: Scalars['Int']['output'];
+	time: Scalars['Int']['output'];
 };
 
 export type UpdateItemInput = {
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
+	id: Scalars['ID']['input'];
+	name: Scalars['String']['input'];
 };
-
-
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
 
-
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
-  resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>;
 };
 export type Resolver<TResult, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> = ResolverFn<TResult, TParent, TContext, TArgs> | ResolverWithResolve<TResult, TParent, TContext, TArgs>;
 
-export type ResolverFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Promise<TResult> | TResult;
+export type ResolverFn<TResult, TParent, TContext, TArgs> = (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo) => Promise<TResult> | TResult;
 
-export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
+export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo) => AsyncIterable<TResult> | Promise<AsyncIterable<TResult>>;
 
-export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => TResult | Promise<TResult>;
+export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (parent: TParent, args: TArgs, context: TContext, info: GraphQLResolveInfo) => TResult | Promise<TResult>;
 
-export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
-  subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
-  resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
+export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs>
+{
+	subscribe: SubscriptionSubscribeFn<{ [key in TKey]: TResult }, TParent, TContext, TArgs>;
+	resolve?: SubscriptionResolveFn<TResult, { [key in TKey]: TResult }, TContext, TArgs>;
 }
 
-export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
-  subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>;
-  resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
+export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
+{
+	subscribe: SubscriptionSubscribeFn<any, TParent, TContext, TArgs>;
+	resolve: SubscriptionResolveFn<TResult, any, TContext, TArgs>;
 }
 
-export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
-  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
-  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
+export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> = SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs> | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>;
 
 export type SubscriptionResolver<TResult, TKey extends string, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> =
-  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
-  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
+	| ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+	| SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>;
 
-export type TypeResolveFn<TTypes, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (
-  parent: TParent,
-  context: TContext,
-  info: GraphQLResolveInfo
-) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
+export type TypeResolveFn<TTypes, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (parent: TParent, context: TContext, info: GraphQLResolveInfo) => Maybe<TTypes> | Promise<Maybe<TTypes>>;
 
 export type IsTypeOfResolverFn<T = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>;
 
 export type NextResolverFn<T> = () => Promise<T>;
 
 export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> = (
-  next: NextResolverFn<TResult>,
-  parent: TParent,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo
+	next: NextResolverFn<TResult>,
+	parent: TParent,
+	args: TArgs,
+	context: TContext,
+	info: GraphQLResolveInfo,
 ) => TResult | Promise<TResult>;
-
-
-
-
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  CreateItemInput: CreateItemInput;
-  ID: ResolverTypeWrapper<Scalars['ID']['output']>;
-  Ingredient: ResolverTypeWrapper<Ingredient>;
-  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  Item: ResolverTypeWrapper<Item>;
-  Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
-  Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
-  QueryItemsInput: QueryItemsInput;
-  Recipe: ResolverTypeWrapper<Recipe>;
-  String: ResolverTypeWrapper<Scalars['String']['output']>;
-  UpdateItemInput: UpdateItemInput;
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+	CreateItemInput: CreateItemInput;
+	ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+	Ingredient: ResolverTypeWrapper<Ingredient>;
+	Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+	Item: ResolverTypeWrapper<Item>;
+	Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+	Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
+	Recipe: ResolverTypeWrapper<Recipe>;
+	String: ResolverTypeWrapper<Scalars['String']['output']>;
+	UpdateItemInput: UpdateItemInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Boolean: Scalars['Boolean']['output'];
-  CreateItemInput: CreateItemInput;
-  ID: Scalars['ID']['output'];
-  Ingredient: Ingredient;
-  Int: Scalars['Int']['output'];
-  Item: Item;
-  Mutation: Record<PropertyKey, never>;
-  Query: Record<PropertyKey, never>;
-  QueryItemsInput: QueryItemsInput;
-  Recipe: Recipe;
-  String: Scalars['String']['output'];
-  UpdateItemInput: UpdateItemInput;
+	Boolean: Scalars['Boolean']['output'];
+	CreateItemInput: CreateItemInput;
+	ID: Scalars['ID']['output'];
+	Ingredient: Ingredient;
+	Int: Scalars['Int']['output'];
+	Item: Item;
+	Mutation: Record<PropertyKey, never>;
+	Query: Record<PropertyKey, never>;
+	Recipe: Recipe;
+	String: Scalars['String']['output'];
+	UpdateItemInput: UpdateItemInput;
 };
 
 export type IngredientResolvers<ContextType = any, ParentType extends ResolversParentTypes['Ingredient'] = ResolversParentTypes['Ingredient']> = {
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
-  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  recipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType>;
+	id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
+	quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+	recipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType>;
 };
 
 export type ItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['Item'] = ResolversParentTypes['Item']> = {
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  recipes?: Resolver<Maybe<Array<ResolversTypes['Recipe']>>, ParentType, ContextType>;
-  usedIn?: Resolver<Maybe<Array<ResolversTypes['Ingredient']>>, ParentType, ContextType>;
+	id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+	recipes?: Resolver<Maybe<Array<ResolversTypes['Recipe']>>, ParentType, ContextType>;
+	usedIn?: Resolver<Maybe<Array<ResolversTypes['Ingredient']>>, ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationCreateItemArgs, 'data'>>;
-  deleteItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationDeleteItemArgs, 'id'>>;
-  updateItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationUpdateItemArgs, 'data'>>;
+	createItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationCreateItemArgs, 'data'>>;
+	deleteItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationDeleteItemArgs, 'id'>>;
+	updateItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationUpdateItemArgs, 'data'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
-  itemByName?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByNameArgs, 'name'>>;
-  items?: Resolver<Array<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemsArgs, 'data'>>;
+	itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
+	itemByName?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByNameArgs, 'name'>>;
+	items?: Resolver<Array<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemsArgs, 'skip' | 'take'>>;
 };
 
 export type RecipeResolvers<ContextType = any, ParentType extends ResolversParentTypes['Recipe'] = ResolversParentTypes['Recipe']> = {
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  ingredients?: Resolver<Array<ResolversTypes['Ingredient']>, ParentType, ContextType>;
-  item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
-  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  time?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+	id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+	ingredients?: Resolver<Array<ResolversTypes['Ingredient']>, ParentType, ContextType>;
+	item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
+	quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+	time?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
-  Ingredient?: IngredientResolvers<ContextType>;
-  Item?: ItemResolvers<ContextType>;
-  Mutation?: MutationResolvers<ContextType>;
-  Query?: QueryResolvers<ContextType>;
-  Recipe?: RecipeResolvers<ContextType>;
+	Ingredient?: IngredientResolvers<ContextType>;
+	Item?: ItemResolvers<ContextType>;
+	Mutation?: MutationResolvers<ContextType>;
+	Query?: QueryResolvers<ContextType>;
+	Recipe?: RecipeResolvers<ContextType>;
 };
-

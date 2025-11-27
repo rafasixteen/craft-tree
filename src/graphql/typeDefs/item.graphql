@@ -14,14 +14,8 @@ input UpdateItemInput {
 	name: String!
 }
 
-input QueryItemsInput {
-	skip: Int!
-	take: Int!
-	search: String
-}
-
 extend type Query {
-	items(data: QueryItemsInput!): [Item!]!
+	items(skip: Int!, take: Int!, search: String): [Item!]!
 	itemById(id: ID!): Item
 	itemByName(name: String!): Item
 }

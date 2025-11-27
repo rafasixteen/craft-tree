@@ -5,7 +5,7 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 	Query: {
 		items: async (_parent, args, ctx) =>
 		{
-			const { skip, take, search } = args.data;
+			const { skip, take, search } = args;
 			const hardLimit = 96;
 
 			return ctx.prisma.item.findMany({
