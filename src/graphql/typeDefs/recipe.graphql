@@ -1,0 +1,7 @@
+type Recipe {
+	id: ID!
+	item: Item!
+	quantity: Int!
+	time: Int!
+	ingredients: [Ingredient!]!
+}

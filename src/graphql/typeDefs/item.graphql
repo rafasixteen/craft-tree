@@ -1,0 +1,33 @@
+type Item {
+	id: ID!
+	name: String!
+	recipes: [Recipe!]
+	usedIn: [Ingredient!]
+}
+
+input CreateItemInput {
+	name: String!
+}
+
+input UpdateItemInput {
+	id: ID!
+	name: String!
+}
+
+input QueryItemsInput {
+	skip: Int!
+	take: Int!
+	search: String
+}
+
+extend type Query {
+	items(data: QueryItemsInput!): [Item!]!
+	itemById(id: ID!): Item
+	itemByName(name: String!): Item
+}
+
+extend type Mutation {
+	createItem(data: CreateItemInput!): Item!
+	updateItem(data: UpdateItemInput!): Item!
+	deleteItem(id: ID!): Item!
+}

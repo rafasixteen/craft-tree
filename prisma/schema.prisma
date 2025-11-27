@@ -20,6 +20,7 @@ model Recipe {
   id          String       @id @default(uuid())
   item        Item         @relation(fields: [itemId], references: [id])
   itemId      String
+  quantity    Int
   time        Float
   ingredients Ingredient[]
 

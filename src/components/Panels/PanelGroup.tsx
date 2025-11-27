@@ -12,8 +12,7 @@ export default function PanelGroup({ children, direction = 'horizontal', classNa
 	const style: React.CSSProperties = {
 		display: 'flex',
 		flexDirection: direction === 'horizontal' ? 'row' : 'column',
-		height: '100%',
-		width: '100%',
+		flexGrow: 1,
 	};
 
 	return (

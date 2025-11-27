@@ -1,35 +1,32 @@
 'use server';
 
-import PanelGroup from '../components/PanelGroup';
-import Panel from '../components/Panel';
+import { Panel, PanelGroup } from '@/components/Panels';
 import styles from './page.module.css';
-import Pagination from './_components/Pagination';
-import ItemsList from './_components/ItemsList';
-import SearchBar from './_components/SearchBar';
-import { readItemsQueryParams } from '@/lib/cookies/items-query';
-import { getItems } from '@/lib/api/items';
-import RecipeTree from './_components/RecipeTree';
+import * as Tabs from '@radix-ui/react-tabs';
+import RecipeTree from '@/components/RecipeTree';
 
 export default async function ItemsPage()
 {
-	const { page, limit, search } = await readItemsQueryParams();
-	const { items, totalItems, totalPages } = await getItems({ page, search, limit });
+	const flexGrowStyle = {
+		flexGrow: 1,
+	};
 
 	return (
 		<PanelGroup direction="horizontal" className={styles.panelGroup}>
 			<Panel size={70}>
-				<div className={styles['tree-view']}>
-					<RecipeTree />
-				</div>
+				<Tabs.Root style={flexGrowStyle} className={styles.tabs} defaultValue="recipe">
+					<Tabs.List>
+						<Tabs.Trigger value="recipe">Recipe Tree</Tabs.Trigger>
+						<Tabs.Trigger value="recipes">Recipes</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content style={flexGrowStyle} value="recipe">
+						<RecipeTree />
+					</Tabs.Content>
+					<Tabs.Content value="recipes"></Tabs.Content>
+				</Tabs.Root>
 			</Panel>
 			<Panel size={30}>
-				<div className={styles.sidebar}>
-					<Pagination page={page} />
-
-					<ItemsList items={items} />
-
-					<SearchBar defaultValue={search} />
-				</div>
+				<div className={styles.sidebar}></div>
 			</Panel>
 		</PanelGroup>
 	);
