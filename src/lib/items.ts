@@ -1,4 +1,4 @@
-import { QueryItemsArgs, QueryTotalItemsArgs, MutationDeleteItemArgs, MutationUpdateItemArgs } from '@/graphql/generated/graphql';
+import { QueryItemsArgs, QueryTotalItemsArgs, MutationUpdateItemArgs, CreateItemInput, MutationCreateItemArgs } from '@/graphql/generated/graphql';
 import { graphqlRequest } from './api';
 import { Item } from '@prisma/client';
 
@@ -27,6 +27,20 @@ export async function getTotalItems(args: QueryTotalItemsArgs)
 	return (await graphqlRequest<{ totalItems: number }>(TOTAL_ITEMS_QUERY, args)).totalItems;
 }
 
+export async function createItem(args: MutationCreateItemArgs)
+{
+	const CREATE_ITEM = `
+		mutation CreateItem($data: CreateItemInput!) {
+			createItem(data: $data) {
+				id
+				name
+			}
+		}
+	`;
+
+	return (await graphqlRequest<{ createItem: Item }>(CREATE_ITEM, args)).createItem;
+}
+
 export async function updateItem(args: MutationUpdateItemArgs)
 {
 	const UPDATE_ITEM = `
@@ -38,7 +52,7 @@ export async function updateItem(args: MutationUpdateItemArgs)
 		}
 	`;
 
-	return await graphqlRequest<Item>(UPDATE_ITEM, args);
+	return (await graphqlRequest<{ updateItem: Item }>(UPDATE_ITEM, args)).updateItem;
 }
 
 export async function deleteItem(id: string)
@@ -52,5 +66,5 @@ export async function deleteItem(id: string)
 		}
 	`;
 
-	return await graphqlRequest<{ deleteItem: { id: string } }>(DELETE_ITEM, { id });
+	return (await graphqlRequest<{ deleteItem: Item }>(DELETE_ITEM, { id })).deleteItem;
 }

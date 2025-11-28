@@ -2,6 +2,36 @@ type Recipe {
 	id: ID!
 	item: Item!
 	quantity: Int!
-	time: Int!
+	time: Float!
 	ingredients: [Ingredient!]!
+}
+
+input IngredientInput {
+	itemId: ID!
+	quantity: Int!
+}
+
+input CreateRecipeInput {
+	itemId: ID!
+	quantity: Int!
+	time: Float!
+	ingredients: [IngredientInput!]!
+}
+
+input UpdateRecipeInput {
+	id: ID!
+	quantity: Int
+	time: Float
+	ingredients: [IngredientInput!]
+}
+
+extend type Query {
+	recipes: [Recipe!]!
+	recipeById(id: ID!): Recipe
+}
+
+extend type Mutation {
+	createRecipe(data: CreateRecipeInput!): Recipe!
+	updateRecipe(data: UpdateRecipeInput!): Recipe!
+	deleteRecipe(id: ID!): Recipe!
 }

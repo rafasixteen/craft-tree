@@ -22,7 +22,8 @@
 		"paths": {
 			"@/*": ["*"],
 			"@lib/*": ["lib/*"],
-			"@components/*": ["components/*"]
+			"@components/*": ["components/*"],
+			"@graphql/*": ["graphql/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
