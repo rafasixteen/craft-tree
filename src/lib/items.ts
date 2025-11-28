@@ -1,17 +1,9 @@
-import { QueryItemsArgs, QueryTotalItemsArgs } from '@/graphql/generated/graphql';
+import { QueryItemsArgs, QueryTotalItemsArgs, MutationDeleteItemArgs, MutationUpdateItemArgs } from '@/graphql/generated/graphql';
 import { graphqlRequest } from './api';
 import { Item } from '@prisma/client';
 
-export async function getItems(params: { page: number; pageSize: number; search?: string })
+export async function getItems(args: QueryItemsArgs)
 {
-	const { search, page, pageSize } = params;
-
-	const variables: QueryItemsArgs = {
-		search,
-		skip: (page - 1) * pageSize,
-		take: pageSize,
-	};
-
 	const ITEMS_QUERY = `
 		query Items($search: String!, $skip: Int!, $take: Int!) {
 			items(search: $search, skip: $skip, take: $take) {
@@ -21,7 +13,7 @@ export async function getItems(params: { page: number; pageSize: number; search?
 		}
 	`;
 
-	return (await graphqlRequest<{ items: Item[] }>(ITEMS_QUERY, variables)).items;
+	return (await graphqlRequest<{ items: Item[] }>(ITEMS_QUERY, args)).items;
 }
 
 export async function getTotalItems(args: QueryTotalItemsArgs)
@@ -33,4 +25,32 @@ export async function getTotalItems(args: QueryTotalItemsArgs)
 	`;
 
 	return (await graphqlRequest<{ totalItems: number }>(TOTAL_ITEMS_QUERY, args)).totalItems;
+}
+
+export async function updateItem(args: MutationUpdateItemArgs)
+{
+	const UPDATE_ITEM = `
+		mutation UpdateItem($data: UpdateItemInput!) {
+			updateItem(data: $data) {
+				id
+				name
+			}
+		}
+	`;
+
+	return await graphqlRequest<Item>(UPDATE_ITEM, args);
+}
+
+export async function deleteItem(id: string)
+{
+	const DELETE_ITEM = `
+		mutation DeleteItem($id: ID!) {
+			deleteItem(id: $id) {
+				id
+				name
+			}
+		}
+	`;
+
+	return await graphqlRequest<{ deleteItem: { id: string } }>(DELETE_ITEM, { id });
 }

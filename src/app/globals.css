@@ -7,6 +7,7 @@ body {
 body.root-layout {
 	display: flex;
 	flex-direction: column;
+	height: 100vh;
 }
 
 .header {
@@ -22,4 +23,5 @@ body.root-layout {
 .main {
 	flex: 1;
 	display: flex;
+	min-height: 0;
 }

@@ -1,7 +1,39 @@
 .card {
+	display: flex;
+	align-items: center;
 	border: 1px solid #ccc;
 	border-radius: 8px;
 	padding: 16px;
 	background-color: #fff;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.content {
+	margin-right: auto;
+}
+
+.card svg {
+	align-self: center;
+	cursor: pointer;
+}
+
+.card > input {
+	flex-grow: 1;
+	border: none;
+	background: transparent;
+	font-size: 0.95rem;
+	color: #333;
+	padding: 0;
+	outline: none;
+}
+
+.card > input:not([readonly]) {
+	border-bottom: 1px solid #888;
+	padding-bottom: 2px;
 }

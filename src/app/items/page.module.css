@@ -6,3 +6,13 @@
 	padding: 1rem;
 	background: #f4f4f4;
 }
+
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	justify-content: space-between;
+	margin: 1rem 1rem 1rem 0.5rem;
+	padding: 1rem;
+	background: #f4f4f4;
+}

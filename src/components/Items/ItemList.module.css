@@ -1,12 +1,10 @@
 .item-list {
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
-	gap: 8px;
-}
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	padding-right: 1rem;
 
-.temp-item-card {
-	visibility: hidden;
-	position: absolute;
-	pointer-events: none;
+	flex-grow: 1;
+	overflow-y: scroll;
 }
