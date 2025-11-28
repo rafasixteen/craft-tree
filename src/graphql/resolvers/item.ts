@@ -15,6 +15,14 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 				take: Math.min(take, hardLimit),
 			});
 		},
+		totalItems: async (_parent, args, ctx) =>
+		{
+			const { search } = args;
+
+			return ctx.prisma.item.count({
+				where: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+			});
+		},
 		itemById: async (_parent, args, ctx) => ctx.prisma.item.findUnique({ where: { id: args.id } }),
 		itemByName: async (_parent, args, ctx) => ctx.prisma.item.findUnique({ where: { name: args.name } }),
 	},

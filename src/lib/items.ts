@@ -1,10 +1,6 @@
-import { Item, QueryItemsArgs } from '@/graphql/generated/graphql';
+import { QueryItemsArgs, QueryTotalItemsArgs } from '@/graphql/generated/graphql';
 import { graphqlRequest } from './api';
-
-interface ItemsQueryResponse
-{
-	items: Item[];
-}
+import { Item } from '@prisma/client';
 
 export async function getItems(params: { page: number; pageSize: number; search?: string })
 {
@@ -17,13 +13,24 @@ export async function getItems(params: { page: number; pageSize: number; search?
 	};
 
 	const ITEMS_QUERY = `
-		query Items( $skip: Int!, $take: Int!, $search: String) {
-			items(skip: $skip, take: $take,search: $search) {
+		query Items($search: String!, $skip: Int!, $take: Int!) {
+			items(search: $search, skip: $skip, take: $take) {
 				id
 				name
 			}
 		}
 	`;
 
-	return await graphqlRequest<ItemsQueryResponse>(ITEMS_QUERY, variables);
+	return (await graphqlRequest<{ items: Item[] }>(ITEMS_QUERY, variables)).items;
+}
+
+export async function getTotalItems(args: QueryTotalItemsArgs)
+{
+	const TOTAL_ITEMS_QUERY = `
+		query TotalItems($search: String!) {
+			totalItems(search: $search)
+		}
+	`;
+
+	return (await graphqlRequest<{ totalItems: number }>(TOTAL_ITEMS_QUERY, args)).totalItems;
 }

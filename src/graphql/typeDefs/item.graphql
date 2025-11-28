@@ -16,6 +16,7 @@ input UpdateItemInput {
 
 extend type Query {
 	items(skip: Int!, take: Int!, search: String): [Item!]!
+	totalItems(search: String): Int!
 	itemById(id: ID!): Item
 	itemByName(name: String!): Item
 }

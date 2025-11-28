@@ -7,9 +7,7 @@ import { loadFilesSync } from '@graphql-tools/load-files';
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import path from 'path';
 
-const typesArray = loadFilesSync(path.join(process.cwd(), 'src', 'graphql', 'typeDefs', '**', '*.graphql'), {
-	extensions: ['graphql'],
-});
+const typesArray = loadFilesSync(path.join(process.cwd(), 'src/graphql/typeDefs/**/*.graphql'), { extensions: ['graphql'] });
 export const typeDefs = mergeTypeDefs(typesArray);
 
 const server = new ApolloServer<GraphQLContext>({
@@ -21,4 +19,12 @@ const handler = startServerAndCreateNextHandler<NextRequest, GraphQLContext>(ser
 	context: async (req) => createContext(req),
 });
 
-export { handler as GET, handler as POST };
+export async function GET(req: NextRequest)
+{
+	return handler(req);
+}
+
+export async function POST(req: NextRequest)
+{
+	return handler(req);
+}
