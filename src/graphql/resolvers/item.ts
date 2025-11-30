@@ -15,8 +15,18 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 				take: Math.min(take, hardLimit),
 			});
 		},
-		itemById: async (_parent, args, ctx) => ctx.prisma.item.findUnique({ where: { id: args.id } }),
-		itemByName: async (_parent, args, ctx) => ctx.prisma.item.findUnique({ where: { name: args.name } }),
+		itemById: async (_parent, args, ctx) =>
+		{
+			return ctx.prisma.item.findUnique({
+				where: { id: args.id },
+			});
+		},
+		itemByName: async (_parent, args, ctx) =>
+		{
+			return ctx.prisma.item.findUnique({
+				where: { name: args.name },
+			});
+		},
 	},
 
 	Mutation: {
