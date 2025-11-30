@@ -1,0 +1,8 @@
+type MaterialBill {
+	item: Item!
+	quantity: Int!
+}
+
+extend type Query {
+	billOfMaterials(itemId: ID!): [MaterialBill!]!
+}

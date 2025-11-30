@@ -1,10 +1,12 @@
 import { itemResolvers } from './item';
 import { recipeResolvers } from './recipe';
+import { billOfMaterialsResolvers } from './bill-of-materials';
 
 export const resolvers = {
 	Query: {
 		...itemResolvers.Query,
 		...recipeResolvers.Query,
+		...billOfMaterialsResolvers.Query,
 	},
 	Mutation: {
 		...itemResolvers.Mutation,
@@ -15,8 +17,5 @@ export const resolvers = {
 	},
 	Recipe: {
 		...recipeResolvers.Recipe,
-	},
-	Ingredient: {
-		...recipeResolvers.Ingredient,
 	},
 };

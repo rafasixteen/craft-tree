@@ -1,6 +1,5 @@
 type Ingredient {
 	id: ID!
-	recipe: Recipe!
 	item: Item!
 	quantity: Int!
 }
