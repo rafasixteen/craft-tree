@@ -36,14 +36,4 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 			return ctx.prisma.item.delete({ where: { id: args.id } });
 		},
 	},
-	Item: {
-		recipes: async (parent, _args, ctx) =>
-		{
-			return ctx.prisma.recipe.findMany({ where: { itemId: parent.id } });
-		},
-		usedIn: async (parent, _args, ctx) =>
-		{
-			return ctx.prisma.ingredient.findMany({ where: { itemId: parent.id } });
-		},
-	},
 };

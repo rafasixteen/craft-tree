@@ -8,7 +8,6 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -17,20 +16,6 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-};
-
-export type CraftingRecipeNode = {
-  __typename?: 'CraftingRecipeNode';
-  id: Scalars['ID']['output'];
-  ingredients: Array<CraftingTreeNode>;
-  quantity: Scalars['Int']['output'];
-  time: Scalars['Float']['output'];
-};
-
-export type CraftingTreeNode = {
-  __typename?: 'CraftingTreeNode';
-  item: Item;
-  recipes: Array<CraftingRecipeNode>;
 };
 
 export type CreateItemInput = {
@@ -62,12 +47,6 @@ export type Item = {
   name: Scalars['String']['output'];
   recipes?: Maybe<Array<Recipe>>;
   usedIn?: Maybe<Array<Ingredient>>;
-};
-
-export type MaterialBill = {
-  __typename?: 'MaterialBill';
-  item: Item;
-  quantity: Scalars['Int']['output'];
 };
 
 export type Mutation = {
@@ -113,23 +92,11 @@ export type MutationUpdateRecipeArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  billOfMaterials: Array<MaterialBill>;
-  craftingTree: CraftingTreeNode;
   itemById?: Maybe<Item>;
   itemByName?: Maybe<Item>;
   items: Array<Item>;
   recipe?: Maybe<Recipe>;
   recipes: Array<Recipe>;
-};
-
-
-export type QueryBillOfMaterialsArgs = {
-  itemId: Scalars['ID']['input'];
-};
-
-
-export type QueryCraftingTreeArgs = {
-  itemId: Scalars['ID']['input'];
 };
 
 
@@ -248,8 +215,6 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
-  CraftingRecipeNode: ResolverTypeWrapper<Omit<CraftingRecipeNode, 'ingredients'> & { ingredients: Array<ResolversTypes['CraftingTreeNode']> }>;
-  CraftingTreeNode: ResolverTypeWrapper<Omit<CraftingTreeNode, 'item' | 'recipes'> & { item: ResolversTypes['Item'], recipes: Array<ResolversTypes['CraftingRecipeNode']> }>;
   CreateItemInput: CreateItemInput;
   CreateRecipeInput: CreateRecipeInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
@@ -258,7 +223,6 @@ export type ResolversTypes = {
   IngredientInput: IngredientInput;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Item: ResolverTypeWrapper<PrismaItem>;
-  MaterialBill: ResolverTypeWrapper<Omit<MaterialBill, 'item'> & { item: ResolversTypes['Item'] }>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Recipe: ResolverTypeWrapper<PrismaRecipe>;
@@ -270,8 +234,6 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
-  CraftingRecipeNode: Omit<CraftingRecipeNode, 'ingredients'> & { ingredients: Array<ResolversParentTypes['CraftingTreeNode']> };
-  CraftingTreeNode: Omit<CraftingTreeNode, 'item' | 'recipes'> & { item: ResolversParentTypes['Item'], recipes: Array<ResolversParentTypes['CraftingRecipeNode']> };
   CreateItemInput: CreateItemInput;
   CreateRecipeInput: CreateRecipeInput;
   Float: Scalars['Float']['output'];
@@ -280,25 +242,12 @@ export type ResolversParentTypes = {
   IngredientInput: IngredientInput;
   Int: Scalars['Int']['output'];
   Item: PrismaItem;
-  MaterialBill: Omit<MaterialBill, 'item'> & { item: ResolversParentTypes['Item'] };
   Mutation: Record<PropertyKey, never>;
   Query: Record<PropertyKey, never>;
   Recipe: PrismaRecipe;
   String: Scalars['String']['output'];
   UpdateItemInput: UpdateItemInput;
   UpdateRecipeInput: UpdateRecipeInput;
-};
-
-export type CraftingRecipeNodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CraftingRecipeNode'] = ResolversParentTypes['CraftingRecipeNode']> = {
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  ingredients?: Resolver<Array<ResolversTypes['CraftingTreeNode']>, ParentType, ContextType>;
-  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  time?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
-};
-
-export type CraftingTreeNodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CraftingTreeNode'] = ResolversParentTypes['CraftingTreeNode']> = {
-  item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
-  recipes?: Resolver<Array<ResolversTypes['CraftingRecipeNode']>, ParentType, ContextType>;
 };
 
 export type IngredientResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Ingredient'] = ResolversParentTypes['Ingredient']> = {
@@ -314,11 +263,6 @@ export type ItemResolvers<ContextType = GraphQLContext, ParentType extends Resol
   usedIn?: Resolver<Maybe<Array<ResolversTypes['Ingredient']>>, ParentType, ContextType>;
 };
 
-export type MaterialBillResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['MaterialBill'] = ResolversParentTypes['MaterialBill']> = {
-  item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
-  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-};
-
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationCreateItemArgs, 'data'>>;
   createRecipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType, RequireFields<MutationCreateRecipeArgs, 'data'>>;
@@ -329,8 +273,6 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  billOfMaterials?: Resolver<Array<ResolversTypes['MaterialBill']>, ParentType, ContextType, RequireFields<QueryBillOfMaterialsArgs, 'itemId'>>;
-  craftingTree?: Resolver<ResolversTypes['CraftingTreeNode'], ParentType, ContextType, RequireFields<QueryCraftingTreeArgs, 'itemId'>>;
   itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
   itemByName?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByNameArgs, 'name'>>;
   items?: Resolver<Array<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemsArgs, 'skip' | 'take'>>;
@@ -347,11 +289,8 @@ export type RecipeResolvers<ContextType = GraphQLContext, ParentType extends Res
 };
 
 export type Resolvers<ContextType = GraphQLContext> = {
-  CraftingRecipeNode?: CraftingRecipeNodeResolvers<ContextType>;
-  CraftingTreeNode?: CraftingTreeNodeResolvers<ContextType>;
   Ingredient?: IngredientResolvers<ContextType>;
   Item?: ItemResolvers<ContextType>;
-  MaterialBill?: MaterialBillResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Recipe?: RecipeResolvers<ContextType>;
