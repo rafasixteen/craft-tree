@@ -1,0 +1,14 @@
+type CraftingNode {
+	item: Item!
+	recipes: [RecipeNode!]!
+}
+
+type RecipeNode {
+	quantity: Int!
+	time: Float!
+	ingredients: [CraftingNode!]!
+}
+
+type Query {
+	craftingTree(itemId: ID!): CraftingNode!
+}

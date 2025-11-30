@@ -8,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -16,6 +17,12 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+};
+
+export type CraftingNode = {
+  __typename?: 'CraftingNode';
+  item: Item;
+  recipes: Array<RecipeNode>;
 };
 
 export type CreateItemInput = {
@@ -34,7 +41,6 @@ export type Ingredient = {
   id: Scalars['ID']['output'];
   item: Item;
   quantity: Scalars['Int']['output'];
-  recipe: Recipe;
 };
 
 export type IngredientInput = {
@@ -88,16 +94,22 @@ export type MutationUpdateItemArgs = {
 
 export type MutationUpdateRecipeArgs = {
   data: UpdateRecipeInput;
+  id: Scalars['ID']['input'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  craftingTree: CraftingNode;
   itemById?: Maybe<Item>;
   itemByName?: Maybe<Item>;
   items: Array<Item>;
-  recipeById?: Maybe<Recipe>;
+  recipe?: Maybe<Recipe>;
   recipes: Array<Recipe>;
-  totalItems: Scalars['Int']['output'];
+};
+
+
+export type QueryCraftingTreeArgs = {
+  itemId: Scalars['ID']['input'];
 };
 
 
@@ -118,13 +130,8 @@ export type QueryItemsArgs = {
 };
 
 
-export type QueryRecipeByIdArgs = {
+export type QueryRecipeArgs = {
   id: Scalars['ID']['input'];
-};
-
-
-export type QueryTotalItemsArgs = {
-  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Recipe = {
@@ -136,13 +143,19 @@ export type Recipe = {
   time: Scalars['Float']['output'];
 };
 
+export type RecipeNode = {
+  __typename?: 'RecipeNode';
+  ingredients: Array<CraftingNode>;
+  quantity: Scalars['Int']['output'];
+  time: Scalars['Float']['output'];
+};
+
 export type UpdateItemInput = {
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
 };
 
 export type UpdateRecipeInput = {
-  id: Scalars['ID']['input'];
   ingredients?: InputMaybe<Array<IngredientInput>>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
   time?: InputMaybe<Scalars['Float']['input']>;
@@ -222,6 +235,7 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CraftingNode: ResolverTypeWrapper<Omit<CraftingNode, 'item' | 'recipes'> & { item: ResolversTypes['Item'], recipes: Array<ResolversTypes['RecipeNode']> }>;
   CreateItemInput: CreateItemInput;
   CreateRecipeInput: CreateRecipeInput;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
@@ -233,6 +247,7 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Recipe: ResolverTypeWrapper<PrismaRecipe>;
+  RecipeNode: ResolverTypeWrapper<Omit<RecipeNode, 'ingredients'> & { ingredients: Array<ResolversTypes['CraftingNode']> }>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   UpdateItemInput: UpdateItemInput;
   UpdateRecipeInput: UpdateRecipeInput;
@@ -241,6 +256,7 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
+  CraftingNode: Omit<CraftingNode, 'item' | 'recipes'> & { item: ResolversParentTypes['Item'], recipes: Array<ResolversParentTypes['RecipeNode']> };
   CreateItemInput: CreateItemInput;
   CreateRecipeInput: CreateRecipeInput;
   Float: Scalars['Float']['output'];
@@ -252,16 +268,21 @@ export type ResolversParentTypes = {
   Mutation: Record<PropertyKey, never>;
   Query: Record<PropertyKey, never>;
   Recipe: PrismaRecipe;
+  RecipeNode: Omit<RecipeNode, 'ingredients'> & { ingredients: Array<ResolversParentTypes['CraftingNode']> };
   String: Scalars['String']['output'];
   UpdateItemInput: UpdateItemInput;
   UpdateRecipeInput: UpdateRecipeInput;
+};
+
+export type CraftingNodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['CraftingNode'] = ResolversParentTypes['CraftingNode']> = {
+  item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
+  recipes?: Resolver<Array<ResolversTypes['RecipeNode']>, ParentType, ContextType>;
 };
 
 export type IngredientResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Ingredient'] = ResolversParentTypes['Ingredient']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
   quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  recipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType>;
 };
 
 export type ItemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Item'] = ResolversParentTypes['Item']> = {
@@ -277,16 +298,16 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationDeleteItemArgs, 'id'>>;
   deleteRecipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType, RequireFields<MutationDeleteRecipeArgs, 'id'>>;
   updateItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationUpdateItemArgs, 'data'>>;
-  updateRecipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType, RequireFields<MutationUpdateRecipeArgs, 'data'>>;
+  updateRecipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType, RequireFields<MutationUpdateRecipeArgs, 'data' | 'id'>>;
 };
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  craftingTree?: Resolver<ResolversTypes['CraftingNode'], ParentType, ContextType, RequireFields<QueryCraftingTreeArgs, 'itemId'>>;
   itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
   itemByName?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByNameArgs, 'name'>>;
   items?: Resolver<Array<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemsArgs, 'skip' | 'take'>>;
-  recipeById?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeByIdArgs, 'id'>>;
+  recipe?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeArgs, 'id'>>;
   recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
-  totalItems?: Resolver<ResolversTypes['Int'], ParentType, ContextType, Partial<QueryTotalItemsArgs>>;
 };
 
 export type RecipeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Recipe'] = ResolversParentTypes['Recipe']> = {
@@ -297,11 +318,19 @@ export type RecipeResolvers<ContextType = GraphQLContext, ParentType extends Res
   time?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 
+export type RecipeNodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['RecipeNode'] = ResolversParentTypes['RecipeNode']> = {
+  ingredients?: Resolver<Array<ResolversTypes['CraftingNode']>, ParentType, ContextType>;
+  quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  time?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = GraphQLContext> = {
+  CraftingNode?: CraftingNodeResolvers<ContextType>;
   Ingredient?: IngredientResolvers<ContextType>;
   Item?: ItemResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Recipe?: RecipeResolvers<ContextType>;
+  RecipeNode?: RecipeNodeResolvers<ContextType>;
 };
 

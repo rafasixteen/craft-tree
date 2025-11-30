@@ -19,7 +19,6 @@ input CreateRecipeInput {
 }
 
 input UpdateRecipeInput {
-	id: ID!
 	quantity: Int
 	time: Float
 	ingredients: [IngredientInput!]
@@ -27,11 +26,11 @@ input UpdateRecipeInput {
 
 extend type Query {
 	recipes: [Recipe!]!
-	recipeById(id: ID!): Recipe
+	recipe(id: ID!): Recipe
 }
 
 extend type Mutation {
 	createRecipe(data: CreateRecipeInput!): Recipe!
-	updateRecipe(data: UpdateRecipeInput!): Recipe!
+	updateRecipe(id: ID!, data: UpdateRecipeInput!): Recipe!
 	deleteRecipe(id: ID!): Recipe!
 }

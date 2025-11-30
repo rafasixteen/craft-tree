@@ -15,16 +15,18 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 				take: Math.min(take, hardLimit),
 			});
 		},
-		totalItems: async (_parent, args, ctx) =>
+		itemById: async (_parent, args, ctx) =>
 		{
-			const { search } = args;
-
-			return ctx.prisma.item.count({
-				where: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+			return ctx.prisma.item.findUnique({
+				where: { id: args.id },
 			});
 		},
-		itemById: async (_parent, args, ctx) => ctx.prisma.item.findUnique({ where: { id: args.id } }),
-		itemByName: async (_parent, args, ctx) => ctx.prisma.item.findUnique({ where: { name: args.name } }),
+		itemByName: async (_parent, args, ctx) =>
+		{
+			return ctx.prisma.item.findUnique({
+				where: { name: args.name },
+			});
+		},
 	},
 
 	Mutation: {
@@ -42,14 +44,6 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 		deleteItem: async (_parent, args, ctx) =>
 		{
 			return ctx.prisma.item.delete({ where: { id: args.id } });
-		},
-	},
-	Item: {
-		recipes: async (parent, _args, ctx) => {
-			return ctx.prisma.recipe.findMany({ where: { itemId: parent.id } });
-		},
-		usedIn: async (parent, _args, ctx) => {
-			return ctx.prisma.ingredient.findMany({ where: { itemId: parent.id } });
 		},
 	},
 };
