@@ -5,7 +5,7 @@ import styles from './ItemList.module.css';
 import ItemCard from './ItemCard';
 import { getItems, deleteItem, createItem, updateItem } from '@/lib/items';
 import { useRef, useState } from 'react';
-import { Item } from '@prisma/client';
+import type { Item } from '@/graphql/generated/graphql';
 
 interface ItemListProps
 {

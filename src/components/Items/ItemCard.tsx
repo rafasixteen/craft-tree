@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Item } from '@prisma/client';
+import type { Item } from '@/graphql/generated/graphql';
 import { Pencil1Icon, TrashIcon, CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import styles from './ItemCard.module.css';
 

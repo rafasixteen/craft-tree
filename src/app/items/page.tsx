@@ -5,7 +5,7 @@ import { ItemList } from '@components/Items';
 import { SearchBar } from '@/components/SearchBar';
 import styles from './page.module.css';
 import * as Tabs from '@radix-ui/react-tabs';
-import { CraftingTree } from '@/components/Crafting Tree';
+import { RecipeTree } from '@/components/RecipeTree';
 
 export default async function ItemsPage({ searchParams }: { searchParams?: Promise<{ search?: string; selectedItemId?: string }> })
 {
@@ -26,7 +26,7 @@ export default async function ItemsPage({ searchParams }: { searchParams?: Promi
 						<Tabs.Trigger value="recipes">Recipes</Tabs.Trigger>
 					</Tabs.List>
 					<Tabs.Content style={flexGrowStyle} value="recipe">
-						<CraftingTree itemId={selectedItemId} />
+						<RecipeTree itemId={selectedItemId} />
 					</Tabs.Content>
 					<Tabs.Content value="recipes"></Tabs.Content>
 				</Tabs.Root>

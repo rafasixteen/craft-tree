@@ -1,8 +1,8 @@
 type Item {
 	id: ID!
 	name: String!
-	recipes: [Recipe!]
-	usedIn: [Ingredient!]
+	recipes: [Recipe!]!
+	usedIn: [Ingredient!]!
 }
 
 input CreateItemInput {

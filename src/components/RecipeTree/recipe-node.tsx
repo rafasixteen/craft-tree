@@ -1,51 +1,48 @@
 'use client';
 
 import { Handle, Position, type Node, type NodeProps } from '@xyflow/react';
-import { Item, Recipe } from '@/graphql/generated/graphql';
+import { Item } from '@/graphql/generated/graphql';
 import { useEffect, useState } from 'react';
 import { getItemById } from '@/lib/items';
 import styles from './recipe-node.module.css';
 
-type RecipeNodeData = {
-	itemId: string;
+export type RecipeNodeData = {
+	item: Item;
 	isRoot: boolean;
-	onRecipeChanged: (recipeIndex: number) => void;
+	currentRecipeIndex: number;
 };
 
-type RecipeNode = Node<RecipeNodeData>;
+export type RecipeNodeType = Node<RecipeNodeData>;
 
-export default function RecipeNode({ data }: NodeProps<RecipeNode>)
+export default function RecipeNode({ data }: NodeProps<RecipeNodeType>)
 {
-	const [item, setItem] = useState<Item | null>(null);
-	const [currentIndex, setCurrentIndex] = useState(0);
+	const [recipeIndex, setRecipeIndex] = useState(data.currentRecipeIndex);
 
 	useEffect(() =>
 	{
-		getItemById(data.itemId).then((fetched) => setItem(fetched));
-	}, [data.itemId]);
+		data.currentRecipeIndex = recipeIndex;
+	}, [data, recipeIndex]);
 
-	if (!item) return <div className={styles.node}>Loading...</div>;
-
-	const recipes = item.recipes ?? [];
-	const recipe = recipes[currentIndex];
-
-	const nextRecipe = () =>
+	function prevRecipe()
 	{
-		let nextIndex = (currentIndex + 1) % recipes.length;
-		setCurrentIndex(nextIndex);
-		data.onRecipeChanged(nextIndex);
-	};
+		const prevIndex = (recipeIndex - 1 + recipes.length) % recipes.length;
+		setRecipeIndex(prevIndex);
+	}
 
-	const prevRecipe = () =>
+	function nextRecipe()
 	{
-		let prevIndex = (currentIndex - 1 + recipes.length) % recipes.length;
-		setCurrentIndex(prevIndex);
-		data.onRecipeChanged(prevIndex);
-	};
+		const nextIndex = (recipeIndex + 1) % recipes.length;
+		setRecipeIndex(nextIndex);
+	}
+
+	if (!data.item) return <div className={styles.node}>Loading...</div>;
+
+	const recipes = data.item.recipes;
+	const recipe = recipes[recipeIndex];
 
 	return (
 		<div className={styles.node}>
-			<p> {item.name}</p>
+			<p> {data.item.name}</p>
 
 			{recipe && (
 				<div className={styles.recipe}>
@@ -68,7 +65,7 @@ export default function RecipeNode({ data }: NodeProps<RecipeNode>)
 				<div className={styles.carouselControls}>
 					<button onClick={prevRecipe}>&lt;</button>
 					<span>
-						{currentIndex + 1}/{recipes.length}
+						{recipeIndex + 1}/{recipes.length}
 					</span>
 					<button onClick={nextRecipe}>&gt;</button>
 				</div>

@@ -52,8 +52,8 @@ export type Item = {
   __typename?: 'Item';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
-  recipes?: Maybe<Array<Recipe>>;
-  usedIn?: Maybe<Array<Ingredient>>;
+  recipes: Array<Recipe>;
+  usedIn: Array<Ingredient>;
 };
 
 export type Mutation = {
@@ -288,8 +288,8 @@ export type IngredientResolvers<ContextType = GraphQLContext, ParentType extends
 export type ItemResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Item'] = ResolversParentTypes['Item']> = {
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  recipes?: Resolver<Maybe<Array<ResolversTypes['Recipe']>>, ParentType, ContextType>;
-  usedIn?: Resolver<Maybe<Array<ResolversTypes['Ingredient']>>, ParentType, ContextType>;
+  recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
+  usedIn?: Resolver<Array<ResolversTypes['Ingredient']>, ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
