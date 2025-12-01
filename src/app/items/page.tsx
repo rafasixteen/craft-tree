@@ -5,12 +5,13 @@ import { ItemList } from '@components/Items';
 import { SearchBar } from '@/components/SearchBar';
 import styles from './page.module.css';
 import * as Tabs from '@radix-ui/react-tabs';
-import RecipeTree from '@/components/RecipeTree';
+import { CraftingTree } from '@/components/Crafting Tree';
 
-export default async function ItemsPage({ searchParams }: { searchParams?: Promise<{ search?: string }> })
+export default async function ItemsPage({ searchParams }: { searchParams?: Promise<{ search?: string; selectedItemId?: string }> })
 {
 	const params = await searchParams;
 	const search = params?.search ?? '';
+	const selectedItemId = params?.selectedItemId ?? '';
 
 	const flexGrowStyle = {
 		flexGrow: 1,
@@ -25,7 +26,7 @@ export default async function ItemsPage({ searchParams }: { searchParams?: Promi
 						<Tabs.Trigger value="recipes">Recipes</Tabs.Trigger>
 					</Tabs.List>
 					<Tabs.Content style={flexGrowStyle} value="recipe">
-						<RecipeTree />
+						<CraftingTree itemId={selectedItemId} />
 					</Tabs.Content>
 					<Tabs.Content value="recipes"></Tabs.Content>
 				</Tabs.Root>

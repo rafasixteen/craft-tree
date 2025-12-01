@@ -1,6 +1,5 @@
-import { QueryItemsArgs, QueryTotalItemsArgs, MutationUpdateItemArgs, CreateItemInput, MutationCreateItemArgs } from '@/graphql/generated/graphql';
+import { QueryItemsArgs, MutationUpdateItemArgs, MutationCreateItemArgs, Item } from '@/graphql/generated/graphql';
 import { graphqlRequest } from './api';
-import { Item } from '@prisma/client';
 
 export async function getItems(args: QueryItemsArgs)
 {
@@ -16,15 +15,35 @@ export async function getItems(args: QueryItemsArgs)
 	return (await graphqlRequest<{ items: Item[] }>(ITEMS_QUERY, args)).items;
 }
 
-export async function getTotalItems(args: QueryTotalItemsArgs)
+export async function getItemById(id: string)
 {
-	const TOTAL_ITEMS_QUERY = `
-		query TotalItems($search: String!) {
-			totalItems(search: $search)
+	const ITEM_QUERY = `
+		query ItemById($id: ID!) {
+			itemById(id: $id) {
+				id
+				name
+				recipes {
+					id
+					item {
+						id
+						name
+					}
+					quantity
+					time
+					ingredients {
+						id
+						item {
+							id 
+							name
+						}
+						quantity
+					}
+				}
+			}
 		}
 	`;
 
-	return (await graphqlRequest<{ totalItems: number }>(TOTAL_ITEMS_QUERY, args)).totalItems;
+	return (await graphqlRequest<{ itemById: Item }>(ITEM_QUERY, { id })).itemById;
 }
 
 export async function createItem(args: MutationCreateItemArgs)

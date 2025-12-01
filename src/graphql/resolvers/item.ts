@@ -19,12 +19,36 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 		{
 			return ctx.prisma.item.findUnique({
 				where: { id: args.id },
+				include: {
+					recipes: {
+						include: {
+							item: true,
+							ingredients: {
+								include: {
+									item: true,
+								},
+							},
+						},
+					},
+				},
 			});
 		},
 		itemByName: async (_parent, args, ctx) =>
 		{
 			return ctx.prisma.item.findUnique({
 				where: { name: args.name },
+				include: {
+					recipes: {
+						include: {
+							item: true,
+							ingredients: {
+								include: {
+									item: true,
+								},
+							},
+						},
+					},
+				},
 			});
 		},
 	},

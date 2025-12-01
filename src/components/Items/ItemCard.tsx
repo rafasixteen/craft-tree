@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Item } from '@prisma/client';
 import { Pencil1Icon, TrashIcon, CheckIcon, Cross2Icon } from '@radix-ui/react-icons';
 import styles from './ItemCard.module.css';
@@ -19,6 +20,19 @@ export default function ItemCard({ item, isEditing, onDelete, setEditing, saveIt
 {
 	const [name, setName] = useState(item.name);
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	const router = useRouter();
+	const searchParams = useSearchParams();
+
+	function handleSelect()
+	{
+		if (isEditing) return;
+
+		const params = new URLSearchParams(searchParams.toString());
+		params.set('selectedItemId', item.id);
+
+		router.push(`?${params.toString()}`);
+	}
 
 	useEffect(() =>
 	{
@@ -50,7 +64,7 @@ export default function ItemCard({ item, isEditing, onDelete, setEditing, saveIt
 	}
 
 	return (
-		<div className={styles.card}>
+		<div className={styles.card} onClick={handleSelect}>
 			<input ref={inputRef} className={styles.input} value={name} onChange={(e) => setName(e.target.value)} readOnly={!isEditing} onKeyDown={handleKeyDown} placeholder="New Item" />
 
 			<div className={styles.actions}>
