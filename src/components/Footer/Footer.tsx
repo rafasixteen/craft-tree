@@ -1,4 +1,4 @@
 export default function Footer()
 {
-	return <div>&copy; {new Date().getFullYear()} Craft Tree. All rights reserved.</div>;
+	return <footer className="flex items-center justify-center px-4 py-2 border-t">&copy; {new Date().getFullYear()} Craft Tree. All rights reserved.</footer>;
 }

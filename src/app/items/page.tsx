@@ -1,43 +1,21 @@
-'use server';
+import ItemListV2 from '@/components/Items/ItemListV2';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
-import { Panel, PanelGroup } from '@components/Panels';
-import { ItemList } from '@components/Items';
-import { SearchBar } from '@/components/SearchBar';
-import styles from './page.module.css';
-import * as Tabs from '@radix-ui/react-tabs';
-import { RecipeTree } from '@/components/RecipeTree';
-
-export default async function ItemsPage({ searchParams }: { searchParams?: Promise<{ search?: string; selectedItemId?: string }> })
+export default function ItemsPage()
 {
-	const params = await searchParams;
-	const search = params?.search ?? '';
-	const selectedItemId = params?.selectedItemId ?? '';
-
-	const flexGrowStyle = {
-		flexGrow: 1,
-	};
-
 	return (
-		<PanelGroup direction="horizontal" className={styles.panelGroup}>
-			<Panel size={70}>
-				<Tabs.Root style={flexGrowStyle} className={styles.tabs} defaultValue="recipe">
-					<Tabs.List>
-						<Tabs.Trigger value="recipe">Recipe Tree</Tabs.Trigger>
-						<Tabs.Trigger value="recipes">Recipes</Tabs.Trigger>
-					</Tabs.List>
-					<Tabs.Content style={flexGrowStyle} value="recipe">
-						<RecipeTree itemId={selectedItemId} />
-					</Tabs.Content>
-					<Tabs.Content value="recipes"></Tabs.Content>
-				</Tabs.Root>
-			</Panel>
-
-			<Panel size={30}>
-				<div className={styles.sidebar}>
-					<ItemList search={search} />
-					<SearchBar />
+		<ResizablePanelGroup direction="horizontal">
+			<ResizablePanel minSize={25} defaultSize={25}>
+				<div className="">
+					<ItemListV2 />
 				</div>
-			</Panel>
-		</PanelGroup>
+			</ResizablePanel>
+			<ResizableHandle withHandle />
+			<ResizablePanel minSize={40} defaultSize={75}>
+				<div className="flex h-full items-center justify-center p-6">
+					<span className="font-semibold">2</span>
+				</div>
+			</ResizablePanel>
+		</ResizablePanelGroup>
 	);
 }
