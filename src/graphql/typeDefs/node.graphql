@@ -1,0 +1,43 @@
+enum NodeType {
+	folder
+	item
+	recipe
+}
+
+type Node {
+	id: ID!
+	name: String!
+
+	type: NodeType!
+	resourceId: ID
+
+	parentId: ID
+	parent: Node
+	children: [Node!]
+	order: Int!
+}
+
+input CreateNodeInput {
+	name: String!
+	type: NodeType!
+	parentId: ID # Optional: null = create root node
+	resourceId: ID # Only used when type = item or recipe
+	order: Int
+}
+
+input UpdateNodeInput {
+	name: String
+	parentId: ID
+	order: Int
+}
+
+extend type Query {
+	rootNodes: [Node!]!
+	nodeById(id: ID!): Node
+}
+
+extend type Mutation {
+	createNode(data: CreateNodeInput!): Node!
+	updateNode(id: ID!, data: UpdateNodeInput!): Node!
+	deleteNode(id: ID!): Node!
+}

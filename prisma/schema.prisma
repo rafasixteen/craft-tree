@@ -37,3 +37,26 @@ model Ingredient {
   @@unique(name: "itemId_quantity", fields: [itemId, quantity])
   @@map("Ingredients")
 }
+
+model Node {
+  id   String @id @default(uuid())
+  name String
+
+  type       NodeType
+  resourceId String?
+
+  parentId String?
+  parent   Node?   @relation("NodeToChildren", fields: [parentId], references: [id])
+  children Node[]  @relation("NodeToChildren")
+  order    Int
+
+  @@index([parentId, order])
+  @@index([type, resourceId])
+  @@map("Nodes")
+}
+
+enum NodeType {
+  folder
+  item
+  recipe
+}

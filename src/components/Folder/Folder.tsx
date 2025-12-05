@@ -37,7 +37,7 @@ export function Folder<T>({ item, ...props }: FolderProps<T>)
 	return (
 		<div
 			{...props}
-			className={`relative flex justify-between items-center cursor-pointer group px-2 py-1 rounded transition-colors 
+			className={`relative flex justify-between items-center cursor-pointer group px-2 py-1 transition-colors 
         ${item.isSelected() ? 'bg-primary/10' : ''}
         ${isMenuOpen ? 'bg-muted/50' : ''} 
         hover:bg-muted/50`}

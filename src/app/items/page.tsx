@@ -1,4 +1,4 @@
-import ItemListV2 from '@/components/Items/ItemListV2';
+import ItemListV3 from '@/components/Items/ItemListV3';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 export default function ItemsPage()
@@ -6,8 +6,8 @@ export default function ItemsPage()
 	return (
 		<ResizablePanelGroup direction="horizontal">
 			<ResizablePanel minSize={25} defaultSize={25}>
-				<div className="">
-					<ItemListV2 />
+				<div>
+					<ItemListV3 />
 				</div>
 			</ResizablePanel>
 			<ResizableHandle withHandle />
