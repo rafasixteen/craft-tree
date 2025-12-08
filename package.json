@@ -2,16 +2,9 @@
 	"name": "craft-tree",
 	"version": "0.1.0",
 	"private": true,
-	"type": "module",
 	"scripts": {
 		"dev": "next dev --turbopack",
-		"build": "next build",
-		"start": "next start",
-		"start:migrate:prod": "node server.js",
-		"lint": "next lint",
-		"docker:dev": "npm run dev",
-		"docker:compose:dev": "docker-compose down && docker compose up -d --build",
-		"docker:compose:prod": "docker-compose down && docker compose -f docker-compose.prod.yml up -d --build",
+		"dev:all": "concurrently \"npm run dev\" \"npm run codegen:watch\"",
 		"codegen:watch": "graphql-codegen --watch"
 	},
 	"dependencies": {
@@ -46,8 +39,7 @@
 		"sharp": "0.32.6",
 		"swr": "^2.3.6",
 		"tailwind-merge": "^3.4.0",
-		"tailwindcss": "^4.1.17",
-		"zod": "^4.1.12"
+		"tailwindcss": "^4.1.17"
 	},
 	"devDependencies": {
 		"@graphql-codegen/cli": "^6.1.0",
@@ -58,6 +50,7 @@
 		"@types/node": "^20.19.25",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.7",
+		"concurrently": "^9.2.1",
 		"eslint": "^8",
 		"eslint-config-next": "14.0.4",
 		"prettier": "^3.6.2",

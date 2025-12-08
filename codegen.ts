@@ -1,11 +1,10 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
-import path from 'path';
 
 const config: CodegenConfig = {
-	schema: path.join(process.cwd(), 'src', 'graphql', 'typeDefs', '**', '*.graphql').replace(/\\/g, '/'),
+	schema: 'src/graphql/typeDefs/**/*.{graphql,gql}',
 	documents: 'src/**/*.{ts,tsx,js,jsx,graphql}',
 	generates: {
-		'./src/graphql/generated/graphql.ts': {
+		'./generated/graphql/types.ts': {
 			plugins: ['typescript', 'typescript-resolvers'],
 			config: {
 				mappers: {
