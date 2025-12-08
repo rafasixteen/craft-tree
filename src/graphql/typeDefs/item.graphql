@@ -10,7 +10,6 @@ input CreateItemInput {
 }
 
 input UpdateItemInput {
-	id: ID!
 	name: String!
 }
 
@@ -22,6 +21,6 @@ extend type Query {
 
 extend type Mutation {
 	createItem(data: CreateItemInput!): Item!
-	updateItem(data: UpdateItemInput!): Item!
+	updateItem(id: ID!, data: UpdateItemInput!): Item!
 	deleteItem(id: ID!): Item!
 }

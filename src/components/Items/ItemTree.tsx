@@ -1,0 +1,225 @@
+'use client';
+
+import { Tree, NodeApi, TreeApi } from 'react-arborist';
+import { useRef, useState, useEffect } from 'react';
+import { Button } from '@components/ui/button';
+import { Plus, Search } from 'lucide-react';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { useResizeObserver } from '@/hooks/use-resize-observer';
+import { createNode, deleteNode, getRootNodes, updateNode } from '@/lib/graphql/nodes';
+import { Node } from '@/graphql/generated/graphql';
+import { createItem, deleteItem, updateItem } from '@/lib/graphql/items';
+import { createRecipe, deleteRecipe } from '@/lib/graphql/recipes';
+import { RowRenderer, NodeRenderer } from '@components/Items';
+
+export default function ItemTree()
+{
+	const [search, setSearch] = useState('');
+	const [treeData, setTreeData] = useState<Node[]>([]);
+
+	const treeRef = useRef<TreeApi<Node>>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	const { width, height } = useResizeObserver({
+		ref: containerRef,
+	});
+
+	async function refreshTree()
+	{
+		const nodes = await getRootNodes(['id', 'name', 'type', 'resourceId', 'parentId', 'order'], 16);
+		setTreeData(nodes);
+	}
+
+	async function createRootNode()
+	{
+		const tree = treeRef.current;
+
+		if (tree)
+		{
+			tree.create({
+				type: 'internal',
+				parentId: null,
+			});
+		}
+	}
+
+	useEffect(() =>
+	{
+		refreshTree();
+	}, []);
+
+	async function onCreate({ parentId, parentNode, index, type }: { parentId: string | null; parentNode: NodeApi<Node> | null; index: number; type: 'internal' | 'leaf' })
+	{
+		let newNodeId: string;
+
+		if (parentNode === null)
+		{
+			const newNode = await createNode(
+				{
+					data: {
+						name: 'New Folder',
+						type: 'folder',
+					},
+				},
+				['id'],
+			);
+
+			newNodeId = newNode.id;
+		}
+		else
+		{
+			if (parentNode.data.type === 'folder')
+			{
+				const newItem = await createItem(
+					{
+						data: {
+							name: 'New Item',
+						},
+					},
+					['id', 'name'],
+				);
+
+				const newNode = await createNode(
+					{
+						data: {
+							name: newItem.name,
+							type: 'item',
+							resourceId: newItem.id,
+							parentId: parentId,
+						},
+					},
+					['id'],
+				);
+
+				newNodeId = newNode.id;
+			}
+			else if (parentNode.data.type === 'item')
+			{
+				const newRecipe = await createRecipe(
+					{
+						data: {
+							itemId: parentNode.data.resourceId!,
+							quantity: 1,
+							time: 1,
+						},
+					},
+					['id'],
+				);
+
+				const newNode = await createNode(
+					{
+						data: {
+							name: 'New Recipe',
+							type: 'recipe',
+							resourceId: newRecipe.id,
+							parentId: parentId,
+						},
+					},
+					['id'],
+				);
+
+				newNodeId = newNode.id;
+			}
+			else
+			{
+				throw new Error(`Cannot create child node under parent of type ${parentNode.data.type}`);
+			}
+		}
+
+		refreshTree();
+		return newNodeId;
+	}
+
+	function onRename({ id, name }: { id: string; name: string })
+	{
+		const tree = treeRef.current;
+
+		if (!tree) throw new Error('Tree ref is not set');
+
+		const node = tree.get(id);
+
+		if (!node) throw new Error(`Node with id ${id} not found`);
+
+		updateNode(
+			{
+				id,
+				data: {
+					name,
+				},
+			},
+			['id'],
+		);
+
+		if (node.data.type === 'item')
+		{
+			updateItem(
+				{
+					id: node.data.resourceId!,
+					data: {
+						name,
+					},
+				},
+				['id'],
+			);
+		}
+	}
+
+	function onMove({ dragIds, parentId, index }: { dragIds: string[]; parentId: string | null; index: number })
+	{
+		console.log('MOVE', { dragIds, parentId, index });
+	}
+
+	function onDelete({ ids, nodes }: { ids: string[]; nodes: NodeApi<Node>[] })
+	{
+		for (const node of nodes)
+		{
+			deleteNode({ id: node.id }, ['id']);
+
+			if (node.data.type === 'item')
+			{
+				deleteItem({ id: node.data.resourceId! }, ['id']);
+			}
+			else if (node.data.type === 'recipe')
+			{
+				deleteRecipe({ id: node.data.resourceId! }, ['id']);
+			}
+		}
+	}
+
+	return (
+		<>
+			<div className="flex m-2 gap-2">
+				<Button variant="ghost" size="icon" onClick={createRootNode}>
+					<Plus />
+				</Button>
+
+				<InputGroup>
+					<InputGroupInput className="text-sm" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+					<InputGroupAddon>
+						<Search />
+					</InputGroupAddon>
+					<InputGroupAddon align="inline-end">12 results</InputGroupAddon>
+				</InputGroup>
+			</div>
+			<div ref={containerRef} className="flex grow">
+				<Tree<Node>
+					ref={treeRef}
+					data={treeData}
+					onCreate={onCreate}
+					onRename={onRename}
+					onMove={onMove}
+					onDelete={onDelete}
+					width={width}
+					height={height}
+					indent={24}
+					rowHeight={40}
+					searchTerm={search}
+					searchMatch={(node, term) => node.data.name.toLowerCase().includes(term.toLowerCase())}
+					renderRow={RowRenderer}
+				>
+					{NodeRenderer}
+				</Tree>
+			</div>
+		</>
+	);
+}

@@ -1,6 +1,5 @@
 import { Resolvers } from '@/graphql/generated/graphql';
 import { GraphQLContext } from '../context';
-import { fi } from 'zod/v4/locales';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {

@@ -20,8 +20,8 @@ type Node {
 input CreateNodeInput {
 	name: String!
 	type: NodeType!
-	parentId: ID # Optional: null = create root node
-	resourceId: ID # Only used when type = item or recipe
+	parentId: ID
+	resourceId: ID
 	order: Int
 }
 

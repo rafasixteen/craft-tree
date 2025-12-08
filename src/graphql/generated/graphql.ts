@@ -33,7 +33,7 @@ export type CreateNodeInput = {
 };
 
 export type CreateRecipeInput = {
-  ingredients: Array<IngredientInput>;
+  ingredients?: InputMaybe<Array<IngredientInput>>;
   itemId: Scalars['ID']['input'];
   quantity: Scalars['Int']['input'];
   time: Scalars['Float']['input'];
@@ -105,6 +105,7 @@ export type MutationDeleteRecipeArgs = {
 
 export type MutationUpdateItemArgs = {
   data: UpdateItemInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -181,7 +182,6 @@ export type Recipe = {
 };
 
 export type UpdateItemInput = {
-  id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
 };
 
@@ -333,7 +333,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
   deleteItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationDeleteItemArgs, 'id'>>;
   deleteNode?: Resolver<ResolversTypes['Node'], ParentType, ContextType, RequireFields<MutationDeleteNodeArgs, 'id'>>;
   deleteRecipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType, RequireFields<MutationDeleteRecipeArgs, 'id'>>;
-  updateItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationUpdateItemArgs, 'data'>>;
+  updateItem?: Resolver<ResolversTypes['Item'], ParentType, ContextType, RequireFields<MutationUpdateItemArgs, 'data' | 'id'>>;
   updateNode?: Resolver<ResolversTypes['Node'], ParentType, ContextType, RequireFields<MutationUpdateNodeArgs, 'data' | 'id'>>;
   updateRecipe?: Resolver<ResolversTypes['Recipe'], ParentType, ContextType, RequireFields<MutationUpdateRecipeArgs, 'data' | 'id'>>;
 };

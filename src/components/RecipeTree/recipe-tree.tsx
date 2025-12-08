@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type OnNodesChange, type OnEdgesChange, Controls, MiniMap, Background, OnConnect } from '@xyflow/react';
 import RecipeNode, { RecipeNodeType } from './recipe-node';
-import { getItemById } from '@/lib/items';
+import { getItemById } from '@/lib/graphql/items';
 import '@xyflow/react/dist/style.css';
 
 const nodeTypes = { recipeNode: RecipeNode };

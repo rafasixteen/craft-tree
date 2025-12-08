@@ -60,9 +60,11 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 		},
 		updateItem: async (_parent, args, ctx) =>
 		{
+			const { id, data } = args;
+
 			return ctx.prisma.item.update({
-				where: { id: args.data.id },
-				data: { name: args.data.name },
+				where: { id },
+				data,
 			});
 		},
 		deleteItem: async (_parent, args, ctx) =>

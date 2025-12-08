@@ -3,7 +3,7 @@
 import { Handle, Position, type Node, type NodeProps } from '@xyflow/react';
 import { Item } from '@/graphql/generated/graphql';
 import { useEffect, useState } from 'react';
-import { getItemById } from '@/lib/items';
+import { getItemById } from '@/lib/graphql/items';
 import styles from './recipe-node.module.css';
 
 export type RecipeNodeData = {

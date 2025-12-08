@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import { ApolloProvider } from '@apollo/client/react';
-import { getApolloClient } from '@/lib/apollo-client';
+import { getApolloClient } from '@/lib/graphql/apollo-client';
 
 const client = getApolloClient();
 
