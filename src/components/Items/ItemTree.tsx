@@ -253,7 +253,6 @@ export default function ItemTree()
 					onRename={onRename}
 					onMove={onMove}
 					onDelete={onDelete}
-					onSelect={onSelect}
 					width={width}
 					height={height}
 					overscanCount={1}
@@ -267,12 +266,4 @@ export default function ItemTree()
 			</div>
 		</>
 	);
-}
-
-function onSelect(nodes: NodeApi<Node>[])
-{
-	for (const node of nodes)
-	{
-		console.log('Selected node:', node.data);
-	}
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import { ItemTree } from '@/components/Items';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 

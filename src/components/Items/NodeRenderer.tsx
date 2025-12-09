@@ -100,18 +100,13 @@ function DisplayName(node: NodeApi<Node>): React.JSX.Element
 				onFocus={(e) => e.currentTarget.select()}
 				onBlur={() => node.reset()}
 				onKeyDown={onInputKeyDown}
-				autoFocus
 				className="w-full text-sm border border-input px-1 py-0.5 rounded"
 			/>
 		);
 	}
 	else
 	{
-		return (
-			<span className="block truncate text-sm cursor-text select-none" onDoubleClick={() => node.edit()}>
-				{node.data.name}
-			</span>
-		);
+		return <span className="block truncate text-sm select-none">{node.data.name}</span>;
 	}
 }
 
