@@ -1,4 +1,4 @@
-import { MutationCreateRecipeArgs, MutationDeleteRecipeArgs, MutationUpdateRecipeArgs, Recipe } from '@/graphql/generated/graphql';
+import { MutationCreateRecipeArgs, MutationDeleteRecipeArgs, MutationUpdateRecipeArgs, Recipe } from '@generated/graphql/types';
 import { graphqlRequest } from './api';
 import { buildSelection } from './utils';
 

@@ -15,7 +15,6 @@ input CreateRecipeInput {
 	itemId: ID!
 	quantity: Int!
 	time: Float!
-	ingredients: [IngredientInput!]
 }
 
 input UpdateRecipeInput {

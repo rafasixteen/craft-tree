@@ -1,4 +1,4 @@
-import { Resolvers } from '@/graphql/generated/graphql';
+import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
@@ -18,8 +18,7 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				},
 			});
 		},
-
-		nodeById: async (_parent, args, ctx) =>
+		node: async (_parent, args, ctx) =>
 		{
 			return ctx.prisma.node.findUnique({
 				where: {
@@ -32,7 +31,6 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 			});
 		},
 	},
-
 	Mutation: {
 		createNode: async (_parent, args, ctx) =>
 		{
@@ -65,7 +63,6 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				},
 			});
 		},
-
 		updateNode: async (_parent, args, ctx) =>
 		{
 			const { id, data } = args;
@@ -86,7 +83,6 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				},
 			});
 		},
-
 		deleteNode: async (_parent, args, ctx) =>
 		{
 			const { id } = args;
@@ -98,14 +94,12 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 			});
 		},
 	},
-
 	Node: {
 		parent: async (node, _args, ctx) =>
 		{
 			if (!node.parentId) return null;
 			return ctx.prisma.node.findUnique({ where: { id: node.parentId } });
 		},
-
 		children: async (node, _args, ctx) =>
 		{
 			return ctx.prisma.node.findMany({

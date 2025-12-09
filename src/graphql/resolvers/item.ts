@@ -1,42 +1,14 @@
-import { Resolvers } from '@/graphql/generated/graphql';
+import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
 
 export const itemResolvers: Resolvers<GraphQLContext> = {
 	Query: {
-		items: async (_parent, args, ctx) =>
-		{
-			const { skip, take, search } = args;
-			const hardLimit = 96;
-
-			return ctx.prisma.item.findMany({
-				where: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
-				orderBy: { name: 'asc' },
-				skip,
-				take: Math.min(take, hardLimit),
-			});
-		},
-		itemById: async (_parent, args, ctx) =>
+		item: async (_parent, args, ctx) =>
 		{
 			return ctx.prisma.item.findUnique({
-				where: { id: args.id },
-				include: {
-					recipes: {
-						include: {
-							item: true,
-							ingredients: {
-								include: {
-									item: true,
-								},
-							},
-						},
-					},
+				where: {
+					id: args.id,
 				},
-			});
-		},
-		itemByName: async (_parent, args, ctx) =>
-		{
-			return ctx.prisma.item.findUnique({
-				where: { name: args.name },
 				include: {
 					recipes: {
 						include: {
@@ -56,7 +28,9 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 	Mutation: {
 		createItem: async (_parent, args, ctx) =>
 		{
-			return ctx.prisma.item.create({ data: args.data });
+			return ctx.prisma.item.create({
+				data: args.data,
+			});
 		},
 		updateItem: async (_parent, args, ctx) =>
 		{
@@ -64,12 +38,16 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 
 			return ctx.prisma.item.update({
 				where: { id },
-				data,
+				data: data,
 			});
 		},
 		deleteItem: async (_parent, args, ctx) =>
 		{
-			return ctx.prisma.item.delete({ where: { id: args.id } });
+			return ctx.prisma.item.delete({
+				where: {
+					id: args.id,
+				},
+			});
 		},
 	},
 };

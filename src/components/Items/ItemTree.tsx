@@ -6,11 +6,11 @@ import { Button } from '@components/ui/button';
 import { Plus, Search } from 'lucide-react';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { useResizeObserver } from '@/hooks/use-resize-observer';
-import { createNode, deleteNode, getRootNodes, updateNode } from '@/lib/graphql/nodes';
-import { Node } from '@/graphql/generated/graphql';
+import { createNode, deleteNode, getNode, getNodeWithChildren, getRootNodes, updateNode } from '@/lib/graphql/nodes';
+import { Node } from '@generated/graphql/types';
 import { createItem, deleteItem, updateItem } from '@/lib/graphql/items';
 import { createRecipe, deleteRecipe } from '@/lib/graphql/recipes';
-import { RowRenderer, NodeRenderer } from '@components/Items';
+import { NodeRenderer } from '@components/Items';
 
 export default function ItemTree()
 {
@@ -26,8 +26,16 @@ export default function ItemTree()
 
 	async function refreshTree()
 	{
-		const nodes = await getRootNodes(['id', 'name', 'type', 'resourceId', 'parentId', 'order'], 16);
-		setTreeData(nodes);
+		const rootNodeIds = await getRootNodes(['id']);
+		const rootNodes: Node[] = [];
+
+		for (const rootNodeId of rootNodeIds)
+		{
+			const rootNode = await getNodeWithChildren(rootNodeId.id, ['id', 'name', 'type', 'resourceId', 'parentId', 'order']);
+			rootNodes.push(rootNode);
+		}
+
+		setTreeData(rootNodes);
 	}
 
 	async function createRootNode()
@@ -42,11 +50,6 @@ export default function ItemTree()
 			});
 		}
 	}
-
-	useEffect(() =>
-	{
-		refreshTree();
-	}, []);
 
 	async function onCreate({ parentId, parentNode, index, type }: { parentId: string | null; parentNode: NodeApi<Node> | null; index: number; type: 'internal' | 'leaf' })
 	{
@@ -70,28 +73,46 @@ export default function ItemTree()
 		{
 			if (parentNode.data.type === 'folder')
 			{
-				const newItem = await createItem(
-					{
-						data: {
-							name: 'New Item',
+				if (type === 'internal')
+				{
+					const newNode = await createNode(
+						{
+							data: {
+								name: 'New Folder',
+								type: 'folder',
+								parentId: parentId,
+							},
 						},
-					},
-					['id', 'name'],
-				);
+						['id'],
+					);
 
-				const newNode = await createNode(
-					{
-						data: {
-							name: newItem.name,
-							type: 'item',
-							resourceId: newItem.id,
-							parentId: parentId,
+					newNodeId = newNode.id;
+				}
+				else
+				{
+					const newItem = await createItem(
+						{
+							data: {
+								name: 'New Item',
+							},
 						},
-					},
-					['id'],
-				);
+						['id', 'name'],
+					);
 
-				newNodeId = newNode.id;
+					const newNode = await createNode(
+						{
+							data: {
+								name: newItem.name,
+								type: 'item',
+								resourceId: newItem.id,
+								parentId: parentId,
+							},
+						},
+						['id'],
+					);
+
+					newNodeId = newNode.id;
+				}
 			}
 			else if (parentNode.data.type === 'item')
 			{
@@ -105,6 +126,8 @@ export default function ItemTree()
 					},
 					['id'],
 				);
+
+				console.log('Created recipe', newRecipe);
 
 				const newNode = await createNode(
 					{
@@ -127,7 +150,7 @@ export default function ItemTree()
 		}
 
 		refreshTree();
-		return newNodeId;
+		return { id: newNodeId };
 	}
 
 	function onRename({ id, name }: { id: string; name: string })
@@ -173,18 +196,38 @@ export default function ItemTree()
 	{
 		for (const node of nodes)
 		{
+			deleteNodeRecursive(node.data);
+		}
+
+		refreshTree();
+
+		function deleteNodeRecursive(node: Node)
+		{
+			if (node.children && node.children.length > 0)
+			{
+				for (const child of node.children)
+				{
+					deleteNodeRecursive(child);
+				}
+			}
+
 			deleteNode({ id: node.id }, ['id']);
 
-			if (node.data.type === 'item')
+			if (node.type === 'item')
 			{
-				deleteItem({ id: node.data.resourceId! }, ['id']);
+				deleteItem({ id: node.resourceId! }, ['id']);
 			}
-			else if (node.data.type === 'recipe')
+			else if (node.type === 'recipe')
 			{
-				deleteRecipe({ id: node.data.resourceId! }, ['id']);
+				deleteRecipe({ id: node.resourceId! }, ['id']);
 			}
 		}
 	}
+
+	useEffect(() =>
+	{
+		refreshTree();
+	}, []);
 
 	return (
 		<>
@@ -203,23 +246,33 @@ export default function ItemTree()
 			</div>
 			<div ref={containerRef} className="flex grow">
 				<Tree<Node>
+					className="react-aborist"
 					ref={treeRef}
 					data={treeData}
 					onCreate={onCreate}
 					onRename={onRename}
 					onMove={onMove}
 					onDelete={onDelete}
+					onSelect={onSelect}
 					width={width}
 					height={height}
+					overscanCount={1}
 					indent={24}
 					rowHeight={40}
 					searchTerm={search}
 					searchMatch={(node, term) => node.data.name.toLowerCase().includes(term.toLowerCase())}
-					renderRow={RowRenderer}
 				>
 					{NodeRenderer}
 				</Tree>
 			</div>
 		</>
 	);
+}
+
+function onSelect(nodes: NodeApi<Node>[])
+{
+	for (const node of nodes)
+	{
+		console.log('Selected node:', node.data);
+	}
 }

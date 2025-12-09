@@ -5,42 +5,83 @@ import React, { useState } from 'react';
 import { Button } from '@components/ui/button';
 import { Ban, ChevronRight, Ellipsis, File, Plus, FolderOpen, FolderClosed } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Node, NodeType } from '@/graphql/generated/graphql';
+import { Node, NodeType } from '@generated/graphql/types';
 import { Input } from '@components/ui/input';
 import { cn } from '@/lib/utils';
+
+interface Action
+{
+	label: string;
+	onExecute: () => void;
+}
+
+interface ActionGroup
+{
+	group: Action[];
+}
+
+type ActionsByNodeType = {
+	[K in NodeType]: ActionGroup[];
+};
+
+function createLeafNode(node: NodeApi<Node>, tree: TreeApi<Node>)
+{
+	tree.create({
+		parentId: node.id,
+		type: 'leaf',
+	});
+}
+
+function createFolderNode(node: NodeApi<Node>, tree: TreeApi<Node>)
+{
+	tree.create({
+		parentId: node.id,
+		type: 'internal',
+	});
+}
+
+function onInputKeyDown(node: NodeApi<Node>, event: React.KeyboardEvent<HTMLInputElement>)
+{
+	switch (event.key)
+	{
+		case 'Enter':
+			node.submit(event.currentTarget.value);
+			break;
+		case 'Escape':
+			node.reset();
+			break;
+		default:
+			break;
+	}
+}
+
+function startEditing(node: NodeApi<Node>, inputRef: React.RefObject<HTMLInputElement>)
+{
+	node.edit();
+
+	if (inputRef.current)
+	{
+		inputRef.current.focus();
+		inputRef.current.select();
+	}
+}
 
 export default function NodeRenderer({ node, style, dragHandle, tree }: NodeRendererProps<Node>)
 {
 	const [menuOpen, setMenuOpen] = useState(false);
 
-	function onPlusButtonClick()
-	{
-		if (node.data.type === 'folder' || node.data.type === 'item')
-		{
-			tree.create({
-				parentId: node.id,
-				type: 'leaf',
-			});
-		}
-	}
-
-	function onInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>)
-	{
-		switch (event.key)
-		{
-			case 'Enter':
-				node.submit(event.currentTarget.value);
-				break;
-			case 'Escape':
-				node.reset();
-				break;
-			default:
-				break;
-		}
-	}
+	const inputRef = React.useRef<HTMLInputElement>(null);
 
 	return (
-		<div className={cn('group hover:bg-muted/50 transition-all', menuOpen && 'bg-muted/50')} style={style} ref={dragHandle}>
+		<div
+			className={cn(
+				'box-border group hover:bg-muted/50 transition-all',
+				menuOpen && 'bg-muted/50',
+				node.isSelected && 'before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-primary',
+			)}
+			style={style}
+			ref={dragHandle}
+		>
 			<div className="flex justify-between">
 				<div className="items-center flex ml-2">
 					{DisplayChevron(node)}
@@ -48,21 +89,23 @@ export default function NodeRenderer({ node, style, dragHandle, tree }: NodeRend
 					{DisplayIcon(node)}
 
 					<Input
+						ref={inputRef}
 						readOnly={!node.isEditing}
 						type="text"
 						defaultValue={node.data.name}
 						onBlur={() => node.reset()}
-						onKeyDown={onInputKeyDown}
+						onKeyDown={(event) => onInputKeyDown(node, event)}
 						required
 						className={cn(
-							'border-none shadow-none bg-transparent! rounded-none focus-visible:ring-0 focus-visible:border-none text-sm',
+							'border-none shadow-none bg-transparent! rounded-none text-sm transition-all',
 							!node.isEditing && 'pointer-events-none select-none',
+							'focus-visible:border-2 focus-visible:border-primary focus-visible:ring-0 focus-visible:bg-background',
 						)}
 					/>
 				</div>
 
 				<div className={cn('flex gap-1 items-center transition-opacity', menuOpen ? 'opacity-100' : 'opacity-0 group-hover:opacity-100')}>
-					<Button variant="ghost" size="icon-sm" className="m-1" onClick={onPlusButtonClick}>
+					<Button variant="ghost" size="icon-sm" className="m-1" onClick={() => createLeafNode(node, tree)}>
 						<Plus />
 					</Button>
 
@@ -72,7 +115,7 @@ export default function NodeRenderer({ node, style, dragHandle, tree }: NodeRend
 								<Ellipsis />
 							</Button>
 						</DropdownMenuTrigger>
-						{DisplayContextMenu(node, tree)}
+						{DisplayContextMenu(node, tree, inputRef)}
 					</DropdownMenu>
 				</div>
 			</div>
@@ -108,56 +151,42 @@ function DisplayIcon(node: NodeApi<Node>): React.JSX.Element
 	}
 }
 
-interface Action
-{
-	label: string;
-	onExecute: (node: NodeApi<Node>, tree: TreeApi<Node>) => void;
-}
-
-interface ActionGroup
-{
-	group: Action[];
-}
-
-type ActionsByNodeType = {
-	[K in NodeType]: ActionGroup[];
-};
-
-function DisplayContextMenu(node: NodeApi<Node>, tree: TreeApi<Node>): React.JSX.Element
+function DisplayContextMenu(node: NodeApi<Node>, tree: TreeApi<Node>, inputRef: React.RefObject<HTMLInputElement>): React.JSX.Element
 {
 	const actionsByNodeType: ActionsByNodeType = {
 		folder: [
 			{
 				group: [
-					{ label: 'New Item', onExecute: () => console.log('New Item') },
-					{ label: 'New Folder', onExecute: () => console.log('New Folder') },
+					{ label: 'New Item', onExecute: () => createLeafNode(node, tree) },
+					{ label: 'New Folder', onExecute: () => createFolderNode(node, tree) },
 				],
 			},
 			{
 				group: [
-					{ label: 'Rename', onExecute: (node) => node.edit() },
-					{ label: 'Duplicate', onExecute: (node) => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: (node, tree) => tree.delete(node.id) },
+					{ label: 'Rename', onExecute: () => startEditing(node, inputRef) },
+					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
+					{ label: 'Delete', onExecute: () => tree.delete(node.id) },
 				],
 			},
 		],
 		item: [
 			{
-				group: [{ label: 'New Recipe', onExecute: (node) => console.log('New Recipe') }],
+				group: [{ label: 'New Recipe', onExecute: () => createLeafNode(node, tree) }],
 			},
 			{
 				group: [
-					{ label: 'Rename', onExecute: (node) => node.edit() },
-					{ label: 'Duplicate', onExecute: (node) => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: (node, tree) => tree.delete(node.id) },
+					{ label: 'Rename', onExecute: () => startEditing(node, inputRef) },
+					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
+					{ label: 'Delete', onExecute: () => tree.delete(node.id) },
 				],
 			},
 		],
 		recipe: [
 			{
 				group: [
-					{ label: 'Duplicate', onExecute: (node) => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: (node, tree) => tree.delete(node.id) },
+					{ label: 'Rename', onExecute: () => startEditing(node, inputRef) },
+					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
+					{ label: 'Delete', onExecute: () => tree.delete(node.id) },
 				],
 			},
 		],
@@ -168,7 +197,7 @@ function DisplayContextMenu(node: NodeApi<Node>, tree: TreeApi<Node>): React.JSX
 			{actionsByNodeType[node.data.type].map((group, groupIndex) => (
 				<DropdownMenuGroup key={groupIndex}>
 					{group.group.map((action, actionIndex) => (
-						<DropdownMenuItem key={actionIndex} onSelect={() => action.onExecute(node, tree)}>
+						<DropdownMenuItem key={actionIndex} onSelect={() => action.onExecute()}>
 							{action.label}
 						</DropdownMenuItem>
 					))}

@@ -1,16 +1,14 @@
-import { Node, MutationCreateNodeArgs, MutationUpdateNodeArgs, MutationDeleteNodeArgs } from '@/graphql/generated/graphql';
+import { Node, MutationCreateNodeArgs, MutationUpdateNodeArgs, MutationDeleteNodeArgs } from '@generated/graphql/types';
 import { graphqlRequest } from './api';
 import { buildSelection } from './utils';
 
-export async function getRootNodes<T extends keyof Node>(fields: T[], depth: number = 0): Promise<Pick<Node, T>[]>
+type NodeWithChildren<T extends keyof Node> = Pick<Node, T | 'id'> & {
+	children: NodeWithChildren<T>[] | null;
+};
+
+export async function getRootNodes<T extends keyof Node>(fields: T[]): Promise<Pick<Node, T>[]>
 {
-	const maxDepth = 16;
-	const minDepth = 0;
-
-	if (depth < minDepth) depth = minDepth;
-	if (depth > maxDepth) depth = maxDepth;
-
-	const selection = buildDepthSelection(fields, depth);
+	const selection = buildSelection(fields);
 
 	const query = `
 		query RootNodes {
@@ -22,20 +20,49 @@ export async function getRootNodes<T extends keyof Node>(fields: T[], depth: num
 
 	const response = await graphqlRequest<{ rootNodes: Pick<Node, T>[] }>(query);
 	return response.rootNodes;
+}
 
-	function buildDepthSelection<T extends keyof Node>(fields: T[], depth: number): string
-	{
-		const base = fields.join('\n');
+export async function getNodeWithChildren<T extends keyof Node>(id: string, fields: T[]): Promise<NodeWithChildren<T>>
+{
+	const node = await getNode(id, fields);
+	const children = await getNodeChildren(id, fields);
 
-		if (depth <= 0) return base;
+	const childrenWithSubtree: NodeWithChildren<T>[] | null = children.length > 0 ? await Promise.all(children.map((child) => getNodeWithChildren(child.id, fields))) : null;
+	return { ...node, children: childrenWithSubtree };
+}
 
-		return `
-		${base}
-			children {
-				${buildDepthSelection(fields, depth - 1)}
+export async function getNodeChildren<T extends keyof Node>(id: string, fields: T[]): Promise<Pick<Node, T | 'id'>[]>
+{
+	const selection = buildSelection(fields);
+
+	const query = `
+		query Query($id: ID!) {
+			node(id: $id) {
+				children {
+					${selection}
+				}
 			}
+		}
+  	`;
+
+	const response = await graphqlRequest<{ node: { children: Pick<Node, T | 'id'>[] } }>(query, { id });
+	return response.node.children;
+}
+
+export async function getNode<T extends keyof Node>(id: string, fields: T[]): Promise<Pick<Node, T | 'id'>>
+{
+	const selection = buildSelection(fields);
+
+	const query = `
+		query Query($id: ID!) {
+			node(id: $id) {
+				${selection}
+			}	
+		}
 	`;
-	}
+
+	const response = await graphqlRequest<{ node: Node }>(query, { id });
+	return response.node;
 }
 
 export async function createNode<T extends keyof Node>(args: MutationCreateNodeArgs, fields: T[]): Promise<Pick<Node, T>>

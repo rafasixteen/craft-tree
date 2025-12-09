@@ -33,7 +33,7 @@ input UpdateNodeInput {
 
 extend type Query {
 	rootNodes: [Node!]!
-	nodeById(id: ID!): Node
+	node(id: ID!): Node
 }
 
 extend type Mutation {

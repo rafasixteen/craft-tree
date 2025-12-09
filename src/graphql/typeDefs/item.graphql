@@ -14,9 +14,7 @@ input UpdateItemInput {
 }
 
 extend type Query {
-	items(skip: Int!, take: Int!, search: String): [Item!]!
-	itemById(id: ID!): Item
-	itemByName(name: String!): Item
+	item(id: ID!): Item
 }
 
 extend type Mutation {

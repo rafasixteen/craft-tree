@@ -33,7 +33,6 @@ export type CreateNodeInput = {
 };
 
 export type CreateRecipeInput = {
-  ingredients?: InputMaybe<Array<IngredientInput>>;
   itemId: Scalars['ID']['input'];
   quantity: Scalars['Int']['input'];
   time: Scalars['Float']['input'];
@@ -136,34 +135,20 @@ export { NodeType };
 
 export type Query = {
   __typename?: 'Query';
-  itemById?: Maybe<Item>;
-  itemByName?: Maybe<Item>;
-  items: Array<Item>;
-  nodeById?: Maybe<Node>;
+  item?: Maybe<Item>;
+  node?: Maybe<Node>;
   recipe?: Maybe<Recipe>;
   recipes: Array<Recipe>;
   rootNodes: Array<Node>;
 };
 
 
-export type QueryItemByIdArgs = {
+export type QueryItemArgs = {
   id: Scalars['ID']['input'];
 };
 
 
-export type QueryItemByNameArgs = {
-  name: Scalars['String']['input'];
-};
-
-
-export type QueryItemsArgs = {
-  search?: InputMaybe<Scalars['String']['input']>;
-  skip: Scalars['Int']['input'];
-  take: Scalars['Int']['input'];
-};
-
-
-export type QueryNodeByIdArgs = {
+export type QueryNodeArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -352,10 +337,8 @@ export type NodeResolvers<ContextType = GraphQLContext, ParentType extends Resol
 export type NodeTypeResolvers = EnumResolverSignature<{ folder?: any, item?: any, recipe?: any }, ResolversTypes['NodeType']>;
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
-  itemByName?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByNameArgs, 'name'>>;
-  items?: Resolver<Array<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemsArgs, 'skip' | 'take'>>;
-  nodeById?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeByIdArgs, 'id'>>;
+  item?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemArgs, 'id'>>;
+  node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
   recipe?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeArgs, 'id'>>;
   recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
   rootNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
