@@ -24,7 +24,8 @@
 			"@lib/*": ["src/lib/*"],
 			"@components/*": ["src/components/*"],
 			"@graphql/*": ["src/graphql/*"],
-			"@generated/*": ["generated/*"]
+			"@generated/*": ["generated/*"],
+			"@schemas/*": ["src/schemas/*"]
 		}
 	},
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],

@@ -40,37 +40,30 @@ function createFolderNode(node: NodeApi<Node>, tree: TreeApi<Node>)
 	});
 }
 
-function onInputKeyDown(node: NodeApi<Node>, event: React.KeyboardEvent<HTMLInputElement>)
-{
-	switch (event.key)
-	{
-		case 'Enter':
-			node.submit(event.currentTarget.value);
-			break;
-		case 'Escape':
-			node.reset();
-			break;
-		default:
-			break;
-	}
-}
-
 function startEditing(node: NodeApi<Node>, inputRef: React.RefObject<HTMLInputElement>)
 {
 	node.edit();
-
-	if (inputRef.current)
-	{
-		inputRef.current.focus();
-		inputRef.current.select();
-	}
 }
 
 export default function NodeRenderer({ node, style, dragHandle, tree }: NodeRendererProps<Node>)
 {
 	const [menuOpen, setMenuOpen] = useState(false);
+	const [nodeName, setNodeName] = useState(node.data.name);
 
 	const inputRef = React.useRef<HTMLInputElement>(null);
+
+	function onInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>)
+	{
+		if (event.key === 'Escape')
+		{
+			setNodeName(node.data.name);
+			node.reset();
+		}
+		else if (event.key === 'Enter' && event.currentTarget.value !== '')
+		{
+			node.submit(event.currentTarget.value);
+		}
+	}
 
 	return (
 		<div
@@ -92,10 +85,10 @@ export default function NodeRenderer({ node, style, dragHandle, tree }: NodeRend
 						ref={inputRef}
 						readOnly={!node.isEditing}
 						type="text"
-						defaultValue={node.data.name}
+						value={nodeName}
+						onChange={(e) => setNodeName(e.target.value)}
 						onBlur={() => node.reset()}
-						onKeyDown={(event) => onInputKeyDown(node, event)}
-						required
+						onKeyDown={onInputKeyDown}
 						className={cn(
 							'border-none shadow-none bg-transparent! rounded-none text-sm transition-all',
 							!node.isEditing && 'pointer-events-none select-none',

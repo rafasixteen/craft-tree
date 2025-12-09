@@ -1,5 +1,6 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
+import { nameSchema } from '@/schemas/common';
 
 export const itemResolvers: Resolvers<GraphQLContext> = {
 	Query: {
@@ -9,18 +10,6 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 				where: {
 					id: args.id,
 				},
-				include: {
-					recipes: {
-						include: {
-							item: true,
-							ingredients: {
-								include: {
-									item: true,
-								},
-							},
-						},
-					},
-				},
 			});
 		},
 	},
@@ -28,24 +17,39 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 	Mutation: {
 		createItem: async (_parent, args, ctx) =>
 		{
+			const { name } = args.data;
+
+			const parsedName = await nameSchema.parseAsync(name);
+
 			return ctx.prisma.item.create({
-				data: args.data,
+				data: {
+					name: parsedName,
+				},
 			});
 		},
 		updateItem: async (_parent, args, ctx) =>
 		{
 			const { id, data } = args;
+			const { name } = data;
+
+			const parsedName = await nameSchema.parseAsync(name);
 
 			return ctx.prisma.item.update({
-				where: { id },
-				data: data,
+				where: {
+					id: id,
+				},
+				data: {
+					name: parsedName,
+				},
 			});
 		},
 		deleteItem: async (_parent, args, ctx) =>
 		{
+			const { id } = args;
+
 			return ctx.prisma.item.delete({
 				where: {
-					id: args.id,
+					id: id,
 				},
 			});
 		},

@@ -1,5 +1,6 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
+import { nameSchema } from '@/schemas/common';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
@@ -49,10 +50,12 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				finalOrder = siblingCount + 1;
 			}
 
+			const parsedName = await nameSchema.parseAsync(name);
+
 			return ctx.prisma.node.create({
 				data: {
-					name,
-					type,
+					name: parsedName,
+					type: type,
 					parent: parentId ? { connect: { id: parentId } } : undefined,
 					resourceId: resourceId || null,
 					order: finalOrder,
@@ -68,12 +71,15 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 			const { id, data } = args;
 			const { name, parentId, order } = data;
 
+			let parsedName: string | undefined = undefined;
+			if (name !== undefined) parsedName = await nameSchema.parseAsync(name);
+
 			return ctx.prisma.node.update({
 				where: {
 					id,
 				},
 				data: {
-					name: name || undefined,
+					name: parsedName,
 					parent: parentId ? { connect: { id: parentId } } : undefined,
 					order: order || undefined,
 				},
