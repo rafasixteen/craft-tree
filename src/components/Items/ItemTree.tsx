@@ -12,7 +12,12 @@ import { createItem, deleteItem, updateItem } from '@/lib/graphql/items';
 import { createRecipe, deleteRecipe } from '@/lib/graphql/recipes';
 import { NodeRenderer } from '@components/Items';
 
-export default function ItemTree()
+interface ItemTreeProps
+{
+	onNodeClick: (node: Node) => void;
+}
+
+export default function ItemTree({ onNodeClick }: ItemTreeProps)
 {
 	const [search, setSearch] = useState('');
 	const [treeData, setTreeData] = useState<Node[]>([]);
@@ -224,6 +229,12 @@ export default function ItemTree()
 		}
 	}
 
+	function onSelect(nodes: NodeApi<Node>[])
+	{
+		if (nodes.length !== 1) return;
+		onNodeClick(nodes[0].data);
+	}
+
 	useEffect(() =>
 	{
 		refreshTree();
@@ -253,6 +264,7 @@ export default function ItemTree()
 					onRename={onRename}
 					onMove={onMove}
 					onDelete={onDelete}
+					onSelect={onSelect}
 					width={width}
 					height={height}
 					overscanCount={1}

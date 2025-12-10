@@ -4,8 +4,9 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
-		"dev:all": "concurrently \"npm run dev\" \"npm run codegen:watch\"",
-		"codegen:watch": "graphql-codegen --watch"
+		"dev:all": "concurrently \"npm run dev\" \"npm run codegen:watch\" \"npm run prisma:studio\"",
+		"codegen:watch": "graphql-codegen --watch",
+		"prisma:studio": "npx prisma studio"
 	},
 	"dependencies": {
 		"@apollo/client": "^4.0.9",
@@ -15,10 +16,14 @@
 		"@prisma/adapter-better-sqlite3": "^7.1.0",
 		"@prisma/client": "^7.1.0",
 		"@prisma/extension-accelerate": "^2.0.2",
+		"@radix-ui/react-avatar": "^1.1.11",
+		"@radix-ui/react-collapsible": "^1.1.12",
+		"@radix-ui/react-dialog": "^1.1.15",
 		"@radix-ui/react-label": "^2.1.8",
 		"@radix-ui/react-separator": "^1.1.8",
 		"@radix-ui/react-slot": "^1.2.4",
 		"@radix-ui/react-tabs": "^1.1.13",
+		"@radix-ui/react-tooltip": "^1.2.8",
 		"@tailwindcss/postcss": "^4.1.17",
 		"@xyflow/react": "^12.9.3",
 		"apollo-server-core": "^3.13.0",

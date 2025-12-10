@@ -1,25 +1,36 @@
+import { SidebarInset } from '@/components/ui/sidebar';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+
 export default function Home()
 {
 	return (
-		<main className="flex-1 flex flex-col bg-background text-foreground items-center justify-center p-8 text-center">
-			<div className="max-w-2xl mx-auto">
-				<h1 className="text-5xl font-bold mb-6 tracking-tight">Craft Tree</h1>
-				<p className="text-lg text-muted-foreground mb-10">Build, explore, and visualize crafting recipes with ease.</p>
-				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-6">
-					<Card title="Items" description="Browse all available items and materials." href="/items" />
-					<Card title="Recipes" description="Explore how items can be crafted step‑by‑step." href="/recipes" />
+		<SidebarInset>
+			<div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+				<Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem className="hidden md:block">
+							<BreadcrumbLink href="#">components</BreadcrumbLink>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator className="hidden md:block" />
+						<BreadcrumbItem className="hidden md:block">
+							<BreadcrumbLink href="#">ui</BreadcrumbLink>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator className="hidden md:block" />
+						<BreadcrumbItem>
+							<BreadcrumbPage>button.tsx</BreadcrumbPage>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
+			</div>
+			<div className="flex flex-1 flex-col gap-4 p-4">
+				<div className="grid auto-rows-min gap-4 md:grid-cols-3">
+					<div className="bg-muted/50 aspect-video rounded-xl" />
+					<div className="bg-muted/50 aspect-video rounded-xl" />
+					<div className="bg-muted/50 aspect-video rounded-xl" />
 				</div>
 			</div>
-		</main>
-	);
-}
-
-function Card({ title, description, href }: { title: string; description: string; href: string })
-{
-	return (
-		<a href={href} className="p-6 rounded-2xl shadow hover:shadow-lg transition-all border">
-			<h2 className="text-xl font-semibold mb-2">{title}</h2>
-			<p className="text-muted-foreground text-sm">{description}</p>
-		</a>
+		</SidebarInset>
 	);
 }
