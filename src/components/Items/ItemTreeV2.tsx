@@ -1,5 +1,11 @@
 'use client';
 
+import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
+import { FolderIcon, FolderOpenIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Tree, TreeDragLine, TreeItem, TreeItemLabel } from '@/components/ui/tree';
+import { Node } from '@generated/graphql/types';
+import { getNodes } from '@/lib/graphql/nodes';
 import {
 	createOnDropHandler,
 	dragAndDropFeature,
@@ -10,86 +16,87 @@ import {
 	selectionFeature,
 	syncDataLoaderFeature,
 	type TreeState,
+	type TreeInstance,
+	ItemInstance,
 } from '@headless-tree/core';
-import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
-import { CircleXIcon, FilterIcon, FolderIcon, FolderOpenIcon } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
-
-import { Input } from '@/components/ui/input';
-import { Tree, TreeDragLine, TreeItem, TreeItemLabel } from '@/components/ui/tree';
-
-interface Item
-{
-	name: string;
-	children?: string[];
-}
-
-const initialItems: Record<string, Item> = {
-	apis: { name: 'APIs' },
-	backend: { children: ['apis', 'infrastructure'], name: 'Backend' },
-	company: {
-		children: ['engineering', 'marketing', 'operations'],
-		name: 'Company',
-	},
-	components: { name: 'Components' },
-	content: { name: 'Content' },
-	'design-system': {
-		children: ['components', 'tokens', 'guidelines'],
-		name: 'Design System',
-	},
-	engineering: {
-		children: ['frontend', 'backend', 'platform-team'],
-		name: 'Engineering',
-	},
-	finance: { name: 'Finance' },
-	frontend: { children: ['design-system', 'web-platform'], name: 'Frontend' },
-	guidelines: { name: 'Guidelines' },
-	hr: { name: 'HR' },
-	infrastructure: { name: 'Infrastructure' },
-	marketing: { children: ['content', 'seo'], name: 'Marketing' },
-	operations: { children: ['hr', 'finance'], name: 'Operations' },
-	'platform-team': { name: 'Platform Team' },
-	seo: { name: 'SEO' },
-	tokens: { name: 'Tokens' },
-	'web-platform': { name: 'Web Platform' },
-};
 
 const indent = 20;
+const initialExpandedItems = ['engineering', 'frontend', 'design-system'];
+
+const childNode: Node = {
+	id: 'frontend',
+	name: 'Frontend Team',
+	type: 'item',
+	order: 1,
+	children: [],
+};
+
+const rootNode: Node = {
+	id: 'company',
+	name: 'Craft Tree',
+	type: 'folder',
+	children: ['frontend'],
+	order: 1,
+};
+
+const initialNodes: Record<string, Node> = {
+	company: rootNode,
+	frontend: childNode,
+};
 
 interface ItemTreeV2Props
 {
 	searchValue: string;
 }
 
+function isItemFolder(item: ItemInstance<Node>): boolean
+{
+	const node = item.getItemData();
+	return node.children.length > 0;
+}
+
+function getItemName(item: ItemInstance<Node>): string
+{
+	const node = item.getItemData();
+	return node.name;
+}
+
 export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 {
-	const initialExpandedItems = ['engineering', 'frontend', 'design-system'];
-
-	const [items, setItems] = useState(initialItems);
-	const [state, setState] = useState<Partial<TreeState<Item>>>({});
+	const [nodes, setNodes] = useState<Record<string, Node>>({});
+	const [state, setState] = useState<Partial<TreeState<Node>>>({});
 	const [filteredItems, setFilteredItems] = useState<string[]>([]);
-	const inputRef = useRef<HTMLInputElement>(null);
 
-	const tree = useTree<Item>({
+	const dummyRootId = 'tree-root';
+
+	function getItem(id: string): Node
+	{
+		return nodes[id];
+	}
+
+	function getItemChildren(id: string): string[]
+	{
+		const node = nodes[id];
+		return node ? node.children : [];
+	}
+
+	const tree: TreeInstance<Node> = useTree<Node>({
+		features: [syncDataLoaderFeature, selectionFeature, searchFeature, expandAllFeature, hotkeysCoreFeature, dragAndDropFeature, keyboardDragAndDropFeature],
 		canReorder: true,
 		dataLoader: {
-			getChildren: (id) => items[id].children ?? [],
-			getItem: (id) => items[id],
+			getItem: getItem,
+			getChildren: getItemChildren,
 		},
-		features: [syncDataLoaderFeature, selectionFeature, searchFeature, expandAllFeature, hotkeysCoreFeature, dragAndDropFeature, keyboardDragAndDropFeature],
-		getItemName: (i) => i.getItemData().name,
+		getItemName: getItemName,
+		isItemFolder: isItemFolder,
 		indent,
-		isItemFolder: (i) => (i.getItemData()?.children?.length ?? 0) > 0,
-		initialState: {
-			expandedItems: initialExpandedItems,
-			selectedItems: ['components'],
-		},
-		rootItemId: 'company',
+		initialState: { expandedItems: initialExpandedItems },
+		rootItemId: dummyRootId,
 		state,
 		setState,
 		onDrop: createOnDropHandler((parent, newChildren) =>
 		{
-			setItems((prev) => ({
+			setNodes((prev) => ({
 				...prev,
 				[parent.getId()]: {
 					...prev[parent.getId()],
@@ -99,12 +106,6 @@ export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 		}),
 	});
 
-	const shouldShowItem = (id: string) =>
-	{
-		if (!searchValue) return true;
-		return filteredItems.includes(id);
-	};
-
 	useEffect(() =>
 	{
 		if (!searchValue)
@@ -113,44 +114,44 @@ export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 			return;
 		}
 
-		const all = tree.getItems();
-
-		const directMatches = all.filter((item) => item.getItemName().toLowerCase().includes(searchValue.toLowerCase())).map((item) => item.getId());
-
-		const parentMatches = new Set<string>();
-		for (const id of directMatches)
-		{
-			let item = all.find((i) => i.getId() === id);
-			while (item?.getParent?.())
-			{
-				const parent = item.getParent();
-				if (!parent) break;
-				parentMatches.add(parent.getId());
-				item = parent;
-			}
-		}
-
-		const childrenMatches = new Set<string>();
-		const getDesc = (id: string) =>
-		{
-			const c = items[id]?.children ?? [];
-			for (const child of c)
-			{
-				childrenMatches.add(child);
-				if (items[child]?.children?.length) getDesc(child);
-			}
-		};
-		directMatches.forEach(getDesc);
-
-		setFilteredItems([...directMatches, ...Array.from(parentMatches), ...Array.from(childrenMatches)]);
-
-		const folders = all.filter((i) => i.isFolder()).map((i) => i.getId());
+		const filtered = filterNodes(nodes, tree, searchValue);
+		setFilteredItems(filtered);
 
 		setState((prev) => ({
 			...prev,
-			expandedItems: folders,
+			expandedItems: getAllFolders(tree),
 		}));
-	}, [searchValue, tree, items]);
+	}, [searchValue, tree, nodes]);
+
+	useEffect(() =>
+	{
+		async function fetchNodes()
+		{
+			const fetchedNodes = await getNodes(['id', 'name', 'type', 'order', 'children', 'parentId']);
+			const nodesMap: Record<string, Node> = {};
+
+			for (const node of fetchedNodes)
+			{
+				nodesMap[node.id] = node;
+			}
+
+			const rootNode = fetchedNodes.find((n) => !n.parentId);
+
+			if (!rootNode)
+			{
+				throw new Error('No root node was found');
+			}
+
+			setNodes({
+				[dummyRootId]: { id: dummyRootId, name: 'Root', type: 'folder', children: [rootNode.id], order: 0 },
+				...nodesMap,
+			});
+
+			tree.rebuildTree();
+		}
+
+		fetchNodes();
+	}, [tree]);
 
 	return (
 		<div className="flex h-full flex-col gap-2 *:first:grow">
@@ -162,7 +163,7 @@ export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 				) : (
 					tree.getItems().map((item) =>
 						{
-						const visible = shouldShowItem(item.getId());
+						const visible = shouldShowNode(item.getId(), filteredItems, searchValue);
 
 						return (
 							<TreeItem key={item.getId()} item={item} className="data-[visible=false]:hidden" data-visible={visible}>
@@ -186,4 +187,58 @@ export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 			</Tree>
 		</div>
 	);
+}
+
+function filterNodes(nodes: Record<string, Node>, tree: TreeInstance<Node>, searchValue: string)
+{
+	if (!searchValue) return [];
+
+	const all = tree.getItems();
+	const searchLower = searchValue.toLowerCase();
+
+	const directMatches = all.filter((item) => item.getItemName().toLowerCase().includes(searchLower)).map((item) => item.getId());
+
+	const parentMatches = new Set<string>();
+	for (const id of directMatches)
+	{
+		let item = all.find((i) => i.getId() === id);
+		while (item?.getParent?.())
+		{
+			const parent = item.getParent();
+			if (!parent) break;
+			parentMatches.add(parent.getId());
+			item = parent;
+		}
+	}
+
+	const childrenMatches = new Set<string>();
+	const getDescendants = (id: string) =>
+	{
+		const node = nodes[id];
+
+		for (const child of node.children)
+		{
+			childrenMatches.add(child);
+
+			const childNode = nodes[child];
+
+			if (childNode.children?.length) getDescendants(child);
+		}
+	};
+	directMatches.forEach(getDescendants);
+
+	return [...directMatches, ...Array.from(parentMatches), ...Array.from(childrenMatches)];
+}
+
+function getAllFolders(tree: TreeInstance<Node>)
+{
+	return tree
+		.getItems()
+		.filter((i) => i.isFolder())
+		.map((i) => i.getId());
+}
+
+function shouldShowNode(id: string, filteredItems: string[], searchValue: string)
+{
+	return !searchValue || filteredItems.includes(id);
 }

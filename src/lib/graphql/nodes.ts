@@ -2,10 +2,6 @@ import { Node, MutationCreateNodeArgs, MutationUpdateNodeArgs, MutationDeleteNod
 import { graphqlRequest } from './api';
 import { buildSelection } from './utils';
 
-type NodeWithChildren<T extends keyof Node> = Pick<Node, T | 'id'> & {
-	children: NodeWithChildren<T>[] | null;
-};
-
 export async function getRootNodes<T extends keyof Node>(fields: T[]): Promise<Pick<Node, T>[]>
 {
 	const selection = buildSelection(fields);
@@ -22,31 +18,20 @@ export async function getRootNodes<T extends keyof Node>(fields: T[]): Promise<P
 	return response.rootNodes;
 }
 
-export async function getNodeWithChildren<T extends keyof Node>(id: string, fields: T[]): Promise<NodeWithChildren<T>>
-{
-	const node = await getNode(id, fields);
-	const children = await getNodeChildren(id, fields);
-
-	const childrenWithSubtree: NodeWithChildren<T>[] | null = children.length > 0 ? await Promise.all(children.map((child) => getNodeWithChildren(child.id, fields))) : null;
-	return { ...node, children: childrenWithSubtree };
-}
-
-export async function getNodeChildren<T extends keyof Node>(id: string, fields: T[]): Promise<Pick<Node, T | 'id'>[]>
+export async function getNodes<T extends keyof Node>(fields: T[]): Promise<Pick<Node, T>[]>
 {
 	const selection = buildSelection(fields);
 
 	const query = `
-		query Query($id: ID!) {
-			node(id: $id) {
-				children {
-					${selection}
-				}
+		query Query {
+			nodes {
+				${selection}
 			}
 		}
   	`;
 
-	const response = await graphqlRequest<{ node: { children: Pick<Node, T | 'id'>[] } }>(query, { id });
-	return response.node.children;
+	const response = await graphqlRequest<{ nodes: Pick<Node, T>[] }>(query);
+	return response.nodes;
 }
 
 export async function getNode<T extends keyof Node>(id: string, fields: T[]): Promise<Pick<Node, T | 'id'>>

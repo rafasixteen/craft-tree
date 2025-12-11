@@ -6,7 +6,7 @@ import { Button } from '@components/ui/button';
 import { Plus, Search } from 'lucide-react';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { useResizeObserver } from '@/hooks/use-resize-observer';
-import { createNode, deleteNode, getNode, getNodeWithChildren, getRootNodes, updateNode } from '@/lib/graphql/nodes';
+import { createNode, deleteNode, getNode, getRootNodes, updateNode } from '@/lib/graphql/nodes';
 import { Node } from '@generated/graphql/types';
 import { createItem, deleteItem, updateItem } from '@/lib/graphql/items';
 import { createRecipe, deleteRecipe } from '@/lib/graphql/recipes';
@@ -36,8 +36,8 @@ export default function ItemTree({ onNodeClick }: ItemTreeProps)
 
 		for (const rootNodeId of rootNodeIds)
 		{
-			const rootNode = await getNodeWithChildren(rootNodeId.id, ['id', 'name', 'type', 'resourceId', 'parentId', 'order']);
-			rootNodes.push(rootNode);
+			//const rootNode = await getNodeWithChildren(rootNodeId.id, ['id', 'name', 'type', 'resourceId', 'parentId', 'order']);
+			//rootNodes.push(rootNode);
 		}
 
 		setTreeData(rootNodes);
@@ -212,7 +212,7 @@ export default function ItemTree({ onNodeClick }: ItemTreeProps)
 			{
 				for (const child of node.children)
 				{
-					deleteNodeRecursive(child);
+					//deleteNodeRecursive(child);
 				}
 			}
 

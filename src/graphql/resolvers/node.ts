@@ -1,35 +1,53 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
 import { nameSchema } from '@/schemas/common';
+import { Node } from '@generated/graphql/types';
+
+export async function withChildren(node: Node, ctx: GraphQLContext): Promise<Node>
+{
+	const children = await ctx.prisma.node.findMany({
+		where: {
+			parentId: node.id,
+		},
+		orderBy: {
+			order: 'asc',
+		},
+	});
+
+	return {
+		...node,
+		children: children.map((child) => child.id),
+	};
+}
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
-		rootNodes: async (_parent, _args, ctx) =>
+		nodes: async (_parent, _args, ctx) =>
 		{
-			return ctx.prisma.node.findMany({
-				where: {
-					parentId: null,
-				},
+			const nodes = await ctx.prisma.node.findMany({
 				orderBy: {
 					order: 'asc',
 				},
-				include: {
-					children: true,
-					parent: true,
-				},
 			});
+
+			return Promise.all(nodes.map((node) => withChildren({ ...node, children: [] }, ctx)));
 		},
 		node: async (_parent, args, ctx) =>
 		{
-			return ctx.prisma.node.findUnique({
+			const node = await ctx.prisma.node.findUnique({
 				where: {
 					id: args.id,
 				},
-				include: {
-					children: true,
-					parent: true,
-				},
 			});
+
+			if (node)
+			{
+				return withChildren({ ...node, children: [] }, ctx);
+			}
+			else
+			{
+				return null;
+			}
 		},
 	},
 	Mutation: {
@@ -52,19 +70,17 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 
 			const parsedName = await nameSchema.parseAsync(name);
 
-			return ctx.prisma.node.create({
+			const node = await ctx.prisma.node.create({
 				data: {
 					name: parsedName,
-					type: type,
+					type,
 					parent: parentId ? { connect: { id: parentId } } : undefined,
 					resourceId: resourceId || null,
 					order: finalOrder,
 				},
-				include: {
-					children: true,
-					parent: true,
-				},
 			});
+
+			return withChildren({ ...node, children: [] }, ctx);
 		},
 		updateNode: async (_parent, args, ctx) =>
 		{
@@ -74,7 +90,7 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 			let parsedName: string | undefined = undefined;
 			if (name !== undefined) parsedName = await nameSchema.parseAsync(name);
 
-			return ctx.prisma.node.update({
+			const node = await ctx.prisma.node.update({
 				where: {
 					id,
 				},
@@ -83,32 +99,27 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 					parent: parentId ? { connect: { id: parentId } } : undefined,
 					order: order || undefined,
 				},
-				include: {
-					children: true,
-					parent: true,
-				},
 			});
+
+			return withChildren({ ...node, children: [] }, ctx);
 		},
 		deleteNode: async (_parent, args, ctx) =>
 		{
 			const { id } = args;
 
-			return ctx.prisma.node.delete({
+			const node = await ctx.prisma.node.delete({
 				where: {
 					id,
 				},
 			});
+
+			return withChildren({ ...node, children: [] }, ctx);
 		},
 	},
 	Node: {
-		parent: async (node, _args, ctx) =>
-		{
-			if (!node.parentId) return null;
-			return ctx.prisma.node.findUnique({ where: { id: node.parentId } });
-		},
 		children: async (node, _args, ctx) =>
 		{
-			return ctx.prisma.node.findMany({
+			const children = await ctx.prisma.node.findMany({
 				where: {
 					parentId: node.id,
 				},
@@ -116,6 +127,8 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 					order: 'asc',
 				},
 			});
+
+			return children.map((child) => child.id);
 		},
 	},
 };

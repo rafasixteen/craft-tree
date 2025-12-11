@@ -121,11 +121,10 @@ export type MutationUpdateRecipeArgs = {
 
 export type Node = {
   __typename?: 'Node';
-  children?: Maybe<Array<Node>>;
+  children: Array<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   order: Scalars['Int']['output'];
-  parent?: Maybe<Node>;
   parentId?: Maybe<Scalars['ID']['output']>;
   resourceId?: Maybe<Scalars['ID']['output']>;
   type: NodeType;
@@ -137,9 +136,9 @@ export type Query = {
   __typename?: 'Query';
   item?: Maybe<Item>;
   node?: Maybe<Node>;
+  nodes: Array<Node>;
   recipe?: Maybe<Recipe>;
   recipes: Array<Recipe>;
-  rootNodes: Array<Node>;
 };
 
 
@@ -324,11 +323,10 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 };
 
 export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
-  children?: Resolver<Maybe<Array<ResolversTypes['Node']>>, ParentType, ContextType>;
+  children?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   order?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  parent?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType>;
   parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   resourceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>;
@@ -339,9 +337,9 @@ export type NodeTypeResolvers = EnumResolverSignature<{ folder?: any, item?: any
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   item?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemArgs, 'id'>>;
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
+  nodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
   recipe?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeArgs, 'id'>>;
   recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
-  rootNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
 };
 
 export type RecipeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Recipe'] = ResolversParentTypes['Recipe']> = {

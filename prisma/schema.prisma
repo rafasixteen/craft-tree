@@ -46,8 +46,6 @@ model Node {
   resourceId String?
 
   parentId String?
-  parent   Node?   @relation("NodeToChildren", fields: [parentId], references: [id])
-  children Node[]  @relation("NodeToChildren")
   order    Int
 
   @@index([parentId, order])

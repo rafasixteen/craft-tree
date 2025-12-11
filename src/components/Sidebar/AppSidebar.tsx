@@ -1,25 +1,11 @@
 'use client';
 
-import { ChevronRight, File, Folder } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { SearchBar } from '@components/Sidebar';
 import { NavUser } from './NavUser';
 import { CollectionSwitcher } from './CollectionSwitcher';
 import { ItemTreeV2 } from '@/components/Items';
 import { useState } from 'react';
-import {
-	Sidebar,
-	SidebarContent,
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarGroupLabel,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarMenuSub,
-	SidebarHeader,
-	SidebarFooter,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 
 export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {

@@ -12,8 +12,7 @@ type Node {
 	resourceId: ID
 
 	parentId: ID
-	parent: Node
-	children: [Node!]
+	children: [ID!]!
 	order: Int!
 }
 
@@ -32,7 +31,7 @@ input UpdateNodeInput {
 }
 
 extend type Query {
-	rootNodes: [Node!]!
+	nodes: [Node!]!
 	node(id: ID!): Node
 }
 

@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "next dev --turbopack",
 		"dev:all": "concurrently \"npm run dev\" \"npm run codegen:watch\"",
+		"codegen": "graphql-codegen",
 		"codegen:watch": "graphql-codegen --watch",
 		"prisma:studio": "npx prisma studio"
 	},
