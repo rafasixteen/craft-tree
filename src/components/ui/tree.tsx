@@ -72,7 +72,7 @@ function TreeItem<T = any>({ item, className, asChild, children, ...props }: Omi
 	const mergedProps = { ...props, ...itemProps };
 
 	// Extract style from mergedProps to merge with our custom styles
-	const { style: propStyle, onClick, ...otherProps } = mergedProps;
+	const { style: propStyle, ...otherProps } = mergedProps;
 
 	// Merge styles
 	const mergedStyle = {

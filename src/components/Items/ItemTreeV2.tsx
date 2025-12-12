@@ -22,7 +22,7 @@ import {
 	ItemInstance,
 } from '@headless-tree/core';
 
-const indent = 20;
+const indent = 8;
 const dummyRootId = 'tree-root';
 
 interface ItemTreeV2Props

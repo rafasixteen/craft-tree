@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDownIcon, EllipsisIcon, PlusIcon, File, Folder, FolderOpen } from 'lucide-react';
+import { ChevronDownIcon, EllipsisIcon, PlusIcon, Folder, FolderOpen, Box, CookingPot } from 'lucide-react';
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem } from '@/components/ui/tree';
 import { Node, NodeType } from '@generated/graphql/types';
@@ -33,18 +33,12 @@ interface NodeRendererProps
 
 export default function NodeRendererV2({ item, visible, refreshTree }: NodeRendererProps)
 {
-	function toggleItemExpansion()
-	{
-		if (!item.isFolder()) return;
-		return item.isExpanded() ? item.collapse() : item.expand();
-	}
-
 	return (
 		<TreeItem item={item} className="data-[visible=false]:hidden" data-visible={visible}>
 			<div className="in-focus-visible:ring-ring/50 bg-transparent hover:bg-accent in-data-[selected=true]:bg-accent in-data-[selected=true]:text-accent-foreground in-data-[drag-target=true]:bg-accent flex items-center gap-1 rounded-sm px-2 py-1.5 text-sm transition-colors not-in-data-[folder=true]:ps-7 in-focus-visible:ring-[3px] [&_svg]:shrink-0">
-				{item.isFolder() && <ChevronDownIcon className="text-muted-foreground mr-1 size-4 in-aria-[expanded=false]:-rotate-90" onClick={toggleItemExpansion} />}
-				<div className="flex items-center justify-between w-full">
-					<span className="flex grow items-center gap-2" onClick={toggleItemExpansion}>
+				{item.isFolder() && <ChevronDownIcon className="text-muted-foreground size-4 in-aria-[expanded=false]:-rotate-90" />}
+				<div className="flex items-center justify-between w-full ml-1">
+					<span className="flex grow items-center gap-2">
 						{DisplayIcon(item)}
 						{DisplayName(item)}
 					</span>
@@ -73,25 +67,36 @@ function DisplayIcon(item: ItemInstance<Node>)
 {
 	const className = 'size-4 text-muted-foreground';
 
-	if (!item.isFolder())
-	{
-		return <File className={className} />;
-	}
+	const node = item.getItemData();
 
-	if (item.isExpanded())
+	if (node.type === 'folder')
 	{
-		return <FolderOpen className={className} />;
+		if (item.isExpanded())
+		{
+			return <FolderOpen className={className} />;
+		}
+		else
+		{
+			return <Folder className={className} />;
+		}
+	}
+	else if (node.type === 'item')
+	{
+		return <Box className={className} />;
 	}
 	else
 	{
-		return <Folder className={className} />;
+		return <CookingPot className={className} />;
 	}
 }
 
 function DisplayPlusIcon(item: ItemInstance<Node>, refreshTree: () => void)
 {
-	function onClick()
+	function onClick(e: React.MouseEvent)
 	{
+		e.stopPropagation();
+		e.preventDefault();
+
 		const node = item.getItemData();
 
 		if (node.type === 'folder')
