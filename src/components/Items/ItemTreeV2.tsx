@@ -2,7 +2,7 @@
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { useEffect, useState } from 'react';
-import { Tree, TreeDragLine, TreeItem } from '@/components/ui/tree';
+import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { Node } from '@generated/graphql/types';
 import { getDescendantNodes } from '@/lib/graphql/nodes';
 import { Collection } from '@components/Sidebar';
@@ -166,7 +166,7 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 		<div className="flex h-full flex-col gap-2 *:first:grow">
 			<Tree indent={indent} tree={tree}>
 				<AssistiveTreeDescription tree={tree} />
-				<DisplayNodes />
+				{DisplayNodes()}
 				<TreeDragLine />
 			</Tree>
 		</div>
