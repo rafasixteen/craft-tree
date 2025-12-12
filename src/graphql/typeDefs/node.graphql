@@ -12,6 +12,7 @@ type Node {
 	resourceId: ID
 
 	parentId: ID
+	parent: Node
 	children: [ID!]!
 	order: Int!
 }
@@ -21,7 +22,6 @@ input CreateNodeInput {
 	type: NodeType!
 	parentId: ID
 	resourceId: ID
-	order: Int
 }
 
 input UpdateNodeInput {
@@ -32,7 +32,9 @@ input UpdateNodeInput {
 
 extend type Query {
 	nodes: [Node!]!
+	rootNodes: [Node!]!
 	node(id: ID!): Node
+	descendantNodes(id: ID!): [Node!]!
 }
 
 extend type Mutation {

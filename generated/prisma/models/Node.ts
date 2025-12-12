@@ -224,8 +224,8 @@ export type NodeWhereInput = {
   resourceId?: Prisma.StringNullableFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableFilter<"Node"> | string | null
   order?: Prisma.IntFilter<"Node"> | number
-  parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
   children?: Prisma.NodeListRelationFilter
+  parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
 }
 
 export type NodeOrderByWithRelationInput = {
@@ -235,8 +235,8 @@ export type NodeOrderByWithRelationInput = {
   resourceId?: Prisma.SortOrderInput | Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
-  parent?: Prisma.NodeOrderByWithRelationInput
   children?: Prisma.NodeOrderByRelationAggregateInput
+  parent?: Prisma.NodeOrderByWithRelationInput
 }
 
 export type NodeWhereUniqueInput = Prisma.AtLeast<{
@@ -249,8 +249,8 @@ export type NodeWhereUniqueInput = Prisma.AtLeast<{
   resourceId?: Prisma.StringNullableFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableFilter<"Node"> | string | null
   order?: Prisma.IntFilter<"Node"> | number
-  parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
   children?: Prisma.NodeListRelationFilter
+  parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
 }, "id">
 
 export type NodeOrderByWithAggregationInput = {
@@ -285,8 +285,8 @@ export type NodeCreateInput = {
   type: $Enums.NodeType
   resourceId?: string | null
   order: number
-  parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
   children?: Prisma.NodeCreateNestedManyWithoutParentInput
+  parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
 }
 
 export type NodeUncheckedCreateInput = {
@@ -305,8 +305,8 @@ export type NodeUpdateInput = {
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
   resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
-  parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
   children?: Prisma.NodeUpdateManyWithoutParentNestedInput
+  parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
 }
 
 export type NodeUncheckedUpdateInput = {
@@ -345,15 +345,15 @@ export type NodeUncheckedUpdateManyInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
-export type NodeNullableScalarRelationFilter = {
-  is?: Prisma.NodeWhereInput | null
-  isNot?: Prisma.NodeWhereInput | null
-}
-
 export type NodeListRelationFilter = {
   every?: Prisma.NodeWhereInput
   some?: Prisma.NodeWhereInput
   none?: Prisma.NodeWhereInput
+}
+
+export type NodeNullableScalarRelationFilter = {
+  is?: Prisma.NodeWhereInput | null
+  isNot?: Prisma.NodeWhereInput | null
 }
 
 export type NodeOrderByRelationAggregateInput = {
@@ -395,17 +395,17 @@ export type NodeSumOrderByAggregateInput = {
   order?: Prisma.SortOrder
 }
 
-export type NodeCreateNestedOneWithoutChildrenInput = {
-  create?: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
-  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutChildrenInput
-  connect?: Prisma.NodeWhereUniqueInput
-}
-
 export type NodeCreateNestedManyWithoutParentInput = {
   create?: Prisma.XOR<Prisma.NodeCreateWithoutParentInput, Prisma.NodeUncheckedCreateWithoutParentInput> | Prisma.NodeCreateWithoutParentInput[] | Prisma.NodeUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NodeCreateOrConnectWithoutParentInput | Prisma.NodeCreateOrConnectWithoutParentInput[]
   createMany?: Prisma.NodeCreateManyParentInputEnvelope
   connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+}
+
+export type NodeCreateNestedOneWithoutChildrenInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutChildrenInput
+  connect?: Prisma.NodeWhereUniqueInput
 }
 
 export type NodeUncheckedCreateNestedManyWithoutParentInput = {
@@ -423,16 +423,6 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type NodeUpdateOneWithoutChildrenNestedInput = {
-  create?: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
-  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutChildrenInput
-  upsert?: Prisma.NodeUpsertWithoutChildrenInput
-  disconnect?: Prisma.NodeWhereInput | boolean
-  delete?: Prisma.NodeWhereInput | boolean
-  connect?: Prisma.NodeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.NodeUpdateToOneWithWhereWithoutChildrenInput, Prisma.NodeUpdateWithoutChildrenInput>, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
-}
-
 export type NodeUpdateManyWithoutParentNestedInput = {
   create?: Prisma.XOR<Prisma.NodeCreateWithoutParentInput, Prisma.NodeUncheckedCreateWithoutParentInput> | Prisma.NodeCreateWithoutParentInput[] | Prisma.NodeUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NodeCreateOrConnectWithoutParentInput | Prisma.NodeCreateOrConnectWithoutParentInput[]
@@ -447,6 +437,16 @@ export type NodeUpdateManyWithoutParentNestedInput = {
   deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
 }
 
+export type NodeUpdateOneWithoutChildrenNestedInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutChildrenInput
+  upsert?: Prisma.NodeUpsertWithoutChildrenInput
+  disconnect?: Prisma.NodeWhereInput | boolean
+  delete?: Prisma.NodeWhereInput | boolean
+  connect?: Prisma.NodeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.NodeUpdateToOneWithWhereWithoutChildrenInput, Prisma.NodeUpdateWithoutChildrenInput>, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
+}
+
 export type NodeUncheckedUpdateManyWithoutParentNestedInput = {
   create?: Prisma.XOR<Prisma.NodeCreateWithoutParentInput, Prisma.NodeUncheckedCreateWithoutParentInput> | Prisma.NodeCreateWithoutParentInput[] | Prisma.NodeUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NodeCreateOrConnectWithoutParentInput | Prisma.NodeCreateOrConnectWithoutParentInput[]
@@ -459,29 +459,6 @@ export type NodeUncheckedUpdateManyWithoutParentNestedInput = {
   update?: Prisma.NodeUpdateWithWhereUniqueWithoutParentInput | Prisma.NodeUpdateWithWhereUniqueWithoutParentInput[]
   updateMany?: Prisma.NodeUpdateManyWithWhereWithoutParentInput | Prisma.NodeUpdateManyWithWhereWithoutParentInput[]
   deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
-}
-
-export type NodeCreateWithoutChildrenInput = {
-  id?: string
-  name: string
-  type: $Enums.NodeType
-  resourceId?: string | null
-  order: number
-  parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
-}
-
-export type NodeUncheckedCreateWithoutChildrenInput = {
-  id?: string
-  name: string
-  type: $Enums.NodeType
-  resourceId?: string | null
-  parentId?: string | null
-  order: number
-}
-
-export type NodeCreateOrConnectWithoutChildrenInput = {
-  where: Prisma.NodeWhereUniqueInput
-  create: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
 }
 
 export type NodeCreateWithoutParentInput = {
@@ -511,33 +488,27 @@ export type NodeCreateManyParentInputEnvelope = {
   data: Prisma.NodeCreateManyParentInput | Prisma.NodeCreateManyParentInput[]
 }
 
-export type NodeUpsertWithoutChildrenInput = {
-  update: Prisma.XOR<Prisma.NodeUpdateWithoutChildrenInput, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
+export type NodeCreateWithoutChildrenInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  resourceId?: string | null
+  order: number
+  parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
+}
+
+export type NodeUncheckedCreateWithoutChildrenInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  resourceId?: string | null
+  parentId?: string | null
+  order: number
+}
+
+export type NodeCreateOrConnectWithoutChildrenInput = {
+  where: Prisma.NodeWhereUniqueInput
   create: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
-  where?: Prisma.NodeWhereInput
-}
-
-export type NodeUpdateToOneWithWhereWithoutChildrenInput = {
-  where?: Prisma.NodeWhereInput
-  data: Prisma.XOR<Prisma.NodeUpdateWithoutChildrenInput, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
-}
-
-export type NodeUpdateWithoutChildrenInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  order?: Prisma.IntFieldUpdateOperationsInput | number
-  parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
-}
-
-export type NodeUncheckedUpdateWithoutChildrenInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type NodeUpsertWithWhereUniqueWithoutParentInput = {
@@ -566,6 +537,35 @@ export type NodeScalarWhereInput = {
   resourceId?: Prisma.StringNullableFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableFilter<"Node"> | string | null
   order?: Prisma.IntFilter<"Node"> | number
+}
+
+export type NodeUpsertWithoutChildrenInput = {
+  update: Prisma.XOR<Prisma.NodeUpdateWithoutChildrenInput, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
+  create: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
+  where?: Prisma.NodeWhereInput
+}
+
+export type NodeUpdateToOneWithWhereWithoutChildrenInput = {
+  where?: Prisma.NodeWhereInput
+  data: Prisma.XOR<Prisma.NodeUpdateWithoutChildrenInput, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
+}
+
+export type NodeUpdateWithoutChildrenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
+}
+
+export type NodeUncheckedUpdateWithoutChildrenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type NodeCreateManyParentInput = {
@@ -640,8 +640,8 @@ export type NodeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   resourceId?: boolean
   parentId?: boolean
   order?: boolean
-  parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
   children?: boolean | Prisma.Node$childrenArgs<ExtArgs>
+  parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
   _count?: boolean | Prisma.NodeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["node"]>
 
@@ -676,8 +676,8 @@ export type NodeSelectScalar = {
 
 export type NodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "resourceId" | "parentId" | "order", ExtArgs["result"]["node"]>
 export type NodeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
   children?: boolean | Prisma.Node$childrenArgs<ExtArgs>
+  parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
   _count?: boolean | Prisma.NodeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type NodeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -690,8 +690,8 @@ export type NodeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $NodePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Node"
   objects: {
-    parent: Prisma.$NodePayload<ExtArgs> | null
     children: Prisma.$NodePayload<ExtArgs>[]
+    parent: Prisma.$NodePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1094,8 +1094,8 @@ readonly fields: NodeFieldRefs;
  */
 export interface Prisma__NodeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  parent<T extends Prisma.Node$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$parentArgs<ExtArgs>>): Prisma.Prisma__NodeClient<runtime.Types.Result.GetResult<Prisma.$NodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   children<T extends Prisma.Node$childrenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  parent<T extends Prisma.Node$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$parentArgs<ExtArgs>>): Prisma.Prisma__NodeClient<runtime.Types.Result.GetResult<Prisma.$NodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1525,25 +1525,6 @@ export type NodeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * Node.parent
- */
-export type Node$parentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Node
-   */
-  select?: Prisma.NodeSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Node
-   */
-  omit?: Prisma.NodeOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.NodeInclude<ExtArgs> | null
-  where?: Prisma.NodeWhereInput
-}
-
-/**
  * Node.children
  */
 export type Node$childrenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1565,6 +1546,25 @@ export type Node$childrenArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.NodeScalarFieldEnum | Prisma.NodeScalarFieldEnum[]
+}
+
+/**
+ * Node.parent
+ */
+export type Node$parentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Node
+   */
+  select?: Prisma.NodeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Node
+   */
+  omit?: Prisma.NodeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NodeInclude<ExtArgs> | null
+  where?: Prisma.NodeWhereInput
 }
 
 /**

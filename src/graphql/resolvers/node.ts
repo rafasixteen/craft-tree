@@ -1,86 +1,105 @@
-import { Resolvers } from '@generated/graphql/types';
+import { Resolvers, Node, NodeType } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
 import { nameSchema } from '@/schemas/common';
-import { Node } from '@generated/graphql/types';
-
-export async function withChildren(node: Node, ctx: GraphQLContext): Promise<Node>
-{
-	const children = await ctx.prisma.node.findMany({
-		where: {
-			parentId: node.id,
-		},
-		orderBy: {
-			order: 'asc',
-		},
-	});
-
-	return {
-		...node,
-		children: children.map((child) => child.id),
-	};
-}
+import { de } from 'zod/v4/locales';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
 		nodes: async (_parent, _args, ctx) =>
 		{
-			const nodes = await ctx.prisma.node.findMany({
+			return ctx.prisma.node.findMany({
 				orderBy: {
 					order: 'asc',
 				},
+				include: {
+					parent: true,
+					children: true,
+				},
 			});
+		},
+		rootNodes: async (_parent, _args, ctx) =>
+		{
+			return ctx.prisma.node.findMany({
+				where: {
+					parentId: null,
+				},
+				orderBy: {
+					order: 'asc',
+				},
+				include: {
+					parent: true,
+					children: true,
+				},
+			});
+		},
+		descendantNodes: async (_parent, args, ctx) =>
+		{
+			const { id } = args;
 
-			return Promise.all(nodes.map((node) => withChildren({ ...node, children: [] }, ctx)));
+			const rows = await ctx.prisma.$queryRaw<Node[]>`
+				WITH RECURSIVE descendant_nodes AS (
+				SELECT * FROM "Nodes" WHERE id = ${id}
+				UNION ALL
+				SELECT n.* FROM "Nodes" n
+				INNER JOIN descendant_nodes dn ON n."parentId" = dn.id
+				)
+				SELECT * FROM descendant_nodes;
+			`;
+
+			const nodesMap = new Map<string, Node>();
+
+			for (const row of rows)
+			{
+				nodesMap.set(row.id, { ...row, children: [] });
+			}
+
+			for (const node of Array.from(nodesMap.values()))
+			{
+				if (node.parentId && nodesMap.has(node.parentId))
+				{
+					nodesMap.get(node.parentId)!.children.push(node.id);
+				}
+			}
+
+			return Array.from(nodesMap.values());
 		},
 		node: async (_parent, args, ctx) =>
 		{
-			const node = await ctx.prisma.node.findUnique({
+			return ctx.prisma.node.findUnique({
 				where: {
 					id: args.id,
 				},
+				include: {
+					parent: true,
+					children: true,
+				},
 			});
-
-			if (node)
-			{
-				return withChildren({ ...node, children: [] }, ctx);
-			}
-			else
-			{
-				return null;
-			}
 		},
 	},
 	Mutation: {
 		createNode: async (_parent, args, ctx) =>
 		{
-			const { name, type, parentId, resourceId, order } = args.data;
+			const { name, type, parentId, resourceId } = args.data;
 
-			let finalOrder = order;
+			const siblingCount = await ctx.prisma.node.count({
+				where: {
+					parentId: parentId || null,
+				},
+			});
 
-			if (finalOrder === undefined || finalOrder === null)
-			{
-				const siblingCount = await ctx.prisma.node.count({
-					where: {
-						parentId: parentId || null,
-					},
-				});
-
-				finalOrder = siblingCount + 1;
-			}
+			let order = siblingCount + 1;
 
 			const parsedName = await nameSchema.parseAsync(name);
 
-			const node = await ctx.prisma.node.create({
+			return ctx.prisma.node.create({
 				data: {
 					name: parsedName,
 					type,
 					parent: parentId ? { connect: { id: parentId } } : undefined,
-					resourceId: resourceId || null,
-					order: finalOrder,
+					resourceId: resourceId,
+					order: order,
 				},
 			});
-
-			return withChildren({ ...node, children: [] }, ctx);
 		},
 		updateNode: async (_parent, args, ctx) =>
 		{
@@ -101,22 +120,30 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				},
 			});
 
-			return withChildren({ ...node, children: [] }, ctx);
+			return node;
 		},
 		deleteNode: async (_parent, args, ctx) =>
 		{
 			const { id } = args;
 
-			const node = await ctx.prisma.node.delete({
+			return ctx.prisma.node.delete({
 				where: {
 					id,
 				},
 			});
-
-			return withChildren({ ...node, children: [] }, ctx);
 		},
 	},
 	Node: {
+		parent: async (node, _args, ctx) =>
+		{
+			if (!node.parentId) return null;
+
+			return ctx.prisma.node.findUnique({
+				where: {
+					id: node.parentId,
+				},
+			});
+		},
 		children: async (node, _args, ctx) =>
 		{
 			const children = await ctx.prisma.node.findMany({

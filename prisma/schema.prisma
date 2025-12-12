@@ -38,12 +38,17 @@ model Ingredient {
   @@map("Ingredients")
 }
 
+// TODO: Add a onDelete: Cascade to resourceId (split into 2 relations of each type)
+
 model Node {
   id   String @id @default(uuid())
   name String
 
   type       NodeType
   resourceId String?
+
+  children Node[] @relation("NodeChildren")
+  parent   Node?  @relation("NodeChildren", fields: [parentId], references: [id], onDelete: Cascade)
 
   parentId String?
   order    Int

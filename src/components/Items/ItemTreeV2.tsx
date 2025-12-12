@@ -1,11 +1,13 @@
 'use client';
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
-import { FolderIcon, FolderOpenIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Tree, TreeDragLine, TreeItem, TreeItemLabel } from '@/components/ui/tree';
+import { Tree, TreeDragLine, TreeItem } from '@/components/ui/tree';
 import { Node } from '@generated/graphql/types';
-import { getNodes } from '@/lib/graphql/nodes';
+import { getDescendantNodes } from '@/lib/graphql/nodes';
+import { Collection } from '@components/Sidebar';
+import NodeRendererV2 from './NodeRendererV2';
+import useSWR from 'swr';
 import {
 	createOnDropHandler,
 	dragAndDropFeature,
@@ -21,57 +23,42 @@ import {
 } from '@headless-tree/core';
 
 const indent = 20;
-const initialExpandedItems = ['engineering', 'frontend', 'design-system'];
-
-const childNode: Node = {
-	id: 'frontend',
-	name: 'Frontend Team',
-	type: 'item',
-	order: 1,
-	children: [],
-};
-
-const rootNode: Node = {
-	id: 'company',
-	name: 'Craft Tree',
-	type: 'folder',
-	children: ['frontend'],
-	order: 1,
-};
-
-const initialNodes: Record<string, Node> = {
-	company: rootNode,
-	frontend: childNode,
-};
+const dummyRootId = 'tree-root';
 
 interface ItemTreeV2Props
 {
 	searchValue: string;
+	activeCollection?: Collection | null;
 }
 
-function isItemFolder(item: ItemInstance<Node>): boolean
-{
-	const node = item.getItemData();
-	return node.children.length > 0;
-}
-
-function getItemName(item: ItemInstance<Node>): string
-{
-	const node = item.getItemData();
-	return node.name;
-}
-
-export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
+export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2Props)
 {
 	const [nodes, setNodes] = useState<Record<string, Node>>({});
 	const [state, setState] = useState<Partial<TreeState<Node>>>({});
-	const [filteredItems, setFilteredItems] = useState<string[]>([]);
 
-	const dummyRootId = 'tree-root';
+	const shouldFetch = !!activeCollection;
+
+	const { data: fetchedNodes, mutate } = useSWR(shouldFetch ? ['nodes', activeCollection.id] : null, shouldFetch ? () => getDescendantNodes(activeCollection.id) : null, {
+		revalidateOnFocus: false,
+		revalidateOnReconnect: false,
+	});
 
 	function getItem(id: string): Node
 	{
-		return nodes[id];
+		const node = nodes[id];
+
+		if (!node)
+		{
+			return {
+				id,
+				name: 'Unknown',
+				type: 'folder',
+				order: 1,
+				children: [],
+			};
+		}
+
+		return node;
 	}
 
 	function getItemChildren(id: string): string[]
@@ -89,11 +76,10 @@ export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 		},
 		getItemName: getItemName,
 		isItemFolder: isItemFolder,
-		indent,
-		initialState: { expandedItems: initialExpandedItems },
+		indent: indent,
 		rootItemId: dummyRootId,
-		state,
-		setState,
+		state: state,
+		setState: setState,
 		onDrop: createOnDropHandler((parent, newChildren) =>
 		{
 			setNodes((prev) => ({
@@ -108,85 +94,95 @@ export default function ItemTreeV2({ searchValue }: ItemTreeV2Props)
 
 	useEffect(() =>
 	{
-		if (!searchValue)
+		if (!fetchedNodes || !activeCollection)
 		{
-			setFilteredItems([]);
+			setNodes({});
 			return;
 		}
 
-		const filtered = filterNodes(nodes, tree, searchValue);
-		setFilteredItems(filtered);
+		const nodesMap: Record<string, Node> = {};
 
-		setState((prev) => ({
-			...prev,
-			expandedItems: getAllFolders(tree),
-		}));
-	}, [searchValue, tree, nodes]);
+		for (const node of fetchedNodes)
+		{
+			nodesMap[node.id] = node;
+		}
+
+		const rootNode = fetchedNodes.find((n) => n.id === activeCollection.id);
+
+		setNodes({
+			[dummyRootId]: {
+				id: dummyRootId,
+				name: 'Root',
+				type: 'folder',
+				order: 1,
+				children: rootNode ? [rootNode.id] : [],
+			},
+			...nodesMap,
+		});
+	}, [fetchedNodes, activeCollection]);
 
 	useEffect(() =>
 	{
-		async function fetchNodes()
+		if (Object.keys(nodes).length === 0) return;
+
+		const allFolders = tree
+			.getItems()
+			.filter((i) => i.isFolder())
+			.map((i) => i.getId());
+		setState({ expandedItems: allFolders });
+
+		tree.rebuildTree();
+	}, [nodes, tree]);
+
+	useEffect(() =>
+	{
+		tree.setSearch(searchValue);
+	}, [tree, searchValue]);
+
+	function DisplayNodes()
+	{
+		const filteredItems = searchValue ? filterNodes(nodes, tree, searchValue) : [];
+
+		function shouldShowNode(itemInstance: ItemInstance<Node>)
 		{
-			const fetchedNodes = await getNodes(['id', 'name', 'type', 'order', 'children', 'parentId']);
-			const nodesMap: Record<string, Node> = {};
-
-			for (const node of fetchedNodes)
-			{
-				nodesMap[node.id] = node;
-			}
-
-			const rootNode = fetchedNodes.find((n) => !n.parentId);
-
-			if (!rootNode)
-			{
-				throw new Error('No root node was found');
-			}
-
-			setNodes({
-				[dummyRootId]: { id: dummyRootId, name: 'Root', type: 'folder', children: [rootNode.id], order: 0 },
-				...nodesMap,
-			});
-
-			tree.rebuildTree();
+			const id = itemInstance.getId();
+			return !searchValue || filteredItems.includes(id);
 		}
 
-		fetchNodes();
-	}, [tree]);
+		if (searchValue && filteredItems.length === 0)
+		{
+			return <p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>;
+		}
+		else
+		{
+			return tree.getItems().map((item) =>
+			{
+				return <NodeRendererV2 key={item.getId()} item={item} visible={shouldShowNode(item)} refreshTree={mutate} />;
+			});
+		}
+	}
 
 	return (
 		<div className="flex h-full flex-col gap-2 *:first:grow">
 			<Tree indent={indent} tree={tree}>
 				<AssistiveTreeDescription tree={tree} />
-
-				{searchValue && filteredItems.length === 0 ? (
-					<p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>
-				) : (
-					tree.getItems().map((item) =>
-						{
-						const visible = shouldShowNode(item.getId(), filteredItems, searchValue);
-
-						return (
-							<TreeItem key={item.getId()} item={item} className="data-[visible=false]:hidden" data-visible={visible}>
-								<TreeItemLabel>
-									<span className="flex items-center gap-2">
-										{item.isFolder() &&
-											(item.isExpanded() ? (
-												<FolderOpenIcon className="size-4 text-muted-foreground" />
-											) : (
-												<FolderIcon className="size-4 text-muted-foreground" />
-											))}
-										{item.getItemName()}
-									</span>
-								</TreeItemLabel>
-							</TreeItem>
-						);
-					})
-				)}
-
+				<DisplayNodes />
 				<TreeDragLine />
 			</Tree>
 		</div>
 	);
+}
+
+function isItemFolder(item: ItemInstance<Node>): boolean
+{
+	const node = item.getItemData();
+	return node.type === 'folder' || (node.type === 'item' && node.children.length > 0);
+}
+
+function getItemName(item: ItemInstance<Node>): string
+{
+	const node = item.getItemData();
+	return node.name;
 }
 
 function filterNodes(nodes: Record<string, Node>, tree: TreeInstance<Node>, searchValue: string)
@@ -196,12 +192,14 @@ function filterNodes(nodes: Record<string, Node>, tree: TreeInstance<Node>, sear
 	const all = tree.getItems();
 	const searchLower = searchValue.toLowerCase();
 
-	const directMatches = all.filter((item) => item.getItemName().toLowerCase().includes(searchLower)).map((item) => item.getId());
+	const directMatches = all.filter((item) => getItemName(item).toLowerCase().includes(searchLower)).map((item) => item.getId());
 
 	const parentMatches = new Set<string>();
+
 	for (const id of directMatches)
 	{
 		let item = all.find((i) => i.getId() === id);
+
 		while (item?.getParent?.())
 		{
 			const parent = item.getParent();
@@ -228,17 +226,4 @@ function filterNodes(nodes: Record<string, Node>, tree: TreeInstance<Node>, sear
 	directMatches.forEach(getDescendants);
 
 	return [...directMatches, ...Array.from(parentMatches), ...Array.from(childrenMatches)];
-}
-
-function getAllFolders(tree: TreeInstance<Node>)
-{
-	return tree
-		.getItems()
-		.filter((i) => i.isFolder())
-		.map((i) => i.getId());
-}
-
-function shouldShowNode(id: string, filteredItems: string[], searchValue: string)
-{
-	return !searchValue || filteredItems.includes(id);
 }

@@ -1,6 +1,6 @@
 import { NodeType } from '@prisma/client';
 import { GraphQLResolveInfo } from 'graphql';
-import { Item as PrismaItem, Recipe as PrismaRecipe, Ingredient as PrismaIngredient } from '@prisma/client';
+import { Item as PrismaItem, Recipe as PrismaRecipe, Ingredient as PrismaIngredient, Node as PrismaNode } from '@prisma/client';
 import { GraphQLContext } from '@/graphql/context';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -26,7 +26,6 @@ export type CreateItemInput = {
 
 export type CreateNodeInput = {
   name: Scalars['String']['input'];
-  order?: InputMaybe<Scalars['Int']['input']>;
   parentId?: InputMaybe<Scalars['ID']['input']>;
   resourceId?: InputMaybe<Scalars['ID']['input']>;
   type: NodeType;
@@ -125,6 +124,7 @@ export type Node = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   order: Scalars['Int']['output'];
+  parent?: Maybe<Node>;
   parentId?: Maybe<Scalars['ID']['output']>;
   resourceId?: Maybe<Scalars['ID']['output']>;
   type: NodeType;
@@ -134,11 +134,18 @@ export { NodeType };
 
 export type Query = {
   __typename?: 'Query';
+  descendantNodes: Array<Node>;
   item?: Maybe<Item>;
   node?: Maybe<Node>;
   nodes: Array<Node>;
   recipe?: Maybe<Recipe>;
   recipes: Array<Recipe>;
+  rootNodes: Array<Node>;
+};
+
+
+export type QueryDescendantNodesArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -265,7 +272,7 @@ export type ResolversTypes = {
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Item: ResolverTypeWrapper<PrismaItem>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
-  Node: ResolverTypeWrapper<Node>;
+  Node: ResolverTypeWrapper<PrismaNode>;
   NodeType: NodeType;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   Recipe: ResolverTypeWrapper<PrismaRecipe>;
@@ -288,7 +295,7 @@ export type ResolversParentTypes = {
   Int: Scalars['Int']['output'];
   Item: PrismaItem;
   Mutation: Record<PropertyKey, never>;
-  Node: Node;
+  Node: PrismaNode;
   Query: Record<PropertyKey, never>;
   Recipe: PrismaRecipe;
   String: Scalars['String']['output'];
@@ -327,6 +334,7 @@ export type NodeResolvers<ContextType = GraphQLContext, ParentType extends Resol
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   order?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  parent?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType>;
   parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   resourceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>;
@@ -335,11 +343,13 @@ export type NodeResolvers<ContextType = GraphQLContext, ParentType extends Resol
 export type NodeTypeResolvers = EnumResolverSignature<{ folder?: any, item?: any, recipe?: any }, ResolversTypes['NodeType']>;
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  descendantNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryDescendantNodesArgs, 'id'>>;
   item?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemArgs, 'id'>>;
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
   nodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
   recipe?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeArgs, 'id'>>;
   recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
+  rootNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
 };
 
 export type RecipeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Recipe'] = ResolversParentTypes['Recipe']> = {

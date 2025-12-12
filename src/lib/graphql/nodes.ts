@@ -7,7 +7,7 @@ export async function getRootNodes<T extends keyof Node>(fields: T[]): Promise<P
 	const selection = buildSelection(fields);
 
 	const query = `
-		query RootNodes {
+		query Query {
 			rootNodes {
 				${selection}
 			}
@@ -18,6 +18,26 @@ export async function getRootNodes<T extends keyof Node>(fields: T[]): Promise<P
 	return response.rootNodes;
 }
 
+export async function getDescendantNodes(id: string): Promise<Node[]>
+{
+	const query = `
+		query Query($id: ID!) {
+			descendantNodes(id: $id) {
+				id
+				name
+				type
+				order
+				parentId
+				resourceId
+				children
+			}
+		}
+  	`;
+
+	const response = await graphqlRequest<{ descendantNodes: Node[] }>(query, { id });
+	return response.descendantNodes;
+}
+
 export async function getNodes<T extends keyof Node>(fields: T[]): Promise<Pick<Node, T>[]>
 {
 	const selection = buildSelection(fields);
@@ -26,6 +46,9 @@ export async function getNodes<T extends keyof Node>(fields: T[]): Promise<Pick<
 		query Query {
 			nodes {
 				${selection}
+				children {
+					id
+				}
 			}
 		}
   	`;

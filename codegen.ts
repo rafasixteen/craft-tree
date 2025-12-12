@@ -11,6 +11,7 @@ const config: CodegenConfig = {
 					Item: '@prisma/client#Item as PrismaItem',
 					Recipe: '@prisma/client#Recipe as PrismaRecipe',
 					Ingredient: '@prisma/client#Ingredient as PrismaIngredient',
+					Node: '@prisma/client#Node as PrismaNode',
 				},
 				contextType: '@/graphql/context#GraphQLContext',
 				enumValues: {
