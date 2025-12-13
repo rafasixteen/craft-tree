@@ -160,6 +160,7 @@ export type ItemWhereInput = {
   name?: Prisma.StringFilter<"Item"> | string
   recipes?: Prisma.RecipeListRelationFilter
   usedIn?: Prisma.IngredientListRelationFilter
+  nodes?: Prisma.NodeListRelationFilter
 }
 
 export type ItemOrderByWithRelationInput = {
@@ -167,6 +168,7 @@ export type ItemOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   recipes?: Prisma.RecipeOrderByRelationAggregateInput
   usedIn?: Prisma.IngredientOrderByRelationAggregateInput
+  nodes?: Prisma.NodeOrderByRelationAggregateInput
 }
 
 export type ItemWhereUniqueInput = Prisma.AtLeast<{
@@ -177,6 +179,7 @@ export type ItemWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Item"> | string
   recipes?: Prisma.RecipeListRelationFilter
   usedIn?: Prisma.IngredientListRelationFilter
+  nodes?: Prisma.NodeListRelationFilter
 }, "id">
 
 export type ItemOrderByWithAggregationInput = {
@@ -200,6 +203,7 @@ export type ItemCreateInput = {
   name: string
   recipes?: Prisma.RecipeCreateNestedManyWithoutItemInput
   usedIn?: Prisma.IngredientCreateNestedManyWithoutItemInput
+  nodes?: Prisma.NodeCreateNestedManyWithoutItemInput
 }
 
 export type ItemUncheckedCreateInput = {
@@ -207,6 +211,7 @@ export type ItemUncheckedCreateInput = {
   name: string
   recipes?: Prisma.RecipeUncheckedCreateNestedManyWithoutItemInput
   usedIn?: Prisma.IngredientUncheckedCreateNestedManyWithoutItemInput
+  nodes?: Prisma.NodeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type ItemUpdateInput = {
@@ -214,6 +219,7 @@ export type ItemUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   recipes?: Prisma.RecipeUpdateManyWithoutItemNestedInput
   usedIn?: Prisma.IngredientUpdateManyWithoutItemNestedInput
+  nodes?: Prisma.NodeUpdateManyWithoutItemNestedInput
 }
 
 export type ItemUncheckedUpdateInput = {
@@ -221,6 +227,7 @@ export type ItemUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   recipes?: Prisma.RecipeUncheckedUpdateManyWithoutItemNestedInput
   usedIn?: Prisma.IngredientUncheckedUpdateManyWithoutItemNestedInput
+  nodes?: Prisma.NodeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type ItemCreateManyInput = {
@@ -258,6 +265,11 @@ export type ItemScalarRelationFilter = {
   isNot?: Prisma.ItemWhereInput
 }
 
+export type ItemNullableScalarRelationFilter = {
+  is?: Prisma.ItemWhereInput | null
+  isNot?: Prisma.ItemWhereInput | null
+}
+
 export type StringFieldUpdateOperationsInput = {
   set?: string
 }
@@ -290,16 +302,34 @@ export type ItemUpdateOneRequiredWithoutUsedInNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ItemUpdateToOneWithWhereWithoutUsedInInput, Prisma.ItemUpdateWithoutUsedInInput>, Prisma.ItemUncheckedUpdateWithoutUsedInInput>
 }
 
+export type ItemCreateNestedOneWithoutNodesInput = {
+  create?: Prisma.XOR<Prisma.ItemCreateWithoutNodesInput, Prisma.ItemUncheckedCreateWithoutNodesInput>
+  connectOrCreate?: Prisma.ItemCreateOrConnectWithoutNodesInput
+  connect?: Prisma.ItemWhereUniqueInput
+}
+
+export type ItemUpdateOneWithoutNodesNestedInput = {
+  create?: Prisma.XOR<Prisma.ItemCreateWithoutNodesInput, Prisma.ItemUncheckedCreateWithoutNodesInput>
+  connectOrCreate?: Prisma.ItemCreateOrConnectWithoutNodesInput
+  upsert?: Prisma.ItemUpsertWithoutNodesInput
+  disconnect?: Prisma.ItemWhereInput | boolean
+  delete?: Prisma.ItemWhereInput | boolean
+  connect?: Prisma.ItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ItemUpdateToOneWithWhereWithoutNodesInput, Prisma.ItemUpdateWithoutNodesInput>, Prisma.ItemUncheckedUpdateWithoutNodesInput>
+}
+
 export type ItemCreateWithoutRecipesInput = {
   id?: string
   name: string
   usedIn?: Prisma.IngredientCreateNestedManyWithoutItemInput
+  nodes?: Prisma.NodeCreateNestedManyWithoutItemInput
 }
 
 export type ItemUncheckedCreateWithoutRecipesInput = {
   id?: string
   name: string
   usedIn?: Prisma.IngredientUncheckedCreateNestedManyWithoutItemInput
+  nodes?: Prisma.NodeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type ItemCreateOrConnectWithoutRecipesInput = {
@@ -322,24 +352,28 @@ export type ItemUpdateWithoutRecipesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   usedIn?: Prisma.IngredientUpdateManyWithoutItemNestedInput
+  nodes?: Prisma.NodeUpdateManyWithoutItemNestedInput
 }
 
 export type ItemUncheckedUpdateWithoutRecipesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   usedIn?: Prisma.IngredientUncheckedUpdateManyWithoutItemNestedInput
+  nodes?: Prisma.NodeUncheckedUpdateManyWithoutItemNestedInput
 }
 
 export type ItemCreateWithoutUsedInInput = {
   id?: string
   name: string
   recipes?: Prisma.RecipeCreateNestedManyWithoutItemInput
+  nodes?: Prisma.NodeCreateNestedManyWithoutItemInput
 }
 
 export type ItemUncheckedCreateWithoutUsedInInput = {
   id?: string
   name: string
   recipes?: Prisma.RecipeUncheckedCreateNestedManyWithoutItemInput
+  nodes?: Prisma.NodeUncheckedCreateNestedManyWithoutItemInput
 }
 
 export type ItemCreateOrConnectWithoutUsedInInput = {
@@ -362,12 +396,58 @@ export type ItemUpdateWithoutUsedInInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   recipes?: Prisma.RecipeUpdateManyWithoutItemNestedInput
+  nodes?: Prisma.NodeUpdateManyWithoutItemNestedInput
 }
 
 export type ItemUncheckedUpdateWithoutUsedInInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   recipes?: Prisma.RecipeUncheckedUpdateManyWithoutItemNestedInput
+  nodes?: Prisma.NodeUncheckedUpdateManyWithoutItemNestedInput
+}
+
+export type ItemCreateWithoutNodesInput = {
+  id?: string
+  name: string
+  recipes?: Prisma.RecipeCreateNestedManyWithoutItemInput
+  usedIn?: Prisma.IngredientCreateNestedManyWithoutItemInput
+}
+
+export type ItemUncheckedCreateWithoutNodesInput = {
+  id?: string
+  name: string
+  recipes?: Prisma.RecipeUncheckedCreateNestedManyWithoutItemInput
+  usedIn?: Prisma.IngredientUncheckedCreateNestedManyWithoutItemInput
+}
+
+export type ItemCreateOrConnectWithoutNodesInput = {
+  where: Prisma.ItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.ItemCreateWithoutNodesInput, Prisma.ItemUncheckedCreateWithoutNodesInput>
+}
+
+export type ItemUpsertWithoutNodesInput = {
+  update: Prisma.XOR<Prisma.ItemUpdateWithoutNodesInput, Prisma.ItemUncheckedUpdateWithoutNodesInput>
+  create: Prisma.XOR<Prisma.ItemCreateWithoutNodesInput, Prisma.ItemUncheckedCreateWithoutNodesInput>
+  where?: Prisma.ItemWhereInput
+}
+
+export type ItemUpdateToOneWithWhereWithoutNodesInput = {
+  where?: Prisma.ItemWhereInput
+  data: Prisma.XOR<Prisma.ItemUpdateWithoutNodesInput, Prisma.ItemUncheckedUpdateWithoutNodesInput>
+}
+
+export type ItemUpdateWithoutNodesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  recipes?: Prisma.RecipeUpdateManyWithoutItemNestedInput
+  usedIn?: Prisma.IngredientUpdateManyWithoutItemNestedInput
+}
+
+export type ItemUncheckedUpdateWithoutNodesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  recipes?: Prisma.RecipeUncheckedUpdateManyWithoutItemNestedInput
+  usedIn?: Prisma.IngredientUncheckedUpdateManyWithoutItemNestedInput
 }
 
 
@@ -378,11 +458,13 @@ export type ItemUncheckedUpdateWithoutUsedInInput = {
 export type ItemCountOutputType = {
   recipes: number
   usedIn: number
+  nodes: number
 }
 
 export type ItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipes?: boolean | ItemCountOutputTypeCountRecipesArgs
   usedIn?: boolean | ItemCountOutputTypeCountUsedInArgs
+  nodes?: boolean | ItemCountOutputTypeCountNodesArgs
 }
 
 /**
@@ -409,12 +491,20 @@ export type ItemCountOutputTypeCountUsedInArgs<ExtArgs extends runtime.Types.Ext
   where?: Prisma.IngredientWhereInput
 }
 
+/**
+ * ItemCountOutputType without action
+ */
+export type ItemCountOutputTypeCountNodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NodeWhereInput
+}
+
 
 export type ItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   recipes?: boolean | Prisma.Item$recipesArgs<ExtArgs>
   usedIn?: boolean | Prisma.Item$usedInArgs<ExtArgs>
+  nodes?: boolean | Prisma.Item$nodesArgs<ExtArgs>
   _count?: boolean | Prisma.ItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["item"]>
 
@@ -437,6 +527,7 @@ export type ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type ItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipes?: boolean | Prisma.Item$recipesArgs<ExtArgs>
   usedIn?: boolean | Prisma.Item$usedInArgs<ExtArgs>
+  nodes?: boolean | Prisma.Item$nodesArgs<ExtArgs>
   _count?: boolean | Prisma.ItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -447,6 +538,7 @@ export type $ItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     recipes: Prisma.$RecipePayload<ExtArgs>[]
     usedIn: Prisma.$IngredientPayload<ExtArgs>[]
+    nodes: Prisma.$NodePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -847,6 +939,7 @@ export interface Prisma__ItemClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   recipes<T extends Prisma.Item$recipesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Item$recipesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecipePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   usedIn<T extends Prisma.Item$usedInArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Item$usedInArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IngredientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  nodes<T extends Prisma.Item$nodesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Item$nodesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1309,6 +1402,30 @@ export type Item$usedInArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.IngredientScalarFieldEnum | Prisma.IngredientScalarFieldEnum[]
+}
+
+/**
+ * Item.nodes
+ */
+export type Item$nodesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Node
+   */
+  select?: Prisma.NodeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Node
+   */
+  omit?: Prisma.NodeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NodeInclude<ExtArgs> | null
+  where?: Prisma.NodeWhereInput
+  orderBy?: Prisma.NodeOrderByWithRelationInput | Prisma.NodeOrderByWithRelationInput[]
+  cursor?: Prisma.NodeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NodeScalarFieldEnum | Prisma.NodeScalarFieldEnum[]
 }
 
 /**

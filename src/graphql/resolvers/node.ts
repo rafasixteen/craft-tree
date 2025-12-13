@@ -1,25 +1,61 @@
-import { Resolvers, Node, NodeType } from '@generated/graphql/types';
+import { Resolvers, Node } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
 import { nameSchema } from '@/schemas/common';
-import { de } from 'zod/v4/locales';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
+		node: async (_parent, args, ctx) =>
+		{
+			const node = await ctx.prisma.node.findUnique({
+				where: {
+					id: args.id,
+				},
+				include: {
+					parent: {
+						include: {
+							children: true,
+						},
+					},
+					children: {
+						orderBy: {
+							order: 'asc',
+						},
+					},
+					item: true,
+					recipe: true,
+				},
+			});
+
+			if (!node) return null;
+
+			return { ...node, children: node.children.map((child) => child.id) };
+		},
 		nodes: async (_parent, _args, ctx) =>
 		{
-			return ctx.prisma.node.findMany({
+			const nodes = await ctx.prisma.node.findMany({
 				orderBy: {
 					order: 'asc',
 				},
 				include: {
 					parent: true,
-					children: true,
+					children: {
+						orderBy: {
+							order: 'asc',
+						},
+					},
+					item: true,
+					recipe: true,
 				},
 			});
+
+			return nodes.map((node) => ({
+				...node,
+				children: node.children.map((child) => child.id),
+			}));
 		},
 		rootNodes: async (_parent, _args, ctx) =>
 		{
-			return ctx.prisma.node.findMany({
+			const nodes = await ctx.prisma.node.findMany({
 				where: {
 					parentId: null,
 				},
@@ -27,16 +63,31 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 					order: 'asc',
 				},
 				include: {
-					parent: true,
-					children: true,
+					children: {
+						orderBy: {
+							order: 'asc',
+						},
+					},
 				},
 			});
+
+			return nodes.map((node) => ({
+				...node,
+				children: node.children.map((child) => child.id),
+			}));
 		},
 		descendantNodes: async (_parent, args, ctx) =>
 		{
+			interface TreeNode extends Node
+			{
+				parentId?: string;
+				itemId?: string;
+				recipeId?: string;
+			}
+
 			const { id } = args;
 
-			const rows = await ctx.prisma.$queryRaw<Node[]>`
+			const rows = await ctx.prisma.$queryRaw<TreeNode[]>`
 				WITH RECURSIVE descendant_nodes AS (
 				SELECT * FROM "Nodes" WHERE id = ${id}
 				UNION ALL
@@ -46,7 +97,7 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				SELECT * FROM descendant_nodes;
 			`;
 
-			const nodesMap = new Map<string, Node>();
+			const nodesMap = new Map<string, TreeNode>();
 
 			for (const row of rows)
 			{
@@ -63,43 +114,44 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 
 			return Array.from(nodesMap.values());
 		},
-		node: async (_parent, args, ctx) =>
-		{
-			return ctx.prisma.node.findUnique({
-				where: {
-					id: args.id,
-				},
-				include: {
-					parent: true,
-					children: true,
-				},
-			});
-		},
 	},
 	Mutation: {
 		createNode: async (_parent, args, ctx) =>
 		{
-			const { name, type, parentId, resourceId } = args.data;
+			const { name, type, parentId, itemId, recipeId } = args.data;
 
-			const siblingCount = await ctx.prisma.node.count({
-				where: {
-					parentId: parentId || null,
-				},
-			});
-
-			let order = siblingCount + 1;
-
-			const parsedName = await nameSchema.parseAsync(name);
+			if (itemId && recipeId)
+			{
+				throw new Error('A node can only reference either an Item or a Recipe, not both.');
+			}
 
 			return ctx.prisma.node.create({
 				data: {
-					name: parsedName,
+					name: await nameSchema.parseAsync(name),
 					type,
 					parent: parentId ? { connect: { id: parentId } } : undefined,
-					resourceId: resourceId,
-					order: order,
+					item: itemId ? { connect: { id: itemId } } : undefined,
+					recipe: recipeId ? { connect: { id: recipeId } } : undefined,
+					order: await getOrder(),
+				},
+				include: {
+					parent: true,
+					children: true,
+					item: true,
+					recipe: true,
 				},
 			});
+
+			async function getOrder()
+			{
+				const siblingCount = await ctx.prisma.node.count({
+					where: {
+						parentId: parentId || null,
+					},
+				});
+
+				return siblingCount + 1;
+			}
 		},
 		updateNode: async (_parent, args, ctx) =>
 		{
@@ -156,6 +208,26 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 			});
 
 			return children.map((child) => child.id);
+		},
+		item: async (node, _args, ctx) =>
+		{
+			if (node.itemId === null) return null;
+
+			return ctx.prisma.item.findUnique({
+				where: {
+					id: node.itemId,
+				},
+			});
+		},
+		recipe: async (node, _args, ctx) =>
+		{
+			if (node.recipeId === null) return null;
+
+			return ctx.prisma.recipe.findUnique({
+				where: {
+					id: node.recipeId,
+				},
+			});
 		},
 	},
 };

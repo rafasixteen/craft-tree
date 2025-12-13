@@ -27,8 +27,16 @@ export async function getDescendantNodes(id: string): Promise<Node[]>
 				name
 				type
 				order
-				parentId
-				resourceId
+				parent {
+					id
+				}
+				item {
+					id
+					name
+				}
+				recipe {
+					id
+				}
 				children
 			}
 		}
@@ -73,14 +81,25 @@ export async function getNode<T extends keyof Node>(id: string, fields: T[]): Pr
 	return response.node;
 }
 
-export async function createNode<T extends keyof Node>(args: MutationCreateNodeArgs, fields: T[]): Promise<Pick<Node, T>>
+export async function createNode(args: MutationCreateNodeArgs): Promise<Node>
 {
-	const selection = buildSelection(fields);
-
 	const query = `
 		mutation CreateNode($data: CreateNodeInput!) {
 			createNode(data: $data) {
-				${selection}
+				id
+				name
+				type
+				children
+				parent {
+					id
+				}
+				item {
+					id
+					name
+				}
+				recipe {
+					id
+				}
 			}	
 		}
 	`;

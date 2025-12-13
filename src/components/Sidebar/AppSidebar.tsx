@@ -1,6 +1,7 @@
 'use client';
 
-import { SearchBar, CollectionSwitcher, Collection } from '@components/Sidebar';
+import { Collections, Collection } from '@components/Collection';
+import { SearchBar } from '@components/Sidebar';
 import { NavUser } from './NavUser';
 import { ItemTreeV2 } from '@/components/Items';
 import { useState } from 'react';
@@ -16,7 +17,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
 	return (
 		<Sidebar {...props}>
 			<SidebarHeader className="h-32 border-b flex justify-center">
-				<CollectionSwitcher onCollectionsChange={setHasCollections} onActiveCollectionChange={setActiveCollection} />
+				<Collections onCollectionsChange={setHasCollections} onActiveCollectionChange={setActiveCollection} />
 				{hasCollections && <SearchBar value={searchValue} onChange={setSearchValue} />}
 			</SidebarHeader>
 			<SidebarContent>

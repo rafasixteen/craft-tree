@@ -12,6 +12,7 @@ model Item {
   name    String
   recipes Recipe[]
   usedIn  Ingredient[]
+  nodes   Node[]
 
   @@map("Items")
 }
@@ -23,6 +24,7 @@ model Recipe {
   quantity    Int
   time        Float
   ingredients Ingredient[]
+  nodes       Node[]
 
   @@map("Recipes")
 }
@@ -38,14 +40,18 @@ model Ingredient {
   @@map("Ingredients")
 }
 
-// TODO: Add a onDelete: Cascade to resourceId (split into 2 relations of each type)
-
 model Node {
   id   String @id @default(uuid())
   name String
 
-  type       NodeType
-  resourceId String?
+  type NodeType
+
+  // A node only references an Item or a Recipe, not both.
+  item   Item?   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String?
+
+  recipe   Recipe? @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipeId String?
 
   children Node[] @relation("NodeChildren")
   parent   Node?  @relation("NodeChildren", fields: [parentId], references: [id], onDelete: Cascade)
@@ -54,7 +60,6 @@ model Node {
   order    Int
 
   @@index([parentId, order])
-  @@index([type, resourceId])
   @@map("Nodes")
 }
 

@@ -10,6 +10,12 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+// TODO: Once we have login implemented, before allowing the user to go the the main page
+// we should check if they have any collections. If not, we should force them to create one.
+// with a big "Empty" component from shadcn.
+
+// Or just automatically create a default collection and show a little tutorial on first launch.
+
 export interface Collection
 {
 	id: string;
@@ -17,13 +23,13 @@ export interface Collection
 	logo: React.ElementType | null;
 }
 
-interface CollectionSwitcherProps
+interface CollectionsProps
 {
 	onCollectionsChange?: (hasCollections: boolean) => void;
 	onActiveCollectionChange?: (collection: Collection | null) => void;
 }
 
-export default function CollectionSwitcher({ onCollectionsChange, onActiveCollectionChange }: CollectionSwitcherProps)
+export default function Collections({ onCollectionsChange, onActiveCollectionChange }: CollectionsProps)
 {
 	const { isMobile } = useSidebar();
 	const [collections, setCollections] = useState<Collection[]>([]);
@@ -72,15 +78,12 @@ export default function CollectionSwitcher({ onCollectionsChange, onActiveCollec
 
 	async function createCollection()
 	{
-		const node = await createNode(
-			{
-				data: {
-					name: newName,
-					type: 'folder',
-				},
+		const node = await createNode({
+			data: {
+				name: newName,
+				type: 'folder',
 			},
-			['id', 'name'],
-		);
+		});
 
 		const newCollection = { id: node.id, name: node.name, logo: null };
 		setCollections((p) => [...p, newCollection]);
@@ -92,9 +95,12 @@ export default function CollectionSwitcher({ onCollectionsChange, onActiveCollec
 			<SidebarMenuItem>
 				<Dialog open={open} onOpenChange={setOpen}>
 					{!loading && collections.length === 0 ? (
-						<SidebarMenu className="flex flex-row items-center justify-between gap-2 p-1">
-							<p className="text-xs text-center">No collections yet</p>
-							<Button onClick={() => setOpen(true)}>Create Collection</Button>
+						<SidebarMenu className="flex flex-col items-center justify-between gap-3 p-4 text-center">
+							<p className="text-xs text-muted-foreground">No collections yet</p>
+							<Button onClick={() => setOpen(true)}>
+								<Plus className="mr-2 h-3 w-3" />
+								Create Collection
+							</Button>
 						</SidebarMenu>
 					) : (
 						<DropdownMenu>

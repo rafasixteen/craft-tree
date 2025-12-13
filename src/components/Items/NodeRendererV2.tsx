@@ -94,8 +94,8 @@ function DisplayPlusIcon(item: ItemInstance<Node>, refreshTree: () => void)
 {
 	function onClick(e: React.MouseEvent)
 	{
+		// This prevents the click event from going to the TreeItem and causing it to expand/collapse.
 		e.stopPropagation();
-		e.preventDefault();
 
 		const node = item.getItemData();
 
@@ -163,7 +163,15 @@ function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Elem
 			{actionsByNodeType[node.type].map((group, groupIndex) => (
 				<DropdownMenuGroup key={groupIndex}>
 					{group.group.map((action, actionIndex) => (
-						<DropdownMenuItem key={actionIndex} onSelect={() => action.onExecute()}>
+						<DropdownMenuItem
+							key={actionIndex}
+							onSelect={() => action.onExecute()}
+							onClick={(e) =>
+							{
+								// This prevents the click event from going to the TreeItem and causing it to expand/collapse.
+								e.stopPropagation();
+							}}
+						>
 							{action.label}
 						</DropdownMenuItem>
 					))}
@@ -176,16 +184,13 @@ function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Elem
 
 async function createFolderNode(parent: Node, refreshTree: () => void)
 {
-	const newNode = await createNode(
-		{
-			data: {
-				name: 'New Folder',
-				type: 'folder',
-				parentId: parent.id,
-			},
+	const newNode = await createNode({
+		data: {
+			name: 'New Folder',
+			type: 'folder',
+			parentId: parent.id,
 		},
-		['id'],
-	);
+	});
 
 	refreshTree();
 }
@@ -201,33 +206,36 @@ async function createItemNode(parent: Node, refreshTree: () => void)
 		['id', 'name'],
 	);
 
-	const newNode = await createNode(
-		{
-			data: {
-				name: newItem.name,
-				type: 'item',
-				resourceId: newItem.id,
-				parentId: parent.id,
-			},
+	const newNode = await createNode({
+		data: {
+			name: newItem.name,
+			type: 'item',
+			itemId: newItem.id,
+			parentId: parent.id,
 		},
-		['id'],
-	);
+	});
 
 	refreshTree();
 }
 
 async function createRecipeNode(parent: Node, refreshTree: () => void)
 {
-	if (!parent.resourceId)
+	if (parent.type !== 'item')
 	{
-		console.error('Cannot create recipe: parent.resourceId is missing', parent);
+		console.error('Cannot create recipe: parent node is not of type item', parent);
+		return;
+	}
+
+	if (!parent.item)
+	{
+		console.error('Cannot create recipe: parent node has no associated item', parent);
 		return;
 	}
 
 	const newRecipe = await createRecipe(
 		{
 			data: {
-				itemId: parent.resourceId,
+				itemId: parent.item.id,
 				quantity: 1,
 				time: 1,
 			},
@@ -235,17 +243,14 @@ async function createRecipeNode(parent: Node, refreshTree: () => void)
 		['id'],
 	);
 
-	const newNode = await createNode(
-		{
-			data: {
-				name: 'New Recipe',
-				type: 'recipe',
-				resourceId: newRecipe.id,
-				parentId: parent.id,
-			},
+	const newNode = await createNode({
+		data: {
+			name: 'New Recipe',
+			type: 'recipe',
+			recipeId: newRecipe.id,
+			parentId: parent.id,
 		},
-		['id'],
-	);
+	});
 
 	refreshTree();
 }
@@ -264,9 +269,15 @@ async function renameNode(node: Node, newName: string, refreshTree: () => void)
 
 	if (node.type === 'item')
 	{
+		if (!node.item)
+		{
+			console.error('Cannot rename item: node has no associated item', node);
+			return;
+		}
+
 		const updatedItem = await updateItem(
 			{
-				id: node.resourceId!,
+				id: node.item.id,
 				data: {
 					name: newName,
 				},

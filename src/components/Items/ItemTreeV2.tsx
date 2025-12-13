@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { Node } from '@generated/graphql/types';
 import { getDescendantNodes } from '@/lib/graphql/nodes';
-import { Collection } from '@components/Sidebar';
+import { Collection } from '@components/Collection';
 import NodeRendererV2 from './NodeRendererV2';
 import useSWR from 'swr';
 import {

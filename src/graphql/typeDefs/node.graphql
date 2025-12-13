@@ -9,11 +9,13 @@ type Node {
 	name: String!
 
 	type: NodeType!
-	resourceId: ID
 
-	parentId: ID
-	parent: Node
+	item: Item
+	recipe: Recipe
+
 	children: [ID!]!
+	parent: Node
+
 	order: Int!
 }
 
@@ -21,7 +23,8 @@ input CreateNodeInput {
 	name: String!
 	type: NodeType!
 	parentId: ID
-	resourceId: ID
+	itemId: ID
+	recipeId: ID
 }
 
 input UpdateNodeInput {

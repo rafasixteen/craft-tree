@@ -101,7 +101,8 @@ export const NodeScalarFieldEnum = {
   id: 'id',
   name: 'name',
   type: 'type',
-  resourceId: 'resourceId',
+  itemId: 'itemId',
+  recipeId: 'recipeId',
   parentId: 'parentId',
   order: 'order'
 } as const

@@ -25,9 +25,10 @@ export type CreateItemInput = {
 };
 
 export type CreateNodeInput = {
+  itemId?: InputMaybe<Scalars['ID']['input']>;
   name: Scalars['String']['input'];
   parentId?: InputMaybe<Scalars['ID']['input']>;
-  resourceId?: InputMaybe<Scalars['ID']['input']>;
+  recipeId?: InputMaybe<Scalars['ID']['input']>;
   type: NodeType;
 };
 
@@ -122,11 +123,11 @@ export type Node = {
   __typename?: 'Node';
   children: Array<Scalars['ID']['output']>;
   id: Scalars['ID']['output'];
+  item?: Maybe<Item>;
   name: Scalars['String']['output'];
   order: Scalars['Int']['output'];
   parent?: Maybe<Node>;
-  parentId?: Maybe<Scalars['ID']['output']>;
-  resourceId?: Maybe<Scalars['ID']['output']>;
+  recipe?: Maybe<Recipe>;
   type: NodeType;
 };
 
@@ -332,11 +333,11 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
   children?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  item?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   order?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   parent?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType>;
-  parentId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
-  resourceId?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  recipe?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['NodeType'], ParentType, ContextType>;
 };
 

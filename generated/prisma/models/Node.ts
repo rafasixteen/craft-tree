@@ -38,7 +38,8 @@ export type NodeMinAggregateOutputType = {
   id: string | null
   name: string | null
   type: $Enums.NodeType | null
-  resourceId: string | null
+  itemId: string | null
+  recipeId: string | null
   parentId: string | null
   order: number | null
 }
@@ -47,7 +48,8 @@ export type NodeMaxAggregateOutputType = {
   id: string | null
   name: string | null
   type: $Enums.NodeType | null
-  resourceId: string | null
+  itemId: string | null
+  recipeId: string | null
   parentId: string | null
   order: number | null
 }
@@ -56,7 +58,8 @@ export type NodeCountAggregateOutputType = {
   id: number
   name: number
   type: number
-  resourceId: number
+  itemId: number
+  recipeId: number
   parentId: number
   order: number
   _all: number
@@ -75,7 +78,8 @@ export type NodeMinAggregateInputType = {
   id?: true
   name?: true
   type?: true
-  resourceId?: true
+  itemId?: true
+  recipeId?: true
   parentId?: true
   order?: true
 }
@@ -84,7 +88,8 @@ export type NodeMaxAggregateInputType = {
   id?: true
   name?: true
   type?: true
-  resourceId?: true
+  itemId?: true
+  recipeId?: true
   parentId?: true
   order?: true
 }
@@ -93,7 +98,8 @@ export type NodeCountAggregateInputType = {
   id?: true
   name?: true
   type?: true
-  resourceId?: true
+  itemId?: true
+  recipeId?: true
   parentId?: true
   order?: true
   _all?: true
@@ -189,7 +195,8 @@ export type NodeGroupByOutputType = {
   id: string
   name: string
   type: $Enums.NodeType
-  resourceId: string | null
+  itemId: string | null
+  recipeId: string | null
   parentId: string | null
   order: number
   _count: NodeCountAggregateOutputType | null
@@ -221,9 +228,12 @@ export type NodeWhereInput = {
   id?: Prisma.StringFilter<"Node"> | string
   name?: Prisma.StringFilter<"Node"> | string
   type?: Prisma.EnumNodeTypeFilter<"Node"> | $Enums.NodeType
-  resourceId?: Prisma.StringNullableFilter<"Node"> | string | null
+  itemId?: Prisma.StringNullableFilter<"Node"> | string | null
+  recipeId?: Prisma.StringNullableFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableFilter<"Node"> | string | null
   order?: Prisma.IntFilter<"Node"> | number
+  item?: Prisma.XOR<Prisma.ItemNullableScalarRelationFilter, Prisma.ItemWhereInput> | null
+  recipe?: Prisma.XOR<Prisma.RecipeNullableScalarRelationFilter, Prisma.RecipeWhereInput> | null
   children?: Prisma.NodeListRelationFilter
   parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
 }
@@ -232,9 +242,12 @@ export type NodeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  resourceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  itemId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recipeId?: Prisma.SortOrderInput | Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
+  item?: Prisma.ItemOrderByWithRelationInput
+  recipe?: Prisma.RecipeOrderByWithRelationInput
   children?: Prisma.NodeOrderByRelationAggregateInput
   parent?: Prisma.NodeOrderByWithRelationInput
 }
@@ -246,9 +259,12 @@ export type NodeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.NodeWhereInput | Prisma.NodeWhereInput[]
   name?: Prisma.StringFilter<"Node"> | string
   type?: Prisma.EnumNodeTypeFilter<"Node"> | $Enums.NodeType
-  resourceId?: Prisma.StringNullableFilter<"Node"> | string | null
+  itemId?: Prisma.StringNullableFilter<"Node"> | string | null
+  recipeId?: Prisma.StringNullableFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableFilter<"Node"> | string | null
   order?: Prisma.IntFilter<"Node"> | number
+  item?: Prisma.XOR<Prisma.ItemNullableScalarRelationFilter, Prisma.ItemWhereInput> | null
+  recipe?: Prisma.XOR<Prisma.RecipeNullableScalarRelationFilter, Prisma.RecipeWhereInput> | null
   children?: Prisma.NodeListRelationFilter
   parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
 }, "id">
@@ -257,7 +273,8 @@ export type NodeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  resourceId?: Prisma.SortOrderInput | Prisma.SortOrder
+  itemId?: Prisma.SortOrderInput | Prisma.SortOrder
+  recipeId?: Prisma.SortOrderInput | Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   order?: Prisma.SortOrder
   _count?: Prisma.NodeCountOrderByAggregateInput
@@ -274,7 +291,8 @@ export type NodeScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Node"> | string
   name?: Prisma.StringWithAggregatesFilter<"Node"> | string
   type?: Prisma.EnumNodeTypeWithAggregatesFilter<"Node"> | $Enums.NodeType
-  resourceId?: Prisma.StringNullableWithAggregatesFilter<"Node"> | string | null
+  itemId?: Prisma.StringNullableWithAggregatesFilter<"Node"> | string | null
+  recipeId?: Prisma.StringNullableWithAggregatesFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableWithAggregatesFilter<"Node"> | string | null
   order?: Prisma.IntWithAggregatesFilter<"Node"> | number
 }
@@ -283,8 +301,9 @@ export type NodeCreateInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
   order: number
+  item?: Prisma.ItemCreateNestedOneWithoutNodesInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutNodesInput
   children?: Prisma.NodeCreateNestedManyWithoutParentInput
   parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
 }
@@ -293,7 +312,8 @@ export type NodeUncheckedCreateInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
+  itemId?: string | null
+  recipeId?: string | null
   parentId?: string | null
   order: number
   children?: Prisma.NodeUncheckedCreateNestedManyWithoutParentInput
@@ -303,8 +323,9 @@ export type NodeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  item?: Prisma.ItemUpdateOneWithoutNodesNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutNodesNestedInput
   children?: Prisma.NodeUpdateManyWithoutParentNestedInput
   parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
 }
@@ -313,7 +334,8 @@ export type NodeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   children?: Prisma.NodeUncheckedUpdateManyWithoutParentNestedInput
@@ -323,7 +345,8 @@ export type NodeCreateManyInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
+  itemId?: string | null
+  recipeId?: string | null
   parentId?: string | null
   order: number
 }
@@ -332,7 +355,6 @@ export type NodeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -340,7 +362,8 @@ export type NodeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -351,20 +374,21 @@ export type NodeListRelationFilter = {
   none?: Prisma.NodeWhereInput
 }
 
+export type NodeOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type NodeNullableScalarRelationFilter = {
   is?: Prisma.NodeWhereInput | null
   isNot?: Prisma.NodeWhereInput | null
-}
-
-export type NodeOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
 }
 
 export type NodeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  resourceId?: Prisma.SortOrder
+  itemId?: Prisma.SortOrder
+  recipeId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   order?: Prisma.SortOrder
 }
@@ -377,7 +401,8 @@ export type NodeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  resourceId?: Prisma.SortOrder
+  itemId?: Prisma.SortOrder
+  recipeId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   order?: Prisma.SortOrder
 }
@@ -386,13 +411,98 @@ export type NodeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
-  resourceId?: Prisma.SortOrder
+  itemId?: Prisma.SortOrder
+  recipeId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
   order?: Prisma.SortOrder
 }
 
 export type NodeSumOrderByAggregateInput = {
   order?: Prisma.SortOrder
+}
+
+export type NodeCreateNestedManyWithoutItemInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutItemInput, Prisma.NodeUncheckedCreateWithoutItemInput> | Prisma.NodeCreateWithoutItemInput[] | Prisma.NodeUncheckedCreateWithoutItemInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutItemInput | Prisma.NodeCreateOrConnectWithoutItemInput[]
+  createMany?: Prisma.NodeCreateManyItemInputEnvelope
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+}
+
+export type NodeUncheckedCreateNestedManyWithoutItemInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutItemInput, Prisma.NodeUncheckedCreateWithoutItemInput> | Prisma.NodeCreateWithoutItemInput[] | Prisma.NodeUncheckedCreateWithoutItemInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutItemInput | Prisma.NodeCreateOrConnectWithoutItemInput[]
+  createMany?: Prisma.NodeCreateManyItemInputEnvelope
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+}
+
+export type NodeUpdateManyWithoutItemNestedInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutItemInput, Prisma.NodeUncheckedCreateWithoutItemInput> | Prisma.NodeCreateWithoutItemInput[] | Prisma.NodeUncheckedCreateWithoutItemInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutItemInput | Prisma.NodeCreateOrConnectWithoutItemInput[]
+  upsert?: Prisma.NodeUpsertWithWhereUniqueWithoutItemInput | Prisma.NodeUpsertWithWhereUniqueWithoutItemInput[]
+  createMany?: Prisma.NodeCreateManyItemInputEnvelope
+  set?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  disconnect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  delete?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  update?: Prisma.NodeUpdateWithWhereUniqueWithoutItemInput | Prisma.NodeUpdateWithWhereUniqueWithoutItemInput[]
+  updateMany?: Prisma.NodeUpdateManyWithWhereWithoutItemInput | Prisma.NodeUpdateManyWithWhereWithoutItemInput[]
+  deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
+}
+
+export type NodeUncheckedUpdateManyWithoutItemNestedInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutItemInput, Prisma.NodeUncheckedCreateWithoutItemInput> | Prisma.NodeCreateWithoutItemInput[] | Prisma.NodeUncheckedCreateWithoutItemInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutItemInput | Prisma.NodeCreateOrConnectWithoutItemInput[]
+  upsert?: Prisma.NodeUpsertWithWhereUniqueWithoutItemInput | Prisma.NodeUpsertWithWhereUniqueWithoutItemInput[]
+  createMany?: Prisma.NodeCreateManyItemInputEnvelope
+  set?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  disconnect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  delete?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  update?: Prisma.NodeUpdateWithWhereUniqueWithoutItemInput | Prisma.NodeUpdateWithWhereUniqueWithoutItemInput[]
+  updateMany?: Prisma.NodeUpdateManyWithWhereWithoutItemInput | Prisma.NodeUpdateManyWithWhereWithoutItemInput[]
+  deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
+}
+
+export type NodeCreateNestedManyWithoutRecipeInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutRecipeInput, Prisma.NodeUncheckedCreateWithoutRecipeInput> | Prisma.NodeCreateWithoutRecipeInput[] | Prisma.NodeUncheckedCreateWithoutRecipeInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutRecipeInput | Prisma.NodeCreateOrConnectWithoutRecipeInput[]
+  createMany?: Prisma.NodeCreateManyRecipeInputEnvelope
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+}
+
+export type NodeUncheckedCreateNestedManyWithoutRecipeInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutRecipeInput, Prisma.NodeUncheckedCreateWithoutRecipeInput> | Prisma.NodeCreateWithoutRecipeInput[] | Prisma.NodeUncheckedCreateWithoutRecipeInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutRecipeInput | Prisma.NodeCreateOrConnectWithoutRecipeInput[]
+  createMany?: Prisma.NodeCreateManyRecipeInputEnvelope
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+}
+
+export type NodeUpdateManyWithoutRecipeNestedInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutRecipeInput, Prisma.NodeUncheckedCreateWithoutRecipeInput> | Prisma.NodeCreateWithoutRecipeInput[] | Prisma.NodeUncheckedCreateWithoutRecipeInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutRecipeInput | Prisma.NodeCreateOrConnectWithoutRecipeInput[]
+  upsert?: Prisma.NodeUpsertWithWhereUniqueWithoutRecipeInput | Prisma.NodeUpsertWithWhereUniqueWithoutRecipeInput[]
+  createMany?: Prisma.NodeCreateManyRecipeInputEnvelope
+  set?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  disconnect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  delete?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  update?: Prisma.NodeUpdateWithWhereUniqueWithoutRecipeInput | Prisma.NodeUpdateWithWhereUniqueWithoutRecipeInput[]
+  updateMany?: Prisma.NodeUpdateManyWithWhereWithoutRecipeInput | Prisma.NodeUpdateManyWithWhereWithoutRecipeInput[]
+  deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
+}
+
+export type NodeUncheckedUpdateManyWithoutRecipeNestedInput = {
+  create?: Prisma.XOR<Prisma.NodeCreateWithoutRecipeInput, Prisma.NodeUncheckedCreateWithoutRecipeInput> | Prisma.NodeCreateWithoutRecipeInput[] | Prisma.NodeUncheckedCreateWithoutRecipeInput[]
+  connectOrCreate?: Prisma.NodeCreateOrConnectWithoutRecipeInput | Prisma.NodeCreateOrConnectWithoutRecipeInput[]
+  upsert?: Prisma.NodeUpsertWithWhereUniqueWithoutRecipeInput | Prisma.NodeUpsertWithWhereUniqueWithoutRecipeInput[]
+  createMany?: Prisma.NodeCreateManyRecipeInputEnvelope
+  set?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  disconnect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  delete?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  connect?: Prisma.NodeWhereUniqueInput | Prisma.NodeWhereUniqueInput[]
+  update?: Prisma.NodeUpdateWithWhereUniqueWithoutRecipeInput | Prisma.NodeUpdateWithWhereUniqueWithoutRecipeInput[]
+  updateMany?: Prisma.NodeUpdateManyWithWhereWithoutRecipeInput | Prisma.NodeUpdateManyWithWhereWithoutRecipeInput[]
+  deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
 }
 
 export type NodeCreateNestedManyWithoutParentInput = {
@@ -419,10 +529,6 @@ export type EnumNodeTypeFieldUpdateOperationsInput = {
   set?: $Enums.NodeType
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NodeUpdateManyWithoutParentNestedInput = {
   create?: Prisma.XOR<Prisma.NodeCreateWithoutParentInput, Prisma.NodeUncheckedCreateWithoutParentInput> | Prisma.NodeCreateWithoutParentInput[] | Prisma.NodeUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NodeCreateOrConnectWithoutParentInput | Prisma.NodeCreateOrConnectWithoutParentInput[]
@@ -447,6 +553,10 @@ export type NodeUpdateOneWithoutChildrenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.NodeUpdateToOneWithWhereWithoutChildrenInput, Prisma.NodeUpdateWithoutChildrenInput>, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type NodeUncheckedUpdateManyWithoutParentNestedInput = {
   create?: Prisma.XOR<Prisma.NodeCreateWithoutParentInput, Prisma.NodeUncheckedCreateWithoutParentInput> | Prisma.NodeCreateWithoutParentInput[] | Prisma.NodeUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NodeCreateOrConnectWithoutParentInput | Prisma.NodeCreateOrConnectWithoutParentInput[]
@@ -461,12 +571,116 @@ export type NodeUncheckedUpdateManyWithoutParentNestedInput = {
   deleteMany?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
 }
 
+export type NodeCreateWithoutItemInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  order: number
+  recipe?: Prisma.RecipeCreateNestedOneWithoutNodesInput
+  children?: Prisma.NodeCreateNestedManyWithoutParentInput
+  parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
+}
+
+export type NodeUncheckedCreateWithoutItemInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  recipeId?: string | null
+  parentId?: string | null
+  order: number
+  children?: Prisma.NodeUncheckedCreateNestedManyWithoutParentInput
+}
+
+export type NodeCreateOrConnectWithoutItemInput = {
+  where: Prisma.NodeWhereUniqueInput
+  create: Prisma.XOR<Prisma.NodeCreateWithoutItemInput, Prisma.NodeUncheckedCreateWithoutItemInput>
+}
+
+export type NodeCreateManyItemInputEnvelope = {
+  data: Prisma.NodeCreateManyItemInput | Prisma.NodeCreateManyItemInput[]
+}
+
+export type NodeUpsertWithWhereUniqueWithoutItemInput = {
+  where: Prisma.NodeWhereUniqueInput
+  update: Prisma.XOR<Prisma.NodeUpdateWithoutItemInput, Prisma.NodeUncheckedUpdateWithoutItemInput>
+  create: Prisma.XOR<Prisma.NodeCreateWithoutItemInput, Prisma.NodeUncheckedCreateWithoutItemInput>
+}
+
+export type NodeUpdateWithWhereUniqueWithoutItemInput = {
+  where: Prisma.NodeWhereUniqueInput
+  data: Prisma.XOR<Prisma.NodeUpdateWithoutItemInput, Prisma.NodeUncheckedUpdateWithoutItemInput>
+}
+
+export type NodeUpdateManyWithWhereWithoutItemInput = {
+  where: Prisma.NodeScalarWhereInput
+  data: Prisma.XOR<Prisma.NodeUpdateManyMutationInput, Prisma.NodeUncheckedUpdateManyWithoutItemInput>
+}
+
+export type NodeScalarWhereInput = {
+  AND?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
+  OR?: Prisma.NodeScalarWhereInput[]
+  NOT?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
+  id?: Prisma.StringFilter<"Node"> | string
+  name?: Prisma.StringFilter<"Node"> | string
+  type?: Prisma.EnumNodeTypeFilter<"Node"> | $Enums.NodeType
+  itemId?: Prisma.StringNullableFilter<"Node"> | string | null
+  recipeId?: Prisma.StringNullableFilter<"Node"> | string | null
+  parentId?: Prisma.StringNullableFilter<"Node"> | string | null
+  order?: Prisma.IntFilter<"Node"> | number
+}
+
+export type NodeCreateWithoutRecipeInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  order: number
+  item?: Prisma.ItemCreateNestedOneWithoutNodesInput
+  children?: Prisma.NodeCreateNestedManyWithoutParentInput
+  parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
+}
+
+export type NodeUncheckedCreateWithoutRecipeInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  itemId?: string | null
+  parentId?: string | null
+  order: number
+  children?: Prisma.NodeUncheckedCreateNestedManyWithoutParentInput
+}
+
+export type NodeCreateOrConnectWithoutRecipeInput = {
+  where: Prisma.NodeWhereUniqueInput
+  create: Prisma.XOR<Prisma.NodeCreateWithoutRecipeInput, Prisma.NodeUncheckedCreateWithoutRecipeInput>
+}
+
+export type NodeCreateManyRecipeInputEnvelope = {
+  data: Prisma.NodeCreateManyRecipeInput | Prisma.NodeCreateManyRecipeInput[]
+}
+
+export type NodeUpsertWithWhereUniqueWithoutRecipeInput = {
+  where: Prisma.NodeWhereUniqueInput
+  update: Prisma.XOR<Prisma.NodeUpdateWithoutRecipeInput, Prisma.NodeUncheckedUpdateWithoutRecipeInput>
+  create: Prisma.XOR<Prisma.NodeCreateWithoutRecipeInput, Prisma.NodeUncheckedCreateWithoutRecipeInput>
+}
+
+export type NodeUpdateWithWhereUniqueWithoutRecipeInput = {
+  where: Prisma.NodeWhereUniqueInput
+  data: Prisma.XOR<Prisma.NodeUpdateWithoutRecipeInput, Prisma.NodeUncheckedUpdateWithoutRecipeInput>
+}
+
+export type NodeUpdateManyWithWhereWithoutRecipeInput = {
+  where: Prisma.NodeScalarWhereInput
+  data: Prisma.XOR<Prisma.NodeUpdateManyMutationInput, Prisma.NodeUncheckedUpdateManyWithoutRecipeInput>
+}
+
 export type NodeCreateWithoutParentInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
   order: number
+  item?: Prisma.ItemCreateNestedOneWithoutNodesInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutNodesInput
   children?: Prisma.NodeCreateNestedManyWithoutParentInput
 }
 
@@ -474,7 +688,8 @@ export type NodeUncheckedCreateWithoutParentInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
+  itemId?: string | null
+  recipeId?: string | null
   order: number
   children?: Prisma.NodeUncheckedCreateNestedManyWithoutParentInput
 }
@@ -492,8 +707,9 @@ export type NodeCreateWithoutChildrenInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
   order: number
+  item?: Prisma.ItemCreateNestedOneWithoutNodesInput
+  recipe?: Prisma.RecipeCreateNestedOneWithoutNodesInput
   parent?: Prisma.NodeCreateNestedOneWithoutChildrenInput
 }
 
@@ -501,7 +717,8 @@ export type NodeUncheckedCreateWithoutChildrenInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
+  itemId?: string | null
+  recipeId?: string | null
   parentId?: string | null
   order: number
 }
@@ -527,18 +744,6 @@ export type NodeUpdateManyWithWhereWithoutParentInput = {
   data: Prisma.XOR<Prisma.NodeUpdateManyMutationInput, Prisma.NodeUncheckedUpdateManyWithoutParentInput>
 }
 
-export type NodeScalarWhereInput = {
-  AND?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
-  OR?: Prisma.NodeScalarWhereInput[]
-  NOT?: Prisma.NodeScalarWhereInput | Prisma.NodeScalarWhereInput[]
-  id?: Prisma.StringFilter<"Node"> | string
-  name?: Prisma.StringFilter<"Node"> | string
-  type?: Prisma.EnumNodeTypeFilter<"Node"> | $Enums.NodeType
-  resourceId?: Prisma.StringNullableFilter<"Node"> | string | null
-  parentId?: Prisma.StringNullableFilter<"Node"> | string | null
-  order?: Prisma.IntFilter<"Node"> | number
-}
-
 export type NodeUpsertWithoutChildrenInput = {
   update: Prisma.XOR<Prisma.NodeUpdateWithoutChildrenInput, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
   create: Prisma.XOR<Prisma.NodeCreateWithoutChildrenInput, Prisma.NodeUncheckedCreateWithoutChildrenInput>
@@ -554,8 +759,9 @@ export type NodeUpdateWithoutChildrenInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  item?: Prisma.ItemUpdateOneWithoutNodesNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutNodesNestedInput
   parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
 }
 
@@ -563,7 +769,84 @@ export type NodeUncheckedUpdateWithoutChildrenInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type NodeCreateManyItemInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  recipeId?: string | null
+  parentId?: string | null
+  order: number
+}
+
+export type NodeUpdateWithoutItemInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  recipe?: Prisma.RecipeUpdateOneWithoutNodesNestedInput
+  children?: Prisma.NodeUpdateManyWithoutParentNestedInput
+  parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
+}
+
+export type NodeUncheckedUpdateWithoutItemInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  children?: Prisma.NodeUncheckedUpdateManyWithoutParentNestedInput
+}
+
+export type NodeUncheckedUpdateManyWithoutItemInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+export type NodeCreateManyRecipeInput = {
+  id?: string
+  name: string
+  type: $Enums.NodeType
+  itemId?: string | null
+  parentId?: string | null
+  order: number
+}
+
+export type NodeUpdateWithoutRecipeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  item?: Prisma.ItemUpdateOneWithoutNodesNestedInput
+  children?: Prisma.NodeUpdateManyWithoutParentNestedInput
+  parent?: Prisma.NodeUpdateOneWithoutChildrenNestedInput
+}
+
+export type NodeUncheckedUpdateWithoutRecipeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  children?: Prisma.NodeUncheckedUpdateManyWithoutParentNestedInput
+}
+
+export type NodeUncheckedUpdateManyWithoutRecipeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
@@ -572,7 +855,8 @@ export type NodeCreateManyParentInput = {
   id?: string
   name: string
   type: $Enums.NodeType
-  resourceId?: string | null
+  itemId?: string | null
+  recipeId?: string | null
   order: number
 }
 
@@ -580,8 +864,9 @@ export type NodeUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
+  item?: Prisma.ItemUpdateOneWithoutNodesNestedInput
+  recipe?: Prisma.RecipeUpdateOneWithoutNodesNestedInput
   children?: Prisma.NodeUpdateManyWithoutParentNestedInput
 }
 
@@ -589,7 +874,8 @@ export type NodeUncheckedUpdateWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
   children?: Prisma.NodeUncheckedUpdateManyWithoutParentNestedInput
 }
@@ -598,7 +884,8 @@ export type NodeUncheckedUpdateManyWithoutParentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumNodeTypeFieldUpdateOperationsInput | $Enums.NodeType
-  resourceId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  itemId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  recipeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   order?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -637,9 +924,12 @@ export type NodeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   name?: boolean
   type?: boolean
-  resourceId?: boolean
+  itemId?: boolean
+  recipeId?: boolean
   parentId?: boolean
   order?: boolean
+  item?: boolean | Prisma.Node$itemArgs<ExtArgs>
+  recipe?: boolean | Prisma.Node$recipeArgs<ExtArgs>
   children?: boolean | Prisma.Node$childrenArgs<ExtArgs>
   parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
   _count?: boolean | Prisma.NodeCountOutputTypeDefaultArgs<ExtArgs>
@@ -649,9 +939,12 @@ export type NodeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   type?: boolean
-  resourceId?: boolean
+  itemId?: boolean
+  recipeId?: boolean
   parentId?: boolean
   order?: boolean
+  item?: boolean | Prisma.Node$itemArgs<ExtArgs>
+  recipe?: boolean | Prisma.Node$recipeArgs<ExtArgs>
   parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
 }, ExtArgs["result"]["node"]>
 
@@ -659,9 +952,12 @@ export type NodeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   type?: boolean
-  resourceId?: boolean
+  itemId?: boolean
+  recipeId?: boolean
   parentId?: boolean
   order?: boolean
+  item?: boolean | Prisma.Node$itemArgs<ExtArgs>
+  recipe?: boolean | Prisma.Node$recipeArgs<ExtArgs>
   parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
 }, ExtArgs["result"]["node"]>
 
@@ -669,27 +965,36 @@ export type NodeSelectScalar = {
   id?: boolean
   name?: boolean
   type?: boolean
-  resourceId?: boolean
+  itemId?: boolean
+  recipeId?: boolean
   parentId?: boolean
   order?: boolean
 }
 
-export type NodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "resourceId" | "parentId" | "order", ExtArgs["result"]["node"]>
+export type NodeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "itemId" | "recipeId" | "parentId" | "order", ExtArgs["result"]["node"]>
 export type NodeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  item?: boolean | Prisma.Node$itemArgs<ExtArgs>
+  recipe?: boolean | Prisma.Node$recipeArgs<ExtArgs>
   children?: boolean | Prisma.Node$childrenArgs<ExtArgs>
   parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
   _count?: boolean | Prisma.NodeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type NodeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  item?: boolean | Prisma.Node$itemArgs<ExtArgs>
+  recipe?: boolean | Prisma.Node$recipeArgs<ExtArgs>
   parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
 }
 export type NodeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  item?: boolean | Prisma.Node$itemArgs<ExtArgs>
+  recipe?: boolean | Prisma.Node$recipeArgs<ExtArgs>
   parent?: boolean | Prisma.Node$parentArgs<ExtArgs>
 }
 
 export type $NodePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Node"
   objects: {
+    item: Prisma.$ItemPayload<ExtArgs> | null
+    recipe: Prisma.$RecipePayload<ExtArgs> | null
     children: Prisma.$NodePayload<ExtArgs>[]
     parent: Prisma.$NodePayload<ExtArgs> | null
   }
@@ -697,7 +1002,8 @@ export type $NodePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     name: string
     type: $Enums.NodeType
-    resourceId: string | null
+    itemId: string | null
+    recipeId: string | null
     parentId: string | null
     order: number
   }, ExtArgs["result"]["node"]>
@@ -1094,6 +1400,8 @@ readonly fields: NodeFieldRefs;
  */
 export interface Prisma__NodeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  item<T extends Prisma.Node$itemArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$itemArgs<ExtArgs>>): Prisma.Prisma__ItemClient<runtime.Types.Result.GetResult<Prisma.$ItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  recipe<T extends Prisma.Node$recipeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$recipeArgs<ExtArgs>>): Prisma.Prisma__RecipeClient<runtime.Types.Result.GetResult<Prisma.$RecipePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   children<T extends Prisma.Node$childrenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   parent<T extends Prisma.Node$parentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Node$parentArgs<ExtArgs>>): Prisma.Prisma__NodeClient<runtime.Types.Result.GetResult<Prisma.$NodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1128,7 +1436,8 @@ export interface NodeFieldRefs {
   readonly id: Prisma.FieldRef<"Node", 'String'>
   readonly name: Prisma.FieldRef<"Node", 'String'>
   readonly type: Prisma.FieldRef<"Node", 'NodeType'>
-  readonly resourceId: Prisma.FieldRef<"Node", 'String'>
+  readonly itemId: Prisma.FieldRef<"Node", 'String'>
+  readonly recipeId: Prisma.FieldRef<"Node", 'String'>
   readonly parentId: Prisma.FieldRef<"Node", 'String'>
   readonly order: Prisma.FieldRef<"Node", 'Int'>
 }
@@ -1522,6 +1831,44 @@ export type NodeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Nodes to delete.
    */
   limit?: number
+}
+
+/**
+ * Node.item
+ */
+export type Node$itemArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Item
+   */
+  select?: Prisma.ItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Item
+   */
+  omit?: Prisma.ItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ItemInclude<ExtArgs> | null
+  where?: Prisma.ItemWhereInput
+}
+
+/**
+ * Node.recipe
+ */
+export type Node$recipeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Recipe
+   */
+  select?: Prisma.RecipeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Recipe
+   */
+  omit?: Prisma.RecipeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RecipeInclude<ExtArgs> | null
+  where?: Prisma.RecipeWhereInput
 }
 
 /**
