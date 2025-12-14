@@ -3,7 +3,7 @@
 import { Collections, Collection } from '@components/Collection';
 import { SearchBar } from '@components/Sidebar';
 import { NavUser } from './NavUser';
-import { ItemTreeV2 } from '@/components/Items';
+import { ItemTree } from '@/components/Items';
 import { useState } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 
@@ -25,7 +25,7 @@ export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sid
 					<SidebarGroupLabel>Items</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							<ItemTreeV2 searchValue={searchValue} activeCollection={activeCollection} />
+							<ItemTree searchValue={searchValue} activeCollection={activeCollection} />
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
