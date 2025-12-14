@@ -6,8 +6,9 @@ import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { Node } from '@generated/graphql/types';
 import { getDescendantNodes } from '@/lib/graphql/nodes';
 import { Collection } from '@components/Collection';
-import NodeRendererV2 from './NodeRenderer';
+import { NodeRenderer } from '@/components/Items';
 import useSWR from 'swr';
+import { nodeActionsFeature } from '@components/Items/features/nodeActions';
 import {
 	createOnDropHandler,
 	dragAndDropFeature,
@@ -25,13 +26,13 @@ import {
 const indent = 8;
 const dummyRootId = 'tree-root';
 
-interface ItemTreeV2Props
+interface ItemTreeProps
 {
 	searchValue: string;
 	activeCollection?: Collection | null;
 }
 
-export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2Props)
+export default function ItemTree({ searchValue, activeCollection }: ItemTreeProps)
 {
 	const [nodes, setNodes] = useState<Record<string, Node>>({});
 	const [state, setState] = useState<Partial<TreeState<Node>>>({});
@@ -83,7 +84,16 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 	}
 
 	const tree: TreeInstance<Node> = useTree<Node>({
-		features: [syncDataLoaderFeature, selectionFeature, searchFeature, expandAllFeature, hotkeysCoreFeature, dragAndDropFeature, keyboardDragAndDropFeature],
+		features: [
+			syncDataLoaderFeature,
+			selectionFeature,
+			searchFeature,
+			expandAllFeature,
+			hotkeysCoreFeature,
+			dragAndDropFeature,
+			keyboardDragAndDropFeature,
+			nodeActionsFeature,
+		],
 		canReorder: true,
 		dataLoader: {
 			getItem: getItem,
@@ -105,7 +115,49 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 				},
 			}));
 		}),
+		hotkeys: {
+			customExpandAll: {
+				hotkey: 'KeyQ',
+				handler: (e, tree) =>
+				{
+					tree.expandAll();
+				},
+			},
+			customCollapseAll: {
+				hotkey: 'KeyW',
+				handler: (e, tree) =>
+				{
+					tree.collapseAll();
+				},
+			},
+			customCreateChild: {
+				hotkey: 'Control+Plus',
+				handler: (e, tree) =>
+				{
+					e.preventDefault();
+
+					tree.getSelectedItems().forEach((item) =>
+					{
+						const node = item.getItemData();
+						if (node.type === 'recipe') return;
+						item.createChild();
+					});
+				},
+			},
+			customDeleteItem: {
+				hotkey: 'Delete',
+				handler: (e, tree) =>
+				{
+					tree.getSelectedItems().forEach((item) =>
+					{
+						item.deleteItem();
+					});
+				},
+			},
+		},
 	});
+
+	tree.onChange = mutate;
 
 	useEffect(() =>
 	{
@@ -172,7 +224,7 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 		{
 			return tree.getItems().map((item) =>
 			{
-				return <NodeRendererV2 key={item.getId()} item={item} visible={shouldShowNode(item)} refreshTree={mutate} />;
+				return <NodeRenderer key={item.getId()} item={item} visible={shouldShowNode(item)} />;
 			});
 		}
 	}
