@@ -56,7 +56,19 @@ export default function NodeRenderer({ item, visible }: NodeRendererProps)
 
 function DisplayName(item: ItemInstance<Node>)
 {
-	return item.getItemName();
+	function rename()
+	{
+		item.startRenaming();
+	}
+
+	if (item.isRenaming())
+	{
+		return <input {...item.getRenameInputProps()} />;
+	}
+	else
+	{
+		return <p onDoubleClick={rename}>{item.getItemName()}</p>;
+	}
 }
 
 function DisplayIcon(item: ItemInstance<Node>)
@@ -118,7 +130,7 @@ function DisplayContextMenu(item: ItemInstance<Node>): React.JSX.Element
 			},
 			{
 				group: [
-					{ label: 'Rename', onExecute: () => console.log('Rename') },
+					{ label: 'Rename', onExecute: () => item.startRenaming() },
 					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
 					{ label: 'Delete', onExecute: () => item.deleteItem() },
 				],
@@ -130,7 +142,7 @@ function DisplayContextMenu(item: ItemInstance<Node>): React.JSX.Element
 			},
 			{
 				group: [
-					{ label: 'Rename', onExecute: () => console.log('Rename') },
+					{ label: 'Rename', onExecute: () => item.startRenaming() },
 					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
 					{ label: 'Delete', onExecute: () => item.deleteItem() },
 				],
@@ -139,7 +151,7 @@ function DisplayContextMenu(item: ItemInstance<Node>): React.JSX.Element
 		recipe: [
 			{
 				group: [
-					{ label: 'Rename', onExecute: () => console.log('Rename') },
+					{ label: 'Rename', onExecute: () => item.startRenaming() },
 					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
 					{ label: 'Delete', onExecute: () => item.deleteItem() },
 				],

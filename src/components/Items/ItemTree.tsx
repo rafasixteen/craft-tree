@@ -18,6 +18,7 @@ import {
 	searchFeature,
 	selectionFeature,
 	syncDataLoaderFeature,
+	renamingFeature,
 	type TreeState,
 	type TreeInstance,
 	ItemInstance,
@@ -92,6 +93,7 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 			hotkeysCoreFeature,
 			dragAndDropFeature,
 			keyboardDragAndDropFeature,
+			renamingFeature,
 			nodeActionsFeature,
 		],
 		canReorder: true,
@@ -100,6 +102,7 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 			getChildren: getItemChildren,
 		},
 		getItemName: getItemName,
+		onRename: onRename,
 		isItemFolder: isItemFolder,
 		indent: indent,
 		rootItemId: dummyRootId,
@@ -238,6 +241,11 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 			</Tree>
 		</div>
 	);
+}
+
+function onRename(item: ItemInstance<Node>, value: string)
+{
+	item.renameItem(value);
 }
 
 function isItemFolder(item: ItemInstance<Node>): boolean

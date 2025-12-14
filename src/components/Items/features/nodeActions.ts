@@ -1,6 +1,6 @@
 import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
-import { createNode, deleteNode } from '@/lib/graphql/nodes';
-import { createItem } from '@/lib/graphql/items';
+import { createNode, deleteNode, updateNode } from '@/lib/graphql/nodes';
+import { createItem, updateItem } from '@/lib/graphql/items';
 import { Node } from '@generated/graphql/types';
 import { createRecipe } from '@/lib/graphql/recipes';
 
@@ -11,6 +11,7 @@ declare module '@headless-tree/core'
 		createChild: () => void;
 		createFolder: () => void;
 		deleteItem: () => void;
+		renameItem: (newName: string) => void;
 	}
 
 	export interface TreeInstance<T>
@@ -61,6 +62,25 @@ export const nodeActionsFeature: FeatureImplementation = {
 			const tree = item.getTree();
 
 			await deleteNode({ id: node.id }, { id: true });
+			tree.onChange?.();
+		},
+		renameItem: async ({ item }: { item: ItemInstance<Node> }, newName: string) =>
+		{
+			const node = item.getItemData();
+			const tree = item.getTree();
+
+			await updateNode(
+				{
+					id: node.id,
+					data: {
+						name: newName,
+					},
+				},
+				{
+					id: true,
+				},
+			);
+
 			tree.onChange?.();
 		},
 	},
