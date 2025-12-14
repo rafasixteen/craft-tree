@@ -4,7 +4,7 @@ import { ChevronDownIcon, EllipsisIcon, PlusIcon, Folder, FolderOpen, Box, Cooki
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem } from '@/components/ui/tree';
 import { Node, NodeType } from '@generated/graphql/types';
-import { createNode, updateNode } from '@/lib/graphql/nodes';
+import { createNode, deleteNode, updateNode } from '@/lib/graphql/nodes';
 import { createItem, updateItem } from '@/lib/graphql/items';
 import { createRecipe } from '@/lib/graphql/recipes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@components/ui/dropdown-menu';
@@ -119,6 +119,20 @@ function DisplayPlusIcon(item: ItemInstance<Node>, refreshTree: () => void)
 
 function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Element
 {
+	async function del()
+	{
+		await deleteNode(
+			{
+				id: node.id,
+			},
+			{
+				id: true,
+			},
+		);
+
+		refreshTree();
+	}
+
 	const actionsByNodeType: ActionsByNodeType = {
 		folder: [
 			{
@@ -131,7 +145,7 @@ function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Elem
 				group: [
 					{ label: 'Rename', onExecute: () => console.log('Rename') },
 					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: () => console.log('Delete') },
+					{ label: 'Delete', onExecute: () => del() },
 				],
 			},
 		],
@@ -143,7 +157,7 @@ function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Elem
 				group: [
 					{ label: 'Rename', onExecute: () => console.log('Rename') },
 					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: () => console.log('Delete') },
+					{ label: 'Delete', onExecute: () => del() },
 				],
 			},
 		],
@@ -152,7 +166,7 @@ function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Elem
 				group: [
 					{ label: 'Rename', onExecute: () => console.log('Rename') },
 					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: () => console.log('Delete') },
+					{ label: 'Delete', onExecute: () => del() },
 				],
 			},
 		],

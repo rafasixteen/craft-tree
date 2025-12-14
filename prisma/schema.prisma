@@ -46,11 +46,10 @@ model Node {
 
   type NodeType
 
-  // A node only references an Item or a Recipe, not both.
-  item   Item?   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  item   Item?   @relation(fields: [itemId], references: [id])
   itemId String?
 
-  recipe   Recipe? @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipe   Recipe? @relation(fields: [recipeId], references: [id])
   recipeId String?
 
   children Node[] @relation("NodeChildren")
@@ -59,6 +58,10 @@ model Node {
   parentId String?
   order    Int
 
+  /// Ensures that each Item can only be referenced by a single Node.
+  @@unique([itemId], name: "unique_node_item")
+  /// Ensures that each Recipe can only be referenced by a single Node.
+  @@unique([recipeId], name: "unique_node_recipe")
   @@index([parentId, order])
   @@map("Nodes")
 }
