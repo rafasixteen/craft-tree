@@ -1,63 +1,59 @@
 import { MutationUpdateItemArgs, MutationCreateItemArgs, Item, MutationDeleteItemArgs } from '@generated/graphql/types';
-import { graphqlRequest } from './api';
-import { buildSelection } from './utils';
+import { buildSelection, Selection, endpoint } from './utils';
+import { gql, request } from 'graphql-request';
 
-export async function getItem<T extends keyof Item>(id: string, fields: T[]): Promise<Pick<Item, T>>
+export async function getItem(id: string, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
+	const query = gql`
 		query Item($id: ID!) {
 			item(id: $id) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	return (await graphqlRequest<{ item: Item }>(query, { id })).item;
+	const response = await request<{ item: Item }>(endpoint, query, { id });
+	return response.item;
 }
 
-export async function createItem<T extends keyof Item>(args: MutationCreateItemArgs, fields: T[]): Promise<Pick<Item, T>>
+export async function createItem(args: MutationCreateItemArgs, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
-		mutation CreateItem($data: CreateItemInput!) {
+	const query = gql`
+		mutation Mutation($data: CreateItemInput!) {
 			createItem(data: $data) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	return (await graphqlRequest<{ createItem: Item }>(query, args)).createItem;
+	const response = await request<{ createItem: Item }>(endpoint, query, args);
+	return response.createItem;
 }
 
-export async function updateItem<T extends keyof Item>(args: MutationUpdateItemArgs, fields: T[]): Promise<Pick<Item, T>>
+export async function updateItem(args: MutationUpdateItemArgs, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
-		mutation UpdateItem($id: ID!, $data: UpdateItemInput!) {
+	const query = gql`
+		mutation Mutation($id: ID!, $data: UpdateItemInput!) {
 			updateItem(id: $id, data: $data) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	return (await graphqlRequest<{ updateItem: Item }>(query, args)).updateItem;
+	const response = await request<{ updateItem: Item }>(endpoint, query, args);
+	return response.updateItem;
 }
 
-export async function deleteItem<T extends keyof Item>(args: MutationDeleteItemArgs, fields: T[]): Promise<Pick<Item, T>>
+export async function deleteItem(args: MutationDeleteItemArgs, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
-		mutation DeleteItem($id: ID!) {
+	const query = gql`
+		mutation Mutation($id: ID!) {
 			deleteItem(id: $id) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
   	`;
 
-	return (await graphqlRequest<{ deleteItem: Pick<Item, T> }>(query, args)).deleteItem;
+	const response = await request<{ deleteItem: Item }>(endpoint, query, args);
+	return response.deleteItem;
 }

@@ -19,4 +19,7 @@ export const resolvers = {
 	Recipe: {
 		...recipeResolvers.Recipe,
 	},
+	Node: {
+		...nodeResolvers.Node,
+	},
 };

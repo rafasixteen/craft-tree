@@ -121,7 +121,7 @@ export type MutationUpdateRecipeArgs = {
 
 export type Node = {
   __typename?: 'Node';
-  children: Array<Scalars['ID']['output']>;
+  children: Array<Node>;
   id: Scalars['ID']['output'];
   item?: Maybe<Item>;
   name: Scalars['String']['output'];
@@ -331,7 +331,7 @@ export type MutationResolvers<ContextType = GraphQLContext, ParentType extends R
 };
 
 export type NodeResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Node'] = ResolversParentTypes['Node']> = {
-  children?: Resolver<Array<ResolversTypes['ID']>, ParentType, ContextType>;
+  children?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   item?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

@@ -6,75 +6,30 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
 		node: async (_parent, args, ctx) =>
 		{
-			const node = await ctx.prisma.node.findUnique({
+			return ctx.prisma.node.findUnique({
 				where: {
 					id: args.id,
 				},
-				include: {
-					parent: {
-						include: {
-							children: true,
-						},
-					},
-					children: {
-						orderBy: {
-							order: 'asc',
-						},
-					},
-					item: true,
-					recipe: true,
-				},
 			});
-
-			if (!node) return null;
-
-			return { ...node, children: node.children.map((child) => child.id) };
 		},
 		nodes: async (_parent, _args, ctx) =>
 		{
-			const nodes = await ctx.prisma.node.findMany({
+			return await ctx.prisma.node.findMany({
 				orderBy: {
 					order: 'asc',
 				},
-				include: {
-					parent: true,
-					children: {
-						orderBy: {
-							order: 'asc',
-						},
-					},
-					item: true,
-					recipe: true,
-				},
 			});
-
-			return nodes.map((node) => ({
-				...node,
-				children: node.children.map((child) => child.id),
-			}));
 		},
 		rootNodes: async (_parent, _args, ctx) =>
 		{
-			const nodes = await ctx.prisma.node.findMany({
+			return await ctx.prisma.node.findMany({
 				where: {
 					parentId: null,
 				},
 				orderBy: {
 					order: 'asc',
 				},
-				include: {
-					children: {
-						orderBy: {
-							order: 'asc',
-						},
-					},
-				},
 			});
-
-			return nodes.map((node) => ({
-				...node,
-				children: node.children.map((child) => child.id),
-			}));
 		},
 		descendantNodes: async (_parent, args, ctx) =>
 		{
@@ -108,7 +63,7 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 			{
 				if (node.parentId && nodesMap.has(node.parentId))
 				{
-					nodesMap.get(node.parentId)!.children.push(node.id);
+					nodesMap.get(node.parentId)!.children.push(node);
 				}
 			}
 
@@ -133,12 +88,6 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 					item: itemId ? { connect: { id: itemId } } : undefined,
 					recipe: recipeId ? { connect: { id: recipeId } } : undefined,
 					order: await getOrder(),
-				},
-				include: {
-					parent: true,
-					children: true,
-					item: true,
-					recipe: true,
 				},
 			});
 
@@ -180,7 +129,7 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 
 			return ctx.prisma.node.delete({
 				where: {
-					id,
+					id: id,
 				},
 			});
 		},
@@ -198,7 +147,7 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 		},
 		children: async (node, _args, ctx) =>
 		{
-			const children = await ctx.prisma.node.findMany({
+			return ctx.prisma.node.findMany({
 				where: {
 					parentId: node.id,
 				},
@@ -206,8 +155,6 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 					order: 'asc',
 				},
 			});
-
-			return children.map((child) => child.id);
 		},
 		item: async (node, _args, ctx) =>
 		{

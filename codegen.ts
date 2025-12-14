@@ -1,10 +1,11 @@
 import { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-	schema: 'src/graphql/typeDefs/**/*.{graphql,gql}',
-	documents: 'src/**/*.{ts,tsx,js,jsx,graphql}',
+	schema: './src/graphql/types/*{.gql,.graphql}',
+	documents: ['src/graphql/types/*{.gql,.graphql}'],
 	generates: {
 		'./generated/graphql/types.ts': {
+			documents: 'src/graphql/types/*{.gql,.graphql}',
 			plugins: ['typescript', 'typescript-resolvers'],
 			config: {
 				mappers: {

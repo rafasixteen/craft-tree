@@ -1,48 +1,45 @@
 import { MutationCreateRecipeArgs, MutationDeleteRecipeArgs, MutationUpdateRecipeArgs, Recipe } from '@generated/graphql/types';
-import { graphqlRequest } from './api';
-import { buildSelection } from './utils';
+import { buildSelection, Selection, endpoint } from './utils';
+import { request, gql } from 'graphql-request';
 
-export async function createRecipe<T extends keyof Recipe>(args: MutationCreateRecipeArgs, fields: T[]): Promise<Pick<Recipe, T>>
+export async function createRecipe(args: MutationCreateRecipeArgs, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
-		mutation CreateRecipe($data: CreateRecipeInput!) {
+	const query = gql`
+		mutation Mutation($data: CreateRecipeInput!) {
 			createRecipe(data: $data) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	return (await graphqlRequest<{ createRecipe: Recipe }>(query, args)).createRecipe;
+	const response = await request<{ createRecipe: Recipe }>(endpoint, query, { data: args.data });
+	return response.createRecipe;
 }
 
-export async function updateRecipe<T extends keyof Recipe>(args: MutationUpdateRecipeArgs, fields: T[]): Promise<Pick<Recipe, T>>
+export async function updateRecipe(args: MutationUpdateRecipeArgs, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
-		mutation UpdateRecipe($id: ID!, $data: UpdateRecipeInput!) {
+	const query = gql`
+		mutation Mutation($id: ID!, $data: UpdateRecipeInput!) {
 			updateRecipe(id: $id, data: $data) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	return (await graphqlRequest<{ updateRecipe: Recipe }>(query, args)).updateRecipe;
+	const response = await request<{ updateRecipe: Recipe }>(endpoint, query, { id: args.id, data: args.data });
+	return response.updateRecipe;
 }
 
-export async function deleteRecipe<T extends keyof Recipe>(args: MutationDeleteRecipeArgs, fields: T[]): Promise<Pick<Recipe, T>>
+export async function deleteRecipe(args: MutationDeleteRecipeArgs, selection: Selection)
 {
-	const selection = buildSelection(fields);
-
-	const query = `
-		mutation DeleteRecipe($id: ID!) {
+	const query = gql`
+		mutation Mutation($id: ID!) {
 			deleteRecipe(id: $id) {
-				${selection}
+				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	return (await graphqlRequest<{ deleteRecipe: Pick<Recipe, T> }>(query, args)).deleteRecipe;
+	const response = await request<{ deleteRecipe: Recipe }>(endpoint, query, { id: args.id });
+	return response.deleteRecipe;
 }

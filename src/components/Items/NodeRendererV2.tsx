@@ -184,13 +184,19 @@ function DisplayContextMenu(node: Node, refreshTree: () => void): React.JSX.Elem
 
 async function createFolderNode(parent: Node, refreshTree: () => void)
 {
-	const newNode = await createNode({
-		data: {
-			name: 'New Folder',
-			type: 'folder',
-			parentId: parent.id,
+	const newNode = await createNode(
+		{
+			data: {
+				name: 'New Folder',
+				type: 'folder',
+				parentId: parent.id,
+			},
 		},
-	});
+		{
+			id: true,
+			name: true,
+		},
+	);
 
 	refreshTree();
 }
@@ -203,17 +209,26 @@ async function createItemNode(parent: Node, refreshTree: () => void)
 				name: 'New Item',
 			},
 		},
-		['id', 'name'],
+		{
+			id: true,
+			name: true,
+		},
 	);
 
-	const newNode = await createNode({
-		data: {
-			name: newItem.name,
-			type: 'item',
-			itemId: newItem.id,
-			parentId: parent.id,
+	const newNode = await createNode(
+		{
+			data: {
+				name: newItem.name,
+				type: 'item',
+				itemId: newItem.id,
+				parentId: parent.id,
+			},
 		},
-	});
+		{
+			id: true,
+			name: true,
+		},
+	);
 
 	refreshTree();
 }
@@ -240,17 +255,24 @@ async function createRecipeNode(parent: Node, refreshTree: () => void)
 				time: 1,
 			},
 		},
-		['id'],
+		{
+			id: true,
+		},
 	);
 
-	const newNode = await createNode({
-		data: {
-			name: 'New Recipe',
-			type: 'recipe',
-			recipeId: newRecipe.id,
-			parentId: parent.id,
+	const newNode = await createNode(
+		{
+			data: {
+				name: 'New Recipe',
+				type: 'recipe',
+				recipeId: newRecipe.id,
+				parentId: parent.id,
+			},
 		},
-	});
+		{
+			id: true,
+		},
+	);
 
 	refreshTree();
 }
@@ -264,7 +286,9 @@ async function renameNode(node: Node, newName: string, refreshTree: () => void)
 				name: newName,
 			},
 		},
-		['id'],
+		{
+			id: true,
+		},
 	);
 
 	if (node.type === 'item')
@@ -282,7 +306,9 @@ async function renameNode(node: Node, newName: string, refreshTree: () => void)
 					name: newName,
 				},
 			},
-			['id'],
+			{
+				id: true,
+			},
 		);
 	}
 

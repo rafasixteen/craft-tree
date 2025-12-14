@@ -13,7 +13,7 @@ type Node {
 	item: Item
 	recipe: Recipe
 
-	children: [ID!]!
+	children: [Node!]!
 	parent: Node
 
 	order: Int!

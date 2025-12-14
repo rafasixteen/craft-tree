@@ -43,7 +43,11 @@ export default function Collections({ onCollectionsChange, onActiveCollectionCha
 	{
 		async function fetchRootNodes()
 		{
-			const roots = await getRootNodes(['id', 'name']);
+			const roots = await getRootNodes({
+				id: true,
+				name: true,
+			});
+
 			const mapped = roots.map((root) => ({ id: root.id, name: root.name, logo: null }));
 
 			setCollections(mapped);
@@ -78,12 +82,18 @@ export default function Collections({ onCollectionsChange, onActiveCollectionCha
 
 	async function createCollection()
 	{
-		const node = await createNode({
-			data: {
-				name: newName,
-				type: 'folder',
+		const node = await createNode(
+			{
+				data: {
+					name: newName,
+					type: 'folder',
+				},
 			},
-		});
+			{
+				id: true,
+				name: true,
+			},
+		);
 
 		const newCollection = { id: node.id, name: node.name, logo: null };
 		setCollections((p) => [...p, newCollection]);

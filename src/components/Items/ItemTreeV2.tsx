@@ -38,10 +38,25 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 
 	const shouldFetch = !!activeCollection;
 
-	const { data: fetchedNodes, mutate } = useSWR(shouldFetch ? ['nodes', activeCollection.id] : null, shouldFetch ? () => getDescendantNodes(activeCollection.id) : null, {
-		revalidateOnFocus: false,
-		revalidateOnReconnect: false,
-	});
+	const { data: fetchedNodes, mutate } = useSWR(
+		shouldFetch ? ['nodes', activeCollection.id] : null,
+		shouldFetch
+			? () =>
+					getDescendantNodes(activeCollection.id, {
+						id: true,
+						name: true,
+						type: true,
+						order: true,
+						children: { id: true },
+						item: { id: true, name: true },
+						recipe: { id: true },
+					})
+			: null,
+		{
+			revalidateOnFocus: false,
+			revalidateOnReconnect: false,
+		},
+	);
 
 	function getItem(id: string): Node
 	{
@@ -64,7 +79,7 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 	function getItemChildren(id: string): string[]
 	{
 		const node = nodes[id];
-		return node ? node.children : [];
+		return node ? node.children.map((child) => child.id) : [];
 	}
 
 	const tree: TreeInstance<Node> = useTree<Node>({
@@ -86,7 +101,7 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 				...prev,
 				[parent.getId()]: {
 					...prev[parent.getId()],
-					children: newChildren,
+					children: newChildren.map((child) => nodes[child]),
 				},
 			}));
 		}),
@@ -115,7 +130,7 @@ export default function ItemTreeV2({ searchValue, activeCollection }: ItemTreeV2
 				name: 'Root',
 				type: 'folder',
 				order: 1,
-				children: rootNode ? [rootNode.id] : [],
+				children: rootNode ? [rootNode] : [],
 			},
 			...nodesMap,
 		});
@@ -216,11 +231,11 @@ function filterNodes(nodes: Record<string, Node>, tree: TreeInstance<Node>, sear
 
 		for (const child of node.children)
 		{
-			childrenMatches.add(child);
+			childrenMatches.add(child.id);
 
-			const childNode = nodes[child];
+			const childNode = nodes[child.id];
 
-			if (childNode.children?.length) getDescendants(child);
+			if (childNode.children?.length) getDescendants(child.id);
 		}
 	};
 	directMatches.forEach(getDescendants);
