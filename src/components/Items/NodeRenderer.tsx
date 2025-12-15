@@ -56,19 +56,17 @@ export default function NodeRenderer({ item, visible }: NodeRendererProps)
 
 function DisplayName(item: ItemInstance<Node>)
 {
-	function rename()
-	{
-		item.startRenaming();
-	}
-
-	if (item.isRenaming())
-	{
-		return <input {...item.getRenameInputProps()} />;
-	}
-	else
-	{
-		return <p onDoubleClick={rename}>{item.getItemName()}</p>;
-	}
+	return (
+		<div className="flex">
+			{item.isRenaming() ? (
+				<input {...item.getRenameInputProps()} className="w-full mr-2" onFocus={(e) => e.currentTarget.select()} />
+			) : (
+				<p className="truncate" onDoubleClick={() => item.startRenaming()}>
+					{item.getItemName()}
+				</p>
+			)}
+		</div>
+	);
 }
 
 function DisplayIcon(item: ItemInstance<Node>)
