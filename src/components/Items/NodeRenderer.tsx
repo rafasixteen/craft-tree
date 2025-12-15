@@ -5,20 +5,55 @@ import { ItemInstance } from '@headless-tree/core';
 import { TreeItem } from '@/components/ui/tree';
 import { Node, NodeType } from '@generated/graphql/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@components/ui/dropdown-menu';
+import { Kbd, KbdGroup } from '@/components/ui/kbd';
 
-interface Action
+interface ContextAction
 {
 	label: string;
-	onExecute: () => void;
+	execute: (item: ItemInstance<Node>) => void;
+	kbd?: string[];
 }
 
-interface ActionGroup
-{
-	group: Action[];
-}
+const ACTIONS: Record<string, ContextAction> = {
+	newItem: {
+		label: 'New Item',
+		execute: (item) => item.createChild(),
+		kbd: ['F'],
+	},
+	newFolder: {
+		label: 'New Folder',
+		execute: (item) => item.createFolder(),
+		kbd: ['Control', 'F'],
+	},
+	newRecipe: {
+		label: 'New Recipe',
+		execute: (item) => item.createChild(),
+		kbd: ['F'],
+	},
+	rename: {
+		label: 'Rename',
+		execute: (item) => item.startRenaming(),
+		kbd: ['F2'],
+	},
+	duplicate: {
+		label: 'Duplicate',
+		execute: () => console.log('Duplicate'),
+		kbd: ['Ctrl', 'D'],
+	},
+	delete: {
+		label: 'Delete',
+		execute: (item) => item.deleteItem(),
+		kbd: ['Delete'],
+	},
+};
 
-type ActionsByNodeType = {
-	[K in NodeType]: ActionGroup[];
+const ACTION_GROUPS: Record<NodeType, (keyof typeof ACTIONS)[][]> = {
+	folder: [
+		['newItem', 'newFolder'],
+		['rename', 'duplicate', 'delete'],
+	],
+	item: [['newRecipe'], ['rename', 'duplicate', 'delete']],
+	recipe: [['rename', 'duplicate', 'delete']],
 };
 
 interface NodeRendererProps
@@ -118,63 +153,35 @@ function DisplayContextMenu(item: ItemInstance<Node>): React.JSX.Element
 {
 	const node = item.getItemData();
 
-	const actionsByNodeType: ActionsByNodeType = {
-		folder: [
-			{
-				group: [
-					{ label: 'New Item', onExecute: () => item.createChild() },
-					{ label: 'New Folder', onExecute: () => item.createFolder() },
-				],
-			},
-			{
-				group: [
-					{ label: 'Rename', onExecute: () => item.startRenaming() },
-					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: () => item.deleteItem() },
-				],
-			},
-		],
-		item: [
-			{
-				group: [{ label: 'New Recipe', onExecute: () => item.createChild() }],
-			},
-			{
-				group: [
-					{ label: 'Rename', onExecute: () => item.startRenaming() },
-					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: () => item.deleteItem() },
-				],
-			},
-		],
-		recipe: [
-			{
-				group: [
-					{ label: 'Rename', onExecute: () => item.startRenaming() },
-					{ label: 'Duplicate', onExecute: () => console.log('Duplicate') },
-					{ label: 'Delete', onExecute: () => item.deleteItem() },
-				],
-			},
-		],
-	};
-
 	return (
-		<DropdownMenuContent side="right" align="start" className="w-48">
-			{actionsByNodeType[node.type].map((group, groupIndex) => (
+		<DropdownMenuContent side="right" align="start" className="w-56">
+			{ACTION_GROUPS[node.type].map((group, groupIndex) => (
 				<DropdownMenuGroup key={groupIndex}>
-					{group.group.map((action, actionIndex) => (
-						<DropdownMenuItem
-							key={actionIndex}
-							onSelect={() => action.onExecute()}
-							onClick={(e) =>
-							{
-								// This prevents the click event from going to the TreeItem and causing it to expand/collapse.
-								e.stopPropagation();
-							}}
-						>
-							{action.label}
-						</DropdownMenuItem>
-					))}
-					{groupIndex < actionsByNodeType[node.type].length - 1 && <DropdownMenuSeparator />}
+					{group.map((actionKey) =>
+					{
+						const action = ACTIONS[actionKey];
+
+						return (
+							<DropdownMenuItem
+								key={actionKey}
+								onSelect={() => action.execute(item)}
+								onClick={(e) => e.stopPropagation()}
+								className="flex items-center justify-between gap-3"
+							>
+								<span>{action.label}</span>
+
+								{action.kbd && (
+									<KbdGroup>
+										{action.kbd.map((key) => (
+											<Kbd key={key}>{key}</Kbd>
+										))}
+									</KbdGroup>
+								)}
+							</DropdownMenuItem>
+						);
+					})}
+
+					{groupIndex < ACTION_GROUPS[node.type].length - 1 && <DropdownMenuSeparator />}
 				</DropdownMenuGroup>
 			))}
 		</DropdownMenuContent>

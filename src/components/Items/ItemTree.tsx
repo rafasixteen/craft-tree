@@ -134,7 +134,7 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 				},
 			},
 			customCreateChild: {
-				hotkey: 'Control+Plus',
+				hotkey: 'KeyF',
 				handler: (e, tree) =>
 				{
 					e.preventDefault();
@@ -154,6 +154,20 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 					tree.getSelectedItems().forEach((item) =>
 					{
 						item.deleteItem();
+					});
+				},
+			},
+			customCreateFolder: {
+				hotkey: 'Control+KeyF',
+				handler: (e, tree) =>
+				{
+					e.preventDefault();
+
+					tree.getSelectedItems().forEach((item) =>
+					{
+						const node = item.getItemData();
+						if (node.type !== 'folder') return;
+						item.createFolder();
 					});
 				},
 			},
