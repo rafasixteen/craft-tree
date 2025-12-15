@@ -23,6 +23,7 @@ import {
 	type TreeInstance,
 	ItemInstance,
 } from '@headless-tree/core';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const indent = 8;
 const dummyRootId = 'tree-root';

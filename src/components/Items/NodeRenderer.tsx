@@ -108,26 +108,37 @@ function DisplayIcon(item: ItemInstance<Node>)
 {
 	const className = 'size-4 text-muted-foreground';
 
+	function onClick(e: React.MouseEvent)
+	{
+		const href = item.getHref();
+
+		if (href)
+		{
+			e.stopPropagation();
+			window.location.href = href;
+		}
+	}
+
 	const node = item.getItemData();
 
 	if (node.type === 'folder')
 	{
 		if (item.isExpanded())
 		{
-			return <FolderOpen className={className} />;
+			return <FolderOpen className={className} onClick={onClick} />;
 		}
 		else
 		{
-			return <Folder className={className} />;
+			return <Folder className={className} onClick={onClick} />;
 		}
 	}
 	else if (node.type === 'item')
 	{
-		return <Box className={className} />;
+		return <Box className={className} onClick={onClick} />;
 	}
 	else
 	{
-		return <CookingPot className={className} />;
+		return <CookingPot className={className} onClick={onClick} />;
 	}
 }
 

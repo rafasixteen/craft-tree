@@ -1,8 +1,9 @@
 import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
 import { createNode, deleteNode, updateNode } from '@/lib/graphql/nodes';
-import { createItem, updateItem } from '@/lib/graphql/items';
+import { createItem } from '@/lib/graphql/items';
 import { Node } from '@generated/graphql/types';
 import { createRecipe } from '@/lib/graphql/recipes';
+import slugify from 'slugify';
 
 declare module '@headless-tree/core'
 {
@@ -12,6 +13,7 @@ declare module '@headless-tree/core'
 		createFolder: () => void;
 		deleteItem: () => void;
 		renameItem: (newName: string) => void;
+		getHref: () => string;
 	}
 
 	export interface TreeInstance<T>
@@ -82,6 +84,23 @@ export const nodeActionsFeature: FeatureImplementation = {
 			);
 
 			tree.onChange?.();
+		},
+		getHref: ({ item }) =>
+		{
+			const node = item.getItemData();
+			const slug = slugify(node.name, { lower: true, strict: true });
+
+			switch (node.type)
+			{
+				case 'folder':
+					return `/collections/${slug}`;
+				case 'item':
+					return `/items/${slug}`;
+				case 'recipe':
+					return `/recipes/${slug}`;
+				default:
+					return '/';
+			}
 		},
 	},
 };
