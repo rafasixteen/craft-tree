@@ -1,7 +1,0 @@
-CREATE TRIGGER IF NOT EXISTS delete_item_after_node_delete
-AFTER DELETE ON Nodes
-FOR EACH ROW
-WHEN OLD.itemId IS NOT NULL
-BEGIN
-    DELETE FROM Items WHERE id = OLD.itemId;
-END;
