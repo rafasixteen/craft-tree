@@ -1,14 +1,15 @@
 'use client';
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
-import { useEffect, useState } from 'react';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { Node } from '@generated/graphql/types';
 import { getDescendantNodes } from '@/lib/graphql/nodes';
-import { Collection } from '@components/Collection';
 import { NodeRenderer } from '@/components/Items';
+import { Collection } from '@components/Collection';
 import useSWR from 'swr';
 import { nodeActionsFeature } from '@components/Items/features/nodeActions';
+import { useTreeStore } from '@/store/treeStore';
+import { useEffect, useState } from 'react';
 import {
 	createOnDropHandler,
 	dragAndDropFeature,
@@ -19,46 +20,33 @@ import {
 	selectionFeature,
 	syncDataLoaderFeature,
 	renamingFeature,
-	type TreeState,
 	type TreeInstance,
 	ItemInstance,
 } from '@headless-tree/core';
-import { useRouter, useSearchParams } from 'next/navigation';
 
 const indent = 8;
-const dummyRootId = 'tree-root';
 
 interface ItemTreeProps
 {
-	searchValue: string;
-	activeCollection?: Collection | null;
+	collection: Collection;
+	searchValue?: string;
 }
 
-export default function ItemTree({ searchValue, activeCollection }: ItemTreeProps)
+export default function ItemTree({ collection, searchValue }: ItemTreeProps)
 {
 	const [nodes, setNodes] = useState<Record<string, Node>>({});
-	const [state, setState] = useState<Partial<TreeState<Node>>>({});
+	const { expandedItems, setExpandedItems, selectedItems, setSelectedItems } = useTreeStore();
 
-	const shouldFetch = !!activeCollection;
-
-	const { data: fetchedNodes, mutate } = useSWR(
-		shouldFetch ? ['nodes', activeCollection.id] : null,
-		shouldFetch
-			? () =>
-					getDescendantNodes(activeCollection.id, {
-						id: true,
-						name: true,
-						type: true,
-						order: true,
-						children: { id: true },
-						item: { id: true, name: true },
-						recipe: { id: true },
-					})
-			: null,
-		{
-			revalidateOnFocus: false,
-			revalidateOnReconnect: false,
-		},
+	const { data: fetchedNodes, mutate } = useSWR(['tree', collection.id], () =>
+		getDescendantNodes(collection.id, {
+			id: true,
+			name: true,
+			type: true,
+			order: true,
+			children: { id: true },
+			item: { id: true, name: true },
+			recipe: { id: true },
+		}),
 	);
 
 	function getItem(id: string): Node
@@ -68,7 +56,7 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 		if (!node)
 		{
 			return {
-				id,
+				id: 'unknown',
 				name: 'Unknown',
 				type: 'folder',
 				order: 1,
@@ -106,9 +94,10 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 		onRename: onRename,
 		isItemFolder: isItemFolder,
 		indent: indent,
-		rootItemId: dummyRootId,
-		state: state,
-		setState: setState,
+		rootItemId: 'tree-root',
+		state: { selectedItems, expandedItems },
+		setSelectedItems: wrapZustandSetter(setSelectedItems),
+		setExpandedItems: wrapZustandSetter(setExpandedItems),
 		onDrop: createOnDropHandler((parent, newChildren) =>
 		{
 			setNodes((prev) => ({
@@ -175,54 +164,10 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 		},
 	});
 
-	tree.onChange = mutate;
-
-	useEffect(() =>
+	tree.onChange = () =>
 	{
-		if (!fetchedNodes || !activeCollection)
-		{
-			setNodes({});
-			return;
-		}
-
-		const nodesMap: Record<string, Node> = {};
-
-		for (const node of fetchedNodes)
-		{
-			nodesMap[node.id] = node;
-		}
-
-		const rootNode = fetchedNodes.find((n) => n.id === activeCollection.id);
-
-		setNodes({
-			[dummyRootId]: {
-				id: dummyRootId,
-				name: 'Root',
-				type: 'folder',
-				order: 1,
-				children: rootNode ? [rootNode] : [],
-			},
-			...nodesMap,
-		});
-	}, [fetchedNodes, activeCollection]);
-
-	useEffect(() =>
-	{
-		if (Object.keys(nodes).length === 0) return;
-
-		const allFolders = tree
-			.getItems()
-			.filter((i) => i.isFolder())
-			.map((i) => i.getId());
-		setState({ expandedItems: allFolders });
-
-		tree.rebuildTree();
-	}, [nodes, tree]);
-
-	useEffect(() =>
-	{
-		tree.setSearch(searchValue);
-	}, [tree, searchValue]);
+		mutate();
+	};
 
 	function DisplayNodes()
 	{
@@ -247,6 +192,39 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 		}
 	}
 
+	useEffect(() =>
+	{
+		if (!fetchedNodes) return;
+
+		const rootNode = fetchedNodes.find((node) => node.id === collection.id);
+
+		if (!rootNode) return;
+
+		const dummyRootNode: Node = {
+			id: 'tree-root',
+			name: 'Root',
+			type: 'folder',
+			order: 1,
+			children: [rootNode],
+		};
+
+		const nodesMap: Record<string, Node> = {
+			[dummyRootNode.id]: dummyRootNode,
+		};
+
+		for (const node of fetchedNodes)
+		{
+			nodesMap[node.id] = node;
+		}
+
+		setNodes(nodesMap);
+	}, [fetchedNodes, collection.id]);
+
+	useEffect(() =>
+	{
+		tree.rebuildTree();
+	}, [nodes, tree]);
+
 	return (
 		<div className="flex h-full flex-col gap-2 *:first:grow">
 			<Tree indent={indent} tree={tree}>
@@ -256,6 +234,21 @@ export default function ItemTree({ searchValue, activeCollection }: ItemTreeProp
 			</Tree>
 		</div>
 	);
+}
+
+function wrapZustandSetter(setter: (ids: string[]) => void)
+{
+	return (updaterOrValue: string[] | ((old: string[]) => string[])) =>
+	{
+		if (typeof updaterOrValue === 'function')
+		{
+			setter(updaterOrValue([]));
+		}
+		else
+		{
+			setter(updaterOrValue);
+		}
+	};
 }
 
 function onRename(item: ItemInstance<Node>, value: string)
@@ -302,13 +295,12 @@ function filterNodes(nodes: Record<string, Node>, tree: TreeInstance<Node>, sear
 	const childrenMatches = new Set<string>();
 	const getDescendants = (id: string) =>
 	{
-		const node = nodes[id];
+		const node = nodes[id]!;
 
 		for (const child of node.children)
 		{
 			childrenMatches.add(child.id);
-
-			const childNode = nodes[child.id];
+			const childNode = nodes[child.id]!;
 
 			if (childNode.children?.length) getDescendants(child.id);
 		}

@@ -10,6 +10,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
 	title: 'Craft Tree',
+	viewport: 'width=device-width, initial-scale=1',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode })
@@ -19,9 +20,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<head>
-				<meta name="viewport" content="initial-scale=1, width=device-width" />
-			</head>
 			<body className="flex h-screen">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<ApolloProviderWrapper>

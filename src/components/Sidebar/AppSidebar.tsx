@@ -1,31 +1,25 @@
-'use client';
+'use server';
 
-import { Collections, Collection } from '@components/Collection';
-import { SearchBar } from '@components/Sidebar';
+import { CollectionsLoader, CollectionManager } from '@components/Collection';
 import { NavUser } from './NavUser';
 import { ItemTree } from '@/components/Items';
-import { useState } from 'react';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 
-export default function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
+export default async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {
-	const [searchValue, setSearchValue] = useState('');
-
-	const [activeCollection, setActiveCollection] = useState<Collection | null>(null);
-	const [hasCollections, setHasCollections] = useState(true);
+	const collections = await CollectionsLoader();
 
 	return (
 		<Sidebar {...props}>
 			<SidebarHeader className="h-32 border-b flex justify-center">
-				<Collections onCollectionsChange={setHasCollections} onActiveCollectionChange={setActiveCollection} />
-				{hasCollections && <SearchBar value={searchValue} onChange={setSearchValue} />}
+				<CollectionManager initialCollections={collections} />
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupLabel>Items</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							<ItemTree searchValue={searchValue} activeCollection={activeCollection} />
+							<ItemTree collection={collections[0]} />
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>

@@ -1,3 +1,7 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { CircleXIcon, Search } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { SidebarGroup, SidebarGroupContent } from '@/components/ui/sidebar';
@@ -7,16 +11,29 @@ import { Button } from '@components/ui/button';
 
 interface SearchBarProps
 {
-	value: string;
-	onChange: (value: string) => void;
+	initialValue?: string;
 }
 
-export default function SearchBar({ value, onChange }: SearchBarProps)
+export default function SearchBar({ initialValue = '' }: SearchBarProps)
 {
-	function clearSearch()
+	const [value, setValue] = useState(initialValue);
+
+	const router = useRouter();
+	const searchParams = useSearchParams();
+
+	function updateSearch(value: string)
 	{
-		onChange('');
+		setValue(value);
+
+		const params = new URLSearchParams(searchParams.toString());
+		value ? params.set('search', value) : params.delete('search');
+		router.replace(`${window.location.pathname}?${params.toString()}`);
 	}
+
+	useEffect(() =>
+	{
+		setValue(searchParams.get('search') ?? '');
+	}, [searchParams]);
 
 	return (
 		<SidebarGroup className="p-0">
@@ -30,10 +47,10 @@ export default function SearchBar({ value, onChange }: SearchBarProps)
 						<Search className="size-4 text-muted-foreground" />
 					</InputGroupAddon>
 
-					<InputGroupInput id="search" placeholder="Search..." value={value} onChange={(e) => onChange(e.target.value)} />
+					<InputGroupInput id="search" placeholder="Search..." value={value} onChange={(e) => updateSearch(e.target.value)} />
 
 					<InputGroupAddon align="inline-end">
-						<Button variant="ghost" size="icon" onClick={clearSearch} className={cn(!value && 'invisible', 'hover:bg-transparent!')}>
+						<Button variant="ghost" size="icon" onClick={() => updateSearch('')} className={cn(!value && 'invisible', 'hover:bg-transparent!')}>
 							<CircleXIcon />
 						</Button>
 					</InputGroupAddon>
