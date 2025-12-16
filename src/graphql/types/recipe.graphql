@@ -1,5 +1,7 @@
 type Recipe {
 	id: ID!
+	name: String!
+	slug: String!
 	item: Item!
 	quantity: Int!
 	time: Float!
@@ -12,20 +14,22 @@ input IngredientInput {
 }
 
 input CreateRecipeInput {
+	name: String!
 	itemId: ID!
 	quantity: Int!
 	time: Float!
 }
 
 input UpdateRecipeInput {
+	name: String
 	quantity: Int
 	time: Float
 	ingredients: [IngredientInput!]
 }
 
 extend type Query {
-	recipes: [Recipe!]!
-	recipe(id: ID!): Recipe
+	recipeById(id: ID!): Recipe
+	recipeBySlug(slug: String!): Recipe
 }
 
 extend type Mutation {

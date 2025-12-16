@@ -4,12 +4,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model Item {
   id      String       @id @default(uuid())
   name    String
+  slug    String?      @unique // Slug is optional because we rely on triggers to populate it on insert and update.
   recipes Recipe[]
   usedIn  Ingredient[]
   nodes   Node[]
@@ -19,6 +20,8 @@ model Item {
 
 model Recipe {
   id          String       @id @default(uuid())
+  name        String
+  slug        String?      @unique // Slug is optional because we rely on triggers to populate it on insert and update.
   item        Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId      String
   quantity    Int

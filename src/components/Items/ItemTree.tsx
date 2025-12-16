@@ -43,9 +43,19 @@ export default function ItemTree({ collection, searchValue }: ItemTreeProps)
 			name: true,
 			type: true,
 			order: true,
-			children: { id: true },
-			item: { id: true, name: true },
-			recipe: { id: true },
+			children: {
+				id: true,
+			},
+			item: {
+				id: true,
+				name: true,
+				slug: true,
+			},
+			recipe: {
+				id: true,
+				name: true,
+				slug: true,
+			},
 		}),
 	);
 

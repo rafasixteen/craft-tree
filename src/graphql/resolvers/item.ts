@@ -4,11 +4,19 @@ import { nameSchema } from '@/schemas/common';
 
 export const itemResolvers: Resolvers<GraphQLContext> = {
 	Query: {
-		item: async (_parent, args, ctx) =>
+		itemById: async (_parent, args, ctx) =>
 		{
 			return ctx.prisma.item.findUnique({
 				where: {
 					id: args.id,
+				},
+			});
+		},
+		itemBySlug: async (_parent, args, ctx) =>
+		{
+			return ctx.prisma.item.findUnique({
+				where: {
+					slug: args.slug,
 				},
 			});
 		},
@@ -32,14 +40,14 @@ export const itemResolvers: Resolvers<GraphQLContext> = {
 			const { id, data } = args;
 			const { name } = data;
 
-			const parsedName = await nameSchema.parseAsync(name);
+			const parsedName = name ? await nameSchema.parseAsync(name) : undefined;
 
 			return ctx.prisma.item.update({
 				where: {
 					id: id,
 				},
 				data: {
-					name: parsedName,
+					name: parsedName ?? undefined,
 				},
 			});
 		},

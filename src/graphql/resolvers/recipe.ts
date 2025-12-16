@@ -1,13 +1,10 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
+import { nameSchema } from '@/schemas/common';
 
 export const recipeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
-		recipes: async (_parent, _args, ctx) =>
-		{
-			return ctx.prisma.recipe.findMany();
-		},
-		recipe: async (_parent, args, ctx) =>
+		recipeById: async (_parent, args, ctx) =>
 		{
 			return ctx.prisma.recipe.findUnique({
 				where: {
@@ -15,27 +12,37 @@ export const recipeResolvers: Resolvers<GraphQLContext> = {
 				},
 			});
 		},
+		recipeBySlug: async (_parent, args, ctx) =>
+		{
+			return ctx.prisma.recipe.findUnique({
+				where: {
+					slug: args.slug,
+				},
+			});
+		},
 	},
 	Mutation: {
 		createRecipe: async (_parent, args, ctx) =>
 		{
-			const { itemId, quantity, time } = args.data;
+			const { name, itemId, quantity, time } = args.data;
+
+			const parsedName = await nameSchema.parseAsync(name);
 
 			return ctx.prisma.recipe.create({
 				data: {
+					name: parsedName,
 					item: { connect: { id: itemId } },
 					quantity,
 					time,
-				},
-				include: {
-					item: true,
 				},
 			});
 		},
 		updateRecipe: async (_parent, args, ctx) =>
 		{
 			const { id, data } = args;
-			const { quantity, time, ingredients } = data;
+			const { name, quantity, time, ingredients } = data;
+
+			const parsedName = name ? await nameSchema.parseAsync(name) : undefined;
 
 			let ingredientsToConnect;
 
@@ -66,13 +73,10 @@ export const recipeResolvers: Resolvers<GraphQLContext> = {
 					id,
 				},
 				data: {
+					name: parsedName ?? undefined,
 					quantity: quantity ?? undefined,
 					time: time ?? undefined,
 					ingredients: ingredientsToConnect ? { set: ingredientsToConnect.map((ingredient) => ({ id: ingredient.id })) } : undefined,
-				},
-				include: {
-					item: true,
-					ingredients: { include: { item: true } },
 				},
 			});
 		},
@@ -81,10 +85,6 @@ export const recipeResolvers: Resolvers<GraphQLContext> = {
 			return ctx.prisma.recipe.delete({
 				where: {
 					id: args.id,
-				},
-				include: {
-					item: true,
-					ingredients: { include: { item: true } },
 				},
 			});
 		},

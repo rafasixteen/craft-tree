@@ -3,7 +3,6 @@ import { createNode, deleteNode, updateNode } from '@/lib/graphql/nodes';
 import { createItem } from '@/lib/graphql/items';
 import { Node } from '@generated/graphql/types';
 import { createRecipe } from '@/lib/graphql/recipes';
-import slugify from 'slugify';
 
 declare module '@headless-tree/core'
 {
@@ -85,22 +84,20 @@ export const nodeActionsFeature: FeatureImplementation = {
 
 			tree.onChange?.();
 		},
-		getHref: ({ item }) =>
+		getHref: ({ item }: { item: ItemInstance<Node> }) =>
 		{
 			const node = item.getItemData();
-			const slug = slugify(node.name, { lower: true, strict: true });
 
-			switch (node.type)
+			if (node.type === 'item')
 			{
-				case 'folder':
-					return `/collections/${slug}`;
-				case 'item':
-					return `/items/${slug}`;
-				case 'recipe':
-					return `/recipes/${slug}`;
-				default:
-					return '/';
+				return `/items/${node.item?.slug}`;
 			}
+			else if (node.type === 'recipe')
+			{
+				return `/recipes/${node.recipe?.slug}`;
+			}
+
+			return undefined;
 		},
 	},
 };
@@ -176,6 +173,7 @@ async function createRecipeNode(parent: Node)
 	const newRecipe = await createRecipe(
 		{
 			data: {
+				name: 'New Recipe',
 				itemId: parent.item.id,
 				quantity: 1,
 				time: 1,
@@ -183,13 +181,14 @@ async function createRecipeNode(parent: Node)
 		},
 		{
 			id: true,
+			name: true,
 		},
 	);
 
 	const newNode = await createNode(
 		{
 			data: {
-				name: 'New Recipe',
+				name: newRecipe.name,
 				type: 'recipe',
 				recipeId: newRecipe.id,
 				parentId: parent.id,

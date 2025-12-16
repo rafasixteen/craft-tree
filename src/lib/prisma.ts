@@ -1,24 +1,34 @@
 import 'dotenv/config';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import fs from 'fs';
 import { PrismaClient } from '@generated/prisma/client';
 import { glob } from 'glob';
-import fs from 'fs';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const connectionString = `${process.env.DATABASE_URL}`;
+const adapter = new PrismaPg({
+	connectionString: process.env.DATABASE_URL!,
+});
 
-const adapter = new PrismaBetterSqlite3({ url: connectionString });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient({
+	adapter,
+});
 
 export default prisma;
 
-async function runTriggers()
+async function runFiles(files: string[])
 {
-	const files = glob.sync('prisma/sql/triggers/*.sql');
-
 	for (const file of files)
 	{
 		const sql = fs.readFileSync(file, 'utf-8');
-		await prisma.$executeRawUnsafe(sql);
+
+		try
+		{
+			console.log(`Executing file: ${file}`);
+			await prisma.$executeRawUnsafe(sql);
+		}
+		catch (error)
+		{
+			console.error(`Error executing file ${file}:`, error);
+		}
 	}
 }
 
@@ -26,11 +36,12 @@ async function main()
 {
 	try
 	{
-		await runTriggers();
+		await runFiles(glob.sync('prisma/sql/functions/**/*.sql'));
+		await runFiles(glob.sync('prisma/sql/triggers/**/*.sql'));
 	}
 	catch (error)
 	{
-		console.error('Error running triggers:', error);
+		console.error("Error running sql's:", error);
 	}
 }
 
