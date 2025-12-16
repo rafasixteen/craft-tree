@@ -137,6 +137,7 @@ export { NodeType };
 
 export type Query = {
   __typename?: 'Query';
+  ascendantNodes: Array<Node>;
   descendantNodes: Array<Node>;
   itemById?: Maybe<Item>;
   itemBySlug?: Maybe<Item>;
@@ -145,6 +146,11 @@ export type Query = {
   recipeById?: Maybe<Recipe>;
   recipeBySlug?: Maybe<Recipe>;
   rootNodes: Array<Node>;
+};
+
+
+export type QueryAscendantNodesArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -361,6 +367,7 @@ export type NodeResolvers<ContextType = GraphQLContext, ParentType extends Resol
 export type NodeTypeResolvers = EnumResolverSignature<{ folder?: any, item?: any, recipe?: any }, ResolversTypes['NodeType']>;
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  ascendantNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryAscendantNodesArgs, 'id'>>;
   descendantNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryDescendantNodesArgs, 'id'>>;
   itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
   itemBySlug?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemBySlugArgs, 'slug'>>;
