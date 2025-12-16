@@ -1,131 +1,55 @@
-import { Resolvers, Node } from '@generated/graphql/types';
+import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
-import { nameSchema } from '@/schemas/common';
+import { createNode, deleteNode, getAscendentNodes, getDescendantNodes, getNode, getRootNodes, updateNode } from '@/domain/node';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
 		node: async (_parent, args, ctx) =>
 		{
-			return ctx.prisma.node.findUnique({
-				where: {
-					id: args.id,
-				},
-			});
-		},
-		nodes: async (_parent, _args, ctx) =>
-		{
-			return await ctx.prisma.node.findMany({
-				orderBy: {
-					order: 'asc',
-				},
-			});
+			const { id } = args;
+			return getNode(id);
 		},
 		rootNodes: async (_parent, _args, ctx) =>
 		{
-			return await ctx.prisma.node.findMany({
-				where: {
-					parentId: null,
-				},
-				orderBy: {
-					order: 'asc',
-				},
-			});
+			return getRootNodes();
 		},
 		descendantNodes: async (_parent, args, ctx) =>
 		{
 			const { id } = args;
-
-			const rows = await ctx.prisma.$queryRaw<Node[]>`
-				WITH RECURSIVE descendant_nodes AS (
-				SELECT * FROM "Nodes" WHERE id = ${id}
-				UNION ALL
-				SELECT n.* FROM "Nodes" n
-				INNER JOIN descendant_nodes dn ON n."parentId" = dn.id
-				)
-				SELECT * FROM descendant_nodes;
-			`;
-
-			return rows;
+			return getDescendantNodes(id);
 		},
 		ascendantNodes: async (_parent, args, ctx) =>
 		{
 			const { id } = args;
-
-			const rows = await ctx.prisma.$queryRaw<Node[]>`
-				WITH RECURSIVE ascendant_nodes AS (
-				SELECT * FROM "Nodes" WHERE id = ${id}
-				UNION ALL
-				SELECT n.* FROM "Nodes" n
-				INNER JOIN ascendant_nodes an ON n.id = an."parentId"
-				)
-				SELECT * FROM ascendant_nodes;
-			`;
-
-			return rows.reverse();
+			return getAscendentNodes(id);
 		},
 	},
 	Mutation: {
 		createNode: async (_parent, args, ctx) =>
 		{
-			const { name, type, parentId, itemId, recipeId } = args.data;
+			const { data } = args;
 
-			if (itemId && recipeId)
-			{
-				throw new Error('A node can only reference either an Item or a Recipe, not both.');
-			}
-
-			return ctx.prisma.node.create({
-				data: {
-					name: await nameSchema.parseAsync(name),
-					type,
-					parent: parentId ? { connect: { id: parentId } } : undefined,
-					item: itemId ? { connect: { id: itemId } } : undefined,
-					recipe: recipeId ? { connect: { id: recipeId } } : undefined,
-					order: await getOrder(),
-				},
+			return createNode({
+				name: data.name,
+				type: data.type,
+				parentId: data.parentId!,
+				itemId: data.itemId!,
+				recipeId: data.recipeId!,
 			});
-
-			async function getOrder()
-			{
-				const siblingCount = await ctx.prisma.node.count({
-					where: {
-						parentId: parentId || null,
-					},
-				});
-
-				return siblingCount + 1;
-			}
 		},
 		updateNode: async (_parent, args, ctx) =>
 		{
 			const { id, data } = args;
-			const { name, parentId, order } = data;
 
-			let parsedName: string | undefined = undefined;
-			if (name !== undefined) parsedName = await nameSchema.parseAsync(name);
-
-			const node = await ctx.prisma.node.update({
-				where: {
-					id,
-				},
-				data: {
-					name: parsedName,
-					parent: parentId ? { connect: { id: parentId } } : undefined,
-					order: order || undefined,
-				},
+			return updateNode(id, {
+				name: data.name!,
+				parentId: data.parentId!,
 			});
-
-			return node;
 		},
 		deleteNode: async (_parent, args, ctx) =>
 		{
 			const { id } = args;
-
-			return ctx.prisma.node.delete({
-				where: {
-					id: id,
-				},
-			});
+			return deleteNode(id);
 		},
 	},
 	Node: {
