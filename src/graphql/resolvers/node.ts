@@ -33,16 +33,9 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 		},
 		descendantNodes: async (_parent, args, ctx) =>
 		{
-			interface TreeNode extends Node
-			{
-				parentId?: string;
-				itemId?: string;
-				recipeId?: string;
-			}
-
 			const { id } = args;
 
-			const rows = await ctx.prisma.$queryRaw<TreeNode[]>`
+			const rows = await ctx.prisma.$queryRaw<Node[]>`
 				WITH RECURSIVE descendant_nodes AS (
 				SELECT * FROM "Nodes" WHERE id = ${id}
 				UNION ALL
@@ -52,22 +45,23 @@ export const nodeResolvers: Resolvers<GraphQLContext> = {
 				SELECT * FROM descendant_nodes;
 			`;
 
-			const nodesMap = new Map<string, TreeNode>();
+			return rows;
+		},
+		ascendantNodes: async (_parent, args, ctx) =>
+		{
+			const { id } = args;
 
-			for (const row of rows)
-			{
-				nodesMap.set(row.id, { ...row, children: [] });
-			}
+			const rows = await ctx.prisma.$queryRaw<Node[]>`
+				WITH RECURSIVE ascendant_nodes AS (
+				SELECT * FROM "Nodes" WHERE id = ${id}
+				UNION ALL
+				SELECT n.* FROM "Nodes" n
+				INNER JOIN ascendant_nodes an ON n.id = an."parentId"
+				)
+				SELECT * FROM ascendant_nodes;
+			`;
 
-			for (const node of Array.from(nodesMap.values()))
-			{
-				if (node.parentId && nodesMap.has(node.parentId))
-				{
-					nodesMap.get(node.parentId)!.children.push(node);
-				}
-			}
-
-			return Array.from(nodesMap.values());
+			return rows.reverse();
 		},
 	},
 	Mutation: {

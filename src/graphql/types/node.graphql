@@ -38,6 +38,7 @@ extend type Query {
 	rootNodes: [Node!]!
 	node(id: ID!): Node
 	descendantNodes(id: ID!): [Node!]!
+	ascendantNodes(id: ID!): [Node!]!
 }
 
 extend type Mutation {
