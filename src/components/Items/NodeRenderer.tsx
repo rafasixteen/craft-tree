@@ -6,6 +6,7 @@ import { TreeItem } from '@/components/ui/tree';
 import { Node, NodeType } from '@generated/graphql/types';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@components/ui/dropdown-menu';
 import { Kbd, KbdGroup } from '@/components/ui/kbd';
+import { useRouter } from 'next/navigation';
 
 interface ContextAction
 {
@@ -64,23 +65,53 @@ interface NodeRendererProps
 
 export default function NodeRenderer({ item, visible }: NodeRendererProps)
 {
+	const router = useRouter();
+
+	function onItemIconClick(e: React.MouseEvent)
+	{
+		const node = item.getItemData();
+
+		// I don't think i will have a folder page.
+		if (node.type === 'folder') return;
+
+		// This prevents the click event from going to the TreeItem and causing it to expand/collapse.
+		e.stopPropagation();
+
+		const href = item.getHref();
+
+		if (href)
+		{
+			router.push(href);
+		}
+	}
+
+	function onAddIconClick(e: React.MouseEvent)
+	{
+		// This prevents the click event from going to the TreeItem and causing it to expand/collapse.
+		e.stopPropagation();
+		item.createChild();
+	}
+
 	return (
 		<TreeItem item={item} className="data-[visible=false]:hidden" data-visible={visible}>
 			<div className="in-focus-visible:ring-ring/50 bg-transparent hover:bg-accent in-data-[selected=true]:bg-accent in-data-[selected=true]:text-accent-foreground in-data-[drag-target=true]:bg-accent flex items-center gap-1 rounded-sm px-2 py-1.5 text-sm transition-colors not-in-data-[folder=true]:ps-7 in-focus-visible:ring-[3px] [&_svg]:shrink-0">
 				{item.isFolder() && <ChevronDownIcon className="text-muted-foreground size-4 in-aria-[expanded=false]:-rotate-90" />}
 				<div className="flex items-center justify-between w-full ml-1">
 					<span className="flex grow items-center gap-2">
-						{DisplayIcon(item)}
-						{DisplayName(item)}
+						<ItemIcon item={item} className="size-4 text-muted-foreground" onClick={onItemIconClick} />
+
+						<div className="flex">
+							<Name item={item} />
+						</div>
 					</span>
 
 					<span className="flex items-center gap-2">
-						{DisplayPlusIcon(item)}
+						<AddIcon item={item} className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={onAddIconClick} />
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<EllipsisIcon className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-primary" />
 							</DropdownMenuTrigger>
-							{DisplayContextMenu(item)}
+							<ContextMenu item={item} side="right" align="start" className="w-56" />
 						</DropdownMenu>
 					</span>
 				</div>
@@ -89,83 +120,78 @@ export default function NodeRenderer({ item, visible }: NodeRendererProps)
 	);
 }
 
-function DisplayName(item: ItemInstance<Node>)
+interface NameProps extends React.HTMLAttributes<HTMLDivElement>
 {
-	return (
-		<div className="flex">
-			{item.isRenaming() ? (
-				<input {...item.getRenameInputProps()} className="w-full mr-2" onFocus={(e) => e.currentTarget.select()} />
-			) : (
-				<p className="truncate" onDoubleClick={() => item.startRenaming()}>
-					{item.getItemName()}
-				</p>
-			)}
-		</div>
-	);
+	item: ItemInstance<Node>;
 }
 
-function DisplayIcon(item: ItemInstance<Node>)
+function Name({ item }: NameProps)
 {
-	const className = 'size-4 text-muted-foreground';
-
-	function onClick(e: React.MouseEvent)
+	if (item.isRenaming())
 	{
-		const href = item.getHref();
-
-		if (href)
-		{
-			e.stopPropagation();
-			window.location.href = href;
-		}
+		return <input {...item.getRenameInputProps()} className="w-full mr-2" onFocus={(e) => e.currentTarget.select()} />;
 	}
+	else
+	{
+		return (
+			<p className="truncate" onDoubleClick={(e) => item.startRenaming()}>
+				{item.getItemName()}
+			</p>
+		);
+	}
+}
 
+interface IconProps extends React.SVGProps<SVGSVGElement>
+{
+	item: ItemInstance<Node>;
+}
+
+function ItemIcon({ item, ...props }: IconProps)
+{
 	const node = item.getItemData();
 
 	if (node.type === 'folder')
 	{
 		if (item.isExpanded())
 		{
-			return <FolderOpen className={className} onClick={onClick} />;
+			return <FolderOpen {...props} />;
 		}
 		else
 		{
-			return <Folder className={className} onClick={onClick} />;
+			return <Folder {...props} />;
 		}
 	}
 	else if (node.type === 'item')
 	{
-		return <Box className={className} onClick={onClick} />;
+		return <Box {...props} />;
 	}
 	else
 	{
-		return <CookingPot className={className} onClick={onClick} />;
+		return <CookingPot {...props} />;
 	}
 }
 
-function DisplayPlusIcon(item: ItemInstance<Node>)
+function AddIcon({ item, ...props }: IconProps)
 {
-	function onClick(e: React.MouseEvent)
-	{
-		// This prevents the click event from going to the TreeItem and causing it to expand/collapse.
-		e.stopPropagation();
-
-		item.createChild();
-	}
-
 	const node = item.getItemData();
 
 	if (node.type === 'folder' || node.type === 'item')
 	{
-		return <PlusIcon className="w-4 h-4 cursor-pointer text-muted-foreground hover:text-primary" onClick={onClick} />;
+		return <PlusIcon {...props} />;
 	}
 }
 
-function DisplayContextMenu(item: ItemInstance<Node>): React.JSX.Element
+interface ContextMenuProps extends React.ComponentPropsWithoutRef<typeof DropdownMenuContent>
+{
+	item: ItemInstance<Node>;
+}
+
+function ContextMenu({ item, ...props }: ContextMenuProps)
 {
 	const node = item.getItemData();
 
 	return (
-		<DropdownMenuContent side="right" align="start" className="w-56">
+		<DropdownMenuContent {...props}>
 			{ACTION_GROUPS[node.type].map((group, groupIndex) => (
 				<DropdownMenuGroup key={groupIndex}>
 					{group.map((actionKey) =>
