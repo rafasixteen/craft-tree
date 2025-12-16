@@ -34,6 +34,7 @@ export type CreateNodeInput = {
 
 export type CreateRecipeInput = {
   itemId: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
   quantity: Scalars['Int']['input'];
   time: Scalars['Float']['input'];
 };
@@ -55,6 +56,7 @@ export type Item = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   recipes: Array<Recipe>;
+  slug: Scalars['String']['output'];
   usedIn: Array<Ingredient>;
 };
 
@@ -136,11 +138,12 @@ export { NodeType };
 export type Query = {
   __typename?: 'Query';
   descendantNodes: Array<Node>;
-  item?: Maybe<Item>;
+  itemById?: Maybe<Item>;
+  itemBySlug?: Maybe<Item>;
   node?: Maybe<Node>;
   nodes: Array<Node>;
-  recipe?: Maybe<Recipe>;
-  recipes: Array<Recipe>;
+  recipeById?: Maybe<Recipe>;
+  recipeBySlug?: Maybe<Recipe>;
   rootNodes: Array<Node>;
 };
 
@@ -150,8 +153,13 @@ export type QueryDescendantNodesArgs = {
 };
 
 
-export type QueryItemArgs = {
+export type QueryItemByIdArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryItemBySlugArgs = {
+  slug: Scalars['String']['input'];
 };
 
 
@@ -160,8 +168,13 @@ export type QueryNodeArgs = {
 };
 
 
-export type QueryRecipeArgs = {
+export type QueryRecipeByIdArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryRecipeBySlugArgs = {
+  slug: Scalars['String']['input'];
 };
 
 export type Recipe = {
@@ -169,12 +182,14 @@ export type Recipe = {
   id: Scalars['ID']['output'];
   ingredients: Array<Ingredient>;
   item: Item;
+  name: Scalars['String']['output'];
   quantity: Scalars['Int']['output'];
+  slug: Scalars['String']['output'];
   time: Scalars['Float']['output'];
 };
 
 export type UpdateItemInput = {
-  name: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateNodeInput = {
@@ -185,6 +200,7 @@ export type UpdateNodeInput = {
 
 export type UpdateRecipeInput = {
   ingredients?: InputMaybe<Array<IngredientInput>>;
+  name?: InputMaybe<Scalars['String']['input']>;
   quantity?: InputMaybe<Scalars['Int']['input']>;
   time?: InputMaybe<Scalars['Float']['input']>;
 };
@@ -315,6 +331,7 @@ export type ItemResolvers<ContextType = GraphQLContext, ParentType extends Resol
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   usedIn?: Resolver<Array<ResolversTypes['Ingredient']>, ParentType, ContextType>;
 };
 
@@ -345,11 +362,12 @@ export type NodeTypeResolvers = EnumResolverSignature<{ folder?: any, item?: any
 
 export type QueryResolvers<ContextType = GraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   descendantNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryDescendantNodesArgs, 'id'>>;
-  item?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemArgs, 'id'>>;
+  itemById?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemByIdArgs, 'id'>>;
+  itemBySlug?: Resolver<Maybe<ResolversTypes['Item']>, ParentType, ContextType, RequireFields<QueryItemBySlugArgs, 'slug'>>;
   node?: Resolver<Maybe<ResolversTypes['Node']>, ParentType, ContextType, RequireFields<QueryNodeArgs, 'id'>>;
   nodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
-  recipe?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeArgs, 'id'>>;
-  recipes?: Resolver<Array<ResolversTypes['Recipe']>, ParentType, ContextType>;
+  recipeById?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeByIdArgs, 'id'>>;
+  recipeBySlug?: Resolver<Maybe<ResolversTypes['Recipe']>, ParentType, ContextType, RequireFields<QueryRecipeBySlugArgs, 'slug'>>;
   rootNodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, ContextType>;
 };
 
@@ -357,7 +375,9 @@ export type RecipeResolvers<ContextType = GraphQLContext, ParentType extends Res
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   ingredients?: Resolver<Array<ResolversTypes['Ingredient']>, ParentType, ContextType>;
   item?: Resolver<ResolversTypes['Item'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   quantity?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   time?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
 };
 

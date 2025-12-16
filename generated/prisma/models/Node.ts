@@ -254,20 +254,20 @@ export type NodeOrderByWithRelationInput = {
 
 export type NodeWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  itemId?: string
+  recipeId?: string
   AND?: Prisma.NodeWhereInput | Prisma.NodeWhereInput[]
   OR?: Prisma.NodeWhereInput[]
   NOT?: Prisma.NodeWhereInput | Prisma.NodeWhereInput[]
   name?: Prisma.StringFilter<"Node"> | string
   type?: Prisma.EnumNodeTypeFilter<"Node"> | $Enums.NodeType
-  itemId?: Prisma.StringNullableFilter<"Node"> | string | null
-  recipeId?: Prisma.StringNullableFilter<"Node"> | string | null
   parentId?: Prisma.StringNullableFilter<"Node"> | string | null
   order?: Prisma.IntFilter<"Node"> | number
   item?: Prisma.XOR<Prisma.ItemNullableScalarRelationFilter, Prisma.ItemWhereInput> | null
   recipe?: Prisma.XOR<Prisma.RecipeNullableScalarRelationFilter, Prisma.RecipeWhereInput> | null
   children?: Prisma.NodeListRelationFilter
   parent?: Prisma.XOR<Prisma.NodeNullableScalarRelationFilter, Prisma.NodeWhereInput> | null
-}, "id">
+}, "id" | "unique_node_item" | "unique_node_recipe">
 
 export type NodeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -553,10 +553,6 @@ export type NodeUpdateOneWithoutChildrenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.NodeUpdateToOneWithWhereWithoutChildrenInput, Prisma.NodeUpdateWithoutChildrenInput>, Prisma.NodeUncheckedUpdateWithoutChildrenInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NodeUncheckedUpdateManyWithoutParentNestedInput = {
   create?: Prisma.XOR<Prisma.NodeCreateWithoutParentInput, Prisma.NodeUncheckedCreateWithoutParentInput> | Prisma.NodeCreateWithoutParentInput[] | Prisma.NodeUncheckedCreateWithoutParentInput[]
   connectOrCreate?: Prisma.NodeCreateOrConnectWithoutParentInput | Prisma.NodeCreateOrConnectWithoutParentInput[]
@@ -598,6 +594,7 @@ export type NodeCreateOrConnectWithoutItemInput = {
 
 export type NodeCreateManyItemInputEnvelope = {
   data: Prisma.NodeCreateManyItemInput | Prisma.NodeCreateManyItemInput[]
+  skipDuplicates?: boolean
 }
 
 export type NodeUpsertWithWhereUniqueWithoutItemInput = {
@@ -656,6 +653,7 @@ export type NodeCreateOrConnectWithoutRecipeInput = {
 
 export type NodeCreateManyRecipeInputEnvelope = {
   data: Prisma.NodeCreateManyRecipeInput | Prisma.NodeCreateManyRecipeInput[]
+  skipDuplicates?: boolean
 }
 
 export type NodeUpsertWithWhereUniqueWithoutRecipeInput = {
@@ -701,6 +699,7 @@ export type NodeCreateOrConnectWithoutParentInput = {
 
 export type NodeCreateManyParentInputEnvelope = {
   data: Prisma.NodeCreateManyParentInput | Prisma.NodeCreateManyParentInput[]
+  skipDuplicates?: boolean
 }
 
 export type NodeCreateWithoutChildrenInput = {
@@ -1669,6 +1668,7 @@ export type NodeCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Nodes.
    */
   data: Prisma.NodeCreateManyInput | Prisma.NodeCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1687,6 +1687,7 @@ export type NodeCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Nodes.
    */
   data: Prisma.NodeCreateManyInput | Prisma.NodeCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

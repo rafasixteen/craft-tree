@@ -27,16 +27,19 @@ export type AggregateItem = {
 export type ItemMinAggregateOutputType = {
   id: string | null
   name: string | null
+  slug: string | null
 }
 
 export type ItemMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  slug: string | null
 }
 
 export type ItemCountAggregateOutputType = {
   id: number
   name: number
+  slug: number
   _all: number
 }
 
@@ -44,16 +47,19 @@ export type ItemCountAggregateOutputType = {
 export type ItemMinAggregateInputType = {
   id?: true
   name?: true
+  slug?: true
 }
 
 export type ItemMaxAggregateInputType = {
   id?: true
   name?: true
+  slug?: true
 }
 
 export type ItemCountAggregateInputType = {
   id?: true
   name?: true
+  slug?: true
   _all?: true
 }
 
@@ -132,6 +138,7 @@ export type ItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type ItemGroupByOutputType = {
   id: string
   name: string
+  slug: string | null
   _count: ItemCountAggregateOutputType | null
   _min: ItemMinAggregateOutputType | null
   _max: ItemMaxAggregateOutputType | null
@@ -158,6 +165,7 @@ export type ItemWhereInput = {
   NOT?: Prisma.ItemWhereInput | Prisma.ItemWhereInput[]
   id?: Prisma.StringFilter<"Item"> | string
   name?: Prisma.StringFilter<"Item"> | string
+  slug?: Prisma.StringNullableFilter<"Item"> | string | null
   recipes?: Prisma.RecipeListRelationFilter
   usedIn?: Prisma.IngredientListRelationFilter
   nodes?: Prisma.NodeListRelationFilter
@@ -166,6 +174,7 @@ export type ItemWhereInput = {
 export type ItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrderInput | Prisma.SortOrder
   recipes?: Prisma.RecipeOrderByRelationAggregateInput
   usedIn?: Prisma.IngredientOrderByRelationAggregateInput
   nodes?: Prisma.NodeOrderByRelationAggregateInput
@@ -173,6 +182,7 @@ export type ItemOrderByWithRelationInput = {
 
 export type ItemWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  slug?: string
   AND?: Prisma.ItemWhereInput | Prisma.ItemWhereInput[]
   OR?: Prisma.ItemWhereInput[]
   NOT?: Prisma.ItemWhereInput | Prisma.ItemWhereInput[]
@@ -180,11 +190,12 @@ export type ItemWhereUniqueInput = Prisma.AtLeast<{
   recipes?: Prisma.RecipeListRelationFilter
   usedIn?: Prisma.IngredientListRelationFilter
   nodes?: Prisma.NodeListRelationFilter
-}, "id">
+}, "id" | "slug">
 
 export type ItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ItemCountOrderByAggregateInput
   _max?: Prisma.ItemMaxOrderByAggregateInput
   _min?: Prisma.ItemMinOrderByAggregateInput
@@ -196,11 +207,13 @@ export type ItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ItemScalarWhereWithAggregatesInput | Prisma.ItemScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Item"> | string
   name?: Prisma.StringWithAggregatesFilter<"Item"> | string
+  slug?: Prisma.StringNullableWithAggregatesFilter<"Item"> | string | null
 }
 
 export type ItemCreateInput = {
   id?: string
   name: string
+  slug?: string | null
   recipes?: Prisma.RecipeCreateNestedManyWithoutItemInput
   usedIn?: Prisma.IngredientCreateNestedManyWithoutItemInput
   nodes?: Prisma.NodeCreateNestedManyWithoutItemInput
@@ -209,6 +222,7 @@ export type ItemCreateInput = {
 export type ItemUncheckedCreateInput = {
   id?: string
   name: string
+  slug?: string | null
   recipes?: Prisma.RecipeUncheckedCreateNestedManyWithoutItemInput
   usedIn?: Prisma.IngredientUncheckedCreateNestedManyWithoutItemInput
   nodes?: Prisma.NodeUncheckedCreateNestedManyWithoutItemInput
@@ -217,6 +231,7 @@ export type ItemUncheckedCreateInput = {
 export type ItemUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recipes?: Prisma.RecipeUpdateManyWithoutItemNestedInput
   usedIn?: Prisma.IngredientUpdateManyWithoutItemNestedInput
   nodes?: Prisma.NodeUpdateManyWithoutItemNestedInput
@@ -225,6 +240,7 @@ export type ItemUpdateInput = {
 export type ItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recipes?: Prisma.RecipeUncheckedUpdateManyWithoutItemNestedInput
   usedIn?: Prisma.IngredientUncheckedUpdateManyWithoutItemNestedInput
   nodes?: Prisma.NodeUncheckedUpdateManyWithoutItemNestedInput
@@ -233,31 +249,37 @@ export type ItemUncheckedUpdateInput = {
 export type ItemCreateManyInput = {
   id?: string
   name: string
+  slug?: string | null
 }
 
 export type ItemUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ItemCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
 }
 
 export type ItemMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
 }
 
 export type ItemMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  slug?: Prisma.SortOrder
 }
 
 export type ItemScalarRelationFilter = {
@@ -272,6 +294,10 @@ export type ItemNullableScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type ItemCreateNestedOneWithoutRecipesInput = {
@@ -321,6 +347,7 @@ export type ItemUpdateOneWithoutNodesNestedInput = {
 export type ItemCreateWithoutRecipesInput = {
   id?: string
   name: string
+  slug?: string | null
   usedIn?: Prisma.IngredientCreateNestedManyWithoutItemInput
   nodes?: Prisma.NodeCreateNestedManyWithoutItemInput
 }
@@ -328,6 +355,7 @@ export type ItemCreateWithoutRecipesInput = {
 export type ItemUncheckedCreateWithoutRecipesInput = {
   id?: string
   name: string
+  slug?: string | null
   usedIn?: Prisma.IngredientUncheckedCreateNestedManyWithoutItemInput
   nodes?: Prisma.NodeUncheckedCreateNestedManyWithoutItemInput
 }
@@ -351,6 +379,7 @@ export type ItemUpdateToOneWithWhereWithoutRecipesInput = {
 export type ItemUpdateWithoutRecipesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usedIn?: Prisma.IngredientUpdateManyWithoutItemNestedInput
   nodes?: Prisma.NodeUpdateManyWithoutItemNestedInput
 }
@@ -358,6 +387,7 @@ export type ItemUpdateWithoutRecipesInput = {
 export type ItemUncheckedUpdateWithoutRecipesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   usedIn?: Prisma.IngredientUncheckedUpdateManyWithoutItemNestedInput
   nodes?: Prisma.NodeUncheckedUpdateManyWithoutItemNestedInput
 }
@@ -365,6 +395,7 @@ export type ItemUncheckedUpdateWithoutRecipesInput = {
 export type ItemCreateWithoutUsedInInput = {
   id?: string
   name: string
+  slug?: string | null
   recipes?: Prisma.RecipeCreateNestedManyWithoutItemInput
   nodes?: Prisma.NodeCreateNestedManyWithoutItemInput
 }
@@ -372,6 +403,7 @@ export type ItemCreateWithoutUsedInInput = {
 export type ItemUncheckedCreateWithoutUsedInInput = {
   id?: string
   name: string
+  slug?: string | null
   recipes?: Prisma.RecipeUncheckedCreateNestedManyWithoutItemInput
   nodes?: Prisma.NodeUncheckedCreateNestedManyWithoutItemInput
 }
@@ -395,6 +427,7 @@ export type ItemUpdateToOneWithWhereWithoutUsedInInput = {
 export type ItemUpdateWithoutUsedInInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recipes?: Prisma.RecipeUpdateManyWithoutItemNestedInput
   nodes?: Prisma.NodeUpdateManyWithoutItemNestedInput
 }
@@ -402,6 +435,7 @@ export type ItemUpdateWithoutUsedInInput = {
 export type ItemUncheckedUpdateWithoutUsedInInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recipes?: Prisma.RecipeUncheckedUpdateManyWithoutItemNestedInput
   nodes?: Prisma.NodeUncheckedUpdateManyWithoutItemNestedInput
 }
@@ -409,6 +443,7 @@ export type ItemUncheckedUpdateWithoutUsedInInput = {
 export type ItemCreateWithoutNodesInput = {
   id?: string
   name: string
+  slug?: string | null
   recipes?: Prisma.RecipeCreateNestedManyWithoutItemInput
   usedIn?: Prisma.IngredientCreateNestedManyWithoutItemInput
 }
@@ -416,6 +451,7 @@ export type ItemCreateWithoutNodesInput = {
 export type ItemUncheckedCreateWithoutNodesInput = {
   id?: string
   name: string
+  slug?: string | null
   recipes?: Prisma.RecipeUncheckedCreateNestedManyWithoutItemInput
   usedIn?: Prisma.IngredientUncheckedCreateNestedManyWithoutItemInput
 }
@@ -439,6 +475,7 @@ export type ItemUpdateToOneWithWhereWithoutNodesInput = {
 export type ItemUpdateWithoutNodesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recipes?: Prisma.RecipeUpdateManyWithoutItemNestedInput
   usedIn?: Prisma.IngredientUpdateManyWithoutItemNestedInput
 }
@@ -446,6 +483,7 @@ export type ItemUpdateWithoutNodesInput = {
 export type ItemUncheckedUpdateWithoutNodesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recipes?: Prisma.RecipeUncheckedUpdateManyWithoutItemNestedInput
   usedIn?: Prisma.IngredientUncheckedUpdateManyWithoutItemNestedInput
 }
@@ -502,6 +540,7 @@ export type ItemCountOutputTypeCountNodesArgs<ExtArgs extends runtime.Types.Exte
 export type ItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  slug?: boolean
   recipes?: boolean | Prisma.Item$recipesArgs<ExtArgs>
   usedIn?: boolean | Prisma.Item$usedInArgs<ExtArgs>
   nodes?: boolean | Prisma.Item$nodesArgs<ExtArgs>
@@ -511,19 +550,22 @@ export type ItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type ItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  slug?: boolean
 }, ExtArgs["result"]["item"]>
 
 export type ItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  slug?: boolean
 }, ExtArgs["result"]["item"]>
 
 export type ItemSelectScalar = {
   id?: boolean
   name?: boolean
+  slug?: boolean
 }
 
-export type ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name", ExtArgs["result"]["item"]>
+export type ItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug", ExtArgs["result"]["item"]>
 export type ItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   recipes?: boolean | Prisma.Item$recipesArgs<ExtArgs>
   usedIn?: boolean | Prisma.Item$usedInArgs<ExtArgs>
@@ -543,6 +585,7 @@ export type $ItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    slug: string | null
   }, ExtArgs["result"]["item"]>
   composites: {}
 }
@@ -971,6 +1014,7 @@ export interface Prisma__ItemClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface ItemFieldRefs {
   readonly id: Prisma.FieldRef<"Item", 'String'>
   readonly name: Prisma.FieldRef<"Item", 'String'>
+  readonly slug: Prisma.FieldRef<"Item", 'String'>
 }
     
 
@@ -1200,6 +1244,7 @@ export type ItemCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Items.
    */
   data: Prisma.ItemCreateManyInput | Prisma.ItemCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1218,6 +1263,7 @@ export type ItemCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Items.
    */
   data: Prisma.ItemCreateManyInput | Prisma.ItemCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

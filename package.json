@@ -18,6 +18,7 @@
 		"@headless-tree/core": "^1.5.1",
 		"@headless-tree/react": "^1.5.1",
 		"@prisma/adapter-better-sqlite3": "^7.1.0",
+		"@prisma/adapter-pg": "^7.1.0",
 		"@prisma/client": "^7.1.0",
 		"@prisma/extension-accelerate": "^2.0.2",
 		"@radix-ui/react-accordion": "^1.2.12",
