@@ -2,6 +2,34 @@ import { MutationCreateRecipeArgs, MutationDeleteRecipeArgs, MutationUpdateRecip
 import { buildSelection, Selection, endpoint } from './utils';
 import { request, gql } from 'graphql-request';
 
+export async function getRecipeById(id: string, selection: Selection)
+{
+	const query = gql`
+		query Recipe($id: ID!) {
+			recipeById(id: $id) {
+				${buildSelection(selection)}
+			}
+		}
+	`;
+
+	const response = await request<{ recipeById: Recipe }>(endpoint, query, { id });
+	return response.recipeById;
+}
+
+export async function getRecipeBySlug(slug: string, selection: Selection)
+{
+	const query = gql`
+		query Recipe($slug: String!) {
+			recipeBySlug(slug: $slug) {
+				${buildSelection(selection)}
+			}
+		}
+	`;
+
+	const response = await request<{ recipeBySlug: Recipe }>(endpoint, query, { slug });
+	return response.recipeBySlug;
+}
+
 export async function createRecipe(args: MutationCreateRecipeArgs, selection: Selection)
 {
 	const query = gql`

@@ -2,18 +2,32 @@ import { MutationUpdateItemArgs, MutationCreateItemArgs, Item, MutationDeleteIte
 import { buildSelection, Selection, endpoint } from './utils';
 import { gql, request } from 'graphql-request';
 
-export async function getItem(id: string, selection: Selection)
+export async function getItemById(id: string, selection: Selection)
 {
 	const query = gql`
 		query Item($id: ID!) {
-			item(id: $id) {
+			itemById(id: $id) {
 				${buildSelection(selection)}
 			}
 		}
 	`;
 
-	const response = await request<{ item: Item }>(endpoint, query, { id });
-	return response.item;
+	const response = await request<{ itemById: Item }>(endpoint, query, { id });
+	return response.itemById;
+}
+
+export async function getItemBySlug(slug: string, selection: Selection)
+{
+	const query = gql`
+		query Item($slug: String!) {
+			itemBySlug(slug: $slug) {
+				${buildSelection(selection)}
+			}
+		}
+	`;
+
+	const response = await request<{ itemBySlug: Item }>(endpoint, query, { slug });
+	return response.itemBySlug;
 }
 
 export async function createItem(args: MutationCreateItemArgs, selection: Selection)
