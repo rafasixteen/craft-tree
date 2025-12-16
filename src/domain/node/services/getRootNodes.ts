@@ -6,5 +6,8 @@ export async function getRootNodes()
 		where: {
 			parentId: null,
 		},
+		orderBy: {
+			order: 'asc',
+		},
 	});
 }
