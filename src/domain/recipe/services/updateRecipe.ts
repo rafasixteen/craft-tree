@@ -1,8 +1,8 @@
 import prisma from '@/lib/prisma';
-import { UpdateRecipeInput } from '@domain/recipe';
+import { Recipe, UpdateRecipeInput } from '@domain/recipe';
 import { nameSchema } from '@domain/shared';
 
-export async function updateRecipe(id: string, data: UpdateRecipeInput)
+export async function updateRecipe(id: string, data: UpdateRecipeInput): Promise<Recipe>
 {
 	const { name, quantity, time, ingredients } = data;
 
@@ -19,6 +19,13 @@ export async function updateRecipe(id: string, data: UpdateRecipeInput)
 				quantity: quantity ?? undefined,
 				time: time ?? undefined,
 				ingredients: ingredientsToConnect ? { set: ingredientsToConnect.map((ingredient) => ({ id: ingredient.id })) } : undefined,
+			},
+			include: {
+				ingredients: {
+					include: {
+						item: true,
+					},
+				},
 			},
 		});
 

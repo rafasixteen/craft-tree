@@ -1,8 +1,8 @@
 import prisma from '@/lib/prisma';
-import { CreateRecipeInput } from '@domain/recipe';
+import { CreateRecipeInput, Recipe } from '@domain/recipe';
 import { nameSchema } from '@domain/shared';
 
-export async function createRecipe(data: CreateRecipeInput)
+export async function createRecipe(data: CreateRecipeInput): Promise<Recipe>
 {
 	const { name, itemId } = data;
 
@@ -14,6 +14,13 @@ export async function createRecipe(data: CreateRecipeInput)
 			item: { connect: { id: itemId } },
 			quantity: 0,
 			time: 0,
+		},
+		include: {
+			ingredients: {
+				include: {
+					item: true,
+				},
+			},
 		},
 	});
 }

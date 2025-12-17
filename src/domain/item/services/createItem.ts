@@ -1,8 +1,8 @@
-import { CreateItemInput } from '@/domain/item';
-import { nameSchema } from '@/domain/shared';
+import { CreateItemInput, Item } from '@domain/item';
+import { nameSchema } from '@domain/shared';
 import prisma from '@/lib/prisma';
 
-export async function createItem(data: CreateItemInput)
+export async function createItem(data: CreateItemInput): Promise<Item>
 {
 	const { name } = data;
 

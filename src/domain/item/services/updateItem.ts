@@ -1,8 +1,8 @@
-import { UpdateItemInput } from '@/domain/item';
-import { nameSchema } from '@/domain/shared';
+import { Item, UpdateItemInput } from '@domain/item';
+import { nameSchema } from '@domain/shared';
 import prisma from '@/lib/prisma';
 
-export async function updateItem(id: string, data: UpdateItemInput)
+export async function updateItem(id: string, data: UpdateItemInput): Promise<Item>
 {
 	const { name } = data;
 

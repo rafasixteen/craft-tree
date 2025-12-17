@@ -1,4 +1,19 @@
+import { Item } from '@domain/item';
+import { Recipe } from '@domain/recipe';
+
 export type NodeType = 'folder' | 'item' | 'recipe';
+
+export interface Node
+{
+	id: string;
+	name: string;
+	type: NodeType;
+	order: number;
+	item: Item | null;
+	recipe: Recipe | null;
+	children: Node[];
+	parent: Node | null;
+}
 
 export interface CreateNodeInput
 {

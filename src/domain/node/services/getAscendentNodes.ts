@@ -1,7 +1,7 @@
 import prisma from '@/lib/prisma';
-import { Node } from '@generated/graphql/types';
+import { Node } from '@domain/node';
 
-export async function getAscendentNodes(id: string)
+export async function getAscendentNodes(id: string): Promise<Node[]>
 {
 	const rows = await prisma.$queryRaw<Node[]>`
 		WITH RECURSIVE ascendent_nodes AS (

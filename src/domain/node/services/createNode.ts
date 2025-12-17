@@ -1,8 +1,9 @@
 import prisma from '@/lib/prisma';
 import { CreateNodeInput } from '@domain/node';
-import { nameSchema } from '@/domain/shared';
+import { nameSchema } from '@domain/shared';
+import { Node } from '@domain/node';
 
-export async function createNode(data: CreateNodeInput)
+export async function createNode(data: CreateNodeInput): Promise<Partial<Node>>
 {
 	const { name, type, parentId, itemId, recipeId } = data;
 

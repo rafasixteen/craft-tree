@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
+import { Node } from '@domain/node';
 
-export async function getDescendantNodes(id: string)
+export async function getDescendantNodes(id: string): Promise<Node[]>
 {
 	return await prisma.$queryRaw<Node[]>`
 		WITH RECURSIVE descendant_nodes AS (

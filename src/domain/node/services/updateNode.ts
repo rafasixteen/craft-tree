@@ -1,8 +1,8 @@
-import prisma from '@/lib/prisma';
-import { UpdateNodeInput } from '@domain/node';
-import { nameSchema } from '@/domain/shared';
+import prisma from '@lib/prisma';
+import { UpdateNodeInput, Node } from '@domain/node';
+import { nameSchema } from '@domain/shared';
 
-export async function updateNode(id: string, data: UpdateNodeInput)
+export async function updateNode(id: string, data: UpdateNodeInput): Promise<Partial<Node>>
 {
 	const { name, parentId } = data;
 
