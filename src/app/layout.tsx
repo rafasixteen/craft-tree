@@ -28,7 +28,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 								<AppSidebar side="left" variant="sidebar" collapsible="offcanvas" />
 								<div className="flex flex-col flex-1">
 									<Header />
-									<main className="flex-1 relative">{children}</main>
+									<main className="flex-1 min-h-0">{children}</main>
 									<Footer />
 								</div>
 							</div>

@@ -1,7 +1,7 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
-import { getItemBySlug } from '@/domain/item';
-import { getAscendentNodes } from '@/domain/node';
+import { getItemBySlug } from '@domain/item';
+import { getAscendentNodes } from '@domain/node';
 import { Node } from '@generated/graphql/types';
 import prisma from '@/lib/prisma';
 import React from 'react';

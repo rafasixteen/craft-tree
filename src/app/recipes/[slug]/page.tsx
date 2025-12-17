@@ -1,3 +1,5 @@
+import { RecipeEditor } from '@components/recipe';
+import { getRecipeBySlug } from '@domain/recipe';
 import React from 'react';
 
 interface RecipePageProps extends React.HTMLAttributes<HTMLDivElement>
@@ -5,15 +7,12 @@ interface RecipePageProps extends React.HTMLAttributes<HTMLDivElement>
 	params: Promise<{ slug: string }>;
 }
 
-export default async function RecipePage({ params, ...props }: RecipePageProps)
+export default async function RecipePage({ params }: RecipePageProps)
 {
 	const { slug } = await params;
+	const recipe = await getRecipeBySlug(slug);
 
-	return (
-		<div className="grid auto-rows-min gap-4 md:grid-cols-3">
-			<div className="bg-muted/50 aspect-video rounded-xl" />
-			<div className="bg-muted/50 aspect-video rounded-xl" />
-			<div className="bg-muted/50 aspect-video rounded-xl" />
-		</div>
-	);
+	if (!recipe) return <div>Recipe not found</div>;
+
+	return <RecipeEditor recipe={recipe} className="flex-1" />;
 }

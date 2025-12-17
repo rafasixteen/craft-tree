@@ -1,9 +1,22 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, type Node, type Edge, type OnNodesChange, type OnEdgesChange, Controls, MiniMap, Background, OnConnect } from '@xyflow/react';
+import {
+	ReactFlow,
+	addEdge,
+	applyNodeChanges,
+	applyEdgeChanges,
+	type Node,
+	type Edge,
+	type OnNodesChange,
+	type OnEdgesChange,
+	Controls,
+	MiniMap,
+	Background,
+	OnConnect,
+} from '@xyflow/react';
 import RecipeNode, { RecipeNodeType } from './recipe-node';
-import { getItem } from '@/lib/graphql/items';
+import { getItemById } from '@/lib/graphql/items';
 import '@xyflow/react/dist/style.css';
 
 const nodeTypes = { recipeNode: RecipeNode };
@@ -47,7 +60,7 @@ async function buildNode(itemId: string, x: number, y: number, depth: number, no
 
 	visited.add(nodeId);
 
-	const item = await getItem(itemId);
+	const item = await getItemById(itemId);
 
 	if (!item)
 	{
