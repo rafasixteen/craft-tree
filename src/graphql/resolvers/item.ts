@@ -1,6 +1,6 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
-import { createItem, deleteItem, getItemById, getItemBySlug, updateItem } from '@/domain/item';
+import { createItem, deleteItem, getItemById, getItemBySlug, updateItem } from '@domain/item';
 
 export const itemResolvers: Resolvers<GraphQLContext> = {
 	Query: {

@@ -1,6 +1,5 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
-import { nameSchema } from '@/schemas/common';
 import { createRecipe, deleteRecipe, getRecipeById, getRecipeBySlug, updateRecipe } from '@domain/recipe';
 
 export const recipeResolvers: Resolvers<GraphQLContext> = {
@@ -36,6 +35,12 @@ export const recipeResolvers: Resolvers<GraphQLContext> = {
 		{
 			const { id } = args;
 			return deleteRecipe(id);
+		},
+	},
+	Recipe: {
+		ingredients: async (recipe, _args, ctx) =>
+		{
+			return getRecipeById(recipe.id).then((r) => r?.ingredients || []);
 		},
 	},
 };

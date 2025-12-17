@@ -1,6 +1,6 @@
 import { Resolvers } from '@generated/graphql/types';
 import { GraphQLContext } from '../context';
-import { createNode, deleteNode, getAscendentNodes, getDescendantNodes, getNode, getRootNodes, updateNode } from '@/domain/node';
+import { createNode, deleteNode, getAscendentNodes, getDescendantNodes, getNode, getRootNodes, updateNode } from '@domain/node';
 
 export const nodeResolvers: Resolvers<GraphQLContext> = {
 	Query: {
