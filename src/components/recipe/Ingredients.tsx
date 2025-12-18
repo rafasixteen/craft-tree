@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Ingredient } from '@/domain/recipe';
 import { Item } from '@/domain/item';
 import { Check, Pencil, Plus, Trash, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import slugify from 'slugify';
+import { getItemBySlug } from '@/lib/graphql/items';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -17,13 +19,16 @@ interface Props extends React.HTMLAttributes<HTMLDivElement>
 	scroll?: 'smooth' | 'auto' | 'instant';
 }
 
-const emptyItem: Item = {
-	id: '',
-	name: '',
-};
-
 function createEmptyIngredient(): Ingredient
 {
+	const emptyItem: Item = {
+		id: '',
+		name: '',
+	};
+
+	// This id is fine, they are just for representation.
+	// When saving to the database, this id is never used.
+
 	return {
 		id: crypto.randomUUID(),
 		item: emptyItem,
@@ -34,6 +39,7 @@ function createEmptyIngredient(): Ingredient
 export function Ingredients({ initialIngredients, onIngredientsChanged, addBehaviour = 'scroll-bottom', scroll = 'smooth', className, ...otherProps }: Props)
 {
 	const [ingredients, setIngredients] = useState<Ingredient[]>(initialIngredients);
+	const [itemStatus, setItemStatus] = useState<Record<string, boolean>>({});
 	const [draft, setDraft] = useState<Ingredient>(createEmptyIngredient());
 
 	const [editingId, setEditingId] = useState<string | null>(null);
@@ -54,11 +60,38 @@ export function Ingredients({ initialIngredients, onIngredientsChanged, addBehav
 		setDraft((prev) => ({ ...prev, quantity: value }));
 	}
 
-	function addIngredient()
+	async function addIngredient()
 	{
-		if (!draft.item.name || draft.quantity <= 0) return;
+		if (!draft.item.name)
+		{
+			alert('Please provide a name for the item.');
+			return;
+		}
 
-		const next = [...ingredients, draft];
+		const itemSlug = slugify(draft.item.name, { lower: true });
+		const item = await getItemBySlug(itemSlug, {
+			id: true,
+			name: true,
+		});
+
+		if (!item)
+		{
+			alert(`Item '${draft.item.name}' does not exist!`);
+			return;
+		}
+
+		if (draft.quantity <= 0)
+		{
+			alert('Please provide a quantity greater than 0.');
+			return;
+		}
+
+		const newIngredient = {
+			...draft,
+			item: item,
+		};
+
+		const next = [...ingredients, newIngredient];
 
 		setIngredients(next);
 		onIngredientsChanged(next);
@@ -93,11 +126,28 @@ export function Ingredients({ initialIngredients, onIngredientsChanged, addBehav
 		setEditDraft(null);
 	}
 
-	function saveEdit()
+	async function saveEdit()
 	{
 		if (!editDraft) return;
 
-		const next = ingredients.map((i) => (i.id === editDraft.id ? editDraft : i));
+		const itemSlug = slugify(draft.item.name, { lower: true });
+		const item = await getItemBySlug(itemSlug, {
+			id: true,
+			name: true,
+		});
+
+		if (!item)
+		{
+			alert(`Item '${editDraft.item.name}' does not exist!`);
+			return;
+		}
+
+		const updatedIngredient = {
+			...editDraft,
+			item,
+		};
+
+		const next = ingredients.map((i) => (i.id === updatedIngredient.id ? updatedIngredient : i));
 
 		setIngredients(next);
 		onIngredientsChanged?.(next);
@@ -117,35 +167,54 @@ export function Ingredients({ initialIngredients, onIngredientsChanged, addBehav
 		onIngredientsChanged?.(next);
 	}
 
+	useEffect(() =>
+	{
+		ingredients.forEach(async (ingredient) =>
+		{
+			const itemName = ingredient.item.name;
+			const itemSlug = slugify(itemName, { lower: true });
+
+			const item = await getItemBySlug(itemSlug, {
+				name: true,
+			});
+
+			setItemStatus((prev) => ({
+				...prev,
+				[itemName]: item !== null,
+			}));
+		});
+	}, [ingredients]);
+
 	const gridCols = 'grid grid-cols-3 gap-2 p-1.5';
 
 	return (
-		<div className={cn('flex flex-col', className)} {...otherProps}>
+		<div className={cn('flex flex-col flex-1 min-h-0 h-full', className)} {...otherProps}>
 			<div className={cn(gridCols, 'font-semibold border-b')}>
 				<p className="text-center">Item</p>
 				<p className="text-center">Quantity</p>
 				<p className="text-center">Actions</p>
 			</div>
 
-			<div className="h-full overflow-y-auto scrollbar-hide" ref={scrollRef}>
+			<div className="flex-1 overflow-y-auto scrollbar-hide" ref={scrollRef}>
 				{ingredients.map((ingredient) =>
 				{
 					const isEditing = ingredient.id === editingId;
+					const itemExists = itemStatus[ingredient.item.name];
 
 					return (
-						<div key={ingredient.id} className={cn(gridCols, 'items-center border-b last:border-0 hover:bg-accent/20')}>
+						<div key={ingredient.id} className={cn(gridCols, 'items-center border-b last:border-0', itemExists ? 'hover:bg-accent/20' : 'opacity-50')}>
 							<div>
 								<Name
 									isEditing={isEditing}
 									value={isEditing ? editDraft!.item.name : ingredient.item.name}
-									onChange={(v) => updateEditDraft((draft) => ({ ...draft, item: { ...draft.item, name: v } }))}
+									onNameChanged={(v) => updateEditDraft((draft) => ({ ...draft, item: { ...draft.item, name: v } }))}
 								/>
 							</div>
 							<div>
 								<Quantity
 									isEditing={isEditing}
 									value={isEditing ? editDraft!.quantity : ingredient.quantity}
-									onChange={(v) => updateEditDraft((draft) => ({ ...draft, quantity: v }))}
+									onQuantityChanged={(v) => updateEditDraft((draft) => ({ ...draft, quantity: v }))}
 								/>
 							</div>
 							<div className="flex gap-2 justify-center">
@@ -163,8 +232,8 @@ export function Ingredients({ initialIngredients, onIngredientsChanged, addBehav
 			</div>
 
 			<div className={cn(gridCols, 'items-center border-t hover:bg-accent/20')}>
-				<Input placeholder="Item name" value={draft.item.name} onChange={(e) => updateItemName(e.target.value)} />
-				<Input type="number" min={0} value={draft.quantity} onChange={(e) => updateQuantity(Number(e.target.value))} />
+				<Name isEditing={true} placeholder="Item name" value={draft.item.name} onNameChanged={updateItemName} />
+				<Quantity isEditing={true} value={draft.quantity} onQuantityChanged={updateQuantity} />
 
 				<div className="flex gap-2 justify-center">
 					<Button onClick={addIngredient} size="icon-sm">
@@ -215,40 +284,40 @@ function Actions({ isEditing, onEdit, onDelete, onSave, onCancel }: ActionsProps
 	}
 }
 
-interface NameProps
+interface NameProps extends React.ComponentProps<typeof Input>
 {
 	isEditing: boolean;
 	value: string;
-	onChange: (value: string) => void;
+	onNameChanged: (value: string) => void;
 }
 
-function Name({ isEditing, value, onChange }: NameProps)
+function Name({ isEditing, value, onNameChanged, ...props }: NameProps)
 {
 	if (isEditing)
 	{
-		return <Input value={value} onChange={(e) => onChange(e.target.value)} />;
+		return <Input value={value} onChange={(e) => onNameChanged(e.target.value)} {...props} />;
 	}
 	else
 	{
-		return <Input className="bg-transparent border-none focus:ring-0 pointer-events-none" value={value} readOnly />;
+		return <Input className="bg-transparent border-none focus:ring-0 pointer-events-none" value={value} readOnly {...props} />;
 	}
 }
 
-interface QuantityProps
+interface QuantityProps extends React.ComponentProps<typeof Input>
 {
 	isEditing: boolean;
 	value: number;
-	onChange: (value: number) => void;
+	onQuantityChanged: (value: number) => void;
 }
 
-export function Quantity({ isEditing, value, onChange }: QuantityProps)
+export function Quantity({ isEditing, value, onQuantityChanged, ...props }: QuantityProps)
 {
 	if (isEditing)
 	{
-		return <Input type="number" min={0} value={value} onChange={(e) => onChange(Number(e.target.value))} />;
+		return <Input type="number" min={0} value={value} onChange={(e) => onQuantityChanged(Number(e.target.value))} {...props} />;
 	}
 	else
 	{
-		return <Input className="bg-transparent border-none focus:ring-0 pointer-events-none" type="number" value={value} readOnly />;
+		return <Input className="bg-transparent border-none focus:ring-0 pointer-events-none" type="number" value={value} readOnly {...props} />;
 	}
 }

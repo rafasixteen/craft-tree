@@ -12,7 +12,5 @@ export default async function RecipePage({ params }: RecipePageProps)
 	const { slug } = await params;
 	const recipe = await getRecipeBySlug(slug);
 
-	if (!recipe) return <div>Recipe not found</div>;
-
-	return <RecipeEditor recipe={recipe} className="flex-1" />;
+	return <RecipeEditor recipe={recipe!} />;
 }

@@ -10,23 +10,20 @@ import './globals.css';
 
 export const metadata: Metadata = {
 	title: 'Craft Tree',
-	viewport: 'width=device-width, initial-scale=1',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode })
+export default function RootLayout({ children }: { children: React.ReactNode })
 {
-	const cookieStore = await cookies();
-	const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true';
-
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className="flex h-screen">
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<ApolloProviderWrapper>
-						<SidebarProvider defaultOpen={defaultOpen}>
-							<div className="flex flex-1">
+						<SidebarProvider defaultOpen={true}>
+							<div className="flex flex-1 min-h-0">
 								<AppSidebar side="left" variant="sidebar" collapsible="offcanvas" />
-								<div className="flex flex-col flex-1">
+
+								<div className="flex flex-col flex-1 min-h-0">
 									<Header />
 									<main className="flex-1 min-h-0">{children}</main>
 									<Footer />
