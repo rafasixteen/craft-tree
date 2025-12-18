@@ -1,4 +1,4 @@
-import { MutationCreateRecipeArgs, MutationDeleteRecipeArgs, MutationUpdateRecipeArgs, Recipe } from '@generated/graphql/types';
+import { CreateRecipeInput, MutationCreateRecipeArgs, MutationDeleteRecipeArgs, MutationUpdateRecipeArgs, Recipe, UpdateRecipeInput } from '@generated/graphql/types';
 import { buildSelection, Selection, endpoint } from './utils';
 import { request, gql } from 'graphql-request';
 
@@ -30,7 +30,7 @@ export async function getRecipeBySlug(slug: string, selection: Selection)
 	return response.recipeBySlug;
 }
 
-export async function createRecipe(args: MutationCreateRecipeArgs, selection: Selection)
+export async function createRecipe(data: CreateRecipeInput, selection: Selection)
 {
 	const query = gql`
 		mutation Mutation($data: CreateRecipeInput!) {
@@ -40,11 +40,11 @@ export async function createRecipe(args: MutationCreateRecipeArgs, selection: Se
 		}
 	`;
 
-	const response = await request<{ createRecipe: Recipe }>(endpoint, query, { data: args.data });
+	const response = await request<{ createRecipe: Recipe }>(endpoint, query, { data });
 	return response.createRecipe;
 }
 
-export async function updateRecipe(args: MutationUpdateRecipeArgs, selection: Selection)
+export async function updateRecipe(id: string, data: UpdateRecipeInput, selection: Selection)
 {
 	const query = gql`
 		mutation Mutation($id: ID!, $data: UpdateRecipeInput!) {
@@ -54,11 +54,11 @@ export async function updateRecipe(args: MutationUpdateRecipeArgs, selection: Se
 		}
 	`;
 
-	const response = await request<{ updateRecipe: Recipe }>(endpoint, query, { id: args.id, data: args.data });
+	const response = await request<{ updateRecipe: Recipe }>(endpoint, query, { id, data });
 	return response.updateRecipe;
 }
 
-export async function deleteRecipe(args: MutationDeleteRecipeArgs, selection: Selection)
+export async function deleteRecipe(id: string, selection: Selection)
 {
 	const query = gql`
 		mutation Mutation($id: ID!) {
@@ -68,6 +68,6 @@ export async function deleteRecipe(args: MutationDeleteRecipeArgs, selection: Se
 		}
 	`;
 
-	const response = await request<{ deleteRecipe: Recipe }>(endpoint, query, { id: args.id });
+	const response = await request<{ deleteRecipe: Recipe }>(endpoint, query, { id });
 	return response.deleteRecipe;
 }
