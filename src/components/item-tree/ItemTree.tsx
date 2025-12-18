@@ -4,10 +4,10 @@ import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { Node } from '@generated/graphql/types';
 import { getDescendantNodes } from '@/lib/graphql/nodes';
-import { NodeRenderer } from '@/components/items';
+import { NodeRenderer } from '@/components/item-tree';
 import { Collection } from '@/components/collections';
 import useSWR from 'swr';
-import { nodeActionsFeature } from '@/components/items/features/nodeActions';
+import { nodeActionsFeature } from '@/components/item-tree/features/nodeActions';
 import { useTreeStore } from '@/store/treeStore';
 import { useEffect, useState } from 'react';
 import {
