@@ -1,8 +1,8 @@
 'use server';
 
-import { CollectionsLoader, CollectionManager } from '@components/Collection';
-import { NavUser } from './NavUser';
-import { ItemTree } from '@/components/Items';
+import { CollectionsLoader, CollectionManager } from '@/components/collections';
+import { NavUser } from '@/components/user';
+import { ItemTree } from '@/components/items';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 
 export default async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
@@ -11,7 +11,7 @@ export default async function AppSidebar({ ...props }: React.ComponentProps<type
 
 	return (
 		<Sidebar {...props}>
-			<SidebarHeader className="h-32 border-b flex justify-center">
+			<SidebarHeader className="h-16 border-b flex justify-center">
 				<CollectionManager initialCollections={collections} />
 			</SidebarHeader>
 			<SidebarContent>
