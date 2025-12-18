@@ -9,10 +9,10 @@ export interface Node
 	name: string;
 	type: NodeType;
 	order: number;
-	item: Item | null;
-	recipe: Recipe | null;
-	children: Node[];
-	parent: Node | null;
+	item?: Item;
+	recipe?: Recipe;
+	children?: Node[];
+	parent?: Node;
 }
 
 export interface CreateNodeInput
