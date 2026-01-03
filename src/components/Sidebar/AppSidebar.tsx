@@ -2,7 +2,7 @@
 
 import { CollectionsLoader, CollectionManager } from '@/components/collections';
 import { NavUser } from '@/components/user';
-import { ItemTree } from '@/components/items';
+import { ItemTree } from '@/components/item-tree';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 
 export default async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
