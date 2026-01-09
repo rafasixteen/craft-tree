@@ -33,7 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 						<AppSidebar side="left" variant="sidebar" collapsible="offExamples" />
 						<div className="flex flex-col flex-1 ">
 							<Header />
-							<main className="flex-1 overflow-y-auto">{children}</main>
+							<main className="flex-1 overflow-y-auto no-scrollbar">{children}</main>
 							<Footer />
 						</div>
 					</SidebarProvider>
