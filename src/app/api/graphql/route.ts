@@ -3,8 +3,8 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 import { resolvers } from '@/graphql/resolvers';
-import { GraphQLContext } from '@/graphql/context';
-import db from '@/db/client';
+import { createContext } from '@/graphql/context';
+import type { GraphQLContext } from '@/graphql/context';
 
 const typeDefs = loadSchemaSync('src/graphql/schema/**/*.{gql,graphql}', {
 	loaders: [new GraphQLFileLoader()],
@@ -17,10 +17,7 @@ const schema = makeExecutableSchema({
 
 const yoga = createYoga<GraphQLContext>({
 	schema,
-	context: async () => ({
-		db,
-		user: null,
-	}),
+	context: createContext,
 });
 
 export const GET = yoga;

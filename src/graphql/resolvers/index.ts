@@ -1,3 +1,5 @@
-import { userResolvers } from './user';
+// import { userResolvers } from './user';
 
-export const resolvers = [userResolvers];
+export const resolvers = [
+	/*userResolvers*/
+];

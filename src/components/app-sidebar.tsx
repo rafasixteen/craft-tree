@@ -1,9 +1,13 @@
 'use server';
 
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
+import { User } from '@/components/user';
+import { auth, signIn, signOut } from '@/auth';
 
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {
+	const session = await auth();
+
 	return (
 		<Sidebar {...props}>
 			<SidebarHeader className="h-16 border-b flex justify-center">
@@ -23,10 +27,8 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter className="h-16 border-t">
-				{
-					// <NavUser user={{ name: 'John Doe', email: 'john.doe@example.com', avatar: '/path/to/avatar.jpg' }} />
-				}
+			<SidebarFooter className="h-16 border-t justify-center">
+				<User user={{ name: session?.user?.name ?? '', email: session?.user?.email ?? '', avatar: session?.user?.image ?? '' }} />
 			</SidebarFooter>
 		</Sidebar>
 	);

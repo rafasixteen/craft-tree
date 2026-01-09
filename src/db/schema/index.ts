@@ -1,2 +1,5 @@
 export * from './users';
-export * from './customers';
+export * from './accounts';
+export * from './sessions';
+export * from './verification-tokens';
+export * from './authenticators';
