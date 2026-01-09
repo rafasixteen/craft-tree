@@ -1,33 +1,22 @@
-export default function Page()
+import { SidebarInset } from '@/components/ui/sidebar';
+import { BreadcrumbTrail } from '@/components/breadcrumb-trail';
+
+const path = [{ name: 'components' }, { name: 'ui' }, { name: 'button.tsx' }];
+
+export default function Home()
 {
 	return (
-		<div className="p-4 space-y-8">
-			<h1 className="text-2xl font-bold">Welcome to Craft Tree!</h1>
-
-			<p>
-				Craft Tree is a place where ideas grow, branches connect, and creativity spreads outward. Scroll down to explore more content and see how the page extends far
-				beyond its parent container.
-			</p>
-
-			{/* Repeated content blocks */}
-			{Array.from({ length: 20 }).map((_, index) => (
-				<section key={index} className="border rounded-lg p-4 shadow-sm space-y-2">
-					<h2 className="text-xl font-semibold">Section {index + 1}</h2>
-					<p>
-						This is a content section designed to increase the overall height of the page. Each section contains text, spacing, and structure that contributes to
-						vertical overflow.
-					</p>
-					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-						nostrud exercitation ullamco laboris.
-					</p>
-				</section>
-			))}
-
-			{/* Extra vertical space at the bottom */}
-			<div className="h-[800px] bg-primary/80 rounded-lg flex items-center justify-center">
-				<span className="text-gray-500">Extra vertical space (800px tall)</span>
+		<SidebarInset>
+			<div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+				<BreadcrumbTrail path={path} />
 			</div>
-		</div>
+			<div className="flex flex-1 flex-col gap-4 p-4">
+				<div className="grid auto-rows-min gap-4 md:grid-cols-3">
+					<div className="bg-muted/50 aspect-video rounded-xl" />
+					<div className="bg-muted/50 aspect-video rounded-xl" />
+					<div className="bg-muted/50 aspect-video rounded-xl" />
+				</div>
+			</div>
+		</SidebarInset>
 	);
 }
