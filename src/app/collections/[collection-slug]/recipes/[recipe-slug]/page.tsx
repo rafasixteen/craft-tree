@@ -2,14 +2,14 @@ import React from 'react';
 
 interface RecipePageProps extends React.HTMLAttributes<HTMLDivElement>
 {
-	params: Promise<{ slug: string }>;
+	params: Promise<{ 'recipe-slug': string }>;
 }
 
 export default async function RecipePage({ params }: RecipePageProps)
 {
-	const { slug } = await params;
+	const { 'recipe-slug': recipeSlug } = await params;
 
-	return <div>Recipe: {slug}</div>;
+	return <div>Recipe: {recipeSlug}</div>;
 
 	// const recipe = await getRecipeBySlug(slug);
 

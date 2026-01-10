@@ -2,14 +2,14 @@ import React from 'react';
 
 interface ItemPageProps extends React.HTMLAttributes<HTMLDivElement>
 {
-	params: Promise<{ slug: string }>;
+	params: Promise<{ 'item-slug': string }>;
 }
 
 export default async function ItemPage({ params }: ItemPageProps)
 {
-	const { slug } = await params;
+	const { 'item-slug': itemSlug } = await params;
 
-	return <div>Item: {slug}</div>;
+	return <div>Item: {itemSlug}</div>;
 
 	// const item = await getItemBySlug(slug);
 
