@@ -1,4 +1,0 @@
-{
-	"exportall.config.relExclusion": ["/src/components/auth/index.ts", "/src/components"],
-	"exportall.config.folderListener": ["/src/components/auth", "/src/components"]
-}
