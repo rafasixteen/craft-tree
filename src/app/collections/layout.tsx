@@ -1,6 +1,8 @@
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Sidebar } from '@/components/sidebar';
 import { Collection } from '@/components/collections';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
 
 const mockCollections: Collection[] = [
 	{ id: 'microtopia', name: 'Microtopia' },
@@ -8,8 +10,11 @@ const mockCollections: Collection[] = [
 	{ id: '2', name: 'Summer Projects' },
 ];
 
-export default function CollectionsLayout({ children }: { children: React.ReactNode })
+export default async function CollectionsLayout({ children }: { children: React.ReactNode })
 {
+	const session = await auth();
+	if (!session) redirect('/sign-in');
+
 	return (
 		<div className="h-full w-full flex flex-col">
 			{/* Panels */}

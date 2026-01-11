@@ -8,6 +8,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 	adapter: DrizzleAdapter(database),
 	session: { strategy: 'jwt' },
 	pages: {
-		signIn: '/session',
+		signIn: '/sign-in',
+		error: '/sign-in',
 	},
 });
