@@ -1,8 +1,8 @@
-import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core';
+import { integer, pgTable, text, primaryKey } from 'drizzle-orm/pg-core';
 import type { AdapterAccountType } from 'next-auth/adapters';
-import { users } from './users';
+import { users } from '@/db/schema';
 
-export const accounts = sqliteTable(
+export const accounts = pgTable(
 	'account',
 	{
 		userId: text('userId')

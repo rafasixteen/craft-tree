@@ -1,7 +1,7 @@
-import { integer, sqliteTable, text, primaryKey } from 'drizzle-orm/sqlite-core';
+import { integer, pgTable, text, primaryKey, boolean } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
-export const authenticators = sqliteTable(
+export const authenticators = pgTable(
 	'authenticator',
 	{
 		credentialID: text('credentialID').notNull().unique(),
@@ -12,9 +12,7 @@ export const authenticators = sqliteTable(
 		credentialPublicKey: text('credentialPublicKey').notNull(),
 		counter: integer('counter').notNull(),
 		credentialDeviceType: text('credentialDeviceType').notNull(),
-		credentialBackedUp: integer('credentialBackedUp', {
-			mode: 'boolean',
-		}).notNull(),
+		credentialBackedUp: boolean('credentialBackedUp').notNull(),
 		transports: text('transports'),
 	},
 	(authenticator) => [
