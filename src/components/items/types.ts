@@ -1,9 +1,5 @@
-export type TreeNodeType = 'collection' | 'item' | 'recipe';
-
-export interface TreeNode
+export interface Item
 {
-	id: string;
 	name: string;
-	type: TreeNodeType;
-	slug?: string;
+	children?: string[];
 }
