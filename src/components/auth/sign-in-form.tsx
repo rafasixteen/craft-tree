@@ -58,13 +58,7 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'div'>)
 
 				<div className="flex flex-wrap gap-3 justify-center">
 					{providers.map((provider) => (
-						<Button
-							key={provider.id}
-							variant="outline"
-							type="button"
-							className="flex items-center justify-center min-w-30"
-							onClick={() => signIn(provider.id, { callbackUrl: '/' })}
-						>
+						<Button key={provider.id} type="button" className="flex items-center justify-center min-w-30" onClick={() => signIn(provider.id, { callbackUrl: '/' })}>
 							{provider.icon}
 							{provider.name}
 						</Button>
