@@ -1,8 +1,16 @@
-// This page is never actually rendered because the Collections component
-// redirects to the active collection. However, we still need to define it
-// to satisfy the Next.js routing system.
+'use server';
 
-export default function CollectionsPage()
+import { auth } from '@/auth';
+import { getUserCollections } from '@/domain/collection';
+import { getUserIdFromEmail } from '@/domain/user';
+import { redirect } from 'next/navigation';
+
+export default async function Page()
 {
-	return null;
+	const session = await auth();
+
+	const userId = await getUserIdFromEmail(session!.user!.email!);
+	const collections = await getUserCollections(userId);
+
+	redirect(`/collections/${collections[0].slug}`);
 }

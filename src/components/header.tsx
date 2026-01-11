@@ -1,7 +1,6 @@
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Navbar } from '@/components/navbar';
 import { User } from '@/components/user';
-import { SessionProvider } from 'next-auth/react';
 
 export function Header()
 {
@@ -10,9 +9,7 @@ export function Header()
 			<Navbar />
 			<div className="flex items-center gap-4">
 				<ThemeToggle />
-				<SessionProvider>
-					<User />
-				</SessionProvider>
+				<User />
 			</div>
 		</header>
 	);
