@@ -1,7 +1,7 @@
 import { pgTable, text, uuid, uniqueIndex, foreignKey } from 'drizzle-orm/pg-core';
-import { collections } from '@/db/schema';
+import { collectionsTable } from '@/db/schema';
 
-export const folders = pgTable(
+export const foldersTable = pgTable(
 	'folders',
 	{
 		id: uuid().defaultRandom().primaryKey(),
@@ -12,7 +12,7 @@ export const folders = pgTable(
 		parentFolderId: uuid('parent_folder_id'),
 
 		collectionId: uuid()
-			.references(() => collections.id, { onDelete: 'cascade' })
+			.references(() => collectionsTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
 	(table) => [

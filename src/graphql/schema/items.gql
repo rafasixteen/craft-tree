@@ -1,0 +1,14 @@
+type Item {
+	id: String!
+	name: String!
+	slug: String!
+	collectionId: String!
+	collection: Collection
+	recipes: [Recipe!]
+}
+
+extend type Mutation {
+	createItem(collectionId: String!, name: String!): Item!
+	updateItem(id: String!, name: String!): Item
+	deleteItem(id: String!): Boolean!
+}

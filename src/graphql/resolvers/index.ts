@@ -1,5 +1,5 @@
-// import { userResolvers } from './user';
+import { collectionResolvers } from './collections';
+import { itemResolvers } from './items';
+import { recipeResolvers } from './recipes';
 
-export const resolvers = [
-	/*userResolvers*/
-];
+export const resolvers = [collectionResolvers, itemResolvers, recipeResolvers];

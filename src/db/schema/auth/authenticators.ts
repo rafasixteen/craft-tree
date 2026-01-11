@@ -1,13 +1,13 @@
 import { integer, pgTable, text, primaryKey, boolean } from 'drizzle-orm/pg-core';
-import { users } from './users';
+import { usersTable } from './users';
 
-export const authenticators = pgTable(
+export const authenticatorsTable = pgTable(
 	'authenticator',
 	{
 		credentialID: text('credentialID').notNull().unique(),
 		userId: text('userId')
 			.notNull()
-			.references(() => users.id, { onDelete: 'cascade' }),
+			.references(() => usersTable.id, { onDelete: 'cascade' }),
 		providerAccountId: text('providerAccountId').notNull(),
 		credentialPublicKey: text('credentialPublicKey').notNull(),
 		counter: integer('counter').notNull(),

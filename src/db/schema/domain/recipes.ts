@@ -1,14 +1,14 @@
 import { pgTable, uuid, integer, text } from 'drizzle-orm/pg-core';
-import { items } from '@/db/schema';
+import { itemsTable } from '@/db/schema';
 
-export const recipes = pgTable('recipes', {
+export const recipesTable = pgTable('recipes', {
 	id: uuid().defaultRandom().primaryKey(),
 
 	name: text().notNull(),
 	slug: text().notNull().unique(),
 
 	itemId: uuid()
-		.references(() => items.id, { onDelete: 'cascade' })
+		.references(() => itemsTable.id, { onDelete: 'cascade' })
 		.notNull(),
 
 	quantity: integer().notNull(),
