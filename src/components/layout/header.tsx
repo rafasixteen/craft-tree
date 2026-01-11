@@ -1,6 +1,5 @@
-import { ThemeToggle } from '@/components/theme-toggle';
-import { Navbar } from '@/components/navbar';
-import { User } from '@/components/user';
+import { Navbar, ThemeToggle } from '@/components/layout';
+import { User } from '@/components/auth';
 
 export function Header()
 {

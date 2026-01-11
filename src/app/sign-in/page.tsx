@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SignInForm } from '@/components/auth/sign-in-form';
+import { SignInForm } from '@/components/auth';
 import { cn } from '@/lib/utils';
 
 // TODO: Fix me - Error message doesn't fade out as it should, it simply disappears after 3 seconds.

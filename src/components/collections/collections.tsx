@@ -2,13 +2,12 @@
 
 import { ChevronsUpDown, Plus, Wallet } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createCollection } from '@/domain/collection/services/create-collection';
-import { Collection, ensureUniqueSlug } from '@/domain/collection';
+import { Collection } from '@/domain/collection';
 import useIsMobile from '@/hooks/use-is-mobile';
-import { deslugify } from '@/lib/utils';
 
 interface CollectionsProps
 {

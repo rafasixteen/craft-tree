@@ -3,7 +3,7 @@ import { getUserCollections } from '@/domain/collection';
 import { auth } from '@/auth';
 import React from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import { Sidebar } from '@/components/sidebar';
+import { Sidebar } from '@/components/layout';
 import { redirect } from 'next/navigation';
 
 interface LayoutProps

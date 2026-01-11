@@ -1,9 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
-import { ThemeProvider } from '@/components/theme-provider';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
+import { Footer, Header, ThemeProvider } from '@/components/layout';
 import { cn } from '@/lib/utils';
 import { SessionProvider } from 'next-auth/react';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BreadcrumbTrail } from '@/components/breadcrumb-trail';
+import { BreadcrumbTrail } from '@/components/shared/breadcrumb-trail';
 
 interface LayoutProps
 {
