@@ -1,16 +1,27 @@
 'use client';
 
-import { useTree } from '@headless-tree/react';
+import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { Item } from '@/components/items';
 import { ItemTreeNode } from '@/components/items';
-import { Tree } from '@/components/ui/tree';
 import { useEffect, useRef, useState } from 'react';
-import { expandAllFeature, hotkeysCoreFeature, searchFeature, selectionFeature, syncDataLoaderFeature, type TreeState } from '@headless-tree/core';
-import { CircleXIcon, FilterIcon, FolderIcon, FolderOpenIcon } from 'lucide-react';
+import { CircleXIcon, FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
+import { doubleClickExpandFeature } from '@/components/items/features';
+import { Tree, TreeDragLine } from '@/components/ui/tree';
+import {
+	expandAllFeature,
+	hotkeysCoreFeature,
+	searchFeature,
+	selectionFeature,
+	syncDataLoaderFeature,
+	dragAndDropFeature,
+	keyboardDragAndDropFeature,
+	renamingFeature,
+	createOnDropHandler,
+	TreeState,
+} from '@headless-tree/core';
 
-const items: Record<string, Item> = {
+const initialItems: Record<string, Item> = {
 	apis: { name: 'APIs' },
 	backend: { children: ['apis', 'infrastructure'], name: 'Backend' },
 	company: {
@@ -45,6 +56,7 @@ const indent = 20;
 export function ItemTree()
 {
 	const initialExpandedItems = ['engineering', 'frontend', 'design-system'];
+	const [items, setItems] = useState(initialItems);
 	const [state, setState] = useState<Partial<TreeState<Item>>>({});
 	const [searchValue, setSearchValue] = useState('');
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -55,11 +67,47 @@ export function ItemTree()
 			getChildren: (itemId) => items[itemId].children ?? [],
 			getItem: (itemId) => items[itemId],
 		},
-		features: [syncDataLoaderFeature, hotkeysCoreFeature, selectionFeature, searchFeature, expandAllFeature],
+		features: [
+			syncDataLoaderFeature,
+			hotkeysCoreFeature,
+			selectionFeature,
+			searchFeature,
+			expandAllFeature,
+			dragAndDropFeature,
+			keyboardDragAndDropFeature,
+			renamingFeature,
+			doubleClickExpandFeature,
+		],
 		getItemName: (item) => item.getItemData().name,
 		isItemFolder: (item) => (item.getItemData()?.children?.length ?? 0) > 0,
+		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
+		{
+			setItems((prevItems) => ({
+				...prevItems,
+				[parentItem.getId()]: {
+					...prevItems[parentItem.getId()],
+					children: newChildrenIds,
+				},
+			}));
+		}),
+		onRename: (item, newName) =>
+		{
+			// Update the item name in our state
+			const itemId = item.getId();
+			setItems((prevItems) => ({
+				...prevItems,
+				[itemId]: {
+					...prevItems[itemId],
+					name: newName,
+				},
+			}));
+
+			// TODO: If we are in the item href link (e.g., /collections/new-collection/items/{item-name}),
+			// we should also update the URL to reflect the new name.
+		},
 		initialState: {
 			expandedItems: ['engineering', 'frontend', 'design-system'],
+			selectedItems: ['components'],
 		},
 		setState: setState,
 		state: state,
@@ -270,16 +318,17 @@ export function ItemTree()
 		<div className="flex h-full flex-col gap-2 *:first:grow">
 			{searchBar()}
 			<Tree indent={indent} tree={tree}>
+				<AssistiveTreeDescription tree={tree} />
 				{searchValue && filteredItems.length === 0 ? (
 					<p className="px-3 py-4 text-center text-sm">No items found for "{searchValue}"</p>
 				) : (
 					tree.getItems().map((item) =>
 						{
 						const isVisible = shouldShowItem(item.getId());
-
 						return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
 					})
 				)}
+				<TreeDragLine />
 			</Tree>
 		</div>
 	);
