@@ -1,10 +1,10 @@
 import { getUserIdFromEmail } from '@/domain/user';
 import { getUserCollections } from '@/domain/collection';
 import { auth } from '@/auth';
-import React from 'react';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import { Sidebar } from '@/components/layout';
 import { redirect } from 'next/navigation';
+import React from 'react';
 
 interface LayoutProps
 {
@@ -15,6 +15,7 @@ interface LayoutProps
 export default async function Layout({ children, params }: LayoutProps)
 {
 	const session = await auth();
+	if (!session) redirect('/sign-in');
 
 	const { 'collection-slug': collectionSlug } = await params;
 

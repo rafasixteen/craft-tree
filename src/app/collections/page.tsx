@@ -1,16 +1,18 @@
 'use server';
 
 import { auth } from '@/auth';
-import { getUserCollections } from '@/domain/collection';
+import { createCollection, getUserCollections } from '@/domain/collection';
 import { getUserIdFromEmail } from '@/domain/user';
 import { redirect } from 'next/navigation';
 
-export default async function Page()
+export default async function Layout(children: React.ReactNode)
 {
 	const session = await auth();
+	if (!session) redirect('/sign-in');
 
 	const userId = await getUserIdFromEmail(session!.user!.email!);
 	const collections = await getUserCollections(userId);
 
-	redirect(`/collections/${collections[0].slug}`);
+	const firstCollection = collections[0] ?? (await createCollection({ name: 'New Collection', userId }));
+	redirect(`/collections/${firstCollection.slug}`);
 }
