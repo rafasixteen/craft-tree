@@ -5,7 +5,7 @@ import { createCollection, getUserCollections } from '@/domain/collection';
 import { getUserIdFromEmail } from '@/domain/user';
 import { redirect } from 'next/navigation';
 
-export default async function Layout(children: React.ReactNode)
+export default async function Page()
 {
 	const session = await auth();
 	if (!session) redirect('/sign-in');
