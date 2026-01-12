@@ -3,9 +3,7 @@
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { Item } from '@/components/items';
 import { ItemTreeNode, SearchBar } from '@/components/items';
-import { useEffect, useRef, useState } from 'react';
-import { CircleXIcon, FilterIcon } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { useEffect, useState } from 'react';
 import { doubleClickExpandFeature } from '@/components/items/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import {
@@ -18,7 +16,6 @@ import {
 	keyboardDragAndDropFeature,
 	renamingFeature,
 	createOnDropHandler,
-	TreeState,
 } from '@headless-tree/core';
 
 const initialItems: Record<string, Item> = {
@@ -57,7 +54,6 @@ export function ItemTree()
 {
 	const initialExpandedItems = ['engineering', 'frontend', 'design-system'];
 	const [items, setItems] = useState(initialItems);
-	const [state, setState] = useState<Partial<TreeState<Item>>>({});
 	const [searchValue, setSearchValue] = useState('');
 	const [filteredItems, setFilteredItems] = useState<string[]>([]);
 
@@ -108,8 +104,6 @@ export function ItemTree()
 			expandedItems: ['engineering', 'frontend', 'design-system'],
 			selectedItems: ['components'],
 		},
-		setState: setState,
-		state: state,
 		rootItemId: 'company',
 		indent,
 	});
@@ -201,11 +195,11 @@ export function ItemTree()
 		const folderIdsToExpand = allItems.filter((item) => item.isFolder()).map((item) => item.getId());
 
 		// Update expanded items in the tree state
-		setState((prevState) => ({
+		tree.setState((prevState) => ({
 			...prevState,
 			expandedItems: [...new Set([...currentExpandedItems, ...folderIdsToExpand])],
 		}));
-	}, [searchValue, tree]);
+	}, [searchValue, tree, items]);
 
 	return (
 		<div className="flex h-full flex-col gap-2 *:first:grow">
@@ -249,7 +243,7 @@ export function ItemTree()
 					else
 					{
 						// If input is cleared, reset to initial expanded state
-						setState((prevState) => ({
+						tree.setState((prevState) => ({
 							...prevState,
 							expandedItems: initialExpandedItems,
 						}));
@@ -264,7 +258,7 @@ export function ItemTree()
 			<Tree indent={indent} tree={tree}>
 				<AssistiveTreeDescription tree={tree} />
 				{searchValue && filteredItems.length === 0 ? (
-					<p className="px-3 py-4 text-center text-sm">No items found for "{searchValue}"</p>
+					<p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>
 				) : (
 					tree.getItems().map((item) =>
 						{
