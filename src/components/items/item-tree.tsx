@@ -58,8 +58,6 @@ interface ItemTreeProps
 export function ItemTree({ indent = 16 }: ItemTreeProps)
 {
 	const [items, setItems] = useState(initialItems);
-	const [searchValue, setSearchValue] = useState('');
-	const [filteredItems, setFilteredItems] = useState<string[]>([]);
 
 	const tree = useTree<Item>({
 		dataLoader: {
@@ -79,6 +77,12 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		],
 		getItemName: (item) => item.getItemData().name,
 		isItemFolder: (item) => (item.getItemData()?.children?.length ?? 0) > 0,
+		// Custom search matching logic
+		isSearchMatchingItem: (search, item) =>
+		{
+			const itemName = item.getItemName().toLowerCase();
+			return itemName.includes(search.toLowerCase());
+		},
 		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
 		{
 			setItems((prevItems) => ({
@@ -108,34 +112,22 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		indent,
 	});
 
-	const shouldShowItem = (itemId: string) =>
-	{
-		if (!searchValue || searchValue.length === 0) return true;
-		return filteredItems.includes(itemId);
-	};
+	const searchValue = tree.getSearchValue();
 
-	useEffect(() =>
+	// Calculate which items should be visible based on search
+	const getVisibleItems = () =>
 	{
 		if (!searchValue || searchValue.length === 0)
 		{
-			setFilteredItems([]);
-			return;
+			return new Set<string>();
 		}
 
-		// Get all items
-		const allItems = tree.getItems();
+		// Get matching items using the searchFeature's built-in matching
+		const matchingItems = tree.getSearchMatchingItems();
+		const directMatches = matchingItems.map((item) => item.getId());
+		const visibleIds = new Set<string>(directMatches);
 
-		// First, find direct matches
-		const directMatches = allItems
-			.filter((item) =>
-			{
-				const name = item.getItemName().toLowerCase();
-				return name.includes(searchValue.toLowerCase());
-			})
-			.map((item) => item.getId());
-
-		// Then, find all parent IDs of matching items
-		const parentIds = new Set<string>();
+		// Add all parent IDs of matching items
 		for (const matchId of directMatches)
 		{
 			let item = tree.getItems().find((i) => i.getId() === matchId);
@@ -145,7 +137,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 				const parent = item.getParent();
 				if (parent)
 				{
-					parentIds.add(parent.getId());
+					visibleIds.add(parent.getId());
 					item = parent;
 				}
 				else
@@ -155,8 +147,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			}
 		}
 
-		// Find all children of matching items
-		const childrenIds = new Set<string>();
+		// Add all children of matching items
 		for (const matchId of directMatches)
 		{
 			const item = tree.getItems().find((i) => i.getId() === matchId);
@@ -169,7 +160,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 
 					for (const childId of children)
 					{
-						childrenIds.add(childId);
+						visibleIds.add(childId);
 
 						if (items[childId]?.children?.length)
 						{
@@ -182,56 +173,34 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			}
 		}
 
-		// Combine direct matches, parents, and children
-		setFilteredItems([...directMatches, ...Array.from(parentIds), ...Array.from(childrenIds)]);
-
-		// Keep all folders expanded during search to ensure all matches are visible
-		// Store current expanded state first
-		const currentExpandedItems = tree.getState().expandedItems || [];
-
-		// Get all folder IDs that need to be expanded to show matches
-		const folderIdsToExpand = allItems.filter((item) => item.isFolder()).map((item) => item.getId());
-
-		// Update expanded items in the tree state
-		tree.setState((prevState) => ({
-			...prevState,
-			expandedItems: [...new Set([...currentExpandedItems, ...folderIdsToExpand])],
-		}));
-	}, [searchValue, tree, items]);
-
-	const searchBarOnChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-	{
-		const value = e.target.value;
-		setSearchValue(value);
-
-		const searchProps = tree.getSearchInputElementProps();
-
-		if (searchProps.onChange) searchProps.onChange(e);
-		if (value.length > 0) tree.expandAll();
+		return visibleIds;
 	};
 
-	const searchBarOnBlur = (e: React.FocusEvent<HTMLInputElement>) =>
-	{
-		e.preventDefault();
+	const visibleItems = getVisibleItems();
 
+	const shouldShowItem = (itemId: string) =>
+	{
+		if (!searchValue || searchValue.length === 0) return true;
+		return visibleItems.has(itemId);
+	};
+
+	useEffect(() =>
+	{
 		if (searchValue && searchValue.length > 0)
 		{
-			const searchProps = tree.getSearchInputElementProps();
-
-			if (searchProps.onChange)
-			{
-				const syntheticEvent = {
-					target: { value: searchValue },
-				} as React.ChangeEvent<HTMLInputElement>;
-
-				searchProps.onChange(syntheticEvent);
-			}
+			tree.expandAll();
 		}
+	}, [searchValue, tree]);
+
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+	{
+		const value = e.target.value;
+		tree.setSearch(value || null);
 	};
 
 	const displayNodes = () =>
 	{
-		if (searchValue && filteredItems.length === 0)
+		if (searchValue && visibleItems.size === 0)
 		{
 			return <p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>;
 		}
@@ -246,7 +215,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 	return (
 		<div className="flex h-full flex-col gap-2">
 			<div className="relative">
-				<Input className="peer ps-9" value={searchValue} onChange={searchBarOnChange} onBlur={searchBarOnBlur} type="search" placeholder="Filter items..." />
+				<Input className="peer ps-9" value={tree.getSearchValue() || ''} onChange={handleSearchChange} type="search" placeholder="Filter items..." />
 				<div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
 					<FilterIcon className="size-4" />
 				</div>
