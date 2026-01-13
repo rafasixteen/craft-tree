@@ -2,10 +2,12 @@
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { Item } from '@/components/items';
-import { ItemTreeNode, SearchBar } from '@/components/items';
+import { ItemTreeNode } from '@/components/items';
 import { useEffect, useState } from 'react';
 import { doubleClickExpandFeature } from '@/components/items/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
+import { FilterIcon } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -52,7 +54,6 @@ const indent = 20;
 
 export function ItemTree()
 {
-	const initialExpandedItems = ['engineering', 'frontend', 'design-system'];
 	const [items, setItems] = useState(initialItems);
 	const [searchValue, setSearchValue] = useState('');
 	const [filteredItems, setFilteredItems] = useState<string[]>([]);
@@ -100,22 +101,16 @@ export function ItemTree()
 			// TODO: If we are in the item href link (e.g., /collections/new-collection/items/{item-name}),
 			// we should also update the URL to reflect the new name.
 		},
-		initialState: {
-			expandedItems: ['engineering', 'frontend', 'design-system'],
-			selectedItems: ['components'],
-		},
 		rootItemId: 'company',
 		indent,
 	});
 
-	// This function determines if an item should be visible based on our custom filtering
-	function shouldShowItem(itemId: string)
+	const shouldShowItem = (itemId: string) =>
 	{
 		if (!searchValue || searchValue.length === 0) return true;
 		return filteredItems.includes(itemId);
-	}
+	};
 
-	// Update filtered items when search value changes
 	useEffect(() =>
 	{
 		if (!searchValue || searchValue.length === 0)
@@ -201,71 +196,63 @@ export function ItemTree()
 		}));
 	}, [searchValue, tree, items]);
 
+	const searchBarOnChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+	{
+		const value = e.target.value;
+		setSearchValue(value);
+
+		const searchProps = tree.getSearchInputElementProps();
+
+		if (searchProps.onChange) searchProps.onChange(e);
+		if (value.length > 0) tree.expandAll();
+	};
+
+	const searchBarOnBlur = (e: React.FocusEvent<HTMLInputElement>) =>
+	{
+		e.preventDefault();
+
+		if (searchValue && searchValue.length > 0)
+		{
+			const searchProps = tree.getSearchInputElementProps();
+
+			if (searchProps.onChange)
+			{
+				const syntheticEvent = {
+					target: { value: searchValue },
+				} as React.ChangeEvent<HTMLInputElement>;
+
+				searchProps.onChange(syntheticEvent);
+			}
+		}
+	};
+
+	const displayNodes = () =>
+	{
+		if (searchValue && filteredItems.length === 0)
+		{
+			return <p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>;
+		}
+
+		return tree.getItems().map((item) =>
+		{
+			const isVisible = shouldShowItem(item.getId());
+			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
+		});
+	};
+
 	return (
-		<div className="flex h-full flex-col gap-2 *:first:grow">
-			<SearchBar
-				className="peer ps-9"
-				onBlur={(e) =>
-				{
-					// Prevent default blur behavior
-					e.preventDefault();
-
-					// Re-apply the search to ensure it stays active
-					if (searchValue && searchValue.length > 0)
-					{
-						const searchProps = tree.getSearchInputElementProps();
-						if (searchProps.onChange)
-						{
-							const syntheticEvent = {
-								target: { value: searchValue },
-							} as React.ChangeEvent<HTMLInputElement>;
-							searchProps.onChange(syntheticEvent);
-						}
-					}
-				}}
-				onChange={(e) =>
-				{
-					const value = e.target.value;
-					setSearchValue(value);
-
-					// Apply the search to the tree's internal state as well
-					const searchProps = tree.getSearchInputElementProps();
-					if (searchProps.onChange)
-					{
-						searchProps.onChange(e);
-					}
-
-					if (value.length > 0)
-					{
-						// If input has at least one character, expand all items
-						tree.expandAll();
-					}
-					else
-					{
-						// If input is cleared, reset to initial expanded state
-						tree.setState((prevState) => ({
-							...prevState,
-							expandedItems: initialExpandedItems,
-						}));
-						setFilteredItems([]);
-					}
-				}}
-				placeholder="Filter items..."
-				type="search"
-				value={searchValue}
-			/>
+		<div className="flex h-full flex-col gap-2">
+			{/* Search bar to filter items */}
+			<div className="relative">
+				<Input className="peer ps-9" value={searchValue} onChange={searchBarOnChange} onBlur={searchBarOnBlur} type="search" placeholder="Filter items..." />
+				<div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+					<FilterIcon className="size-4" />
+				</div>
+			</div>
 
 			<Tree indent={indent} tree={tree}>
 				<AssistiveTreeDescription tree={tree} />
-				{searchValue && filteredItems.length === 0 ? (
-					<p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>
-				) : (
-					tree.getItems().map((item) =>
-						{
-						const isVisible = shouldShowItem(item.getId());
-						return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
-					})
-				)}
+				{displayNodes()}
 				<TreeDragLine />
 			</Tree>
 		</div>
