@@ -50,9 +50,12 @@ const initialItems: Record<string, Item> = {
 	'web-platform': { name: 'Web Platform' },
 };
 
-const indent = 20;
+interface ItemTreeProps
+{
+	indent?: number;
+}
 
-export function ItemTree()
+export function ItemTree({ indent = 16 }: ItemTreeProps)
 {
 	const [items, setItems] = useState(initialItems);
 	const [searchValue, setSearchValue] = useState('');
@@ -242,7 +245,6 @@ export function ItemTree()
 
 	return (
 		<div className="flex h-full flex-col gap-2">
-			{/* Search bar to filter items */}
 			<div className="relative">
 				<Input className="peer ps-9" value={searchValue} onChange={searchBarOnChange} onBlur={searchBarOnBlur} type="search" placeholder="Filter items..." />
 				<div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
