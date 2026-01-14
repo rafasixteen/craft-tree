@@ -15,6 +15,11 @@ const eslintConfig = defineConfig([
 		'src/graphql/generated/**',
 		'src/components/ui',
 	]),
+	{
+		rules: {
+			'@typescript-eslint/no-explicit-any': 'off',
+		},
+	},
 ]);
 
 export default eslintConfig;

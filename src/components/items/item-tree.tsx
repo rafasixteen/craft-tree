@@ -4,10 +4,11 @@ import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { Item } from '@/components/items';
 import { ItemTreeNode } from '@/components/items';
 import { useEffect, useState } from 'react';
-import { doubleClickExpandFeature } from '@/components/items/features';
+import { doubleClickExpandFeature, testFeature } from '@/components/items/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
-import { FilterIcon } from 'lucide-react';
+import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -74,10 +75,10 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			keyboardDragAndDropFeature,
 			renamingFeature,
 			doubleClickExpandFeature,
+			testFeature,
 		],
 		getItemName: (item) => item.getItemData().name,
 		isItemFolder: (item) => (item.getItemData()?.children?.length ?? 0) > 0,
-		// Custom search matching logic
 		isSearchMatchingItem: (search, item) =>
 		{
 			const itemName = item.getItemName().toLowerCase();
@@ -214,13 +215,29 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 
 	return (
 		<div className="flex h-full flex-col gap-2">
-			<div className="relative">
-				<Input className="peer ps-9" value={tree.getSearchValue() || ''} onChange={handleSearchChange} type="search" placeholder="Filter items..." />
-				<div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
-					<FilterIcon className="size-4" />
+			<div className="flex gap-2">
+				{/* Search Bar */}
+				<div className="relative flex-1">
+					<Input className="peer ps-9" value={tree.getSearchValue() || ''} onChange={handleSearchChange} type="search" placeholder="Filter items..." />
+					<div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+						<FilterIcon className="size-4" />
+					</div>
 				</div>
+
+				{/* Plus Icon */}
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={() =>
+					{
+						tree.createItem('Test Item', '63c4d599-f6af-41b6-ac20-8f1f32d194c0', 'w');
+					}}
+				>
+					<PlusIcon className="size-4" />
+				</Button>
 			</div>
 
+			{/* Tree */}
 			<Tree indent={indent} tree={tree}>
 				<AssistiveTreeDescription tree={tree} />
 				{displayNodes()}

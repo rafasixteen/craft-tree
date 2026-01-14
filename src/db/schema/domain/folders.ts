@@ -7,7 +7,7 @@ export const foldersTable = pgTable(
 		id: uuid().defaultRandom().primaryKey(),
 
 		name: text().notNull(),
-		slug: text().notNull().unique(),
+		slug: text().notNull(),
 
 		parentFolderId: uuid('parent_folder_id'),
 

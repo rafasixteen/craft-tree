@@ -1,28 +1,37 @@
 'use server';
 
 import { slugify } from '@/lib/utils';
-import { getCollectionBySlug } from './get-collection-by-slug';
+import { collectionsTable } from '@/db/schema';
+import { like } from 'drizzle-orm';
+import db from '@/db/client';
 
 export async function ensureUniqueSlug(name: string): Promise<string>
 {
-	let slug = slugify(name);
+	const baseSlug = slugify(name);
+
+	const rows = await db
+		.select({ slug: collectionsTable.slug })
+		.from(collectionsTable)
+		.where(like(collectionsTable.slug, `${baseSlug}%`));
+
+	if (rows.length === 0)
+	{
+		return baseSlug;
+	}
+
+	const used = new Set(rows.map((r) => r.slug));
+
+	if (!used.has(baseSlug))
+	{
+		return baseSlug;
+	}
+
 	let suffix = 1;
 
-	let existingCollection = await getCollectionBySlug(slug);
-
-	while (existingCollection)
+	while (used.has(`${baseSlug}-${suffix}`))
 	{
-		const newSlug = `${slug}-${suffix}`;
-		existingCollection = await getCollectionBySlug(newSlug);
-
-		if (!existingCollection)
-		{
-			slug = newSlug;
-			break;
-		}
-
 		suffix++;
 	}
 
-	return slug;
+	return `${baseSlug}-${suffix}`;
 }
