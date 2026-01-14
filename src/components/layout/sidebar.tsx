@@ -13,7 +13,7 @@ export function Sidebar({ collections, activeCollection }: SidebarProps)
 	return (
 		<div className="flex flex-col p-2 gap-2">
 			<Collections collections={collections} activeCollection={activeCollection} />
-			<ItemTree />
+			<ItemTree collection={activeCollection} />
 		</div>
 	);
 }

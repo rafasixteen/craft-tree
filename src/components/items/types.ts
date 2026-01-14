@@ -1,4 +1,4 @@
-export interface Item
+export interface TreeItemNode
 {
 	name: string;
 	children?: string[];

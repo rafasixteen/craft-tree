@@ -1,13 +1,13 @@
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
-import { Item } from '@/components/items';
+import { TreeItemNode } from '@/components/items';
 import { FolderIcon, FolderOpenIcon } from 'lucide-react';
 import { Input } from '../ui/input';
 import Link from 'next/link';
 
 interface ItemTreeNodeProps
 {
-	item: ItemInstance<Item>;
+	item: ItemInstance<TreeItemNode>;
 	visible: boolean;
 }
 

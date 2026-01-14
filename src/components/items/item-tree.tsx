@@ -1,7 +1,6 @@
 'use client';
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
-import { Item } from '@/components/items';
 import { ItemTreeNode } from '@/components/items';
 import { useEffect, useState } from 'react';
 import { doubleClickExpandFeature, testFeature } from '@/components/items/features';
@@ -9,6 +8,8 @@ import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { getFoldersFromCollection } from '@/domain/folder';
+import { TreeItemNode } from '@/components/items';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -20,8 +21,9 @@ import {
 	renamingFeature,
 	createOnDropHandler,
 } from '@headless-tree/core';
+import { Collection } from '@/domain/collection';
 
-const initialItems: Record<string, Item> = {
+const initialItems: Record<string, TreeItemNode> = {
 	apis: { name: 'APIs' },
 	backend: { children: ['apis', 'infrastructure'], name: 'Backend' },
 	company: {
@@ -53,17 +55,39 @@ const initialItems: Record<string, Item> = {
 
 interface ItemTreeProps
 {
+	collection: Collection;
 	indent?: number;
 }
 
-export function ItemTree({ indent = 16 }: ItemTreeProps)
+export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 {
-	const [items, setItems] = useState(initialItems);
+	const [nodes, setNodes] = useState<Record<string, TreeItemNode>>({});
 
-	const tree = useTree<Item>({
+	function getItem(id: string): TreeItemNode
+	{
+		const node = nodes[id];
+
+		if (!node)
+		{
+			return {
+				name: 'Unknown',
+				children: [],
+			};
+		}
+
+		return node;
+	}
+
+	function getItemChildren(id: string): string[]
+	{
+		const node = nodes[id];
+		return node?.children || [];
+	}
+
+	const tree = useTree<TreeItemNode>({
 		dataLoader: {
-			getChildren: (itemId) => items[itemId].children ?? [],
-			getItem: (itemId) => items[itemId],
+			getItem: getItem,
+			getChildren: getItemChildren,
 		},
 		features: [
 			syncDataLoaderFeature,
@@ -86,10 +110,10 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		},
 		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
 		{
-			setItems((prevItems) => ({
-				...prevItems,
+			setNodes((prevNodes) => ({
+				...prevNodes,
 				[parentItem.getId()]: {
-					...prevItems[parentItem.getId()],
+					...prevNodes[parentItem.getId()],
 					children: newChildrenIds,
 				},
 			}));
@@ -98,10 +122,10 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		{
 			// Update the item name in our state
 			const itemId = item.getId();
-			setItems((prevItems) => ({
-				...prevItems,
+			setNodes((prevNodes) => ({
+				...prevNodes,
 				[itemId]: {
-					...prevItems[itemId],
+					...prevNodes[itemId],
 					name: newName,
 				},
 			}));
@@ -109,7 +133,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			// TODO: If we are in the item href link (e.g., /collections/new-collection/items/{item-name}),
 			// we should also update the URL to reflect the new name.
 		},
-		rootItemId: 'company',
+		rootItemId: collection.id,
 		indent,
 	});
 
@@ -157,13 +181,13 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			{
 				const getDescendants = (itemId: string) =>
 				{
-					const children = items[itemId]?.children || [];
+					const children = nodes[itemId]?.children || [];
 
 					for (const childId of children)
 					{
 						visibleIds.add(childId);
 
-						if (items[childId]?.children?.length)
+						if (nodes[childId]?.children?.length)
 						{
 							getDescendants(childId);
 						}
@@ -193,6 +217,42 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		}
 	}, [searchValue, tree]);
 
+	useEffect(() =>
+	{
+		getFoldersFromCollection(collection.id)
+			.then((folders) =>
+			{
+				console.log('Loaded folders:', folders);
+
+				const root: TreeItemNode = {
+					name: 'Root',
+					children: folders.map((folder) => folder.id),
+				};
+
+				const loadedItems: Record<string, TreeItemNode> = {
+					[collection.id]: root,
+				};
+
+				for (const folder of folders)
+				{
+					loadedItems[folder.id] = {
+						name: folder.name,
+						children: [],
+					};
+				}
+
+				console.log('Setting items:', loadedItems);
+				setNodes(loadedItems);
+
+				// Notify the tree to refresh with new data
+				tree.rebuildTree();
+			})
+			.catch((error) =>
+			{
+				console.error('Error loading folders:', error);
+			});
+	}, [collection.id, tree]);
+
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 	{
 		const value = e.target.value;
@@ -209,6 +269,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		return tree.getItems().map((item) =>
 		{
 			const isVisible = shouldShowItem(item.getId());
+			console.log(`Item ${item.getId()} visibility: ${isVisible}`);
 			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
 		});
 	};
@@ -230,7 +291,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 					size="icon"
 					onClick={() =>
 					{
-						tree.createItem('Test Item', '63c4d599-f6af-41b6-ac20-8f1f32d194c0', 'w');
+						tree.createFolder('Test Folder', collection.id, null);
 					}}
 				>
 					<PlusIcon className="size-4" />
