@@ -8,10 +8,10 @@ import db from '@/db/client';
 interface CreateItemArgs
 {
 	name: string;
-	collectionId: string;
+	folderId: string;
 }
 
-export async function createItem({ name, collectionId }: CreateItemArgs): Promise<Item>
+export async function createItem({ name, folderId }: CreateItemArgs): Promise<Item>
 {
 	const baseSlug = slugify(name);
 	let suffix = 0;
@@ -22,7 +22,7 @@ export async function createItem({ name, collectionId }: CreateItemArgs): Promis
 
 		try
 		{
-			const [insertedItem] = await db.insert(itemsTable).values({ name, slug, collectionId }).returning();
+			const [insertedItem] = await db.insert(itemsTable).values({ name, slug, folderId }).returning();
 			return insertedItem;
 		}
 		catch (error: any)
