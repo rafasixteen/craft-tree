@@ -20,6 +20,6 @@ export const foldersTable = pgTable(
 			columns: [table.parentFolderId],
 			foreignColumns: [table.id],
 		}).onDelete('cascade'),
-		uniqueIndex('unique_slug_per_collection_folder').on(table.collectionId, table.slug),
+		uniqueIndex().on(table.collectionId, table.slug),
 	],
 );

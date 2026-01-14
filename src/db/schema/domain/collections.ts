@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, uniqueIndex, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, uniqueIndex } from 'drizzle-orm/pg-core';
 import { usersTable } from '@/db/schema';
 
 export const collectionsTable = pgTable(
@@ -13,11 +13,5 @@ export const collectionsTable = pgTable(
 			.references(() => usersTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
-	(table) => [
-		foreignKey({
-			columns: [table.userId],
-			foreignColumns: [table.id],
-		}).onDelete('cascade'),
-		uniqueIndex('unique_slug_per_user_id').on(table.userId, table.slug),
-	],
+	(table) => [uniqueIndex().on(table.userId, table.slug)],
 );

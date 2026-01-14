@@ -13,5 +13,5 @@ export const itemsTable = pgTable(
 			.references(() => collectionsTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
-	(table) => [uniqueIndex('unique_slug_per_collection').on(table.collectionId, table.slug)],
+	(table) => [uniqueIndex().on(table.collectionId, table.slug)],
 );
