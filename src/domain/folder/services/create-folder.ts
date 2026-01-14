@@ -1,6 +1,6 @@
 'use server';
 
-import { itemsTable as foldersTable } from '@/db/schema';
+import { foldersTable } from '@/db/schema';
 import { slugify } from '@/lib/utils';
 import { Folder } from '@/domain/folder';
 import db from '@/db/client';
@@ -9,7 +9,7 @@ interface CreateFolderArgs
 {
 	name: string;
 	collectionId: string;
-	parentFolderId: string;
+	parentFolderId: string | null;
 }
 
 export async function createFolder({ name, collectionId, parentFolderId }: CreateFolderArgs): Promise<Folder>
