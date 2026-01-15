@@ -1,14 +1,21 @@
-import { FeatureImplementation } from '@headless-tree/core';
+import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
 import { createItem } from '@/domain/item';
 import { createFolder } from '@/domain/folder';
+import { Node } from '@/components/items';
 
 declare module '@headless-tree/core'
 {
 	export interface TreeInstance<T>
 	{
 		createFolder: (name: string, collectionId: string, parentFolderId: string | null) => void;
-		createItem: (name: string, collectionId: string, parentFolderId: string | null) => void;
+		createItem: (name: string, folderId: string | null) => void;
 		createRecipe: (name: string, collectionId: string, itemId: string) => void;
+		onChange: () => void;
+	}
+
+	export interface ItemInstance<T>
+	{
+		getHref: () => string;
 	}
 }
 
@@ -16,11 +23,31 @@ export const testFeature: FeatureImplementation = {
 	treeInstance: {
 		createFolder: async (opts, name: string, collectionId: string, parentFolderId: string | null) =>
 		{
-			return await createFolder({ name, collectionId, parentFolderId });
+			const folder = await createFolder({ name, collectionId, parentFolderId });
+			opts?.tree?.onChange?.();
+			return folder;
 		},
-		createItem: async (opts, name: string, collectionId: string, parentFolderId: string | null) =>
+		createItem: async (opts, name: string, folderId: string | null) =>
 		{
-			return await createItem({ name, folderId: collectionId });
+			const item = await createItem({ name, folderId });
+			opts?.tree?.onChange?.();
+			return item;
+		},
+	},
+	itemInstance: {
+		getHref: ({ item }: { item: ItemInstance<Node> }) =>
+		{
+			const node = item.getItemData();
+
+			switch (node.type)
+			{
+				case 'folder':
+					return `/collections/${node.collectionSlug}/items/${node.slug}`;
+				case 'item':
+					return `/collections/${node.collectionSlug}/items/${node.slug}`;
+				case 'recipe':
+					return `/collections/${node.collectionSlug}/recipes/${node.slug}`;
+			}
 		},
 	},
 };

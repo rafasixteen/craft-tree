@@ -9,9 +9,7 @@ export const itemsTable = pgTable(
 		name: text().notNull(),
 		slug: text().notNull().unique(),
 
-		folderId: uuid('folder_id')
-			.references(() => foldersTable.id, { onDelete: 'cascade' })
-			.notNull(),
+		folderId: uuid('folder_id').references(() => foldersTable.id, { onDelete: 'cascade' }),
 	},
 	(table) => [uniqueIndex().on(table.folderId, table.slug)],
 );

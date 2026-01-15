@@ -1,36 +1,10 @@
-export interface TreeItemNode
-{
-	name: string;
-	children?: string[];
-}
-
-export interface FolderNode
+export interface Node
 {
 	id: string;
 	name: string;
-	type: 'folder';
+	slug: string;
+	type: 'folder' | 'item' | 'recipe';
+	collectionSlug: string;
 	children?: string[];
+	resourceSlug?: string;
 }
-
-export interface ItemNode
-{
-	id: string;
-	name: string;
-	type: 'item';
-	children?: string[];
-	item: {
-		slug: string;
-	};
-}
-
-export interface RecipeNode
-{
-	id: string;
-	name: string;
-	type: 'recipe';
-	recipe: {
-		slug: string;
-	};
-}
-
-export type Node = FolderNode | ItemNode | RecipeNode;

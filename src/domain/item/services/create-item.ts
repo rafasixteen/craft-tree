@@ -8,7 +8,7 @@ import db from '@/db/client';
 interface CreateItemArgs
 {
 	name: string;
-	folderId: string;
+	folderId: string | null;
 }
 
 export async function createItem({ name, folderId }: CreateItemArgs): Promise<Item>

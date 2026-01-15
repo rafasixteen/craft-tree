@@ -2,14 +2,15 @@
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/items';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { doubleClickExpandFeature, testFeature } from '@/components/items/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getFoldersFromCollection } from '@/domain/folder';
-import { TreeItemNode } from '@/components/items';
+import { Node } from '@/components/items';
+import { Collection } from '@/domain/collection';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -21,37 +22,6 @@ import {
 	renamingFeature,
 	createOnDropHandler,
 } from '@headless-tree/core';
-import { Collection } from '@/domain/collection';
-
-const initialItems: Record<string, TreeItemNode> = {
-	apis: { name: 'APIs' },
-	backend: { children: ['apis', 'infrastructure'], name: 'Backend' },
-	company: {
-		children: ['engineering', 'marketing', 'operations'],
-		name: 'Company',
-	},
-	components: { name: 'Components' },
-	content: { name: 'Content' },
-	'design-system': {
-		children: ['components', 'tokens', 'guidelines'],
-		name: 'Design System',
-	},
-	engineering: {
-		children: ['frontend', 'backend', 'platform-team'],
-		name: 'Engineering',
-	},
-	finance: { name: 'Finance' },
-	frontend: { children: ['design-system', 'web-platform'], name: 'Frontend' },
-	guidelines: { name: 'Guidelines' },
-	hr: { name: 'HR' },
-	infrastructure: { name: 'Infrastructure' },
-	marketing: { children: ['content', 'seo'], name: 'Marketing' },
-	operations: { children: ['hr', 'finance'], name: 'Operations' },
-	'platform-team': { name: 'Platform Team' },
-	seo: { name: 'SEO' },
-	tokens: { name: 'Tokens' },
-	'web-platform': { name: 'Web Platform' },
-};
 
 interface ItemTreeProps
 {
@@ -61,30 +31,76 @@ interface ItemTreeProps
 
 export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 {
-	const [nodes, setNodes] = useState<Record<string, TreeItemNode>>({});
+	const [nodes, setNodes] = useState<Record<string, Node>>({});
 
-	function getItem(id: string): TreeItemNode
+	const loadFolders = useCallback(async () =>
 	{
-		const node = nodes[id];
-
-		if (!node)
+		try
 		{
-			return {
-				name: 'Unknown',
-				children: [],
+			const folders = await getFoldersFromCollection(collection.id);
+			const root: Node = {
+				id: collection.id,
+				name: 'Root',
+				slug: 'root',
+				type: 'folder',
+				collectionSlug: collection.slug,
+				children: folders.map((folder) => folder.id),
 			};
-		}
 
-		return node;
+			const loadedItems: Record<string, Node> = { [collection.id]: root };
+
+			for (const folder of folders)
+			{
+				loadedItems[folder.id] = {
+					id: folder.id,
+					name: folder.name,
+					slug: folder.slug,
+					type: 'folder',
+					collectionSlug: collection.slug,
+				};
+			}
+
+			setNodes(loadedItems);
+		}
+		catch (error)
+		{
+			console.error('Error loading folders:', error);
+		}
+	}, [collection.id, collection.slug]);
+
+	function getItem(id: string): Node
+	{
+		return nodes[id] || { name: 'Loading...', children: [] };
 	}
 
 	function getItemChildren(id: string): string[]
 	{
 		const node = nodes[id];
-		return node?.children || [];
+
+		if (!node)
+		{
+			return [];
+		}
+
+		if (node.type === 'recipe')
+		{
+			return [];
+		}
+
+		return node.children || [];
 	}
 
-	const tree = useTree<TreeItemNode>({
+	function isItemFolder(item: Node): boolean
+	{
+		return item.type === 'folder';
+	}
+
+	function getItemName(item: Node): string
+	{
+		return item.name;
+	}
+
+	const tree = useTree<Node>({
 		dataLoader: {
 			getItem: getItem,
 			getChildren: getItemChildren,
@@ -101,8 +117,8 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			doubleClickExpandFeature,
 			testFeature,
 		],
-		getItemName: (item) => item.getItemData().name,
-		isItemFolder: (item) => (item.getItemData()?.children?.length ?? 0) > 0,
+		getItemName: (item) => getItemName(item.getItemData()),
+		isItemFolder: (item) => isItemFolder(item.getItemData()),
 		isSearchMatchingItem: (search, item) =>
 		{
 			const itemName = item.getItemName().toLowerCase();
@@ -217,41 +233,20 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		}
 	}, [searchValue, tree]);
 
+	tree.onChange = () =>
+	{
+		loadFolders();
+	};
+
 	useEffect(() =>
 	{
-		getFoldersFromCollection(collection.id)
-			.then((folders) =>
-			{
-				console.log('Loaded folders:', folders);
+		loadFolders();
+	}, [loadFolders]);
 
-				const root: TreeItemNode = {
-					name: 'Root',
-					children: folders.map((folder) => folder.id),
-				};
-
-				const loadedItems: Record<string, TreeItemNode> = {
-					[collection.id]: root,
-				};
-
-				for (const folder of folders)
-				{
-					loadedItems[folder.id] = {
-						name: folder.name,
-						children: [],
-					};
-				}
-
-				console.log('Setting items:', loadedItems);
-				setNodes(loadedItems);
-
-				// Notify the tree to refresh with new data
-				tree.rebuildTree();
-			})
-			.catch((error) =>
-			{
-				console.error('Error loading folders:', error);
-			});
-	}, [collection.id, tree]);
+	useEffect(() =>
+	{
+		tree.rebuildTree();
+	}, [nodes, tree]);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 	{
@@ -269,7 +264,6 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		return tree.getItems().map((item) =>
 		{
 			const isVisible = shouldShowItem(item.getId());
-			console.log(`Item ${item.getId()} visibility: ${isVisible}`);
 			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
 		});
 	};
