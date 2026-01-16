@@ -16,14 +16,9 @@ declare module '@headless-tree/core'
 		createItem: (name: string, folderId: string | null) => void;
 		createRecipe: (name: string, collectionId: string, itemId: string) => void;
 	}
-
-	export interface ItemInstance<T>
-	{
-		getHref: () => string;
-	}
 }
 
-export const testFeature: FeatureImplementation = {
+export const mutationFeature: FeatureImplementation = {
 	treeInstance: {
 		createFolder: async (opts, name: string, collectionId: string, parentFolderId: string | null) =>
 		{
@@ -36,22 +31,6 @@ export const testFeature: FeatureImplementation = {
 			const item = await createItem({ name, folderId });
 			opts.tree.getConfig().onChange?.();
 			return item;
-		},
-	},
-	itemInstance: {
-		getHref: ({ item }: { item: ItemInstance<Node> }) =>
-		{
-			const node = item.getItemData();
-
-			switch (node.type)
-			{
-				case 'folder':
-					return `/collections/${node.collectionSlug}/items/${node.slug}`;
-				case 'item':
-					return `/collections/${node.collectionSlug}/items/${node.slug}`;
-				case 'recipe':
-					return `/collections/${node.collectionSlug}/recipes/${node.slug}`;
-			}
 		},
 	},
 };

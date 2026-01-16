@@ -13,6 +13,7 @@ declare module '@headless-tree/core'
 	export interface ItemInstance<T>
 	{
 		getDropdownContent: () => ComponentType<DropdownContentProps> | null;
+		getHref: () => string;
 	}
 }
 
@@ -32,6 +33,20 @@ export const nodeDropdownsFeature: FeatureImplementation = {
 					return RecipeDropdown;
 				default:
 					return null;
+			}
+		},
+		getHref: ({ item }: { item: ItemInstance<Node> }) =>
+		{
+			const node = item.getItemData();
+
+			switch (node.type)
+			{
+				case 'folder':
+					return `/collections/${node.collectionSlug}/items/${node.slug}`;
+				case 'item':
+					return `/collections/${node.collectionSlug}/items/${node.slug}`;
+				case 'recipe':
+					return `/collections/${node.collectionSlug}/recipes/${node.slug}`;
 			}
 		},
 	},

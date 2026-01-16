@@ -3,7 +3,7 @@
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/items';
 import { useCallback, useEffect, useState } from 'react';
-import { doubleClickExpandFeature, testFeature, nodeDropdownsFeature } from '@/components/items/features';
+import { doubleClickExpandFeature, mutationFeature, nodeDropdownsFeature } from '@/components/items/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -115,7 +115,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			keyboardDragAndDropFeature,
 			renamingFeature,
 			doubleClickExpandFeature,
-			testFeature,
+			mutationFeature,
 			nodeDropdownsFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),
