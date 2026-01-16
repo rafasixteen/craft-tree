@@ -9,7 +9,7 @@ export const recipesTable = pgTable(
 		name: text().notNull(),
 		slug: text().notNull(),
 
-		itemId: uuid()
+		itemId: uuid('item_id')
 			.references(() => itemsTable.id, { onDelete: 'cascade' })
 			.notNull(),
 

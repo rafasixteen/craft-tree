@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getFoldersFromCollection } from '@/domain/folder';
 import { Node } from '@/components/items';
-import { Collection } from '@/domain/collection';
+import { Collection, getAllRowsRecursive } from '@/domain/collection';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -38,6 +38,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		try
 		{
 			const folders = await getFoldersFromCollection(collection.id);
+
 			const root: Node = {
 				id: collection.id,
 				name: 'Root',
@@ -47,9 +48,9 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 				children: folders.map((folder) => folder.id),
 			};
 
-			const loadedItems: Record<string, Node> = { [collection.id]: root };
+			//const loadedItems: Record<string, Node> = { [collection.id]: root };
 
-			for (const folder of folders)
+			/*for (const folder of folders)
 			{
 				loadedItems[folder.id] = {
 					id: folder.id,
@@ -60,7 +61,64 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 				};
 			}
 
-			setNodes(loadedItems);
+			setNodes(loadedItems);*/
+
+			const rows = await getAllRowsRecursive(collection.id);
+
+			const nodes: Record<string, Node> = {};
+
+			nodes[collection.id] = root;
+
+			for (const row of rows)
+			{
+				if (!nodes[row.folder_id])
+				{
+					nodes[row.folder_id] = {
+						id: row.folder_id,
+						name: row.folder_name,
+						slug: row.folder_slug,
+						collectionSlug: collection.slug,
+						type: 'folder',
+						children: [],
+					};
+
+					if (row.parent_folder_id)
+					{
+						nodes[row.parent_folder_id]?.children!.push(row.folder_id);
+					}
+				}
+
+				if (row.item_id && !nodes[row.item_id])
+				{
+					nodes[row.item_id] = {
+						id: row.item_id,
+						name: row.item_name!,
+						slug: row.item_slug!,
+						collectionSlug: collection.slug,
+						type: 'item',
+						children: [],
+					};
+
+					nodes[row.folder_id].children!.push(row.item_id);
+				}
+
+				if (row.recipe_id && !nodes[row.recipe_id])
+				{
+					nodes[row.recipe_id] = {
+						id: row.recipe_id,
+						name: row.recipe_name!,
+						slug: row.recipe_slug!,
+						collectionSlug: collection.slug,
+						type: 'recipe',
+					};
+
+					nodes[row.item_id!].children!.push(row.recipe_id);
+				}
+
+				console.log('Nodes so far:', nodes);
+
+				setNodes(nodes);
+			}
 		}
 		catch (error)
 		{

@@ -4,13 +4,13 @@ import { itemsTable, recipesTable } from '@/db/schema';
 export const ingredientsTable = pgTable('ingredients', {
 	id: uuid().defaultRandom().primaryKey(),
 
-	itemId: uuid()
+	itemId: uuid('item_id')
 		.references(() => itemsTable.id, { onDelete: 'cascade' })
 		.notNull(),
 
 	quantity: integer().notNull(),
 
-	recipeId: uuid()
+	recipeId: uuid('recipe_id')
 		.references(() => recipesTable.id, { onDelete: 'cascade' })
 		.notNull(),
 });

@@ -9,7 +9,7 @@ export const collectionsTable = pgTable(
 		name: text().notNull(),
 		slug: text().notNull(),
 
-		userId: text()
+		userId: text('user_id')
 			.references(() => usersTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},

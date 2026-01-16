@@ -11,7 +11,7 @@ export const foldersTable = pgTable(
 
 		parentFolderId: uuid('parent_folder_id'),
 
-		collectionId: uuid()
+		collectionId: uuid('collection_id')
 			.references(() => collectionsTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
