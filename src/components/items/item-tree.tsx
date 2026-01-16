@@ -3,7 +3,7 @@
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/items';
 import { useCallback, useEffect, useState } from 'react';
-import { doubleClickExpandFeature, testFeature } from '@/components/items/features';
+import { doubleClickExpandFeature, testFeature, nodeDropdownsFeature } from '@/components/items/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -116,6 +116,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			renamingFeature,
 			doubleClickExpandFeature,
 			testFeature,
+			nodeDropdownsFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),
 		isItemFolder: (item) => isItemFolder(item.getItemData()),
@@ -151,6 +152,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		},
 		rootItemId: collection.id,
 		indent,
+		onChange: loadFolders,
 	});
 
 	const searchValue = tree.getSearchValue();
@@ -233,15 +235,11 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		}
 	}, [searchValue, tree]);
 
-	tree.onChange = () =>
-	{
-		loadFolders();
-	};
-
 	useEffect(() =>
 	{
-		loadFolders();
-	}, [loadFolders]);
+		// Force an initial onChange to load data.
+		tree.getConfig().onChange?.();
+	}, [tree]);
 
 	useEffect(() =>
 	{

@@ -5,12 +5,16 @@ import { Node } from '@/components/items';
 
 declare module '@headless-tree/core'
 {
+	export interface TreeConfig<T>
+	{
+		onChange?: () => void;
+	}
+
 	export interface TreeInstance<T>
 	{
 		createFolder: (name: string, collectionId: string, parentFolderId: string | null) => void;
 		createItem: (name: string, folderId: string | null) => void;
 		createRecipe: (name: string, collectionId: string, itemId: string) => void;
-		onChange: () => void;
 	}
 
 	export interface ItemInstance<T>
@@ -24,13 +28,13 @@ export const testFeature: FeatureImplementation = {
 		createFolder: async (opts, name: string, collectionId: string, parentFolderId: string | null) =>
 		{
 			const folder = await createFolder({ name, collectionId, parentFolderId });
-			opts?.tree?.onChange?.();
+			opts.tree.getConfig().onChange?.();
 			return folder;
 		},
 		createItem: async (opts, name: string, folderId: string | null) =>
 		{
 			const item = await createItem({ name, folderId });
-			opts?.tree?.onChange?.();
+			opts.tree.getConfig().onChange?.();
 			return item;
 		},
 	},
