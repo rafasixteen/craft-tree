@@ -5,6 +5,7 @@ export interface Node
 	slug: string;
 	type: 'folder' | 'item' | 'recipe';
 	collectionSlug: string;
+	collectionId: string;
 	children?: string[];
 	resourceSlug?: string;
 }

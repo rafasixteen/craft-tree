@@ -7,7 +7,7 @@ export const itemsTable = pgTable(
 		id: uuid().defaultRandom().primaryKey(),
 
 		name: text().notNull(),
-		slug: text().notNull().unique(),
+		slug: text().notNull(),
 
 		folderId: uuid('folder_id').references(() => foldersTable.id, { onDelete: 'cascade' }),
 	},

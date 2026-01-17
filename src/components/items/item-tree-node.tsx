@@ -1,12 +1,12 @@
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
-import { Node } from '@/components/items';
+import { Node } from '@/domain/tree';
 import { FolderIcon, FolderOpenIcon, EllipsisVertical } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
 import { ButtonSpan } from '@/components/ui/button-span';
 import { useMemo } from 'react';
+import Link from 'next/link';
 
 interface ItemTreeNodeProps
 {

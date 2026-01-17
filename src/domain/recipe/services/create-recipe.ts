@@ -1,18 +1,19 @@
 'use server';
 
-import { foldersTable } from '@/db/schema';
+import { recipesTable } from '@/db/schema';
 import { slugify } from '@/lib/utils';
-import { Folder } from '@/domain/folder';
+import { Recipe } from '@/domain/recipe';
 import db from '@/db/client';
 
-interface CreateFolderArgs
+interface CreateRecipeArgs
 {
 	name: string;
-	collectionId: string;
-	parentFolderId: string | null;
+	itemId: string;
+	quantity: number;
+	time: number;
 }
 
-export async function createFolder({ name, collectionId, parentFolderId }: CreateFolderArgs): Promise<Folder>
+export async function createRecipe({ name, itemId, quantity, time }: CreateRecipeArgs): Promise<Recipe>
 {
 	const baseSlug = slugify(name);
 	let suffix = 0;
@@ -23,8 +24,8 @@ export async function createFolder({ name, collectionId, parentFolderId }: Creat
 
 		try
 		{
-			const [insertedFolder] = await db.insert(foldersTable).values({ name, slug, parentFolderId, collectionId }).returning();
-			return insertedFolder;
+			const [insertedRecipe] = await db.insert(recipesTable).values({ name, slug, itemId, quantity, time }).returning();
+			return insertedRecipe;
 		}
 		catch (error: any)
 		{

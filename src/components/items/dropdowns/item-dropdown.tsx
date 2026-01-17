@@ -1,12 +1,19 @@
+'use client';
+
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { PencilIcon, FilesIcon, TrashIcon, PackagePlus } from 'lucide-react';
+import { createRecipe } from '@/domain/recipe';
 
 export function ItemDropdown({ item }: DropdownContentProps)
 {
-	const handleAddToRecipe = () =>
+	const node = item.getItemData();
+	const tree = item.getTree();
+
+	const handleAddRecipe = () =>
 	{
-		console.log('Add to recipe', item.getItemData());
+		createRecipe({ name: 'New Recipe', itemId: node.id, quantity: 1, time: 1 });
+		tree.getConfig().onChange?.();
 	};
 
 	const handleRename = () =>
@@ -26,9 +33,9 @@ export function ItemDropdown({ item }: DropdownContentProps)
 
 	return (
 		<>
-			<DropdownMenuItem onClick={handleAddToRecipe}>
+			<DropdownMenuItem onClick={handleAddRecipe}>
 				<PackagePlus className="size-4" />
-				Add to Recipe
+				Add Recipe
 			</DropdownMenuItem>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem onClick={handleRename}>
@@ -39,7 +46,6 @@ export function ItemDropdown({ item }: DropdownContentProps)
 				<FilesIcon className="size-4" />
 				Duplicate
 			</DropdownMenuItem>
-			<DropdownMenuSeparator />
 			<DropdownMenuItem onClick={handleDelete} variant="destructive">
 				<TrashIcon className="size-4" />
 				Delete

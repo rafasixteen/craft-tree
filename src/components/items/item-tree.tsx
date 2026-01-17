@@ -8,9 +8,8 @@ import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { getFoldersFromCollection } from '@/domain/folder';
-import { Node } from '@/components/items';
-import { Collection, getAllRowsRecursive } from '@/domain/collection';
+import { Collection } from '@/domain/collection';
+import { getTreeNodes, Node } from '@/domain/tree';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -22,6 +21,7 @@ import {
 	renamingFeature,
 	createOnDropHandler,
 } from '@headless-tree/core';
+import { getTopLevelFolders } from '@/domain/folder';
 
 interface ItemTreeProps
 {
@@ -33,43 +33,32 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 {
 	const [nodes, setNodes] = useState<Record<string, Node>>({});
 
-	const loadFolders = useCallback(async () =>
+	const loadNodes = useCallback(async () =>
 	{
 		try
 		{
-			const folders = await getFoldersFromCollection(collection.id);
+			const nodesFromDb = await getTreeNodes(collection.id);
+			const nodes: Record<string, Node> = {};
+
+			const topLevelFolders = await getTopLevelFolders(collection.id);
 
 			const root: Node = {
 				id: collection.id,
 				name: 'Root',
 				slug: 'root',
 				type: 'folder',
+				children: topLevelFolders.map((folder) => folder.id),
 				collectionSlug: collection.slug,
-				children: folders.map((folder) => folder.id),
+				collectionId: collection.id,
 			};
-
-			//const loadedItems: Record<string, Node> = { [collection.id]: root };
-
-			/*for (const folder of folders)
-			{
-				loadedItems[folder.id] = {
-					id: folder.id,
-					name: folder.name,
-					slug: folder.slug,
-					type: 'folder',
-					collectionSlug: collection.slug,
-				};
-			}
-
-			setNodes(loadedItems);*/
-
-			const rows = await getAllRowsRecursive(collection.id);
-
-			const nodes: Record<string, Node> = {};
 
 			nodes[collection.id] = root;
 
-			for (const row of rows)
+			// First pass: create all folder nodes and record parent relationships
+			const folderParentPairs: Array<{ parentId: string; childId: string }> = [];
+			const seenFolderParentPair = new Set<string>();
+
+			for (const row of nodesFromDb)
 			{
 				if (!nodes[row.folder_id])
 				{
@@ -78,16 +67,54 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 						name: row.folder_name,
 						slug: row.folder_slug,
 						collectionSlug: collection.slug,
+						collectionId: collection.id,
 						type: 'folder',
 						children: [],
 					};
-
-					if (row.parent_folder_id)
-					{
-						nodes[row.parent_folder_id]?.children!.push(row.folder_id);
-					}
 				}
 
+				if (row.parent_folder_id)
+				{
+					const key = `${row.parent_folder_id}->${row.folder_id}`;
+					if (!seenFolderParentPair.has(key))
+					{
+						seenFolderParentPair.add(key);
+						folderParentPairs.push({ parentId: row.parent_folder_id, childId: row.folder_id });
+					}
+				}
+			}
+
+			// Link folders to their parents after all folders exist
+			for (const { parentId, childId } of folderParentPairs)
+			{
+				// Ensure parent exists (it should, but guard just in case)
+				if (!nodes[parentId])
+				{
+					nodes[parentId] = {
+						id: parentId,
+						name: 'Folder',
+						slug: 'folder',
+						collectionSlug: collection.slug,
+						collectionId: collection.id,
+						type: 'folder',
+						children: [],
+					};
+				}
+
+				const parent = nodes[parentId];
+				if (!parent.children)
+				{
+					parent.children = [];
+				}
+				if (!parent.children.includes(childId))
+				{
+					parent.children.push(childId);
+				}
+			}
+
+			// Second pass: create items and recipes and link accordingly
+			for (const row of nodesFromDb)
+			{
 				if (row.item_id && !nodes[row.item_id])
 				{
 					nodes[row.item_id] = {
@@ -95,11 +122,15 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 						name: row.item_name!,
 						slug: row.item_slug!,
 						collectionSlug: collection.slug,
+						collectionId: collection.id,
 						type: 'item',
 						children: [],
 					};
 
-					nodes[row.folder_id].children!.push(row.item_id);
+					if (!nodes[row.folder_id].children?.includes(row.item_id))
+					{
+						nodes[row.folder_id].children!.push(row.item_id);
+					}
 				}
 
 				if (row.recipe_id && !nodes[row.recipe_id])
@@ -109,20 +140,23 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 						name: row.recipe_name!,
 						slug: row.recipe_slug!,
 						collectionSlug: collection.slug,
+						collectionId: collection.id,
 						type: 'recipe',
 					};
 
-					nodes[row.item_id!].children!.push(row.recipe_id);
+					if (row.item_id && nodes[row.item_id]?.children && !nodes[row.item_id].children!.includes(row.recipe_id))
+					{
+						nodes[row.item_id].children!.push(row.recipe_id);
+					}
 				}
-
-				console.log('Nodes so far:', nodes);
-
-				setNodes(nodes);
 			}
+
+			console.log('Loaded nodes:', nodes);
+			setNodes(nodes);
 		}
 		catch (error)
 		{
-			console.error('Error loading folders:', error);
+			console.error('Error loading tree nodes:', error);
 		}
 	}, [collection.id, collection.slug]);
 
@@ -150,7 +184,17 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 
 	function isItemFolder(item: Node): boolean
 	{
-		return item.type === 'folder';
+		if (item.type === 'folder')
+		{
+			return true;
+		}
+
+		if (item.type === 'item' && item.children && item.children.length > 0)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	function getItemName(item: Node): string
@@ -210,7 +254,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		},
 		rootItemId: collection.id,
 		indent,
-		onChange: loadFolders,
+		onChange: loadNodes,
 	});
 
 	const searchValue = tree.getSearchValue();
@@ -341,7 +385,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 					size="icon"
 					onClick={() =>
 					{
-						tree.createFolder('Test Folder', collection.id, null);
+						tree.createFolder('New Folder', collection.id, null);
 					}}
 				>
 					<PlusIcon className="size-4" />

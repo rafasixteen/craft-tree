@@ -1,7 +1,6 @@
-import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
+import { FeatureImplementation } from '@headless-tree/core';
 import { createItem } from '@/domain/item';
 import { createFolder } from '@/domain/folder';
-import { Node } from '@/components/items';
 
 declare module '@headless-tree/core'
 {

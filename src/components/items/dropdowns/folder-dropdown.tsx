@@ -1,16 +1,25 @@
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
-import { FolderPlus, PencilIcon, FilesIcon, TrashIcon } from 'lucide-react';
+import { FolderPlus, PencilIcon, FilesIcon, TrashIcon, FilePlusCornerIcon } from 'lucide-react';
+import { createFolder } from '@/domain/folder';
+import { Node } from '@/domain/tree';
 
 export function FolderDropdown({ item }: DropdownContentProps)
 {
-	const node = item.getItemData();
+	const node = item.getItemData() as Node;
 	const tree = item.getTree();
 
 	const handleAddItem = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
 		tree.createItem('New Item', node.id);
+	};
+
+	const handleAddFolder = (e: React.MouseEvent) =>
+	{
+		e.stopPropagation();
+		createFolder({ name: 'New Folder', collectionId: node.collectionId, parentFolderId: node.id });
+		tree.getConfig().onChange?.();
 	};
 
 	const handleRename = (e: React.MouseEvent) =>
@@ -34,8 +43,12 @@ export function FolderDropdown({ item }: DropdownContentProps)
 	return (
 		<>
 			<DropdownMenuItem onClick={handleAddItem}>
-				<FolderPlus className="size-4" />
+				<FilePlusCornerIcon className="size-4" />
 				Add Item
+			</DropdownMenuItem>
+			<DropdownMenuItem onClick={handleAddFolder}>
+				<FolderPlus className="size-4" />
+				Add Folder
 			</DropdownMenuItem>
 			<DropdownMenuSeparator />
 			<DropdownMenuItem onClick={handleRename}>
