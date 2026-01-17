@@ -1,7 +1,7 @@
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
 import { Node } from '@/domain/tree';
-import { FolderIcon, FolderOpenIcon, EllipsisVertical } from 'lucide-react';
+import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPotIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
@@ -37,6 +37,26 @@ function Icon({ item }: { item: ItemInstance<Node> })
 {
 	const className = 'pointer-events-none size-4 text-muted-foreground';
 
+	const node = item.getItemData();
+
+	switch (node.type)
+	{
+		case 'folder':
+		{
+			return item.isExpanded() ? <FolderOpenIcon className={className} /> : <FolderIcon className={className} />;
+		}
+		case 'item':
+		{
+			return <CuboidIcon className={className} />;
+		}
+		case 'recipe':
+		{
+			return <CookingPotIcon className={className} />;
+		}
+		default:
+			return <></>;
+	}
+
 	if (item.isFolder())
 	{
 		return item.isExpanded() ? <FolderOpenIcon className={className} /> : <FolderIcon className={className} />;
@@ -58,7 +78,7 @@ function ActionsDropdown({ item }: { item: ItemInstance<Node> })
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<ButtonSpan variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-					<EllipsisVertical className="size-4" />
+					<EllipsisVerticalIcon className="size-4" />
 				</ButtonSpan>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" side="bottom">
