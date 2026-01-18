@@ -1,5 +1,5 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { DropdownContentProps } from '@/components/items/features';
+import { DropdownContentProps } from '@/components/tree/features';
 import { PencilIcon, FilesIcon, TrashIcon } from 'lucide-react';
 import { deleteRecipe } from '@/domain/recipe';
 

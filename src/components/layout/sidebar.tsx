@@ -1,6 +1,6 @@
 import { Collections } from '@/components/collections';
 import { Collection } from '@/domain/collection';
-import { ItemTree } from '@/components/items';
+import { ItemTree } from '@/components/tree';
 
 interface SidebarProps
 {

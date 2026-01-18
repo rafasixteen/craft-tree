@@ -1,9 +1,9 @@
 'use client';
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
-import { ItemTreeNode } from '@/components/items';
+import { ItemTreeNode } from '@/components/tree';
 import { useCallback, useEffect, useState } from 'react';
-import { doubleClickExpandFeature, mutationFeature, nodeDropdownsFeature } from '@/components/items/features';
+import { doubleClickExpandFeature, mutationFeature, nodeDropdownsFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';

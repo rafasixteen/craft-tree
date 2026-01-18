@@ -1,5 +1,5 @@
 import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
-import { FolderDropdown, ItemDropdown, RecipeDropdown } from '@/components/items/dropdowns';
+import { FolderDropdown, ItemDropdown, RecipeDropdown } from '@/components/tree/dropdowns';
 import { Node } from '@/domain/tree';
 import { ComponentType } from 'react';
 
