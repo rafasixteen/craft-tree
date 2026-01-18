@@ -42,7 +42,7 @@ export const nodeDropdownsFeature: FeatureImplementation = {
 			switch (node.type)
 			{
 				case 'folder':
-					return `/collections/${node.collectionSlug}/items/${node.slug}`;
+					return `/collections/${node.collectionSlug}/folders/${node.slug}`;
 				case 'item':
 					return `/collections/${node.collectionSlug}/items/${node.slug}`;
 				case 'recipe':
