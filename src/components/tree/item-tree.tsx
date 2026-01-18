@@ -453,19 +453,6 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 						<FilterIcon className="size-4" />
 					</div>
 				</div>
-
-				{/* Plus Icon */}
-				<Button
-					variant="ghost"
-					size="icon"
-					onClick={() =>
-					{
-						createFolder({ name: 'New Folder', collectionId: collection.id, parentFolderId: null });
-						tree.getConfig().onChange?.();
-					}}
-				>
-					<PlusIcon className="size-4" />
-				</Button>
 			</div>
 
 			{/* Tree */}
