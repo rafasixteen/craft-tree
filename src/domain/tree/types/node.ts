@@ -1,9 +1,11 @@
+import { NodeType } from '@/domain/tree';
+
 export interface Node
 {
 	id: string;
 	name: string;
 	slug: string;
-	type: 'collection' | 'folder' | 'item' | 'recipe';
+	type: NodeType;
 	collectionSlug: string;
 	collectionId: string;
 	children?: string[];
