@@ -1,8 +1,9 @@
 'use server';
 
 import { recipesTable } from '@/db/schema';
-import { slugify } from '@/lib/utils';
 import { Recipe } from '@/domain/recipe';
+import { nameSchema, withUniqueSlugRetry } from '@/domain/shared';
+import { slugify } from '@/lib/utils';
 import db from '@/db/client';
 
 interface CreateRecipeArgs
@@ -15,28 +16,12 @@ interface CreateRecipeArgs
 
 export async function createRecipe({ name, itemId, quantity, time }: CreateRecipeArgs): Promise<Recipe>
 {
-	const baseSlug = slugify(name);
-	let suffix = 0;
+	const parsedName = await nameSchema.parseAsync(name);
+	const baseSlug = slugify(parsedName);
 
-	while (true)
+	return withUniqueSlugRetry(baseSlug, async (slug) =>
 	{
-		const slug = suffix === 0 ? baseSlug : `${baseSlug}-${suffix}`;
-
-		try
-		{
-			const [insertedRecipe] = await db.insert(recipesTable).values({ name, slug, itemId, quantity, time }).returning();
-			return insertedRecipe;
-		}
-		catch (error: any)
-		{
-			if (error.cause.code === '23505')
-			{
-				// Unique constraint violation—retry with next suffix
-				suffix++;
-				continue;
-			}
-
-			throw error;
-		}
-	}
+		const [insertedRecipe] = await db.insert(recipesTable).values({ name, slug, itemId, quantity, time }).returning();
+		return insertedRecipe;
+	});
 }

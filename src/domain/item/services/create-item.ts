@@ -3,6 +3,7 @@
 import { itemsTable } from '@/db/schema';
 import { slugify } from '@/lib/utils';
 import { Item } from '@/domain/item';
+import { withUniqueSlugRetry, nameSchema } from '@/domain/shared';
 import db from '@/db/client';
 
 interface CreateItemArgs
@@ -13,28 +14,12 @@ interface CreateItemArgs
 
 export async function createItem({ name, folderId }: CreateItemArgs): Promise<Item>
 {
-	const baseSlug = slugify(name);
-	let suffix = 0;
+	const parsedName = await nameSchema.parseAsync(name);
+	const baseSlug = slugify(parsedName);
 
-	while (true)
+	return withUniqueSlugRetry(baseSlug, async (slug) =>
 	{
-		const slug = suffix === 0 ? baseSlug : `${baseSlug}-${suffix}`;
-
-		try
-		{
-			const [insertedItem] = await db.insert(itemsTable).values({ name, slug, folderId }).returning();
-			return insertedItem;
-		}
-		catch (error: any)
-		{
-			if (error.cause.code === '23505')
-			{
-				// Unique constraint violation—retry with next suffix
-				suffix++;
-				continue;
-			}
-
-			throw error;
-		}
-	}
+		const [insertedItem] = await db.insert(itemsTable).values({ name, slug, folderId }).returning();
+		return insertedItem;
+	});
 }

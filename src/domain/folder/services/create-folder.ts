@@ -3,6 +3,7 @@
 import { foldersTable } from '@/db/schema';
 import { slugify } from '@/lib/utils';
 import { Folder } from '@/domain/folder';
+import { nameSchema, withUniqueSlugRetry } from '@/domain/shared';
 import db from '@/db/client';
 
 interface CreateFolderArgs
@@ -14,28 +15,12 @@ interface CreateFolderArgs
 
 export async function createFolder({ name, collectionId, parentFolderId }: CreateFolderArgs): Promise<Folder>
 {
-	const baseSlug = slugify(name);
-	let suffix = 0;
+	const parsedName = await nameSchema.parseAsync(name);
+	const baseSlug = slugify(parsedName);
 
-	while (true)
+	return withUniqueSlugRetry(baseSlug, async (slug) =>
 	{
-		const slug = suffix === 0 ? baseSlug : `${baseSlug}-${suffix}`;
-
-		try
-		{
-			const [insertedFolder] = await db.insert(foldersTable).values({ name, slug, parentFolderId, collectionId }).returning();
-			return insertedFolder;
-		}
-		catch (error: any)
-		{
-			if (error.cause.code === '23505')
-			{
-				// Unique constraint violation—retry with next suffix
-				suffix++;
-				continue;
-			}
-
-			throw error;
-		}
-	}
+		const [insertedFolder] = await db.insert(foldersTable).values({ name, slug, parentFolderId, collectionId }).returning();
+		return insertedFolder;
+	});
 }
