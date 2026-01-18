@@ -77,7 +77,7 @@ export function Collections({ collections, activeCollection }: CollectionsProps)
 					<div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
 						<Plus className="size-4" />
 					</div>
-					<div className="text-muted-foreground font-medium">{isPending ? 'Adding…' : 'Add collection'}</div>
+					<div className="text-muted-foreground font-medium">{isPending ? 'Adding…' : 'Create collection'}</div>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
