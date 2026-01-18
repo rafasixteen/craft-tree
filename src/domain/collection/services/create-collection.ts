@@ -1,8 +1,8 @@
 'use server';
 
 import { collectionsTable } from '@/db/schema';
-import { Collection, ensureUniqueSlug } from '@/domain/collection';
-import { deslugify } from '@/lib/utils';
+import { slugify } from '@/lib/utils';
+import { Collection } from '@/domain/collection';
 import db from '@/db/client';
 
 interface CreateCollectionArgs
@@ -13,10 +13,28 @@ interface CreateCollectionArgs
 
 export async function createCollection({ name, userId }: CreateCollectionArgs): Promise<Collection>
 {
-	const slug = await ensureUniqueSlug(name);
-	const deslugifiedName = deslugify(slug);
+	const baseSlug = slugify(name);
+	let suffix = 0;
 
-	const [insertedCollection] = await db.insert(collectionsTable).values({ name: deslugifiedName, slug, userId }).returning();
+	while (true)
+	{
+		const slug = suffix === 0 ? baseSlug : `${baseSlug}-${suffix}`;
 
-	return insertedCollection;
+		try
+		{
+			const [insertedCollection] = await db.insert(collectionsTable).values({ name, slug, userId }).returning();
+			return insertedCollection;
+		}
+		catch (error: any)
+		{
+			if (error.cause.code === '23505')
+			{
+				// Unique constraint violation—retry with next suffix
+				suffix++;
+				continue;
+			}
+
+			throw error;
+		}
+	}
 }
