@@ -1,6 +1,6 @@
 import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
 import { FolderDropdown, ItemDropdown, RecipeDropdown } from '@/components/items/dropdowns';
-import { Node } from '@/components/items';
+import { Node } from '@/domain/tree';
 import { ComponentType } from 'react';
 
 export interface DropdownContentProps
@@ -47,6 +47,8 @@ export const nodeDropdownsFeature: FeatureImplementation = {
 					return `/collections/${node.collectionSlug}/items/${node.slug}`;
 				case 'recipe':
 					return `/collections/${node.collectionSlug}/recipes/${node.slug}`;
+				default:
+					return '#';
 			}
 		},
 	},

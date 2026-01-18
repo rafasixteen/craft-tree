@@ -1,7 +1,7 @@
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { FolderPlus, PencilIcon, FilesIcon, TrashIcon, FilePlusCornerIcon } from 'lucide-react';
-import { createFolder } from '@/domain/folder';
+import { createFolder, deleteFolder } from '@/domain/folder';
 import { Node } from '@/domain/tree';
 
 export function FolderDropdown({ item }: DropdownContentProps)
@@ -37,7 +37,8 @@ export function FolderDropdown({ item }: DropdownContentProps)
 	const handleDelete = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		console.log('Delete folder', item.getItemData());
+		deleteFolder(node.id);
+		tree.getConfig().onChange?.();
 	};
 
 	return (

@@ -151,7 +151,6 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 				}
 			}
 
-			console.log('Loaded nodes:', nodes);
 			setNodes(nodes);
 		}
 		catch (error)

@@ -1,9 +1,13 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '@/components/items/features';
 import { PencilIcon, FilesIcon, TrashIcon } from 'lucide-react';
+import { deleteRecipe } from '@/domain/recipe';
 
 export function RecipeDropdown({ item }: DropdownContentProps)
 {
+	const node = item.getItemData();
+	const tree = item.getTree();
+
 	const handleRename = () =>
 	{
 		item.startRenaming();
@@ -16,7 +20,8 @@ export function RecipeDropdown({ item }: DropdownContentProps)
 
 	const handleDelete = () =>
 	{
-		console.log('Delete recipe', item.getItemData());
+		deleteRecipe(node.id);
+		tree.getConfig().onChange?.();
 	};
 
 	return (

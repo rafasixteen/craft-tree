@@ -4,6 +4,7 @@ import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdow
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { PencilIcon, FilesIcon, TrashIcon, PackagePlus } from 'lucide-react';
 import { createRecipe } from '@/domain/recipe';
+import { deleteItem } from '@/domain/item';
 
 export function ItemDropdown({ item }: DropdownContentProps)
 {
@@ -28,7 +29,8 @@ export function ItemDropdown({ item }: DropdownContentProps)
 
 	const handleDelete = () =>
 	{
-		console.log('Delete item', item.getItemData());
+		deleteItem(node.id);
+		tree.getConfig().onChange?.();
 	};
 
 	return (
