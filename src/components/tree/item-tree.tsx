@@ -5,16 +5,18 @@ import { ItemTreeNode } from '@/components/tree';
 import { useCallback, useEffect, useState } from 'react';
 import { doubleClickExpandFeature, onChangeFeature, nodeDropdownsFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
-import { FilterIcon, PlusIcon } from 'lucide-react';
+import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Collection, renameCollection } from '@/domain/collection';
-import { getTreeNodes, Node } from '@/domain/tree';
-import { createFolder, getTopLevelFolders, renameFolder } from '@/domain/folder';
+import { Node } from '@/domain/tree';
+import { renameFolder } from '@/domain/folder';
 import { nameSchema } from '@/domain/shared';
 import { usePathname, useRouter } from 'next/navigation';
 import { renameItem } from '@/domain/item';
 import { renameRecipe } from '@/domain/recipe';
+import { loadTreeNodesData } from './item-tree.loader';
+import { getItem, getItemChildren, getItemName, isItemFolder, replaceSegment } from './item-tree.utils';
+import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -42,212 +44,14 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 
 	const loadNodes = useCallback(async () =>
 	{
-		try
-		{
-			const nodesFromDb = await getTreeNodes(collection.id);
-			const nodes: Record<string, Node> = {};
-
-			// const topLevelFolders = await getTopLevelFolders(collection.id);
-
-			// Create collection node
-			const collectionNode: Node = {
-				id: collection.id,
-				name: collection.name,
-				slug: collection.slug,
-				type: 'collection',
-				// children: topLevelFolders.map((folder) => folder.id),
-				children: [],
-				collectionSlug: collection.slug,
-				collectionId: collection.id,
-			};
-
-			nodes[collection.id] = collectionNode;
-
-			// Create dummy root wrapper to show collection as a single top-level folder
-			const dummyRootId = `dummy-${collection.id}`;
-			const dummyRoot: Node = {
-				id: dummyRootId,
-				name: 'Root',
-				slug: 'root',
-				type: 'folder',
-				children: [collection.id],
-				collectionSlug: collection.slug,
-				collectionId: collection.id,
-			};
-
-			nodes[dummyRootId] = dummyRoot;
-
-			// First pass: create all folder nodes and record parent relationships
-			const folderParentPairs: Array<{ parentId: string; childId: string }> = [];
-			const seenFolderParentPair = new Set<string>();
-
-			for (const row of nodesFromDb)
-			{
-				if (!nodes[row.folder_id])
-				{
-					nodes[row.folder_id] = {
-						id: row.folder_id,
-						name: row.folder_name,
-						slug: row.folder_slug,
-						collectionSlug: collection.slug,
-						collectionId: collection.id,
-						type: 'folder',
-						children: [],
-					};
-				}
-
-				if (row.parent_folder_id)
-				{
-					const key = `${row.parent_folder_id}->${row.folder_id}`;
-					if (!seenFolderParentPair.has(key))
-					{
-						seenFolderParentPair.add(key);
-						folderParentPairs.push({ parentId: row.parent_folder_id, childId: row.folder_id });
-					}
-				}
-				else
-				{
-					// Top-level folder - add to collection node
-					if (!collectionNode.children.includes(row.folder_id))
-					{
-						collectionNode.children.push(row.folder_id);
-					}
-				}
-			}
-
-			// Link folders to their parents after all folders exist
-			for (const { parentId, childId } of folderParentPairs)
-			{
-				// Ensure parent exists (it should, but guard just in case)
-				if (!nodes[parentId])
-				{
-					nodes[parentId] = {
-						id: parentId,
-						name: 'Folder',
-						slug: 'folder',
-						collectionSlug: collection.slug,
-						collectionId: collection.id,
-						type: 'folder',
-						children: [],
-					};
-				}
-
-				const parent = nodes[parentId];
-				if (!parent.children)
-				{
-					parent.children = [];
-				}
-				if (!parent.children.includes(childId))
-				{
-					parent.children.push(childId);
-				}
-			}
-
-			// Second pass: create items and recipes and link accordingly
-			for (const row of nodesFromDb)
-			{
-				if (row.item_id && !nodes[row.item_id])
-				{
-					nodes[row.item_id] = {
-						id: row.item_id,
-						name: row.item_name!,
-						slug: row.item_slug!,
-						collectionSlug: collection.slug,
-						collectionId: collection.id,
-						type: 'item',
-						children: [],
-					};
-
-					// Add item to folder if it has one, otherwise add to collection
-					if (row.folder_id)
-					{
-						if (!nodes[row.folder_id].children?.includes(row.item_id))
-						{
-							nodes[row.folder_id].children!.push(row.item_id);
-						}
-					}
-					else
-					{
-						// Top-level item - add to collection node
-						if (!collectionNode.children?.includes(row.item_id))
-						{
-							collectionNode.children.push(row.item_id);
-						}
-					}
-				}
-
-				if (row.recipe_id && !nodes[row.recipe_id])
-				{
-					nodes[row.recipe_id] = {
-						id: row.recipe_id,
-						name: row.recipe_name!,
-						slug: row.recipe_slug!,
-						collectionSlug: collection.slug,
-						collectionId: collection.id,
-						type: 'recipe',
-					};
-
-					if (row.item_id && nodes[row.item_id]?.children && !nodes[row.item_id].children!.includes(row.recipe_id))
-					{
-						nodes[row.item_id].children!.push(row.recipe_id);
-					}
-				}
-			}
-
-			setNodes(nodes);
-		}
-		catch (error)
-		{
-			console.error('Error loading tree nodes:', error);
-		}
+		const loadedNodes = await loadTreeNodesData(collection);
+		setNodes(loadedNodes);
 	}, [collection]);
-
-	function getItem(id: string): Node
-	{
-		return nodes[id] || { name: 'Loading...', children: [] };
-	}
-
-	function getItemChildren(id: string): string[]
-	{
-		const node = nodes[id];
-
-		if (!node)
-		{
-			return [];
-		}
-
-		if (node.type === 'recipe')
-		{
-			return [];
-		}
-
-		return node.children || [];
-	}
-
-	function isItemFolder(item: Node): boolean
-	{
-		if (item.type === 'folder' || item.type === 'collection')
-		{
-			return true;
-		}
-
-		if (item.type === 'item' && item.children && item.children.length > 0)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	function getItemName(item: Node): string
-	{
-		return item.name;
-	}
 
 	const tree = useTree<Node>({
 		dataLoader: {
-			getItem: getItem,
-			getChildren: getItemChildren,
+			getItem: (id: string) => getItem(id, nodes),
+			getChildren: (id: string) => getItemChildren(id, nodes),
 		},
 		features: [
 			syncDataLoaderFeature,
@@ -333,76 +137,8 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 	});
 
 	const searchValue = tree.getSearchValue();
-
-	// Calculate which items should be visible based on search
-	const getVisibleItems = () =>
-	{
-		if (!searchValue || searchValue.length === 0)
-		{
-			return new Set<string>();
-		}
-
-		// Get matching items using the searchFeature's built-in matching
-		const matchingItems = tree.getSearchMatchingItems();
-		const directMatches = matchingItems.map((item) => item.getId());
-		const visibleIds = new Set<string>(directMatches);
-
-		// Add all parent IDs of matching items
-		for (const matchId of directMatches)
-		{
-			let item = tree.getItems().find((i) => i.getId() === matchId);
-
-			while (item?.getParent?.())
-			{
-				const parent = item.getParent();
-				if (parent)
-				{
-					visibleIds.add(parent.getId());
-					item = parent;
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-
-		// Add all children of matching items
-		for (const matchId of directMatches)
-		{
-			const item = tree.getItems().find((i) => i.getId() === matchId);
-
-			if (item?.isFolder())
-			{
-				const getDescendants = (itemId: string) =>
-				{
-					const children = nodes[itemId]?.children || [];
-
-					for (const childId of children)
-					{
-						visibleIds.add(childId);
-
-						if (nodes[childId]?.children?.length)
-						{
-							getDescendants(childId);
-						}
-					}
-				};
-
-				getDescendants(item.getId());
-			}
-		}
-
-		return visibleIds;
-	};
-
-	const visibleItems = getVisibleItems();
-
-	const shouldShowItem = (itemId: string) =>
-	{
-		if (!searchValue || searchValue.length === 0) return true;
-		return visibleItems.has(itemId);
-	};
+	const matchingItems = tree.getSearchMatchingItems();
+	const visibleItems = getVisibleItems(searchValue || '', matchingItems, tree, nodes);
 
 	useEffect(() =>
 	{
@@ -438,7 +174,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 
 		return tree.getItems().map((item) =>
 		{
-			const isVisible = shouldShowItem(item.getId());
+			const isVisible = shouldShowItem(item.getId(), searchValue || '', visibleItems);
 			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
 		});
 	};
@@ -463,17 +199,4 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			</Tree>
 		</div>
 	);
-}
-
-function replaceSegment(pathname: string, segmentKey: 'collections' | 'folders' | 'items' | 'recipes', newSlug: string)
-{
-	const parts = pathname.split('/');
-
-	const index = parts.indexOf(segmentKey);
-	if (index === -1) return pathname;
-
-	// Replace the slug right after the segment key
-	parts[index + 1] = newSlug;
-
-	return parts.join('/');
 }
