@@ -1,5 +1,5 @@
 import { Collection } from '@/domain/collection';
-import { getTreeNodes, Node } from '@/domain/tree';
+import { getTreeNodes, Node, NodeType } from '@/domain/tree';
 
 /**
  * Load tree nodes from database and build node hierarchy
@@ -8,154 +8,84 @@ export async function loadTreeNodesData(collection: Collection): Promise<Record<
 {
 	try
 	{
-		const nodesFromDb = await getTreeNodes(collection.id);
+		const rows = await getTreeNodes(collection.id);
 		const nodes: Record<string, Node> = {};
 
-		// Create collection node
-		const collectionNode: Node = {
-			id: collection.id,
-			name: collection.name,
-			slug: collection.slug,
-			type: 'collection',
-			children: [],
-			collectionSlug: collection.slug,
-			collectionId: collection.id,
-		};
+		// Initialize root nodes
+		const collectionNode = createNode(collection.id, collection.name, collection.slug, 'collection', collection);
+		const dummyRoot = createNode(`dummy-${collection.id}`, 'Root', 'root', 'folder', collection, [collection.id]);
 
 		nodes[collection.id] = collectionNode;
+		nodes[dummyRoot.id] = dummyRoot;
 
-		// Create dummy root wrapper to show collection as a single top-level folder
-		const dummyRootId = `dummy-${collection.id}`;
-		const dummyRoot: Node = {
-			id: dummyRootId,
-			name: 'Root',
-			slug: 'root',
-			type: 'folder',
-			children: [collection.id],
-			collectionSlug: collection.slug,
-			collectionId: collection.id,
-		};
+		// Track folder parent relationships to build hierarchy
+		const folderParents = new Map<string, string>();
+		const topLevelFolders: string[] = [];
 
-		nodes[dummyRootId] = dummyRoot;
-
-		// First pass: create all folder nodes and record parent relationships
-		const folderParentPairs: Array<{ parentId: string; childId: string }> = [];
-		const seenFolderParentPair = new Set<string>();
-
-		for (const row of nodesFromDb)
+		// Single pass to extract all structural data
+		for (const row of rows)
 		{
-			if (!nodes[row.folder_id])
+			// Create folder node if needed
+			if (row.folder_id && !nodes[row.folder_id])
 			{
-				nodes[row.folder_id] = {
-					id: row.folder_id,
-					name: row.folder_name,
-					slug: row.folder_slug,
-					collectionSlug: collection.slug,
-					collectionId: collection.id,
-					type: 'folder',
-					children: [],
-				};
+				nodes[row.folder_id] = createNode(row.folder_id, row.folder_name, row.folder_slug, 'folder', collection);
 			}
 
-			if (row.parent_folder_id)
+			// Track folder hierarchy
+			if (row.folder_id && row.parent_folder_id)
 			{
-				const key = `${row.parent_folder_id}->${row.folder_id}`;
-				if (!seenFolderParentPair.has(key))
-				{
-					seenFolderParentPair.add(key);
-					folderParentPairs.push({
-						parentId: row.parent_folder_id,
-						childId: row.folder_id,
-					});
-				}
+				folderParents.set(row.folder_id, row.parent_folder_id);
 			}
-			else
+			else if (row.folder_id)
 			{
-				// Top-level folder - add to collection node
-				if (!collectionNode.children?.includes(row.folder_id))
-				{
-					collectionNode.children?.push(row.folder_id);
-				}
-			}
-		}
-
-		// Link folders to their parents after all folders exist
-		for (const { parentId, childId } of folderParentPairs)
-		{
-			// Ensure parent exists (it should, but guard just in case)
-			if (!nodes[parentId])
-			{
-				nodes[parentId] = {
-					id: parentId,
-					name: 'Folder',
-					slug: 'folder',
-					collectionSlug: collection.slug,
-					collectionId: collection.id,
-					type: 'folder',
-					children: [],
-				};
+				topLevelFolders.push(row.folder_id);
 			}
 
-			const parent = nodes[parentId];
-			if (!parent.children)
-			{
-				parent.children = [];
-			}
-			if (!parent.children.includes(childId))
-			{
-				parent.children.push(childId);
-			}
-		}
-
-		// Second pass: create items and recipes and link accordingly
-		for (const row of nodesFromDb)
-		{
+			// Create item node if needed
 			if (row.item_id && !nodes[row.item_id])
 			{
-				nodes[row.item_id] = {
-					id: row.item_id,
-					name: row.item_name!,
-					slug: row.item_slug!,
-					collectionSlug: collection.slug,
-					collectionId: collection.id,
-					type: 'item',
-					children: [],
-				};
-
-				// Add item to folder if it has one, otherwise add to collection
-				if (row.folder_id)
-				{
-					if (!nodes[row.folder_id].children?.includes(row.item_id))
-					{
-						nodes[row.folder_id].children!.push(row.item_id);
-					}
-				}
-				else
-				{
-					// Top-level item - add to collection node
-					if (!collectionNode.children?.includes(row.item_id))
-					{
-						collectionNode.children?.push(row.item_id);
-					}
-				}
+				nodes[row.item_id] = createNode(row.item_id, row.item_name!, row.item_slug!, 'item', collection);
 			}
 
+			// Create recipe node if needed
 			if (row.recipe_id && !nodes[row.recipe_id])
 			{
-				nodes[row.recipe_id] = {
-					id: row.recipe_id,
-					name: row.recipe_name!,
-					slug: row.recipe_slug!,
-					collectionSlug: collection.slug,
-					collectionId: collection.id,
-					type: 'recipe',
-				};
-
-				if (row.item_id && nodes[row.item_id]?.children && !nodes[row.item_id].children!.includes(row.recipe_id))
-				{
-					nodes[row.item_id].children!.push(row.recipe_id);
-				}
+				nodes[row.recipe_id] = createNode(row.recipe_id, row.recipe_name!, row.recipe_slug!, 'recipe', collection);
 			}
+		}
+
+		// Link folders to their parents
+		folderParents.forEach((parentId, childId) =>
+		{
+			const parent = nodes[parentId] || createNode(parentId, 'Folder', 'folder', 'folder', collection);
+
+			if (!nodes[parentId])
+			{
+				nodes[parentId] = parent;
+			}
+
+			addChild(parent, childId);
+		});
+
+		// Add top-level folders to collection
+		topLevelFolders.forEach((folderId) => addChild(collectionNode, folderId));
+
+		// Link items to their parents (folders or collection)
+		for (const row of rows)
+		{
+			if (!row.item_id) continue;
+
+			const parent = row.folder_id ? nodes[row.folder_id] : collectionNode;
+			if (parent) addChild(parent, row.item_id);
+		}
+
+		// Link recipes to their parent items
+		for (const row of rows)
+		{
+			if (!row.recipe_id || !row.item_id) continue;
+
+			const item = nodes[row.item_id];
+			if (item) addChild(item, row.recipe_id);
 		}
 
 		return nodes;
@@ -164,5 +94,31 @@ export async function loadTreeNodesData(collection: Collection): Promise<Record<
 	{
 		console.error('Error loading tree nodes:', error);
 		return {};
+	}
+}
+
+function createNode(id: string, name: string, slug: string, type: NodeType, collection: Collection, children: string[] = []): Node
+{
+	return {
+		id,
+		name,
+		slug,
+		type,
+		children,
+		collectionSlug: collection.slug,
+		collectionId: collection.id,
+	};
+}
+
+function addChild(parent: Node, childId: string): void
+{
+	if (!parent.children)
+	{
+		parent.children = [];
+	}
+
+	if (!parent.children.includes(childId))
+	{
+		parent.children.push(childId);
 	}
 }
