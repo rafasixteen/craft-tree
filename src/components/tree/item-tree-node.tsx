@@ -1,3 +1,5 @@
+'use client';
+
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
 import { Node } from '@/domain/tree';
@@ -5,7 +7,7 @@ import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPo
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 
 interface ItemTreeNodeProps
@@ -16,19 +18,23 @@ interface ItemTreeNodeProps
 
 export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 {
+	const isRenaming = item.isRenaming();
+
+	const label = (
+		<TreeItemLabel>
+			<div className="flex items-center justify-between flex-1 gap-2">
+				<span className="flex items-center gap-2">
+					<Icon item={item} />
+					<Name item={item} />
+				</span>
+				{!isRenaming && <ActionsDropdown item={item} />}
+			</div>
+		</TreeItemLabel>
+	);
+
 	return (
 		<TreeItem className="data-[visible=false]:hidden group" data-visible={visible} item={item}>
-			<Link href={item.getHref()}>
-				<TreeItemLabel>
-					<div className="flex items-center justify-between flex-1 gap-2">
-						<span className="flex items-center gap-2">
-							<Icon item={item} />
-							<Name item={item} />
-						</span>
-						<ActionsDropdown item={item} />
-					</div>
-				</TreeItemLabel>
-			</Link>
+			{isRenaming ? label : <Link href={item.getHref()}>{label}</Link>}
 		</TreeItem>
 	);
 }
@@ -64,7 +70,19 @@ function Icon({ item }: { item: ItemInstance<Node> })
 
 function Name({ item }: { item: ItemInstance<Node> })
 {
-	return item.isRenaming() ? <Input {...item.getRenameInputProps()} autoFocus className="-my-0.5 h-6 px-1" /> : item.getItemName();
+	const inputRef = useRef<HTMLInputElement | null>(null);
+	const isRenaming = item.isRenaming();
+
+	useEffect(() =>
+	{
+		if (isRenaming && inputRef.current)
+		{
+			inputRef.current.focus();
+			inputRef.current.select();
+		}
+	}, [isRenaming]);
+
+	return isRenaming ? <Input {...item.getRenameInputProps()} ref={inputRef} autoFocus className="-my-0.5 h-6 px-1" /> : item.getItemName();
 }
 
 function ActionsDropdown({ item }: { item: ItemInstance<Node> })

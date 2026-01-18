@@ -12,7 +12,7 @@ export function FolderDropdown({ item }: DropdownContentProps)
 	const handleAddItem = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		createItem({ name: 'New Item', folderId: node.id });
+		createItem({ name: 'New Item', collectionId: node.collectionId, folderId: node.id });
 		tree.getConfig().onChange?.();
 	};
 
@@ -26,7 +26,7 @@ export function FolderDropdown({ item }: DropdownContentProps)
 	const handleRename = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		console.log('Rename folder', item.getItemData());
+		item.startRenaming();
 	};
 
 	const handleDuplicate = (e: React.MouseEvent) =>

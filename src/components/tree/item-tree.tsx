@@ -8,8 +8,13 @@ import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Collection } from '@/domain/collection';
+import { Collection, renameCollection } from '@/domain/collection';
 import { getTreeNodes, Node } from '@/domain/tree';
+import { createFolder, getTopLevelFolders, renameFolder } from '@/domain/folder';
+import { nameSchema } from '@/domain/shared';
+import { usePathname, useRouter } from 'next/navigation';
+import { renameItem } from '@/domain/item';
+import { renameRecipe } from '@/domain/recipe';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -21,7 +26,6 @@ import {
 	renamingFeature,
 	createOnDropHandler,
 } from '@headless-tree/core';
-import { createFolder, getTopLevelFolders } from '@/domain/folder';
 
 interface ItemTreeProps
 {
@@ -31,6 +35,9 @@ interface ItemTreeProps
 
 export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 {
+	const router = useRouter();
+	const pathname = usePathname();
+
 	const [nodes, setNodes] = useState<Record<string, Node>>({});
 
 	const loadNodes = useCallback(async () =>
@@ -40,7 +47,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			const nodesFromDb = await getTreeNodes(collection.id);
 			const nodes: Record<string, Node> = {};
 
-			const topLevelFolders = await getTopLevelFolders(collection.id);
+			// const topLevelFolders = await getTopLevelFolders(collection.id);
 
 			// Create collection node
 			const collectionNode: Node = {
@@ -48,7 +55,8 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 				name: collection.name,
 				slug: collection.slug,
 				type: 'collection',
-				children: topLevelFolders.map((folder) => folder.id),
+				// children: topLevelFolders.map((folder) => folder.id),
+				children: [],
 				collectionSlug: collection.slug,
 				collectionId: collection.id,
 			};
@@ -97,6 +105,14 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 						folderParentPairs.push({ parentId: row.parent_folder_id, childId: row.folder_id });
 					}
 				}
+				else
+				{
+					// Top-level folder - add to collection node
+					if (!collectionNode.children.includes(row.folder_id))
+					{
+						collectionNode.children.push(row.folder_id);
+					}
+				}
 			}
 
 			// Link folders to their parents after all folders exist
@@ -142,9 +158,21 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 						children: [],
 					};
 
-					if (!nodes[row.folder_id].children?.includes(row.item_id))
+					// Add item to folder if it has one, otherwise add to collection
+					if (row.folder_id)
 					{
-						nodes[row.folder_id].children!.push(row.item_id);
+						if (!nodes[row.folder_id].children?.includes(row.item_id))
+						{
+							nodes[row.folder_id].children!.push(row.item_id);
+						}
+					}
+					else
+					{
+						// Top-level item - add to collection node
+						if (!collectionNode.children?.includes(row.item_id))
+						{
+							collectionNode.children.push(row.item_id);
+						}
 					}
 				}
 
@@ -251,20 +279,53 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 				},
 			}));
 		}),
-		onRename: (item, newName) =>
+		onRename: async (item, newName) =>
 		{
-			// Update the item name in our state
-			const itemId = item.getId();
+			const parsedName = await nameSchema.parseAsync(newName);
+
+			const node = item.getItemData();
+
 			setNodes((prevNodes) => ({
 				...prevNodes,
-				[itemId]: {
-					...prevNodes[itemId],
-					name: newName,
+				[node.id]: {
+					...prevNodes[node.id],
+					name: parsedName,
 				},
 			}));
 
-			// TODO: If we are in the item href link (e.g., /collections/new-collection/items/{item-name}),
-			// we should also update the URL to reflect the new name.
+			switch (node.type)
+			{
+				case 'collection':
+				{
+					const renamedCollection = await renameCollection({ collectionId: node.id, newName: parsedName });
+					const nextPath = replaceSegment(pathname, 'collections', renamedCollection.slug);
+					router.replace(nextPath);
+					break;
+				}
+				case 'folder':
+				{
+					const renamedFolder = await renameFolder({ folderId: node.id, newName: parsedName });
+					const nextPath = replaceSegment(pathname, 'folders', renamedFolder.slug);
+					router.replace(nextPath);
+					break;
+				}
+				case 'item':
+				{
+					const renamedItem = await renameItem({ itemId: node.id, newName: parsedName });
+					const nextPath = replaceSegment(pathname, 'items', renamedItem.slug);
+					router.replace(nextPath);
+					break;
+				}
+				case 'recipe':
+				{
+					const renamedRecipe = await renameRecipe({ recipeId: node.id, newName: parsedName });
+					const nextPath = replaceSegment(pathname, 'recipes', renamedRecipe.slug);
+					router.replace(nextPath);
+					break;
+				}
+				default:
+					break;
+			}
 		},
 		rootItemId: `dummy-${collection.id}`,
 		indent,
@@ -415,4 +476,17 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			</Tree>
 		</div>
 	);
+}
+
+function replaceSegment(pathname: string, segmentKey: 'collections' | 'folders' | 'items' | 'recipes', newSlug: string)
+{
+	const parts = pathname.split('/');
+
+	const index = parts.indexOf(segmentKey);
+	if (index === -1) return pathname;
+
+	// Replace the slug right after the segment key
+	parts[index + 1] = newSlug;
+
+	return parts.join('/');
 }

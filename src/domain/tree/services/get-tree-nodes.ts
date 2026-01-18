@@ -47,6 +47,7 @@ export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[
 					folders child
 					JOIN folder_tree ft ON ft.id = child.parent_folder_id
 			)
+		-- items inside folders
 		SELECT
 			ft.id AS folder_id,
 			ft.name AS folder_name,
@@ -61,7 +62,26 @@ export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[
 		FROM
 			folder_tree ft
 			LEFT JOIN items i ON i.folder_id = ft.id
-			LEFT JOIN recipes r ON r.item_id = i.id;
+			LEFT JOIN recipes r ON r.item_id = i.id
+		UNION ALL
+		-- items with no folder
+		SELECT
+			NULL AS folder_id,
+			NULL AS folder_name,
+			NULL AS folder_slug,
+			NULL AS parent_folder_id,
+			i.id AS item_id,
+			i.name AS item_name,
+			i.slug AS item_slug,
+			r.id AS recipe_id,
+			r.name AS recipe_name,
+			r.slug AS recipe_slug
+		FROM
+			items i
+			LEFT JOIN recipes r ON r.item_id = i.id
+		WHERE
+			i.folder_id IS NULL
+			AND i.collection_id = ${collectionId};
 	`);
 
 	return result.rows as unknown as FolderTreeRow[];

@@ -13,21 +13,21 @@ export function CollectionDropdown({ item }: DropdownContentProps)
 	const handleAddItem = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		createItem({ name: 'New Item', folderId: node.id });
+		createItem({ name: 'New Item', collectionId: node.id, folderId: null });
 		tree.getConfig().onChange?.();
 	};
 
 	const handleAddFolder = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		createFolder({ name: 'New Folder', collectionId: node.collectionId, parentFolderId: node.id });
+		createFolder({ name: 'New Folder', collectionId: node.collectionId, parentFolderId: null });
 		tree.getConfig().onChange?.();
 	};
 
 	const handleRename = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		console.log('Rename collection', item.getItemData());
+		item.startRenaming();
 	};
 
 	const handleDuplicate = (e: React.MouseEvent) =>
@@ -41,6 +41,8 @@ export function CollectionDropdown({ item }: DropdownContentProps)
 		e.stopPropagation();
 		deleteCollection(node.id);
 		tree.getConfig().onChange?.();
+
+		// TODO: Redirect to /collections
 	};
 
 	return (
