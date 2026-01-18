@@ -1,5 +1,5 @@
 import { FeatureImplementation, ItemInstance } from '@headless-tree/core';
-import { FolderDropdown, ItemDropdown, RecipeDropdown } from '@/components/tree/dropdowns';
+import { FolderDropdown, ItemDropdown, RecipeDropdown, CollectionDropdown } from '@/components/tree/dropdowns';
 import { Node } from '@/domain/tree';
 import { ComponentType } from 'react';
 
@@ -25,6 +25,8 @@ export const nodeDropdownsFeature: FeatureImplementation = {
 
 			switch (node.type)
 			{
+				case 'collection':
+					return CollectionDropdown;
 				case 'folder':
 					return FolderDropdown;
 				case 'item':

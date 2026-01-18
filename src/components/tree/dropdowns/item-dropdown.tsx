@@ -2,7 +2,7 @@
 
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
-import { PencilIcon, FilesIcon, TrashIcon, PackagePlus } from 'lucide-react';
+import { PencilIcon, FilesIcon, TrashIcon, CookingPotIcon } from 'lucide-react';
 import { createRecipe } from '@/domain/recipe';
 import { deleteItem } from '@/domain/item';
 
@@ -40,7 +40,7 @@ export function ItemDropdown({ item }: DropdownContentProps)
 	return (
 		<>
 			<DropdownMenuItem onClick={handleAddRecipe}>
-				<PackagePlus className="size-4" />
+				<CookingPotIcon className="size-4" />
 				Add Recipe
 			</DropdownMenuItem>
 			<DropdownMenuSeparator />

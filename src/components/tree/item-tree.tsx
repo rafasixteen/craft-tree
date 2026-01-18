@@ -42,17 +42,32 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 
 			const topLevelFolders = await getTopLevelFolders(collection.id);
 
-			const root: Node = {
+			// Create collection node
+			const collectionNode: Node = {
 				id: collection.id,
-				name: 'Root',
-				slug: 'root',
-				type: 'folder',
+				name: collection.name,
+				slug: collection.slug,
+				type: 'collection',
 				children: topLevelFolders.map((folder) => folder.id),
 				collectionSlug: collection.slug,
 				collectionId: collection.id,
 			};
 
-			nodes[collection.id] = root;
+			nodes[collection.id] = collectionNode;
+
+			// Create dummy root wrapper to show collection as a single top-level folder
+			const dummyRootId = `dummy-${collection.id}`;
+			const dummyRoot: Node = {
+				id: dummyRootId,
+				name: 'Root',
+				slug: 'root',
+				type: 'folder',
+				children: [collection.id],
+				collectionSlug: collection.slug,
+				collectionId: collection.id,
+			};
+
+			nodes[dummyRootId] = dummyRoot;
 
 			// First pass: create all folder nodes and record parent relationships
 			const folderParentPairs: Array<{ parentId: string; childId: string }> = [];
@@ -157,7 +172,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 		{
 			console.error('Error loading tree nodes:', error);
 		}
-	}, [collection.id, collection.slug]);
+	}, [collection]);
 
 	function getItem(id: string): Node
 	{
@@ -183,7 +198,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 
 	function isItemFolder(item: Node): boolean
 	{
-		if (item.type === 'folder')
+		if (item.type === 'folder' || item.type === 'collection')
 		{
 			return true;
 		}
@@ -251,7 +266,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			// TODO: If we are in the item href link (e.g., /collections/new-collection/items/{item-name}),
 			// we should also update the URL to reflect the new name.
 		},
-		rootItemId: collection.id,
+		rootItemId: `dummy-${collection.id}`,
 		indent,
 		onChange: loadNodes,
 	});

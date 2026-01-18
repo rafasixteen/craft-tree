@@ -1,10 +1,11 @@
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { PencilIcon, FilesIcon, TrashIcon, CuboidIcon, FolderIcon } from 'lucide-react';
-import { createFolder, deleteFolder } from '@/domain/folder';
+import { createFolder } from '@/domain/folder';
 import { createItem } from '@/domain/item';
+import { deleteCollection } from '@/domain/collection';
 
-export function FolderDropdown({ item }: DropdownContentProps)
+export function CollectionDropdown({ item }: DropdownContentProps)
 {
 	const node = item.getItemData();
 	const tree = item.getTree();
@@ -26,19 +27,19 @@ export function FolderDropdown({ item }: DropdownContentProps)
 	const handleRename = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		console.log('Rename folder', item.getItemData());
+		console.log('Rename collection', item.getItemData());
 	};
 
 	const handleDuplicate = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		console.log('Duplicate folder', item.getItemData());
+		console.log('Duplicate collection', item.getItemData());
 	};
 
 	const handleDelete = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		deleteFolder(node.id);
+		deleteCollection(node.id);
 		tree.getConfig().onChange?.();
 	};
 

@@ -1,7 +1,7 @@
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
 import { Node } from '@/domain/tree';
-import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPotIcon } from 'lucide-react';
+import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPotIcon, BoxIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
@@ -41,6 +41,10 @@ function Icon({ item }: { item: ItemInstance<Node> })
 
 	switch (node.type)
 	{
+		case 'collection':
+		{
+			return <BoxIcon className={className} />;
+		}
 		case 'folder':
 		{
 			return item.isExpanded() ? <FolderOpenIcon className={className} /> : <FolderIcon className={className} />;
@@ -55,11 +59,6 @@ function Icon({ item }: { item: ItemInstance<Node> })
 		}
 		default:
 			return <></>;
-	}
-
-	if (item.isFolder())
-	{
-		return item.isExpanded() ? <FolderOpenIcon className={className} /> : <FolderIcon className={className} />;
 	}
 }
 
