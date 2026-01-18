@@ -3,6 +3,7 @@ import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { FolderPlus, PencilIcon, FilesIcon, TrashIcon, FilePlusCornerIcon } from 'lucide-react';
 import { createFolder, deleteFolder } from '@/domain/folder';
 import { Node } from '@/domain/tree';
+import { createItem } from '@/domain/item';
 
 export function FolderDropdown({ item }: DropdownContentProps)
 {
@@ -12,7 +13,8 @@ export function FolderDropdown({ item }: DropdownContentProps)
 	const handleAddItem = (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		tree.createItem('New Item', node.id);
+		createItem({ name: 'New Item', folderId: node.id });
+		tree.getConfig().onChange?.();
 	};
 
 	const handleAddFolder = (e: React.MouseEvent) =>

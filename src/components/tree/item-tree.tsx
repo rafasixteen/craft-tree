@@ -3,7 +3,7 @@
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
 import { useCallback, useEffect, useState } from 'react';
-import { doubleClickExpandFeature, mutationFeature, nodeDropdownsFeature } from '@/components/tree/features';
+import { doubleClickExpandFeature, onChangeFeature, nodeDropdownsFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon, PlusIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -21,7 +21,7 @@ import {
 	renamingFeature,
 	createOnDropHandler,
 } from '@headless-tree/core';
-import { getTopLevelFolders } from '@/domain/folder';
+import { createFolder, getTopLevelFolders } from '@/domain/folder';
 
 interface ItemTreeProps
 {
@@ -216,7 +216,7 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 			keyboardDragAndDropFeature,
 			renamingFeature,
 			doubleClickExpandFeature,
-			mutationFeature,
+			onChangeFeature,
 			nodeDropdownsFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),
@@ -384,7 +384,8 @@ export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
 					size="icon"
 					onClick={() =>
 					{
-						tree.createFolder('New Folder', collection.id, null);
+						createFolder({ name: 'New Folder', collectionId: collection.id, parentFolderId: null });
+						tree.getConfig().onChange?.();
 					}}
 				>
 					<PlusIcon className="size-4" />

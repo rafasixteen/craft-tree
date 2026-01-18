@@ -8,18 +8,21 @@ export function RecipeDropdown({ item }: DropdownContentProps)
 	const node = item.getItemData();
 	const tree = item.getTree();
 
-	const handleRename = () =>
+	const handleRename = (e: React.MouseEvent) =>
 	{
+		e.stopPropagation();
 		item.startRenaming();
 	};
 
-	const handleDuplicate = () =>
+	const handleDuplicate = (e: React.MouseEvent) =>
 	{
+		e.stopPropagation();
 		console.log('Duplicate recipe', item.getItemData());
 	};
 
-	const handleDelete = () =>
+	const handleDelete = (e: React.MouseEvent) =>
 	{
+		e.stopPropagation();
 		deleteRecipe(node.id);
 		tree.getConfig().onChange?.();
 	};
