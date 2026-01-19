@@ -6,7 +6,7 @@ import { useCollectionsContext } from '@/providers/collections-context';
 import { getTreeNodes, Node, NodeType } from '@/domain/tree';
 import { Collection } from '@/domain/collection';
 
-type NodeMap = Record<string, Node>;
+export type NodeMap = Record<string, Node>;
 
 type TreeNodesContextValue = {
 	nodes: NodeMap;
