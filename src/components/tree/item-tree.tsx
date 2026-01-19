@@ -88,46 +88,82 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			const parsedName = await nameSchema.parseAsync(newName);
 
 			const node = item.getItemData();
+			const oldNodePath = getNodePath(nodes, node);
+			console.log('Old node path:', oldNodePath);
 
+			// Optimistic UI update
 			updateNode({ nodeId: node.id, name: parsedName });
-
-			const currentNodePath = getNodePath(nodes, node);
-
-			// TODO: Only replace the url if the current selected node is the renamed one
-			// And change the collection slug if the renamed node is a collection.
 
 			switch (node.type)
 			{
 				case 'collection':
 				{
-					const renamedCollection = await renameCollection({ collectionId: node.id, newName: parsedName });
-					updateNode({ nodeId: node.id, name: renamedCollection.name, slug: renamedCollection.slug });
-					const nextPath = replaceSegment(pathname, currentNodePath, renamedCollection.slug);
+					const renamedCollection = await renameCollection({
+						collectionId: node.id,
+						newName: parsedName,
+					});
+
+					updateNode({
+						nodeId: node.id,
+						name: renamedCollection.name,
+						slug: renamedCollection.slug,
+					});
+
+					// Replace the collection slug (first segment after /collections/)
+					const pathParts = pathname.split('/').filter(Boolean);
+					const collectionIndex = pathParts.indexOf('collections') + 1;
+					pathParts[collectionIndex] = renamedCollection.slug;
+					const nextPath = '/' + pathParts.join('/');
+
 					router.replace(nextPath);
 					break;
 				}
 				case 'folder':
 				{
-					const renamedFolder = await renameFolder({ folderId: node.id, newName: parsedName });
-					updateNode({ nodeId: node.id, name: renamedFolder.name, slug: renamedFolder.slug });
-					const nextPath = replaceSegment(pathname, currentNodePath, renamedFolder.slug);
-					router.replace(nextPath);
+					const renamedFolder = await renameFolder({
+						folderId: node.id,
+						newName: parsedName,
+					});
+
+					updateNode({
+						nodeId: node.id,
+						name: renamedFolder.name,
+						slug: renamedFolder.slug,
+					});
+
+					const newNodePath = getNodePath(nodes, { ...node, name: renamedFolder.name, slug: renamedFolder.slug });
+					console.log('New node path:', newNodePath);
+
 					break;
 				}
 				case 'item':
 				{
-					const renamedItem = await renameItem({ itemId: node.id, newName: parsedName });
-					updateNode({ nodeId: node.id, name: renamedItem.name, slug: renamedItem.slug });
-					const nextPath = replaceSegment(pathname, currentNodePath, renamedItem.slug);
-					router.replace(nextPath);
+					const renamedItem = await renameItem({
+						itemId: node.id,
+						newName: parsedName,
+					});
+
+					updateNode({
+						nodeId: node.id,
+						name: renamedItem.name,
+						slug: renamedItem.slug,
+					});
+
 					break;
 				}
 				case 'recipe':
 				{
-					const renamedRecipe = await renameRecipe({ recipeId: node.id, newName: parsedName });
-					updateNode({ nodeId: node.id, name: renamedRecipe.name, slug: renamedRecipe.slug });
-					const nextPath = replaceSegment(pathname, currentNodePath, renamedRecipe.slug);
-					router.replace(nextPath);
+					const renamedRecipe = await renameRecipe({
+						recipeId: node.id,
+						newName: parsedName,
+					});
+
+					updateNode({
+						nodeId: node.id,
+						name: renamedRecipe.name,
+						slug: renamedRecipe.slug,
+					});
+
 					break;
 				}
 				default:
