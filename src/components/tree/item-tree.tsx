@@ -7,7 +7,7 @@ import { doubleClickExpandFeature, onChangeFeature, nodeDropdownsFeature } from 
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Collection, renameCollection } from '@/domain/collection';
+import { renameCollection } from '@/domain/collection';
 import { Node } from '@/domain/tree';
 import { renameFolder } from '@/domain/folder';
 import { nameSchema } from '@/domain/shared';
@@ -17,6 +17,7 @@ import { renameRecipe } from '@/domain/recipe';
 import { loadTreeNodesData } from './item-tree.loader';
 import { getItem, getItemChildren, getItemName, isItemFolder, replaceSegment } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
+import { useCollectionContext } from '@/providers/collection-context';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -29,24 +30,19 @@ import {
 	createOnDropHandler,
 } from '@headless-tree/core';
 
-interface ItemTreeProps
-{
-	collection: Collection;
-	indent?: number;
-}
-
-export function ItemTree({ collection, indent = 16 }: ItemTreeProps)
+export function ItemTree({ indent = 16 }: { indent?: number })
 {
 	const router = useRouter();
 	const pathname = usePathname();
 
+	const { activeCollection: collection } = useCollectionContext();
 	const [nodes, setNodes] = useState<Record<string, Node>>({});
 
 	const loadNodes = useCallback(async () =>
 	{
 		const loadedNodes = await loadTreeNodesData(collection);
 		setNodes(loadedNodes);
-	}, [collection]);
+	}, [collection, setNodes]);
 
 	const tree = useTree<Node>({
 		dataLoader: {

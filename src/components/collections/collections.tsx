@@ -8,16 +8,12 @@ import { useRouter } from 'next/navigation';
 import { createCollection } from '@/domain/collection/services/create-collection';
 import { Collection } from '@/domain/collection';
 import useIsMobile from '@/hooks/use-is-mobile';
+import { useCollectionContext } from '@/providers/collection-context';
 
-interface CollectionsProps
-{
-	collections: Collection[];
-	activeCollection: Collection;
-}
-
-export function Collections({ collections, activeCollection }: CollectionsProps)
+export function Collections()
 {
 	const router = useRouter();
+	const { collections, activeCollection } = useCollectionContext();
 
 	const [isPending, startTransition] = useTransition();
 	const { isMobile } = useIsMobile();

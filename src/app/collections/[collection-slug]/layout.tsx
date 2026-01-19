@@ -4,6 +4,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { Sidebar } from '@/components/layout';
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
+import { CollectionProvider } from '@/providers/collection-context';
 import React from 'react';
 
 interface LayoutProps
@@ -26,21 +27,23 @@ export default async function Layout({ children, params }: LayoutProps)
 	if (!activeCollection) notFound();
 
 	return (
-		<div className="h-full w-full flex flex-col">
-			{/* Panels */}
-			<ResizablePanelGroup direction="horizontal" className="flex-1" autoSaveId="panels">
-				{/* Left panel – sidebar */}
-				<ResizablePanel defaultSize={20}>
-					<Sidebar collections={collections} activeCollection={activeCollection} />
-				</ResizablePanel>
+		<CollectionProvider collections={collections} activeCollection={activeCollection}>
+			<div className="h-full w-full flex flex-col">
+				{/* Panels */}
+				<ResizablePanelGroup direction="horizontal" className="flex-1" autoSaveId="panels">
+					{/* Left panel – sidebar */}
+					<ResizablePanel defaultSize={20}>
+						<Sidebar />
+					</ResizablePanel>
 
-				<ResizableHandle withHandle />
+					<ResizableHandle withHandle />
 
-				{/* Center panel – page content */}
-				<ResizablePanel defaultSize={55}>
-					<div className="h-full overflow-y-auto no-scrollbar">{children}</div>
-				</ResizablePanel>
-			</ResizablePanelGroup>
-		</div>
+					{/* Center panel – page content */}
+					<ResizablePanel defaultSize={55}>
+						<div className="h-full overflow-y-auto no-scrollbar">{children}</div>
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			</div>
+		</CollectionProvider>
 	);
 }
