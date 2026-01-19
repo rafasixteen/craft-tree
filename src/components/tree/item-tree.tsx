@@ -16,7 +16,7 @@ import { renameItem } from '@/domain/item';
 import { renameRecipe } from '@/domain/recipe';
 import { getItem, getItemChildren, getItemName, isItemFolder, replaceSegment } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
-import { useCollectionContext } from '@/providers/collection-context';
+import { useCollectionsContext } from '@/providers/collections-context';
 import { useTreeNodes } from '@/providers';
 import {
 	expandAllFeature,
@@ -35,7 +35,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	const router = useRouter();
 	const pathname = usePathname();
 
-	const { activeCollection: collection } = useCollectionContext();
+	const { activeCollection: collection } = useCollectionsContext();
 	const { nodes, mutateNodes, refresh } = useTreeNodes();
 
 	const tree = useTree<Node>({

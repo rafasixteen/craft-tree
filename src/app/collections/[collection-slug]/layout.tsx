@@ -4,7 +4,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { Sidebar } from '@/components/layout';
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
-import { CollectionProvider } from '@/providers/collection-context';
+import { CollectionsProvider } from '@/providers/collections-context';
 import { TreeNodesProvider } from '@/providers/tree-nodes-context';
 import React from 'react';
 
@@ -28,7 +28,7 @@ export default async function Layout({ children, params }: LayoutProps)
 	if (!activeCollection) notFound();
 
 	return (
-		<CollectionProvider collections={collections} activeCollection={activeCollection}>
+		<CollectionsProvider collections={collections} activeCollection={activeCollection}>
 			<TreeNodesProvider>
 				<div className="h-full w-full flex flex-col">
 					{/* Panels */}
@@ -47,6 +47,6 @@ export default async function Layout({ children, params }: LayoutProps)
 					</ResizablePanelGroup>
 				</div>
 			</TreeNodesProvider>
-		</CollectionProvider>
+		</CollectionsProvider>
 	);
 }

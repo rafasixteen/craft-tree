@@ -1,2 +1,2 @@
-export * from './collection-context';
+export * from './collections-context';
 export * from './tree-nodes-context';

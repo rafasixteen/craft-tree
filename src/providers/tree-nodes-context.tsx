@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useMemo } from 'react';
 import useSWR, { MutatorCallback } from 'swr';
-import { useCollectionContext } from '@/providers/collection-context';
+import { useCollectionsContext } from '@/providers/collections-context';
 import { getTreeNodes, Node, NodeType } from '@/domain/tree';
 import { Collection } from '@/domain/collection';
 
@@ -20,7 +20,7 @@ const TreeNodesContext = createContext<TreeNodesContextValue | undefined>(undefi
 
 export function TreeNodesProvider({ children }: { children: React.ReactNode })
 {
-	const { activeCollection } = useCollectionContext();
+	const { activeCollection } = useCollectionsContext();
 
 	const { data, isLoading, error, mutate } = useSWR<NodeMap>(['nodes', activeCollection.id], () => loadNodeData(activeCollection), { keepPreviousData: true });
 
