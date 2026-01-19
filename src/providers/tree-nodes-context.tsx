@@ -3,10 +3,8 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import useSWR, { MutatorCallback } from 'swr';
 import { useCollectionsContext } from '@/providers/collections-context';
-import { getTreeNodes, Node, NodeType } from '@/domain/tree';
+import { getTreeNodes, Node, NodeType, NodeMap } from '@/domain/tree';
 import { Collection } from '@/domain/collection';
-
-export type NodeMap = Record<string, Node>;
 
 type TreeNodesContextValue = {
 	nodes: NodeMap;
@@ -54,7 +52,7 @@ async function loadNodeData(collection: Collection): Promise<Record<string, Node
 
 		// Initialize root nodes
 		const collectionNode = createNode(collection.id, collection.name, collection.slug, 'collection', collection);
-		const dummyRoot = createNode(`dummy-${collection.id}`, 'Root', 'root', 'folder', collection, [collection.id]);
+		const dummyRoot = createNode(`dummy-${collection.id}`, 'Root', 'root', 'dummy', collection, [collection.id]);
 
 		nodes[collection.id] = collectionNode;
 		nodes[dummyRoot.id] = dummyRoot;

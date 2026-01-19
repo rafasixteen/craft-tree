@@ -1,1 +1,1 @@
-export type NodeType = 'collection' | 'folder' | 'item' | 'recipe';
+export type NodeType = 'collection' | 'folder' | 'item' | 'recipe' | 'dummy';
