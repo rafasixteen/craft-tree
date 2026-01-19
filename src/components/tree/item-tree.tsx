@@ -2,22 +2,22 @@
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
-import { useCallback, useEffect, useState } from 'react';
-import { doubleClickExpandFeature, onChangeFeature, nodeDropdownsFeature } from '@/components/tree/features';
+import { useEffect } from 'react';
+import { doubleClickExpandFeature, nodeDropdownsFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { renameCollection } from '@/domain/collection';
-import { Node } from '@/domain/tree';
 import { renameFolder } from '@/domain/folder';
 import { nameSchema } from '@/domain/shared';
+import { Node } from '@/domain/tree';
 import { usePathname, useRouter } from 'next/navigation';
 import { renameItem } from '@/domain/item';
 import { renameRecipe } from '@/domain/recipe';
-import { loadTreeNodesData } from './item-tree.loader';
 import { getItem, getItemChildren, getItemName, isItemFolder, replaceSegment } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionContext } from '@/providers/collection-context';
+import { useTreeNodes } from '@/providers';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -36,13 +36,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	const pathname = usePathname();
 
 	const { activeCollection: collection } = useCollectionContext();
-	const [nodes, setNodes] = useState<Record<string, Node>>({});
-
-	const loadNodes = useCallback(async () =>
-	{
-		const loadedNodes = await loadTreeNodesData(collection);
-		setNodes(loadedNodes);
-	}, [collection, setNodes]);
+	const { nodes, mutateNodes, refresh } = useTreeNodes();
 
 	const tree = useTree<Node>({
 		dataLoader: {
@@ -59,7 +53,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			keyboardDragAndDropFeature,
 			renamingFeature,
 			doubleClickExpandFeature,
-			onChangeFeature,
 			nodeDropdownsFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),
@@ -71,13 +64,16 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		},
 		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
 		{
-			setNodes((prevNodes) => ({
-				...prevNodes,
-				[parentItem.getId()]: {
-					...prevNodes[parentItem.getId()],
-					children: newChildrenIds,
-				},
-			}));
+			mutateNodes(
+				(prevNodes) => ({
+					...prevNodes,
+					[parentItem.getId()]: {
+						...prevNodes[parentItem.getId()],
+						children: newChildrenIds,
+					},
+				}),
+				{ revalidate: false },
+			);
 		}),
 		onRename: async (item, newName) =>
 		{
@@ -85,13 +81,16 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 
 			const node = item.getItemData();
 
-			setNodes((prevNodes) => ({
-				...prevNodes,
-				[node.id]: {
-					...prevNodes[node.id],
-					name: parsedName,
-				},
-			}));
+			mutateNodes(
+				(prevNodes) => ({
+					...prevNodes,
+					[node.id]: {
+						...prevNodes[node.id],
+						name: parsedName,
+					},
+				}),
+				{ revalidate: false },
+			);
 
 			switch (node.type)
 			{
@@ -100,6 +99,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 					const renamedCollection = await renameCollection({ collectionId: node.id, newName: parsedName });
 					const nextPath = replaceSegment(pathname, 'collections', renamedCollection.slug);
 					router.replace(nextPath);
+					await refresh();
 					break;
 				}
 				case 'folder':
@@ -107,6 +107,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 					const renamedFolder = await renameFolder({ folderId: node.id, newName: parsedName });
 					const nextPath = replaceSegment(pathname, 'folders', renamedFolder.slug);
 					router.replace(nextPath);
+					await refresh();
 					break;
 				}
 				case 'item':
@@ -114,6 +115,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 					const renamedItem = await renameItem({ itemId: node.id, newName: parsedName });
 					const nextPath = replaceSegment(pathname, 'items', renamedItem.slug);
 					router.replace(nextPath);
+					await refresh();
 					break;
 				}
 				case 'recipe':
@@ -121,6 +123,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 					const renamedRecipe = await renameRecipe({ recipeId: node.id, newName: parsedName });
 					const nextPath = replaceSegment(pathname, 'recipes', renamedRecipe.slug);
 					router.replace(nextPath);
+					await refresh();
 					break;
 				}
 				default:
@@ -129,7 +132,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		},
 		rootItemId: `dummy-${collection.id}`,
 		indent,
-		onChange: loadNodes,
 	});
 
 	const searchValue = tree.getSearchValue();
@@ -143,12 +145,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			tree.expandAll();
 		}
 	}, [searchValue, tree]);
-
-	useEffect(() =>
-	{
-		// Force an initial onChange to load data.
-		tree.getConfig().onChange?.();
-	}, [tree]);
 
 	useEffect(() =>
 	{

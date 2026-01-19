@@ -7,7 +7,7 @@ import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPo
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 interface ItemTreeNodeProps
@@ -87,7 +87,7 @@ function Name({ item }: { item: ItemInstance<Node> })
 
 function ActionsDropdown({ item }: { item: ItemInstance<Node> })
 {
-	const DropdownContent = useMemo(() => item.getDropdownContent(), [item]);
+	const DropdownContent = item.getDropdownContent();
 
 	if (!DropdownContent) return null;
 

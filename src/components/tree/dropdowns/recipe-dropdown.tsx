@@ -1,12 +1,15 @@
+'use client';
+
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '@/components/tree/features';
 import { PencilIcon, FilesIcon, TrashIcon } from 'lucide-react';
 import { deleteRecipe } from '@/domain/recipe';
+import { useTreeNodes } from '@/providers';
 
 export function RecipeDropdown({ item }: DropdownContentProps)
 {
 	const node = item.getItemData();
-	const tree = item.getTree();
+	const { refresh } = useTreeNodes();
 
 	const handleRename = (e: React.MouseEvent) =>
 	{
@@ -20,11 +23,11 @@ export function RecipeDropdown({ item }: DropdownContentProps)
 		console.log('Duplicate recipe', item.getItemData());
 	};
 
-	const handleDelete = (e: React.MouseEvent) =>
+	const handleDelete = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		deleteRecipe(node.id);
-		tree.getConfig().onChange?.();
+		await deleteRecipe(node.id);
+		await refresh();
 	};
 
 	return (

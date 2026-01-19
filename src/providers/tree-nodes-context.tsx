@@ -1,10 +1,51 @@
-import { Collection } from '@/domain/collection';
-import { getTreeNodes, Node, NodeType } from '@/domain/tree';
+'use client';
 
-/**
- * Load tree nodes from database and build node hierarchy
- */
-export async function loadTreeNodesData(collection: Collection): Promise<Record<string, Node>>
+import React, { createContext, useContext, useMemo } from 'react';
+import useSWR, { MutatorCallback } from 'swr';
+import { useCollectionContext } from '@/providers/collection-context';
+import { getTreeNodes, Node, NodeType } from '@/domain/tree';
+import { Collection } from '@/domain/collection';
+
+type NodeMap = Record<string, Node>;
+
+type TreeNodesContextValue = {
+	nodes: NodeMap;
+	isLoading: boolean;
+	error?: unknown;
+	refresh: () => Promise<NodeMap | undefined>;
+	mutateNodes: (data?: MutatorCallback<NodeMap> | NodeMap, opts?: { revalidate?: boolean }) => Promise<NodeMap | undefined>;
+};
+
+const TreeNodesContext = createContext<TreeNodesContextValue | undefined>(undefined);
+
+export function TreeNodesProvider({ children }: { children: React.ReactNode })
+{
+	const { activeCollection } = useCollectionContext();
+
+	const { data, isLoading, error, mutate } = useSWR<NodeMap>(['nodes', activeCollection.id], () => loadNodeData(activeCollection), { keepPreviousData: true });
+
+	const value = useMemo<TreeNodesContextValue>(
+		() => ({
+			nodes: data ?? {},
+			isLoading,
+			error,
+			refresh: () => mutate(),
+			mutateNodes: (next, opts) => mutate(next as any, { revalidate: opts?.revalidate ?? false }),
+		}),
+		[data, isLoading, error, mutate],
+	);
+
+	return <TreeNodesContext.Provider value={value}>{children}</TreeNodesContext.Provider>;
+}
+
+export function useTreeNodes()
+{
+	const context = useContext(TreeNodesContext);
+	if (!context) throw new Error('useTreeNodes must be used within a TreeNodesProvider');
+	return context;
+}
+
+async function loadNodeData(collection: Collection): Promise<Record<string, Node>>
 {
 	try
 	{

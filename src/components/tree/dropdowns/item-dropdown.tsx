@@ -5,17 +5,18 @@ import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { PencilIcon, FilesIcon, TrashIcon, CookingPotIcon } from 'lucide-react';
 import { createRecipe } from '@/domain/recipe';
 import { deleteItem } from '@/domain/item';
+import { useTreeNodes } from '@/providers';
 
 export function ItemDropdown({ item }: DropdownContentProps)
 {
 	const node = item.getItemData();
-	const tree = item.getTree();
+	const { refresh } = useTreeNodes();
 
-	const handleAddRecipe = (e: React.MouseEvent) =>
+	const handleAddRecipe = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		createRecipe({ name: 'New Recipe', itemId: node.id, quantity: 1, time: 1 });
-		tree.getConfig().onChange?.();
+		await createRecipe({ name: 'New Recipe', itemId: node.id, quantity: 1, time: 1 });
+		await refresh();
 	};
 
 	const handleRename = (e: React.MouseEvent) =>
@@ -30,11 +31,11 @@ export function ItemDropdown({ item }: DropdownContentProps)
 		console.log('Duplicate item', item.getItemData());
 	};
 
-	const handleDelete = (e: React.MouseEvent) =>
+	const handleDelete = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		deleteItem(node.id);
-		tree.getConfig().onChange?.();
+		await deleteItem(node.id);
+		await refresh();
 	};
 
 	return (

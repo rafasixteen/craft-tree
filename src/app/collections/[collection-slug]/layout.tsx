@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/layout';
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
 import { CollectionProvider } from '@/providers/collection-context';
+import { TreeNodesProvider } from '@/providers/tree-nodes-context';
 import React from 'react';
 
 interface LayoutProps
@@ -28,22 +29,24 @@ export default async function Layout({ children, params }: LayoutProps)
 
 	return (
 		<CollectionProvider collections={collections} activeCollection={activeCollection}>
-			<div className="h-full w-full flex flex-col">
-				{/* Panels */}
-				<ResizablePanelGroup direction="horizontal" className="flex-1" autoSaveId="panels">
-					{/* Left panel – sidebar */}
-					<ResizablePanel defaultSize={20}>
-						<Sidebar />
-					</ResizablePanel>
+			<TreeNodesProvider>
+				<div className="h-full w-full flex flex-col">
+					{/* Panels */}
+					<ResizablePanelGroup direction="horizontal" className="flex-1" autoSaveId="panels">
+						{/* Left panel – sidebar */}
+						<ResizablePanel defaultSize={20}>
+							<Sidebar />
+						</ResizablePanel>
 
-					<ResizableHandle withHandle />
+						<ResizableHandle withHandle />
 
-					{/* Center panel – page content */}
-					<ResizablePanel defaultSize={55}>
-						<div className="h-full overflow-y-auto no-scrollbar">{children}</div>
-					</ResizablePanel>
-				</ResizablePanelGroup>
-			</div>
+						{/* Center panel – page content */}
+						<ResizablePanel defaultSize={55}>
+							<div className="h-full overflow-y-auto no-scrollbar">{children}</div>
+						</ResizablePanel>
+					</ResizablePanelGroup>
+				</div>
+			</TreeNodesProvider>
 		</CollectionProvider>
 	);
 }

@@ -1,26 +1,29 @@
+'use client';
+
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { PencilIcon, FilesIcon, TrashIcon, CuboidIcon, FolderIcon } from 'lucide-react';
 import { createFolder, deleteFolder } from '@/domain/folder';
 import { createItem } from '@/domain/item';
+import { useTreeNodes } from '@/providers';
 
 export function FolderDropdown({ item }: DropdownContentProps)
 {
 	const node = item.getItemData();
-	const tree = item.getTree();
+	const { refresh } = useTreeNodes();
 
-	const handleAddItem = (e: React.MouseEvent) =>
+	const handleAddItem = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		createItem({ name: 'New Item', collectionId: node.collectionId, folderId: node.id });
-		tree.getConfig().onChange?.();
+		await createItem({ name: 'New Item', collectionId: node.collectionId, folderId: node.id });
+		await refresh();
 	};
 
-	const handleAddFolder = (e: React.MouseEvent) =>
+	const handleAddFolder = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		createFolder({ name: 'New Folder', collectionId: node.collectionId, parentFolderId: node.id });
-		tree.getConfig().onChange?.();
+		await createFolder({ name: 'New Folder', collectionId: node.collectionId, parentFolderId: node.id });
+		await refresh();
 	};
 
 	const handleRename = (e: React.MouseEvent) =>
@@ -35,11 +38,11 @@ export function FolderDropdown({ item }: DropdownContentProps)
 		console.log('Duplicate folder', item.getItemData());
 	};
 
-	const handleDelete = (e: React.MouseEvent) =>
+	const handleDelete = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		deleteFolder(node.id);
-		tree.getConfig().onChange?.();
+		await deleteFolder(node.id);
+		await refresh();
 	};
 
 	return (
