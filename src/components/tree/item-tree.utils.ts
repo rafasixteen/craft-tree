@@ -1,20 +1,23 @@
 import { Node } from '@/domain/tree';
 
 /**
- * Replace a URL segment with a new slug
- * e.g., /collections/old-name -> /collections/new-name
+ * Replace a node in the URL path with a new slug
+ * Takes the current node path and replaces the last segment with the new slug
+ * e.g., /collections/col1/folder1/item-old -> /collections/col1/folder1/item-new
  */
-export function replaceSegment(pathname: string, segmentKey: 'collections' | 'folders' | 'items' | 'recipes', newSlug: string): string
+export function replaceSegment(pathname: string, currentNodePath: string[], newSlug: string): string
 {
-	const parts = pathname.split('/');
+	// Replace the last segment of the node path with the new slug
+	const newNodePath = [...currentNodePath.slice(0, -1), newSlug];
 
-	const index = parts.indexOf(segmentKey);
-	if (index === -1) return pathname;
+	// Reconstruct the URL: /collections/{newNodePath.join('/')}
+	const pathParts = pathname.split('/').filter(Boolean);
 
-	// Replace the slug right after the segment key
-	parts[index + 1] = newSlug;
+	if (pathParts.length === 0) return pathname;
 
-	return parts.join('/');
+	// The first part is 'collections', then we add all the path segments
+	const collectionsPart = pathParts[0];
+	return '/' + collectionsPart + '/' + newNodePath.join('/');
 }
 
 /**

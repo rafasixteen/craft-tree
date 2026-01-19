@@ -18,6 +18,7 @@ import { getItem, getItemChildren, getItemName, isItemFolder, replaceSegment } f
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionsContext } from '@/providers/collections-context';
 import { useTreeNodes } from '@/providers';
+import { getNodePath } from '@/domain/tree';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -90,13 +91,18 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 
 			updateNode({ nodeId: node.id, name: parsedName });
 
+			const currentNodePath = getNodePath(nodes, node);
+
+			// TODO: Only replace the url if the current selected node is the renamed one
+			// And change the collection slug if the renamed node is a collection.
+
 			switch (node.type)
 			{
 				case 'collection':
 				{
 					const renamedCollection = await renameCollection({ collectionId: node.id, newName: parsedName });
 					updateNode({ nodeId: node.id, name: renamedCollection.name, slug: renamedCollection.slug });
-					const nextPath = replaceSegment(pathname, 'collections', renamedCollection.slug);
+					const nextPath = replaceSegment(pathname, currentNodePath, renamedCollection.slug);
 					router.replace(nextPath);
 					break;
 				}
@@ -104,7 +110,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 				{
 					const renamedFolder = await renameFolder({ folderId: node.id, newName: parsedName });
 					updateNode({ nodeId: node.id, name: renamedFolder.name, slug: renamedFolder.slug });
-					const nextPath = replaceSegment(pathname, 'folders', renamedFolder.slug);
+					const nextPath = replaceSegment(pathname, currentNodePath, renamedFolder.slug);
 					router.replace(nextPath);
 					break;
 				}
@@ -112,7 +118,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 				{
 					const renamedItem = await renameItem({ itemId: node.id, newName: parsedName });
 					updateNode({ nodeId: node.id, name: renamedItem.name, slug: renamedItem.slug });
-					const nextPath = replaceSegment(pathname, 'items', renamedItem.slug);
+					const nextPath = replaceSegment(pathname, currentNodePath, renamedItem.slug);
 					router.replace(nextPath);
 					break;
 				}
@@ -120,7 +126,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 				{
 					const renamedRecipe = await renameRecipe({ recipeId: node.id, newName: parsedName });
 					updateNode({ nodeId: node.id, name: renamedRecipe.name, slug: renamedRecipe.slug });
-					const nextPath = replaceSegment(pathname, 'recipes', renamedRecipe.slug);
+					const nextPath = replaceSegment(pathname, currentNodePath, renamedRecipe.slug);
 					router.replace(nextPath);
 					break;
 				}
