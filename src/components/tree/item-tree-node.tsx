@@ -2,12 +2,13 @@
 
 import { ItemInstance } from '@headless-tree/core';
 import { TreeItem, TreeItemLabel } from '@/components/ui/tree';
-import { Node } from '@/domain/tree';
+import { getNodePath, Node } from '@/domain/tree';
 import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPotIcon, BoxIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
 import { useEffect, useRef } from 'react';
+import { useTreeNodes } from '@/providers';
 import Link from 'next/link';
 
 interface ItemTreeNodeProps
@@ -18,7 +19,13 @@ interface ItemTreeNodeProps
 
 export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 {
+	const { nodes } = useTreeNodes();
+
+	const node = item.getItemData();
 	const isRenaming = item.isRenaming();
+
+	const path = getNodePath(nodes, node);
+	const href = '/collections/' + path.join('/');
 
 	const label = (
 		<TreeItemLabel>
@@ -34,7 +41,7 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 
 	return (
 		<TreeItem className="data-[visible=false]:hidden group" data-visible={visible} item={item}>
-			{isRenaming ? label : <Link href={item.getHref()}>{label}</Link>}
+			{isRenaming ? label : <Link href={href}>{label}</Link>}
 		</TreeItem>
 	);
 }

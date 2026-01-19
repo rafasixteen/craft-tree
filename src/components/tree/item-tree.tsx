@@ -36,7 +36,23 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	const pathname = usePathname();
 
 	const { activeCollection: collection } = useCollectionsContext();
-	const { nodes, mutateNodes, refresh } = useTreeNodes();
+	const { nodes, mutateNodes } = useTreeNodes();
+
+	const updateNode = ({ nodeId, name, slug, children }: { nodeId: string; name?: string; slug?: string; children?: string[] }) =>
+	{
+		mutateNodes(
+			(prevNodes) => ({
+				...prevNodes,
+				[nodeId]: {
+					...prevNodes[nodeId],
+					...(name !== undefined && { name }),
+					...(slug !== undefined && { slug }),
+					...(children !== undefined && { children }),
+				},
+			}),
+			{ revalidate: false },
+		);
+	};
 
 	const tree = useTree<Node>({
 		dataLoader: {
@@ -64,16 +80,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		},
 		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
 		{
-			mutateNodes(
-				(prevNodes) => ({
-					...prevNodes,
-					[parentItem.getId()]: {
-						...prevNodes[parentItem.getId()],
-						children: newChildrenIds,
-					},
-				}),
-				{ revalidate: false },
-			);
+			updateNode({ nodeId: parentItem.getId(), children: newChildrenIds });
 		}),
 		onRename: async (item, newName) =>
 		{
@@ -81,49 +88,40 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 
 			const node = item.getItemData();
 
-			mutateNodes(
-				(prevNodes) => ({
-					...prevNodes,
-					[node.id]: {
-						...prevNodes[node.id],
-						name: parsedName,
-					},
-				}),
-				{ revalidate: false },
-			);
+			updateNode({ nodeId: node.id, name: parsedName });
 
 			switch (node.type)
 			{
 				case 'collection':
 				{
 					const renamedCollection = await renameCollection({ collectionId: node.id, newName: parsedName });
+					updateNode({ nodeId: node.id, name: renamedCollection.name, slug: renamedCollection.slug });
 					const nextPath = replaceSegment(pathname, 'collections', renamedCollection.slug);
 					router.replace(nextPath);
-					await refresh();
 					break;
 				}
 				case 'folder':
 				{
 					const renamedFolder = await renameFolder({ folderId: node.id, newName: parsedName });
+					updateNode({ nodeId: node.id, name: renamedFolder.name, slug: renamedFolder.slug });
 					const nextPath = replaceSegment(pathname, 'folders', renamedFolder.slug);
 					router.replace(nextPath);
-					await refresh();
 					break;
 				}
 				case 'item':
 				{
 					const renamedItem = await renameItem({ itemId: node.id, newName: parsedName });
+					updateNode({ nodeId: node.id, name: renamedItem.name, slug: renamedItem.slug });
 					const nextPath = replaceSegment(pathname, 'items', renamedItem.slug);
 					router.replace(nextPath);
-					await refresh();
 					break;
 				}
 				case 'recipe':
 				{
 					const renamedRecipe = await renameRecipe({ recipeId: node.id, newName: parsedName });
+					updateNode({ nodeId: node.id, name: renamedRecipe.name, slug: renamedRecipe.slug });
 					const nextPath = replaceSegment(pathname, 'recipes', renamedRecipe.slug);
 					router.replace(nextPath);
-					await refresh();
 					break;
 				}
 				default:

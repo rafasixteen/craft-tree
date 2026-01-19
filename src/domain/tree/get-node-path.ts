@@ -7,8 +7,8 @@ export function getNodePath(nodes: NodeMap, node: Node): string[]
 
 	while (current)
 	{
-		// Skip registering path for collection and dummy nodes
-		if (current.type !== 'collection' && current.type !== 'dummy')
+		// Skip registering path for dummy node
+		if (current.type !== 'dummy')
 		{
 			path.unshift(current.slug);
 		}

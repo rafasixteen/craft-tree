@@ -35,6 +35,11 @@ export function findNodeByPath(nodes: NodeMap, pathSegments: string[]): Node | n
 			// At root level, look for a node with matching slug.
 			for (const node of Object.values(nodes))
 			{
+				// Skip dummy node at root level because it shouldn't be matched to any path segment.
+				// This is to prevent matching the dummy node when looking for root-level nodes
+				// if a path segment happens to be "root" (or whatever the dummy node's slug is).
+				if (node.type === 'dummy') continue;
+
 				if (node.slug === segment)
 				{
 					nextNode = node;

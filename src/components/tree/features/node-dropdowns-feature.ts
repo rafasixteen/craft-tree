@@ -37,23 +37,5 @@ export const nodeDropdownsFeature: FeatureImplementation = {
 					return null;
 			}
 		},
-		getHref: ({ item }: { item: ItemInstance<Node> }) =>
-		{
-			const node = item.getItemData();
-
-			switch (node.type)
-			{
-				case 'collection':
-					return `/collections/${node.slug}`;
-				case 'folder':
-					return `/collections/${node.collectionSlug}/folders/${node.slug}`;
-				case 'item':
-					return `/collections/${node.collectionSlug}/items/${node.slug}`;
-				case 'recipe':
-					return `/collections/${node.collectionSlug}/recipes/${node.slug}`;
-				default:
-					return '#';
-			}
-		},
 	},
 };

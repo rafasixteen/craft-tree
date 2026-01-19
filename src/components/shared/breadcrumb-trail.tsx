@@ -1,6 +1,7 @@
 'use client';
 
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import Link from 'next/link';
 import React from 'react';
 
 interface BreadcrumbItemData
@@ -27,7 +28,13 @@ export function BreadcrumbTrail({ path, ...props }: BreadcrumbsProps)
 						<React.Fragment key={item.name + index}>
 							{index > 0 && <BreadcrumbSeparator />}
 							<BreadcrumbItem>
-								{isLast ? <BreadcrumbPage>{item.name}</BreadcrumbPage> : <BreadcrumbLink href={item.href ?? '#'}>{item.name}</BreadcrumbLink>}
+								{isLast ? (
+									<BreadcrumbPage>{item.name}</BreadcrumbPage>
+								) : (
+									<BreadcrumbLink asChild>
+										<Link href={item.href ?? '#'}>{item.name}</Link>
+									</BreadcrumbLink>
+								)}
 							</BreadcrumbItem>
 						</React.Fragment>
 					);

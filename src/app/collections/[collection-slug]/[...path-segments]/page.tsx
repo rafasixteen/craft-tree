@@ -1,6 +1,6 @@
 'use client';
 
-import { useCollectionsContext, useTreeNodes } from '@/providers';
+import { useTreeNodes } from '@/providers';
 import { notFound, useParams } from 'next/navigation';
 import { findNodeByPath, getNodePath } from '@/domain/tree';
 
@@ -8,15 +8,12 @@ export default function Page()
 {
 	const { 'path-segments': pathSegments } = useParams();
 
-	const { activeCollection } = useCollectionsContext();
 	const { nodes, isLoading } = useTreeNodes();
 
 	if (!Array.isArray(pathSegments))
 	{
 		return notFound();
 	}
-
-	console.log(nodes);
 
 	const node = findNodeByPath(nodes, pathSegments);
 
