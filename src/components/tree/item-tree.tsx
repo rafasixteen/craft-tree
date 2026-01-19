@@ -2,7 +2,7 @@
 
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { doubleClickExpandFeature, nodeDropdownsFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
@@ -14,7 +14,7 @@ import { Node } from '@/domain/tree';
 import { usePathname, useRouter } from 'next/navigation';
 import { renameItem } from '@/domain/item';
 import { renameRecipe } from '@/domain/recipe';
-import { getItem, getItemChildren, getItemName, isItemFolder, replaceSegment } from './item-tree.utils';
+import { getItem, getItemChildren, getItemName, isItemFolder } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionsContext } from '@/providers/collections-context';
 import { useTreeNodes } from '@/providers';
@@ -39,18 +39,25 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	const { activeCollection: collection } = useCollectionsContext();
 	const { nodes, mutateNodes } = useTreeNodes();
 
+	// Track the previous nodes to detect slug changes
+	const prevNodesRef = useRef<Record<string, Node>>({});
+
 	const updateNode = ({ nodeId, name, slug, children }: { nodeId: string; name?: string; slug?: string; children?: string[] }) =>
 	{
 		mutateNodes(
-			(prevNodes) => ({
-				...prevNodes,
-				[nodeId]: {
-					...prevNodes[nodeId],
-					...(name !== undefined && { name }),
-					...(slug !== undefined && { slug }),
-					...(children !== undefined && { children }),
-				},
-			}),
+			(prevNodes) =>
+			{
+				if (!prevNodes) return prevNodes;
+				return {
+					...prevNodes,
+					[nodeId]: {
+						...prevNodes[nodeId],
+						...(name !== undefined && { name }),
+						...(slug !== undefined && { slug }),
+						...(children !== undefined && { children }),
+					},
+				};
+			},
 			{ revalidate: false },
 		);
 	};
@@ -88,8 +95,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			const parsedName = await nameSchema.parseAsync(newName);
 
 			const node = item.getItemData();
-			const oldNodePath = getNodePath(nodes, node);
-			console.log('Old node path:', oldNodePath);
 
 			// Optimistic UI update
 			updateNode({ nodeId: node.id, name: parsedName });
@@ -109,13 +114,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 						slug: renamedCollection.slug,
 					});
 
-					// Replace the collection slug (first segment after /collections/)
-					const pathParts = pathname.split('/').filter(Boolean);
-					const collectionIndex = pathParts.indexOf('collections') + 1;
-					pathParts[collectionIndex] = renamedCollection.slug;
-					const nextPath = '/' + pathParts.join('/');
-
-					router.replace(nextPath);
 					break;
 				}
 				case 'folder':
@@ -130,9 +128,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 						name: renamedFolder.name,
 						slug: renamedFolder.slug,
 					});
-
-					const newNodePath = getNodePath(nodes, { ...node, name: renamedFolder.name, slug: renamedFolder.slug });
-					console.log('New node path:', newNodePath);
 
 					break;
 				}
@@ -190,6 +185,145 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	{
 		tree.rebuildTree();
 	}, [nodes, tree]);
+
+	// Synchronize pathname with current node slugs after renames
+	useEffect(() =>
+	{
+		// Only run when we're viewing a specific path (not just the collection root)
+		if (!pathname.includes('/collections/')) return;
+
+		const pathParts = pathname.split('/').filter(Boolean);
+		const collectionsIndex = pathParts.indexOf('collections');
+
+		if (collectionsIndex === -1) return;
+
+		// Extract the path segments from URL
+		const urlSegments = pathParts.slice(collectionsIndex + 1);
+
+		if (urlSegments.length === 0) return;
+
+		// Check if any nodes have changed slugs
+		let nodeWithChangedSlug: Node | null = null;
+
+		for (const nodeId in nodes)
+		{
+			const currentNode = nodes[nodeId];
+			const previousNode = prevNodesRef.current[nodeId];
+
+			// If this node's slug has changed
+			if (previousNode && currentNode && previousNode.slug !== currentNode.slug)
+			{
+				// Check if this node or any ancestor is in the current path
+				const currentPath = getNodePath(nodes, currentNode);
+
+				// If any part of the current path matches a segment that changed, we need to update
+				let isInCurrentPath = false;
+				for (let i = 0; i < Math.min(currentPath.length, urlSegments.length); i++)
+				{
+					if (currentPath[i] === currentNode.slug && urlSegments[i] === previousNode.slug)
+					{
+						isInCurrentPath = true;
+						break;
+					}
+				}
+
+				if (isInCurrentPath)
+				{
+					nodeWithChangedSlug = currentNode;
+					break;
+				}
+			}
+		}
+
+		// If we detected a slug change in the current path, recalculate and redirect
+		if (nodeWithChangedSlug)
+		{
+			// Try to find the node we're currently viewing by reconstructing the path
+			// We'll traverse using the OLD slugs (from URL) as much as possible,
+			// then use node IDs when we hit the renamed node
+			let currentNode: Node | null = null;
+
+			for (let i = 0; i < urlSegments.length; i++)
+			{
+				const segment = urlSegments[i];
+				let nextNode: Node | null = null;
+
+				if (currentNode)
+				{
+					const children: string[] = currentNode.children || [];
+					// Try to find by current slug first
+					for (const childId of children)
+					{
+						const childNode: Node | undefined = nodes[childId];
+						if (childNode && childNode.slug === segment)
+						{
+							nextNode = childNode;
+							break;
+						}
+					}
+
+					// If not found by slug, check if any child's previous slug matches
+					if (!nextNode)
+					{
+						for (const childId of children)
+						{
+							const childNode: Node | undefined = nodes[childId];
+							const prevChild: Node | undefined = prevNodesRef.current[childId];
+							if (childNode && prevChild && prevChild.slug === segment)
+							{
+								nextNode = childNode;
+								break;
+							}
+						}
+					}
+				}
+				else
+				{
+					// At root level, look for collection
+					for (const n of Object.values(nodes))
+					{
+						if (n.type === 'collection' && n.slug === segment)
+						{
+							nextNode = n;
+							break;
+						}
+					}
+
+					// Try with previous slug
+					if (!nextNode)
+					{
+						for (const n of Object.values(nodes))
+						{
+							const prevNode = prevNodesRef.current[n.id];
+							if (n.type === 'collection' && prevNode && prevNode.slug === segment)
+							{
+								nextNode = n;
+								break;
+							}
+						}
+					}
+				}
+
+				if (!nextNode) break;
+				currentNode = nextNode;
+			}
+
+			// If we found the node, redirect to its current path
+			if (currentNode)
+			{
+				const actualPath = getNodePath(nodes, currentNode);
+				const newPathname = `/collections/${actualPath.join('/')}`;
+
+				if (newPathname !== pathname)
+				{
+					router.replace(newPathname);
+				}
+			}
+		}
+
+		// Update the previous nodes reference
+		prevNodesRef.current = { ...nodes };
+	}, [nodes, pathname, router]);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 	{
