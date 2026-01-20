@@ -7,37 +7,26 @@ import { FolderView } from '@/components/folder';
 import { ItemView } from '@/components/item';
 import { RecipeView } from '@/components/recipe';
 
+const componentMap = {
+	folder: FolderView,
+	item: ItemView,
+	recipe: RecipeView,
+} as const;
+
 export default function Page()
 {
 	const { 'path-segments': pathSegments } = useParams();
 	const { nodes, isLoading } = useTreeNodes();
 
-	if (!Array.isArray(pathSegments))
-	{
-		return notFound();
-	}
+	if (!Array.isArray(pathSegments)) return notFound();
+
+	if (isLoading) return <p>Loading...</p>;
 
 	const node = findNodeByPath(nodes, pathSegments);
 
-	if (isLoading)
-	{
-		return <p>Loading...</p>;
-	}
+	if (!node) return <p>Node not found</p>;
 
-	if (!node)
-	{
-		return notFound();
-	}
+	const Component = componentMap[node.type as keyof typeof componentMap];
 
-	switch (node.type)
-	{
-		case 'folder':
-			return <FolderView />;
-		case 'item':
-			return <ItemView />;
-		case 'recipe':
-			return <RecipeView />;
-		default:
-			return notFound();
-	}
+	return Component ? <Component /> : notFound();
 }
