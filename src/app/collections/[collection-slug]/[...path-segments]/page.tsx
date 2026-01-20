@@ -2,12 +2,14 @@
 
 import { useTreeNodes } from '@/providers';
 import { notFound, useParams } from 'next/navigation';
-import { findNodeByPath, getNodePath } from '@/domain/tree';
+import { findNodeByPath } from '@/domain/tree';
+import { FolderView } from '@/components/folder';
+import { ItemView } from '@/components/item';
+import { RecipeView } from '@/components/recipe';
 
 export default function Page()
 {
 	const { 'path-segments': pathSegments } = useParams();
-
 	const { nodes, isLoading } = useTreeNodes();
 
 	if (!Array.isArray(pathSegments))
@@ -17,8 +19,6 @@ export default function Page()
 
 	const node = findNodeByPath(nodes, pathSegments);
 
-	const nodePath = getNodePath(nodes, node!);
-
 	if (isLoading)
 	{
 		return <p>Loading...</p>;
@@ -26,18 +26,18 @@ export default function Page()
 
 	if (!node)
 	{
-		return (
-			<div>
-				<p>Node not found for path: {pathSegments.join('/')}</p>
-			</div>
-		);
+		return notFound();
 	}
 
-	return (
-		<div>
-			<p>Node found for path: {pathSegments.join('/')}</p>
-			<br />
-			<p>Path attempted: {nodePath.join('/')}</p>
-		</div>
-	);
+	switch (node.type)
+	{
+		case 'folder':
+			return <FolderView />;
+		case 'item':
+			return <ItemView />;
+		case 'recipe':
+			return <RecipeView />;
+		default:
+			return notFound();
+	}
 }
