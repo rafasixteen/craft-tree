@@ -39,9 +39,25 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 		</TreeItemLabel>
 	);
 
+	const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) =>
+	{
+		// Prevent link navigation when using modifier keys (shift/ctrl)
+		// This allows the tree's multi-select behavior to work
+		if (e.shiftKey || e.ctrlKey || e.metaKey)
+		{
+			e.preventDefault();
+		}
+	};
+
 	return (
-		<TreeItem className="data-[visible=false]:hidden group" data-visible={visible} item={item}>
-			{isRenaming ? label : <Link href={href}>{label}</Link>}
+		<TreeItem className="data-[visible=false]:hidden group" data-visible={visible} item={item} asChild>
+			{isRenaming ? (
+				label
+			) : (
+				<Link href={href} onClick={handleLinkClick}>
+					{label}
+				</Link>
+			)}
 		</TreeItem>
 	);
 }

@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { ItemInstance } from '@headless-tree/core';
 import { ChevronDownIcon, SquareMinus, SquarePlus } from 'lucide-react';
 import { Slot as SlotPrimitive } from 'radix-ui';
+import { Button } from '@/components/ui/button';
 
 type ToggleIconType = 'chevron' | 'plus-minus';
 
@@ -121,6 +122,21 @@ function TreeItemLabel<T = any>({ item: propItem, children, className, ...props 
 		return null;
 	}
 
+	const handleToggleClick = (e: React.MouseEvent) =>
+	{
+		e.preventDefault();
+		e.stopPropagation();
+
+		if (item.isExpanded())
+		{
+			item.collapse();
+		}
+		else
+		{
+			item.expand();
+		}
+	};
+
 	return (
 		<span
 			data-slot="tree-item-label"
@@ -130,16 +146,19 @@ function TreeItemLabel<T = any>({ item: propItem, children, className, ...props 
 			)}
 			{...props}
 		>
-			{item.isFolder() &&
-				(toggleIconType === 'plus-minus' ? (
-					item.isExpanded() ? (
-						<SquareMinus className="text-muted-foreground size-3.5" stroke="currentColor" strokeWidth="1" />
+			{item.isFolder() && (
+				<Button variant="ghost" size="icon" className="pointer-events-auto" onClick={handleToggleClick}>
+					{toggleIconType === 'plus-minus' ? (
+						item.isExpanded() ? (
+							<SquareMinus className="text-muted-foreground size-3.5" stroke="currentColor" strokeWidth="1" />
+						) : (
+							<SquarePlus className="text-muted-foreground size-3.5" stroke="currentColor" strokeWidth="1" />
+						)
 					) : (
-						<SquarePlus className="text-muted-foreground size-3.5" stroke="currentColor" strokeWidth="1" />
-					)
-				) : (
-					<ChevronDownIcon className="text-muted-foreground size-4 in-aria-[expanded=false]:-rotate-90" />
-				))}
+						<ChevronDownIcon className="text-muted-foreground size-4 in-aria-[expanded=false]:-rotate-90" />
+					)}
+				</Button>
+			)}
 			{children || (typeof item.getItemName === 'function' ? item.getItemName() : null)}
 		</span>
 	);

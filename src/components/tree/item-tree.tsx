@@ -3,7 +3,7 @@
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
 import { useEffect, useRef } from 'react';
-import { doubleClickExpandFeature, nodeDropdownsFeature } from '@/components/tree/features';
+import { nodeDropdownsFeature, removeDefaultExpandFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -76,7 +76,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			dragAndDropFeature,
 			keyboardDragAndDropFeature,
 			renamingFeature,
-			doubleClickExpandFeature,
+			removeDefaultExpandFeature,
 			nodeDropdownsFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),
@@ -184,6 +184,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	useEffect(() =>
 	{
 		tree.rebuildTree();
+		tree.expandAll();
 	}, [nodes]);
 
 	// Synchronize pathname with current node slugs after renames and deletions
@@ -453,8 +454,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
 		});
 	};
-
-	// console.log('Rendering ItemTree with nodes:', nodes);
 
 	return (
 		<div className="flex h-full flex-col gap-2">
