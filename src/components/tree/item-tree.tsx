@@ -186,7 +186,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		tree.rebuildTree();
 	}, [nodes, tree]);
 
-	// Synchronize pathname with current node slugs after renames
+	// Synchronize pathname with current node slugs after renames and deletions
 	useEffect(() =>
 	{
 		// Only run when we're viewing a specific path (not just the collection root)
@@ -201,6 +201,9 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		const urlSegments = pathParts.slice(collectionsIndex + 1);
 
 		if (urlSegments.length === 0) return;
+
+		// Check if any nodes have been deleted
+		const deletedNodeIds = Object.keys(prevNodesRef.current).filter((nodeId) => prevNodesRef.current[nodeId] && !nodes[nodeId]);
 
 		// Check if any nodes have changed slugs
 		let nodeWithChangedSlug: Node | null = null;
@@ -235,7 +238,113 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			}
 		}
 
-		// If we detected a slug change in the current path, recalculate and redirect
+		// Handle deletions first
+		if (deletedNodeIds.length > 0)
+		{
+			// Try to find the current node using URL segments
+			let currentNode: Node | null = null;
+			const pathToCurrentNode: Node[] = []; // Track the path for finding parent
+
+			for (let i = 0; i < urlSegments.length; i++)
+			{
+				const segment = urlSegments[i];
+				let nextNode: Node | null = null;
+
+				if (currentNode)
+				{
+					const children: string[] = currentNode.children || [];
+					for (const childId of children)
+					{
+						const childNode: Node | undefined = nodes[childId];
+						if (childNode && childNode.slug === segment)
+						{
+							nextNode = childNode;
+							break;
+						}
+					}
+				}
+				else
+				{
+					// At root level, look for collection
+					for (const n of Object.values(nodes))
+					{
+						if (n.type === 'collection' && n.slug === segment)
+						{
+							nextNode = n;
+							break;
+						}
+					}
+				}
+
+				if (!nextNode)
+				{
+					// Node not found - check if it was deleted
+					const wasDeleted = deletedNodeIds.some((deletedId) =>
+					{
+						const deletedNode = prevNodesRef.current[deletedId];
+						return deletedNode && deletedNode.slug === segment;
+					});
+
+					if (wasDeleted)
+					{
+						// Find a redirect target
+						let redirectTarget: Node | null = null;
+
+						// Try to find a sibling (if we have a parent)
+						if (currentNode && currentNode.children)
+						{
+							const siblings = currentNode.children.map((childId) => nodes[childId]).filter((n): n is Node => n !== undefined);
+
+							if (siblings.length > 0)
+							{
+								// Redirect to first sibling
+								redirectTarget = siblings[0];
+							}
+						}
+
+						// If no siblings, traverse up to parent, grandparent, etc.
+						if (!redirectTarget)
+						{
+							// Start from the last valid node in the path
+							for (let j = pathToCurrentNode.length - 1; j >= 0; j--)
+							{
+								const ancestor = pathToCurrentNode[j];
+								if (ancestor && nodes[ancestor.id])
+								{
+									redirectTarget = ancestor;
+									break;
+								}
+							}
+						}
+
+						// If still no target, go to collection root
+						if (!redirectTarget)
+						{
+							redirectTarget = nodes[collection.id];
+						}
+
+						if (redirectTarget)
+						{
+							const newPath = getNodePath(nodes, redirectTarget);
+							const newPathname = `/collections/${newPath.join('/')}`;
+							router.replace(newPathname);
+							// Update previous nodes and exit early
+							prevNodesRef.current = { ...nodes };
+							return;
+						}
+					}
+					break;
+				}
+
+				if (nextNode)
+				{
+					pathToCurrentNode.push(nextNode);
+					currentNode = nextNode;
+				}
+			}
+		}
+
+		// Handle renames if we detected a slug change in the current path
 		if (nodeWithChangedSlug)
 		{
 			// Try to find the node we're currently viewing by reconstructing the path
@@ -323,7 +432,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 
 		// Update the previous nodes reference
 		prevNodesRef.current = { ...nodes };
-	}, [nodes, pathname, router]);
+	}, [nodes, pathname, router, collection.id]);
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
 	{
