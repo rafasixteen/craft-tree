@@ -179,12 +179,12 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		{
 			tree.expandAll();
 		}
-	}, [searchValue, tree]);
+	}, [searchValue]);
 
 	useEffect(() =>
 	{
 		tree.rebuildTree();
-	}, [nodes, tree]);
+	}, [nodes]);
 
 	// Synchronize pathname with current node slugs after renames and deletions
 	useEffect(() =>
@@ -453,6 +453,8 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
 		});
 	};
+
+	// console.log('Rendering ItemTree with nodes:', nodes);
 
 	return (
 		<div className="flex h-full flex-col gap-2">

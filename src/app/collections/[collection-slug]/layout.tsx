@@ -6,6 +6,7 @@ import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
 import { CollectionsProvider } from '@/providers/collections-context';
 import { TreeNodesProvider } from '@/providers/tree-nodes-context';
+import { getNodeMap } from '@/domain/tree';
 import React from 'react';
 
 interface LayoutProps
@@ -27,14 +28,16 @@ export default async function Layout({ children, params }: LayoutProps)
 
 	if (!activeCollection) notFound();
 
+	const initialNodes = await getNodeMap(activeCollection);
+
 	return (
 		<CollectionsProvider collections={collections} activeCollection={activeCollection}>
-			<TreeNodesProvider>
+			<TreeNodesProvider initialNodes={initialNodes}>
 				<div className="h-full w-full flex flex-col">
 					{/* Panels */}
-					<ResizablePanelGroup direction="horizontal" className="flex-1" autoSaveId="panels">
+					<ResizablePanelGroup direction="horizontal" className="flex-1">
 						{/* Left panel – sidebar */}
-						<ResizablePanel defaultSize={20}>
+						<ResizablePanel defaultSize={45}>
 							<Sidebar />
 						</ResizablePanel>
 

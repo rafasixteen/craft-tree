@@ -16,11 +16,9 @@ const componentMap = {
 export default function Page()
 {
 	const { 'path-segments': pathSegments } = useParams();
-	const { nodes, isLoading } = useTreeNodes();
+	const { nodes } = useTreeNodes();
 
 	if (!Array.isArray(pathSegments)) return notFound();
-
-	if (isLoading) return <p>Loading...</p>;
 
 	const node = findNodeByPath(nodes, pathSegments);
 
