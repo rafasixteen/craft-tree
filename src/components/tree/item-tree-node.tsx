@@ -7,9 +7,10 @@ import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPo
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTreeNodes } from '@/providers';
 import { FolderDropdown, ItemDropdown, RecipeDropdown, CollectionDropdown } from '@/components/tree/dropdowns';
+import useIsMobile from '@/hooks/use-is-mobile';
 import Link from 'next/link';
 
 interface ItemTreeNodeProps
@@ -20,7 +21,11 @@ interface ItemTreeNodeProps
 
 export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 {
+	const { isMobile } = useIsMobile();
 	const { nodes } = useTreeNodes();
+
+	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
 	const node = item.getItemData();
 	const isRenaming = item.isRenaming();
@@ -28,14 +33,34 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 	const path = getNodePath(nodes, node);
 	const href = '/collections/' + path.join('/');
 
+	const handlePressStart = () =>
+	{
+		if (!isRenaming)
+		{
+			longPressTimerRef.current = setTimeout(() =>
+			{
+				setDropdownOpen(true);
+			}, 500);
+		}
+	};
+
+	const handlePressEnd = () =>
+	{
+		if (longPressTimerRef.current)
+		{
+			clearTimeout(longPressTimerRef.current);
+			longPressTimerRef.current = null;
+		}
+	};
+
 	const label = (
-		<TreeItemLabel>
+		<TreeItemLabel onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} onTouchCancel={handlePressEnd}>
 			<div className="flex items-center justify-between flex-1 gap-2">
 				<span className="flex items-center gap-2">
 					<Icon item={item} />
 					<Name item={item} />
 				</span>
-				{!isRenaming && <ActionsDropdown item={item} />}
+				{!isRenaming && <ActionsDropdown item={item} isMobile={isMobile} dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} />}
 			</div>
 		</TreeItemLabel>
 	);
@@ -109,7 +134,17 @@ function Name({ item }: { item: ItemInstance<Node> })
 	return isRenaming ? <Input {...item.getRenameInputProps()} ref={inputRef} autoFocus className="-my-0.5 h-6 px-1" /> : item.getItemName();
 }
 
-function ActionsDropdown({ item }: { item: ItemInstance<Node> })
+function ActionsDropdown({
+	item,
+	isMobile,
+	dropdownOpen,
+	setDropdownOpen,
+}: {
+	item: ItemInstance<Node>;
+	isMobile: boolean;
+	dropdownOpen: boolean;
+	setDropdownOpen: (open: boolean) => void;
+})
 {
 	const dropdownComponentMap = {
 		collection: CollectionDropdown,
@@ -124,13 +159,13 @@ function ActionsDropdown({ item }: { item: ItemInstance<Node> })
 	if (!DropdownContent) return null;
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
 			<DropdownMenuTrigger asChild>
 				<ButtonSpan variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
 					<EllipsisVerticalIcon className="size-4" />
 				</ButtonSpan>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" side="bottom">
+			<DropdownMenuContent align="start" side={isMobile ? 'left' : 'right'}>
 				<DropdownContent item={item} />
 			</DropdownMenuContent>
 		</DropdownMenu>
