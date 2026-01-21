@@ -5,19 +5,11 @@ import nextTs from 'eslint-config-next/typescript';
 const eslintConfig = defineConfig([
 	...nextVitals,
 	...nextTs,
-	// Override default ignores of eslint-config-next.
-	globalIgnores([
-		// Default ignores of eslint-config-next:
-		'.next/**',
-		'out/**',
-		'build/**',
-		'next-env.d.ts',
-		'src/graphql/generated/**',
-		'src/components/ui',
-	]),
+	globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'src/graphql/generated/**', 'src/components/ui']),
 	{
 		rules: {
 			'@typescript-eslint/no-explicit-any': 'off',
+			'react-hooks/exhaustive-deps': 'off',
 		},
 	},
 ]);

@@ -3,6 +3,7 @@
 import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
 import { useEffect, useRef } from 'react';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { nodeDropdownsFeature, removeDefaultExpandFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
@@ -29,6 +30,7 @@ import {
 	keyboardDragAndDropFeature,
 	renamingFeature,
 	createOnDropHandler,
+	propMemoizationFeature,
 } from '@headless-tree/core';
 
 export function ItemTree({ indent = 16 }: { indent?: number })
@@ -38,6 +40,8 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 
 	const { activeCollection: collection } = useCollectionsContext();
 	const { nodes, mutateNodes } = useTreeNodes();
+
+	const [expandedItems, setExpandedItems] = useLocalStorage<string[]>(`tree-expanded-items-${collection.id}`, []);
 
 	// Track the previous nodes to detect slug changes
 	const prevNodesRef = useRef<Record<string, Node>>({});
@@ -63,6 +67,10 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	};
 
 	const tree = useTree<Node>({
+		state: {
+			expandedItems: expandedItems,
+		},
+		setExpandedItems: setExpandedItems,
 		dataLoader: {
 			getItem: (id: string) => getItem(id, nodes),
 			getChildren: (id: string) => getItemChildren(id, nodes),
@@ -78,6 +86,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			renamingFeature,
 			removeDefaultExpandFeature,
 			nodeDropdownsFeature,
+			propMemoizationFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),
 		isItemFolder: (item) => isItemFolder(item.getItemData()),
@@ -184,7 +193,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	useEffect(() =>
 	{
 		tree.rebuildTree();
-		tree.expandAll();
 	}, [nodes]);
 
 	// Synchronize pathname with current node slugs after renames and deletions

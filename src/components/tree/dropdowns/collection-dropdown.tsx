@@ -7,6 +7,7 @@ import { createFolder } from '@/domain/folder';
 import { createItem } from '@/domain/item';
 import { deleteCollection } from '@/domain/collection';
 import { useTreeNodes } from '@/providers';
+import { redirect } from 'next/navigation';
 
 export function CollectionDropdown({ item }: DropdownContentProps)
 {
@@ -43,9 +44,14 @@ export function CollectionDropdown({ item }: DropdownContentProps)
 	{
 		e.stopPropagation();
 		await deleteCollection(node.id);
-		await refresh();
 
-		// TODO: Redirect to /collections
+		// Clean up localStorage for this collection
+		if (typeof window !== 'undefined')
+		{
+			localStorage.removeItem(`tree-expanded-items-${node.id}`);
+		}
+
+		redirect('/collections');
 	};
 
 	return (
