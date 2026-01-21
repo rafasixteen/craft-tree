@@ -1,13 +1,19 @@
 'use client';
 
 import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { DropdownContentProps } from '../features/node-dropdowns-feature';
 import { PencilIcon, FilesIcon, TrashIcon, CookingPotIcon } from 'lucide-react';
 import { createRecipe } from '@/domain/recipe';
 import { deleteItem } from '@/domain/item';
 import { useTreeNodes } from '@/providers';
+import { Node } from '@/domain/tree';
+import { ItemInstance } from '@headless-tree/core';
 
-export function ItemDropdown({ item }: DropdownContentProps)
+interface ItemDropdownProps
+{
+	item: ItemInstance<Node>;
+}
+
+export function ItemDropdown({ item }: ItemDropdownProps)
 {
 	const node = item.getItemData();
 	const { refresh } = useTreeNodes();

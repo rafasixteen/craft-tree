@@ -14,7 +14,7 @@ import { nameSchema } from '@/domain/shared';
 import { Node } from '@/domain/tree';
 import { usePathname, useRouter } from 'next/navigation';
 import { renameItem } from '@/domain/item';
-import { renameRecipe } from '@/domain/recipe';
+import { updateRecipe } from '@/domain/recipe';
 import { getItem, getItemChildren, getItemName, isItemFolder } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionsContext } from '@/providers/collections-context';
@@ -156,9 +156,11 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 				}
 				case 'recipe':
 				{
-					const renamedRecipe = await renameRecipe({
-						recipeId: node.id,
-						newName: parsedName,
+					const renamedRecipe = await updateRecipe({
+						id: node.id,
+						data: {
+							name: parsedName,
+						},
 					});
 
 					updateNode({
