@@ -1,11 +1,13 @@
+import { Ingredient } from '@/domain/ingredient';
 import { Recipe } from '@/domain/recipe';
 
 interface RecipeViewProps
 {
 	recipe: Recipe;
+	ingredients: Ingredient[];
 }
 
-export function RecipeView({ recipe }: RecipeViewProps)
+export function RecipeView({ recipe, ingredients }: RecipeViewProps)
 {
 	return (
 		<div>

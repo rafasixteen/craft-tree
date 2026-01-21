@@ -3,7 +3,7 @@ import { auth } from '@/auth';
 import { getUserId } from '@/domain/user';
 import { getUserCollections } from '@/domain/collection';
 import { findNodeByPath, getNodeMap } from '@/domain/tree';
-import { getRecipeById } from '@/domain/recipe';
+import { getRecipeById, getRecipeIngredients } from '@/domain/recipe';
 import { getFolderById } from '@/domain/folder';
 import { getItemById } from '@/domain/item';
 import { FolderView } from '@/components/folder';
@@ -64,8 +64,14 @@ export default async function Page({ params }: PageProps)
 		case 'recipe':
 		{
 			const recipe = await getRecipeById(node.id);
-			if (!recipe) return notFound();
-			return <RecipeView recipe={recipe} />;
+			const ingredients = await getRecipeIngredients(node.id);
+
+			if (!recipe || !ingredients)
+			{
+				return notFound();
+			}
+
+			return <RecipeView recipe={recipe} ingredients={ingredients} />;
 		}
 		default:
 			return notFound();
