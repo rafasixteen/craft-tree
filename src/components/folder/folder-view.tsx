@@ -1,4 +1,11 @@
-export function FolderView()
+import { Folder } from '@/domain/folder';
+
+interface FolderViewProps
 {
-	return <div>Folder View</div>;
+	folder: Folder;
+}
+
+export function FolderView({ folder }: FolderViewProps)
+{
+	return <div>{folder.name}</div>;
 }

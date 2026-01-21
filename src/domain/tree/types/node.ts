@@ -9,5 +9,4 @@ export interface Node
 	collectionSlug: string;
 	collectionId: string;
 	children?: string[];
-	resourceSlug?: string;
 }

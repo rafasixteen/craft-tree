@@ -1,4 +1,11 @@
-export function CollectionView()
+import { Collection } from '@/domain/collection';
+
+interface CollectionViewProps
 {
-	return <div>Collection View</div>;
+	collection: Collection;
+}
+
+export function CollectionView({ collection }: CollectionViewProps)
+{
+	return <div>{collection.name}</div>;
 }

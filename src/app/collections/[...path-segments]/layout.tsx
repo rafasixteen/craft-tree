@@ -1,5 +1,3 @@
-import { getUserIdFromEmail } from '@/domain/user';
-import { getUserCollections } from '@/domain/collection';
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
 import { CollectionsProvider } from '@/providers/collections-context';
@@ -8,6 +6,8 @@ import { getNodeMap } from '@/domain/tree';
 import { DesktopLayout } from './desktop-layout';
 import { MobileLayout } from './mobile-layout';
 import { cookies } from 'next/headers';
+import { getUserId } from '@/domain/user';
+import { getUserCollections } from '@/domain/collection';
 import React from 'react';
 
 interface LayoutProps
@@ -24,7 +24,7 @@ export default async function Layout({ children, params }: LayoutProps)
 
 	const session = await auth();
 
-	const userId = await getUserIdFromEmail(session!.user!.email!);
+	const userId = await getUserId(session!.user!.email!);
 	const collections = await getUserCollections(userId);
 
 	const collectionSlug = pathSegments[0];

@@ -2,8 +2,8 @@
 
 import { foldersTable } from '@/db/schema';
 import { Folder } from '@/domain/folder';
-import db from '@/db/client';
 import { eq } from 'drizzle-orm';
+import db from '@/db/client';
 
 export async function getFolderById(id: string): Promise<Folder | null>
 {

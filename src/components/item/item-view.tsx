@@ -1,4 +1,11 @@
-export function ItemView()
+import { Item } from '@/domain/item';
+
+interface ItemViewProps
 {
-	return <div>Item View</div>;
+	item: Item;
+}
+
+export function ItemView({ item }: ItemViewProps)
+{
+	return <div>{item.name}</div>;
 }
