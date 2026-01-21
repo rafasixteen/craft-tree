@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SignInForm } from '@/components/auth';
 import { cn } from '@/lib/utils';
 
-// TODO: Fix me - Error message doesn't fade out as it should, it simply disappears after 3 seconds.
-
 export default function SignInPage()
 {
 	const router = useRouter();
@@ -36,26 +34,30 @@ export default function SignInPage()
 	}, [errorMessage, error, router, searchParams]);
 
 	return (
-		<div className="relative h-full w-full overflow-hidden">
+		<div className="relative h-full overflow-hidden">
 			{/* Animated background elements */}
 			<div className="absolute inset-0 overflow-hidden">
-				<div className="absolute top-0 right-1/4 w-96 h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
+				<div className="absolute top-0 right-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
 				<div
-					className="absolute bottom-40 left-1/4 w-96 h-96 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+					className="absolute bottom-40 left-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
 					style={{ animationDelay: '2s' }}
 				/>
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 p-6 md:p-10">
+			<div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 sm:gap-6 p-4 sm:p-6 md:p-10">
 				<div className="w-full max-w-sm animate-fade-in" style={{ animationDelay: '0.2s' }}>
 					<SignInForm />
 				</div>
-				{errorMessage && (
-					<p className={cn('text-xs text-destructive text-center transition-opacity duration-500 animate-fade-in', visible ? 'opacity-100' : 'opacity-0')}>
-						{errorMessage}
-					</p>
-				)}
+				<p
+					className={cn(
+						'text-xs sm:text-sm text-destructive text-center transition-opacity duration-500 h-5 animate-fade-in',
+						errorMessage && visible ? 'opacity-100' : 'opacity-0',
+					)}
+					style={{ animationDelay: '0.2s' }}
+				>
+					{errorMessage}
+				</p>
 			</div>
 
 			{/* CSS for animations */}
