@@ -1,13 +1,13 @@
 import { getUserIdFromEmail } from '@/domain/user';
 import { getUserCollections } from '@/domain/collection';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import { Sidebar } from '@/components/layout';
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
 import { CollectionsProvider } from '@/providers/collections-context';
 import { TreeNodesProvider } from '@/providers/tree-nodes-context';
 import { getNodeMap } from '@/domain/tree';
-import { BreadcrumbTrail } from '@/components';
+import { DesktopLayout } from './desktop-layout';
+import { MobileLayout } from './mobile-layout';
+import { cookies } from 'next/headers';
 import React from 'react';
 
 interface LayoutProps
@@ -15,6 +15,8 @@ interface LayoutProps
 	children: React.ReactNode;
 	params: Promise<{ 'path-segments': string[] }>;
 }
+
+const LAYOUT_COOKIE_KEY = 'main-layout-panels';
 
 export default async function Layout({ children, params }: LayoutProps)
 {
@@ -37,33 +39,20 @@ export default async function Layout({ children, params }: LayoutProps)
 		href: `/collections/` + pathSegments.slice(0, index + 1).join('/'),
 	}));
 
+	const cookieStore = await cookies();
+	const defaultLayoutString = cookieStore.get(LAYOUT_COOKIE_KEY)?.value;
+	const defaultLayout = defaultLayoutString ? (JSON.parse(defaultLayoutString) as number[]) : undefined;
+
 	return (
 		<CollectionsProvider collections={collections} activeCollection={activeCollection}>
 			<TreeNodesProvider initialNodes={initialNodes}>
-				<div className="h-full w-full flex flex-col">
-					{/* Panels */}
-					<ResizablePanelGroup direction="horizontal" className="flex-1" autoSaveId="main-layout-panels">
-						{/* Left panel – sidebar */}
-						<ResizablePanel collapsible minSize={20} defaultSize={45}>
-							<Sidebar />
-						</ResizablePanel>
+				{/* Desktop Layout - Resizable Panels */}
+				<DesktopLayout path={path} defaultLayout={defaultLayout} layoutId={LAYOUT_COOKIE_KEY}>
+					{children}
+				</DesktopLayout>
 
-						<ResizableHandle withHandle />
-
-						{/* Right panel – page content */}
-						<ResizablePanel defaultSize={55} minSize={30}>
-							<div className="h-full overflow-y-auto no-scrollbar">
-								<div className="flex h-full flex-col min-h-0">
-									<div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-										<BreadcrumbTrail path={path} />
-									</div>
-
-									<div className="flex-1 min-h-0 p-4">{children}</div>
-								</div>
-							</div>
-						</ResizablePanel>
-					</ResizablePanelGroup>
-				</div>
+				{/* Mobile Layout - Toggle View */}
+				<MobileLayout path={path}>{children}</MobileLayout>
 			</TreeNodesProvider>
 		</CollectionsProvider>
 	);
