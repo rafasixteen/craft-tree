@@ -7,7 +7,7 @@ export default async function Home()
 	const session = await auth();
 
 	return (
-		<div className="relative h-full overflow-hidden">
+		<div className="relative h-full overflow-hidden py-4">
 			{/* Animated background elements */}
 			<div className="absolute inset-0 overflow-hidden">
 				<div className="absolute top-0 left-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />

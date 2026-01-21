@@ -30,7 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 					<SessionProvider>
 						<div className="flex flex-col flex-1 ">
 							<Header />
-							<main className="flex-1 p-4 md:p-0">{children}</main>
+							<main className="flex-1">{children}</main>
 							<Footer />
 						</div>
 					</SessionProvider>
