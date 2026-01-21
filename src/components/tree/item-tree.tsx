@@ -4,7 +4,7 @@ import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
 import { useEffect, useRef } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { nodeDropdownsFeature, removeDefaultExpandFeature } from '@/components/tree/features';
+import { removeDefaultExpandFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -85,7 +85,6 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			keyboardDragAndDropFeature,
 			renamingFeature,
 			removeDefaultExpandFeature,
-			nodeDropdownsFeature,
 			propMemoizationFeature,
 		],
 		getItemName: (item) => getItemName(item.getItemData()),

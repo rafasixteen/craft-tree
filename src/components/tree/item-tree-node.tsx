@@ -9,6 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/compon
 import { ButtonSpan } from '@/components/ui/button-span';
 import { useEffect, useRef } from 'react';
 import { useTreeNodes } from '@/providers';
+import { FolderDropdown, ItemDropdown, RecipeDropdown, CollectionDropdown } from '@/components/tree/dropdowns';
 import Link from 'next/link';
 
 interface ItemTreeNodeProps
@@ -110,7 +111,15 @@ function Name({ item }: { item: ItemInstance<Node> })
 
 function ActionsDropdown({ item }: { item: ItemInstance<Node> })
 {
-	const DropdownContent = item.getDropdownContent();
+	const dropdownComponentMap = {
+		collection: CollectionDropdown,
+		folder: FolderDropdown,
+		item: ItemDropdown,
+		recipe: RecipeDropdown,
+	} as const;
+
+	const node = item.getItemData();
+	const DropdownContent = dropdownComponentMap[node.type as keyof typeof dropdownComponentMap];
 
 	if (!DropdownContent) return null;
 
