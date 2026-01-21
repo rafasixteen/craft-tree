@@ -7,16 +7,14 @@ import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { createCollection } from '@/domain/collection/services/create-collection';
 import { Collection } from '@/domain/collection';
-import useIsMobile from '@/hooks/use-is-mobile';
 import { useCollectionsContext } from '@/providers/collections-context';
 
 export function Collections()
 {
 	const router = useRouter();
-	const { collections, activeCollection } = useCollectionsContext();
 
+	const { collections, activeCollection } = useCollectionsContext();
 	const [isPending, startTransition] = useTransition();
-	const { isMobile } = useIsMobile();
 
 	function setActiveCollection(collection: Collection)
 	{
@@ -61,7 +59,7 @@ export function Collections()
 					</div>
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" align="start" side={isMobile ? 'bottom' : 'right'} sideOffset={18}>
+			<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) rounded-lg" align="start" side="bottom" sideOffset={6}>
 				<DropdownMenuLabel className="text-muted-foreground text-xs">Collections</DropdownMenuLabel>
 				{collections.map((collection) => (
 					<DropdownMenuItem key={collection.slug} className="gap-2 p-2" onClick={() => setActiveCollection(collection)}>

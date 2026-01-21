@@ -6,8 +6,10 @@ import { findNodeByPath } from '@/domain/tree';
 import { FolderView } from '@/components/folder';
 import { ItemView } from '@/components/item';
 import { RecipeView } from '@/components/recipe';
+import { CollectionView } from '@/components';
 
 const componentMap = {
+	collection: CollectionView,
 	folder: FolderView,
 	item: ItemView,
 	recipe: RecipeView,
