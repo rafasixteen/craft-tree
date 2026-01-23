@@ -37,7 +37,7 @@ export function DesktopLayout({ children, path, defaultLayout, layoutId }: Deskt
 								<BreadcrumbTrail path={path} />
 							</div>
 
-							<div className="flex-1 min-h-0 p-4">{children}</div>
+							<div className="flex-1 min-h-0">{children}</div>
 						</div>
 					</div>
 				</ResizablePanel>
