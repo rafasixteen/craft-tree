@@ -15,7 +15,7 @@ import { Node } from '@/domain/tree';
 import { usePathname, useRouter } from 'next/navigation';
 import { renameItem } from '@/domain/item';
 import { updateRecipe } from '@/domain/recipe';
-import { getItem, getItemChildren, getItemName, isItemFolder } from './item-tree.utils';
+import { getItem, getItemChildren } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionsContext } from '@/providers/collections-context';
 import { useTreeNodes } from '@/providers';

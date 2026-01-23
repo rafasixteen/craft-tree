@@ -3,13 +3,13 @@ import { auth } from '@/auth';
 import { getUserId } from '@/domain/user';
 import { getUserCollections } from '@/domain/collection';
 import { findNodeByPath, getNodeMap } from '@/domain/tree';
-import { getRecipeById, getRecipeIngredients } from '@/domain/recipe';
+import { getRecipeById, getRecipeIngredients, getRecipeTreeData } from '@/domain/recipe';
 import { getFolderById } from '@/domain/folder';
 import { getItemById } from '@/domain/item';
 import { FolderView } from '@/components/folder';
 import { ItemView } from '@/components/item';
 import { RecipeView } from '@/components/recipe';
-import { CollectionView } from '@/components';
+import { CollectionView } from '@/components/collections';
 
 //TODO: Fix this logic
 
@@ -34,7 +34,7 @@ export default async function Page({ params }: PageProps)
 	if (!session?.user?.email) return notFound();
 
 	const userId = await getUserId(session.user.email);
-	const collections = await getUserCollections(userId);
+	const collections = await getUserCollections(userId!);
 
 	const collectionSlug = pathSegments[0];
 	const activeCollection = collections.find((collection) => collection.slug === collectionSlug);
@@ -59,7 +59,9 @@ export default async function Page({ params }: PageProps)
 		{
 			const item = await getItemById(node.id);
 			if (!item) return notFound();
-			return <ItemView item={item} />;
+
+			const { allRecipes, allIngredients, allItems } = await getRecipeTreeData(item.id);
+			return <ItemView item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />;
 		}
 		case 'recipe':
 		{

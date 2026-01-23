@@ -1,32 +1,6 @@
 import { Node } from '@/domain/tree';
 
 /**
- * Get the name of a node
- */
-export function getItemName(item: Node): string
-{
-	return item.name;
-}
-
-/**
- * Check if a node is a folder (can have children)
- */
-export function isItemFolder(item: Node): boolean
-{
-	if (item.type === 'folder' || item.type === 'collection')
-	{
-		return true;
-	}
-
-	if (item.type === 'item' && item.children && item.children.length > 0)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-/**
  * Get children IDs for a node
  */
 export function getItemChildren(id: string, nodes: Record<string, Node>): string[]

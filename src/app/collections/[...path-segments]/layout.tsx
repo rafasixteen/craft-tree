@@ -25,7 +25,7 @@ export default async function Layout({ children, params }: LayoutProps)
 	const session = await auth();
 
 	const userId = await getUserId(session!.user!.email!);
-	const collections = await getUserCollections(userId);
+	const collections = await getUserCollections(userId!);
 
 	const collectionSlug = pathSegments[0];
 	const activeCollection = collections.find((collection) => collection.slug === collectionSlug);
