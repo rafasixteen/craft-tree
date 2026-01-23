@@ -16,13 +16,19 @@ interface ItemDropdownProps
 export function ItemDropdown({ item }: ItemDropdownProps)
 {
 	const node = item.getItemData();
+	const tree = item.getTree();
+	const treeConfig = tree.getConfig();
+
 	const { refresh } = useTreeNodes();
 
 	const handleAddRecipe = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		await createRecipe({ name: 'New Recipe', itemId: node.id, quantity: 1, time: 1 });
+		const newRecipe = await createRecipe({ name: 'New Recipe', itemId: node.id, quantity: 1, time: 1 });
 		await refresh();
+
+		const newInstance = tree.getItemInstance(newRecipe.id);
+		treeConfig.onItemCreated?.(newInstance, item);
 	};
 
 	const handleRename = (e: React.MouseEvent) =>

@@ -15,6 +15,7 @@ interface RecipeDropdownProps
 export function RecipeDropdown({ item }: RecipeDropdownProps)
 {
 	const node = item.getItemData();
+
 	const { refresh } = useTreeNodes();
 
 	const handleRename = (e: React.MouseEvent) =>

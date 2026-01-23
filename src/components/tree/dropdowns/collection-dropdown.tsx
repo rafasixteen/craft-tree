@@ -18,20 +18,29 @@ interface CollectionDropdownProps
 export function CollectionDropdown({ item }: CollectionDropdownProps)
 {
 	const node = item.getItemData();
+	const tree = item.getTree();
+	const treeConfig = tree.getConfig();
+
 	const { refresh } = useTreeNodes();
 
 	const handleAddItem = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		await createItem({ name: 'New Item', collectionId: node.id, folderId: null });
+		const newItem = await createItem({ name: 'New Item', collectionId: node.id, folderId: null });
 		await refresh();
+
+		const newInstance = tree.getItemInstance(newItem.id);
+		treeConfig.onItemCreated?.(newInstance, item);
 	};
 
 	const handleAddFolder = async (e: React.MouseEvent) =>
 	{
 		e.stopPropagation();
-		await createFolder({ name: 'New Folder', collectionId: node.collectionId, parentFolderId: null });
+		const newFolder = await createFolder({ name: 'New Folder', collectionId: node.id, parentFolderId: null });
 		await refresh();
+
+		const newInstance = tree.getItemInstance(newFolder.id);
+		treeConfig.onItemCreated?.(newInstance, item);
 	};
 
 	const handleRename = (e: React.MouseEvent) =>

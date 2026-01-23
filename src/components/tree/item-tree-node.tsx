@@ -31,7 +31,7 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 	const isRenaming = item.isRenaming();
 
 	const path = getNodePath(nodes, node);
-	const href = '/collections/' + path.join('/');
+	const href = isRenaming ? '#' : '/collections/' + path.join('/');
 
 	const handlePressStart = () =>
 	{
@@ -53,18 +53,6 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 		}
 	};
 
-	const label = (
-		<TreeItemLabel onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} onTouchCancel={handlePressEnd}>
-			<div className="flex items-center justify-between flex-1 gap-2">
-				<span className="flex items-center gap-2">
-					<Icon item={item} />
-					<Name item={item} />
-				</span>
-				{!isRenaming && <ActionsDropdown item={item} isMobile={isMobile} dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} />}
-			</div>
-		</TreeItemLabel>
-	);
-
 	const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) =>
 	{
 		// Prevent link navigation when using modifier keys (shift/ctrl)
@@ -77,13 +65,17 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 
 	return (
 		<TreeItem className="data-[visible=false]:hidden group" data-visible={visible} item={item} asChild>
-			{isRenaming ? (
-				label
-			) : (
-				<Link href={href} onClick={handleLinkClick}>
-					{label}
-				</Link>
-			)}
+			<Link href={href} onClick={handleLinkClick}>
+				<TreeItemLabel onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} onTouchCancel={handlePressEnd}>
+					<div className="flex items-center justify-between flex-1 gap-2">
+						<span className="flex items-center gap-2">
+							<Icon item={item} />
+							<Name item={item} />
+						</span>
+						{!isRenaming && <ActionsDropdown item={item} isMobile={isMobile} dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} />}
+					</div>
+				</TreeItemLabel>
+			</Link>
 		</TreeItem>
 	);
 }
@@ -131,7 +123,7 @@ function Name({ item }: { item: ItemInstance<Node> })
 		}
 	}, [isRenaming]);
 
-	return isRenaming ? <Input {...item.getRenameInputProps()} ref={inputRef} autoFocus className="-my-0.5 h-6 px-1" /> : item.getItemName();
+	return isRenaming ? <Input {...item.getRenameInputProps()} ref={inputRef} autoFocus /> : <p className="text-xs">{item.getItemName()}</p>;
 }
 
 function ActionsDropdown({

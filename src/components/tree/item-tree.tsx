@@ -87,8 +87,36 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			removeDefaultExpandFeature,
 			propMemoizationFeature,
 		],
-		getItemName: (item) => getItemName(item.getItemData()),
-		isItemFolder: (item) => isItemFolder(item.getItemData()),
+		getItemName: (item) =>
+		{
+			const node = item.getItemData();
+			return node.name;
+		},
+		isItemFolder: (item) =>
+		{
+			const node = item.getItemData();
+
+			if (node.children && node.children.length > 0)
+			{
+				return true;
+			}
+
+			if (node.type === 'folder' || node.type === 'collection')
+			{
+				return true;
+			}
+
+			return false;
+		},
+		onItemCreated: (item, parent) =>
+		{
+			if (!parent.isExpanded())
+			{
+				parent.expand();
+			}
+
+			item.startRenaming();
+		},
 		isSearchMatchingItem: (search, item) =>
 		{
 			const itemName = item.getItemName().toLowerCase();
