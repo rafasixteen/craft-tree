@@ -3,7 +3,7 @@
 import { Item, getRecipes } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
-import { getRecipeIngredients } from '../../../domain/recipe/services/get-recipe-ingredients';
+import { getRecipeIngredients } from '@/domain/recipe/services/get-recipe-ingredients';
 import { itemsTable } from '@/db/schema';
 import { inArray } from 'drizzle-orm';
 import db from '@/db/client';

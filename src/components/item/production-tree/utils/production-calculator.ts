@@ -1,7 +1,7 @@
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
 import { Item } from '@/domain/item';
-import { RecipeTree, RecipeTreeNode } from '@/components/recipe';
+import { RecipeTree, RecipeTreeNode } from '@/components/item';
 
 /**
  * Production requirements for a single item/recipe
@@ -98,38 +98,43 @@ export class ProductionCalculator
 				requiredRatePerMinute,
 				producedPerCycle: 1,
 				cycleTimeSeconds: 1,
-				manufacturersNeeded: 1,
-				utilizationPercent: 100,
+				manufacturersNeeded: 0,
+				utilizationPercent: 0,
 				ingredientRequirements: [],
 			};
 			this.cachedRequirements.set(node.item.id, requirement);
 			return;
 		}
 
-		// This is a recipe/manufacturer
 		const recipe = node.recipe;
-		const cycleTimeSeconds = recipe.time;
-		const producedPerCycle = recipe.quantity;
+		const cycleTimeSeconds = recipe.time || 1;
+		const producedPerCycle = recipe.quantity || 1;
+		const ratePerSecond = requiredRatePerMinute / 60;
+		const producedPerSecond = producedPerCycle / cycleTimeSeconds;
+		const manufacturersNeeded = ratePerSecond / producedPerSecond;
+		const utilizationPercent = manufacturersNeeded % 1 === 0 ? 100 : (manufacturersNeeded % 1) * 100;
 
-		// Calculate how many manufacturers we need to produce at the target rate
-		const cyclesNeededPerMinute = (60 / cycleTimeSeconds) * (requiredRatePerMinute / producedPerCycle);
-		const maxCyclesPerMinute = 60 / cycleTimeSeconds;
-		const manufacturersNeeded = Math.ceil(cyclesNeededPerMinute / maxCyclesPerMinute);
-		const utilizationPercent = Math.min((cyclesNeededPerMinute / maxCyclesPerMinute) * 100, 100);
+		const ingredientRequirements: ProductionRequirement['ingredientRequirements'] = [];
 
-		// Calculate ingredient requirements
+		// Get ingredients for this recipe
 		const ingredients = this.allIngredients.get(recipe.id) || [];
-		const ingredientRequirements = ingredients.map((ing) =>
+		for (const ingredient of ingredients)
 		{
-			const ingredientItem = this.allItems.get(ing.itemId);
-			const quantityPerMinute = ing.quantity * cyclesNeededPerMinute;
-			return {
-				itemId: ing.itemId,
-				itemName: ingredientItem?.name || 'Unknown',
-				quantityPerMinute,
-				quantityPerSecond: quantityPerMinute / 60,
-			};
-		});
+			const ingredientRatePerMinute = (ingredient.quantity / producedPerCycle) * requiredRatePerMinute;
+			ingredientRequirements.push({
+				itemId: ingredient.itemId,
+				itemName: this.allItems.get(ingredient.itemId)?.name || ingredient.itemId,
+				quantityPerMinute: ingredientRatePerMinute,
+				quantityPerSecond: ingredientRatePerMinute / 60,
+			});
+
+			// Recursively calculate for children
+			const childNode = node.children.find((c) => c.item.id === ingredient.itemId);
+			if (childNode)
+			{
+				this.calculateNodeRequirements(childNode, ingredientRatePerMinute);
+			}
+		}
 
 		const requirement: ProductionRequirement = {
 			itemId: node.item.id,
@@ -145,15 +150,5 @@ export class ProductionCalculator
 		};
 
 		this.cachedRequirements.set(node.item.id, requirement);
-
-		// Recursively calculate for child nodes (ingredients)
-		for (const child of node.children)
-		{
-			const ingredientRequirement = ingredientRequirements.find((ir) => ir.itemId === child.item.id);
-			if (ingredientRequirement)
-			{
-				this.calculateNodeRequirements(child, ingredientRequirement.quantityPerMinute);
-			}
-		}
 	}
 }

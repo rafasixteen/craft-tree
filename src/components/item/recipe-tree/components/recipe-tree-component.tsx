@@ -5,7 +5,8 @@ import { Item } from '@/domain/item';
 import { Ingredient } from '@/domain/ingredient';
 import { Recipe } from '@/domain/recipe';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RecipeTree, RecipeTreeResult, RecipeTreeNode, RecipeTreeNodeComponent } from '@/components/recipe';
+import { RecipeTree, RecipeTreeResult, RecipeTreeNode } from '../utils/recipe-tree';
+import { RecipeTreeNodeComponent } from './recipe-tree-node-component';
 
 interface RecipeTreeProps
 {
@@ -53,7 +54,7 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 							/>
 						)}
 
-						{node.children.map((child, idx) => (
+						{node.children.map((child: any, idx: any) => (
 							<div key={`${child.item.id}-${idx}`} className="relative">
 								{/* Vertical connector to horizontal line */}
 								{node.children.length > 1 && <div className="absolute left-1/2 -top-4 w-0.5 h-4 bg-border -translate-x-1/2" />}
@@ -66,9 +67,9 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 		);
 	};
 
-	const totalCostItems = Array.from(treeResult.totalCost.values()).sort((a, b) => a.item.name.localeCompare(b.item.name));
+	const totalCostItems = Array.from(treeResult.totalCost.values()).sort((a: any, b: any) => a.item.name.localeCompare(b.item.name));
 
-	const leftoverItems = Array.from(treeResult.leftovers.values()).sort((a, b) => a.item.name.localeCompare(b.item.name));
+	const leftoverItems = Array.from(treeResult.leftovers.values()).sort((a: any, b: any) => a.item.name.localeCompare(b.item.name));
 
 	return (
 		<div className="w-full space-y-6">
@@ -98,15 +99,15 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 								{totalCostItems.map(({ item: costItem, quantity: qty }) => (
 									<div key={costItem.id} className="flex items-center gap-2 p-2 rounded bg-muted/50">
 										<div className="w-6 h-6 bg-background rounded border flex items-center justify-center text-xs font-mono">
-											{costItem.name.substring(0, 2).toUpperCase()}
+											{costItem.name.substring(0, 1).toUpperCase()}
 										</div>
-										<span className="flex-1 text-sm">{costItem.name}</span>
-										<span className="text-sm font-medium">x{qty}</span>
+										<span className="text-sm flex-1">{costItem.name}</span>
+										<span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-mono font-bold">{qty}</span>
 									</div>
 								))}
 							</div>
 						) : (
-							<p className="text-sm text-muted-foreground">No base ingredients required</p>
+							<p className="text-sm text-muted-foreground">No items needed</p>
 						)}
 					</CardContent>
 				</Card>
@@ -123,12 +124,12 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 						{leftoverItems.length > 0 ? (
 							<div className="space-y-2">
 								{leftoverItems.map(({ item: leftoverItem, quantity: qty }) => (
-									<div key={leftoverItem.id} className="flex items-center gap-2 p-2 rounded bg-muted/50">
+									<div key={leftoverItem.id} className="flex items-center gap-2 p-2 rounded bg-yellow-50 dark:bg-yellow-950">
 										<div className="w-6 h-6 bg-background rounded border flex items-center justify-center text-xs font-mono">
-											{leftoverItem.name.substring(0, 2).toUpperCase()}
+											{leftoverItem.name.substring(0, 1).toUpperCase()}
 										</div>
-										<span className="flex-1 text-sm">{leftoverItem.name}</span>
-										<span className="text-sm font-medium text-amber-600">x{qty}</span>
+										<span className="text-sm flex-1">{leftoverItem.name}</span>
+										<span className="text-xs bg-yellow-200 dark:bg-yellow-800 px-2 py-1 rounded font-mono font-bold">{qty}</span>
 									</div>
 								))}
 							</div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { RecipeTreeNode } from '@/components/recipe';
+import { RecipeTreeNode } from '../utils/recipe-tree';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

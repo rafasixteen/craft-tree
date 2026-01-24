@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Ingredient } from '@/domain/ingredient';
-import { RecipeTreeNode, RecipeTree } from '@/components/recipe';
-import { ProductionCalculator } from '@/components/recipe';
+import { RecipeTreeNode, RecipeTree } from '@/components/item';
+import { ProductionCalculator } from '../utils';
 
 interface ProductionFlowProps
 {
@@ -99,44 +99,27 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 									onClick={() => handleRecipeChange(node.item.id, node.selectedRecipeIndex === 0 ? availableRecipes - 1 : (node.selectedRecipeIndex || 0) - 1)}
 									className="p-1 hover:bg-muted rounded"
 								>
-									←
+									{'<'}
 								</button>
 								<span className="text-xs text-muted-foreground">
-									Recipe {(node.selectedRecipeIndex || 0) + 1}/{availableRecipes}
+									{(node.selectedRecipeIndex || 0) + 1} / {availableRecipes}
 								</span>
 								<button
 									onClick={() => handleRecipeChange(node.item.id, node.selectedRecipeIndex === availableRecipes - 1 ? 0 : (node.selectedRecipeIndex || 0) + 1)}
 									className="p-1 hover:bg-muted rounded"
 								>
-									→
+									{'>'}
 								</button>
 							</div>
 						)}
 					</CardContent>
 				</Card>
 
-				{/* Vertical connector */}
-				{node.children.length > 0 && <div className="w-0.5 h-4 bg-border" />}
-
-				{/* Child nodes */}
+				{/* Render children in a grid */}
 				{node.children.length > 0 && (
-					<div className="flex items-start gap-8 mt-4 relative">
-						{node.children.length > 1 && (
-							<div
-								className="absolute top-0 left-0 right-0 h-0.5 bg-border"
-								style={{
-									left: '50%',
-									transform: 'translateX(-50%) translateY(-1rem)',
-									width: `calc(100% - ${100 / node.children.length}%)`,
-								}}
-							/>
-						)}
-
+					<div className="flex items-start gap-8 mt-4">
 						{node.children.map((child, idx) => (
-							<div key={`${child.item.id}-${idx}`} className="relative">
-								{node.children.length > 1 && <div className="absolute left-1/2 -top-4 w-0.5 h-4 bg-border -translate-x-1/2" />}
-								{renderProductionNode(child)}
-							</div>
+							<div key={`${child.item.id}-${idx}`}>{renderProductionNode(child)}</div>
 						))}
 					</div>
 				)}
@@ -144,71 +127,43 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 		);
 	};
 
-	const treeResult = recipeTree.build();
+	if (productionRequirements.size === 0)
+	{
+		return (
+			<div className="w-full space-y-6">
+				<Card>
+					<CardHeader>
+						<CardTitle>Production Requirements</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p className="text-muted-foreground">No data available</p>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
 
 	return (
 		<div className="w-full space-y-6">
+			{/* Production Flow Visualization */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Production Requirements</CardTitle>
+				</CardHeader>
+				<CardContent className="overflow-x-auto">
+					<div className="flex justify-center min-w-max p-8">{renderProductionNode(recipeTree.build().root)}</div>
+				</CardContent>
+			</Card>
+
 			{/* Target Rate Input */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Production Target</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<div className="space-y-2">
-						<Label htmlFor="target-rate">
-							Target production rate for <strong>{item.name}</strong>
-						</Label>
-						<div className="flex items-center gap-2">
-							<Input
-								id="target-rate"
-								type="number"
-								min="0"
-								step="1"
-								value={targetRate}
-								onChange={(e) => setTargetRate(Math.max(0, parseInt(e.target.value) || 0))}
-								className="max-w-xs"
-							/>
-							<span className="text-sm text-muted-foreground">units per minute</span>
-						</div>
-					</div>
-				</CardContent>
-			</Card>
-
-			{/* Production Tree */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Production Chain</CardTitle>
-				</CardHeader>
-				<CardContent className="overflow-x-auto">
-					<div className="flex justify-center min-w-max p-8">{renderProductionNode(treeResult.root)}</div>
-				</CardContent>
-			</Card>
-
-			{/* Requirements Summary */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Summary</CardTitle>
+					<CardTitle>Target Rate</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div className="space-y-3">
-						{Array.from(productionRequirements.values()).map((req) => (
-							<div key={req.itemId} className="flex items-center justify-between p-2 rounded bg-muted/50">
-								<div>
-									<p className="font-semibold text-sm">{req.itemName}</p>
-									{req.recipeName && <p className="text-xs text-muted-foreground">{req.recipeName}</p>}
-								</div>
-								<div className="text-right">
-									{req.recipeId ? (
-										<>
-											<p className="font-mono font-bold">{Math.ceil(req.manufacturersNeeded)} manufact.</p>
-											<p className="text-xs text-muted-foreground">{req.utilizationPercent.toFixed(0)}% utilized</p>
-										</>
-									) : (
-										<p className="font-mono font-bold">{req.requiredRatePerMinute.toFixed(1)}/min</p>
-									)}
-								</div>
-							</div>
-						))}
+					<div className="space-y-2">
+						<Label>Units per Minute</Label>
+						<Input type="number" value={targetRate} onChange={(e) => setTargetRate(Number(e.target.value))} min="0" step="0.1" />
 					</div>
 				</CardContent>
 			</Card>

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
-import { RecipeTreeComponent, ProductionFlow } from '@/components/recipe';
+import { RecipeTreeComponent, ProductionFlow } from '@/components/item';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Ingredient } from '@/domain/ingredient';
