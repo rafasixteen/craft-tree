@@ -1,9 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
 import { RecipeTreeComponent } from '@/components/recipe-tree';
+import { ProductionFlow } from '@/components/recipe-tree';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Ingredient } from '@/domain/ingredient';
 
 interface ItemViewProps
@@ -16,6 +19,7 @@ interface ItemViewProps
 
 export function ItemView({ item, allRecipes, allIngredients, allItems }: ItemViewProps)
 {
+	const [activeTab, setActiveTab] = useState('tree');
 	const hasRecipes = allRecipes.has(item.id) && (allRecipes.get(item.id)?.length || 0) > 0;
 
 	return (
@@ -29,7 +33,22 @@ export function ItemView({ item, allRecipes, allIngredients, allItems }: ItemVie
 				</CardContent>
 			</Card>
 
-			{hasRecipes && <RecipeTreeComponent item={item} quantity={1} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />}
+			{hasRecipes && (
+				<Tabs value={activeTab} onValueChange={setActiveTab}>
+					<TabsList>
+						<TabsTrigger value="tree">Recipe Tree</TabsTrigger>
+						<TabsTrigger value="production">Production</TabsTrigger>
+					</TabsList>
+
+					<TabsContent value="tree" className="space-y-6">
+						<RecipeTreeComponent item={item} quantity={1} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
+					</TabsContent>
+
+					<TabsContent value="production" className="space-y-6">
+						<ProductionFlow item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
+					</TabsContent>
+				</Tabs>
+			)}
 		</div>
 	);
 }

@@ -5,14 +5,9 @@ import { Recipe } from '@/domain/recipe';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export async function getRecipeById(id: string): Promise<Recipe | null>
+export async function getRecipeById(recipeId: string): Promise<Recipe>
 {
-	const existingRecipe = await db
-		.select()
-		.from(recipesTable)
-		.where(eq(recipesTable.id, id))
-		.limit(1)
-		.then((rows) => rows[0] || null);
+	const [recipe] = await db.select().from(recipesTable).where(eq(recipesTable.id, recipeId)).limit(1);
 
-	return existingRecipe;
+	return recipe;
 }
