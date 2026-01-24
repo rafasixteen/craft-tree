@@ -1,6 +1,6 @@
 'use client';
 
-import { RecipeTreeNode as TreeNode } from '@/domain/recipe';
+import { RecipeTreeNode } from '@/components/recipe';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 
 interface RecipeTreeNodeProps
 {
-	node: TreeNode;
+	node: RecipeTreeNode;
 	availableRecipes?: number;
 	onRecipeChange?: (itemId: string, recipeIndex: number) => void;
 }

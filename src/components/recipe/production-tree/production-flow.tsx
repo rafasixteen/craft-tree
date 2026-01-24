@@ -2,12 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import { Item } from '@/domain/item';
-import { Recipe, RecipeTree } from '@/domain/recipe';
+import { Recipe } from '@/domain/recipe';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Ingredient } from '@/domain/ingredient';
-import { RecipeTreeNode } from '@/domain/recipe';
+import { RecipeTreeNode, RecipeTree } from '@/components/recipe';
 import { ProductionCalculator } from '@/components/recipe';
 
 interface ProductionFlowProps

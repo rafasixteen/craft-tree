@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Item } from '@/domain/item';
 import { Ingredient } from '@/domain/ingredient';
-import { Recipe, RecipeTree, RecipeTreeResult, RecipeTreeNode } from '@/domain/recipe';
+import { Recipe } from '@/domain/recipe';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RecipeTreeNodeComponent } from './recipe-tree-node';
+import { RecipeTree, RecipeTreeResult, RecipeTreeNode, RecipeTreeNodeComponent } from '@/components/recipe';
 
 interface RecipeTreeProps
 {

@@ -3,13 +3,14 @@ import { auth } from '@/auth';
 import { getUserId } from '@/domain/user';
 import { getUserCollections } from '@/domain/collection';
 import { findNodeByPath, getNodeMap } from '@/domain/tree';
-import { getRecipeById, getRecipeIngredients, getRecipeTreeData } from '@/domain/recipe';
+import { getRecipeById, getRecipeIngredients } from '@/domain/recipe';
 import { getFolderById } from '@/domain/folder';
 import { getItemById } from '@/domain/item';
 import { FolderView } from '@/components/folder';
 import { ItemView } from '@/components/item';
 import { RecipeView } from '@/components/recipe';
 import { CollectionView } from '@/components/collections';
+import { getRecipeTreeData } from '@/components/recipe';
 
 //TODO: Fix this logic
 
