@@ -9,6 +9,7 @@ import {
 	applyEdgeChanges,
 	type Node,
 	type Edge,
+	type NodeTypes,
 	type FitViewOptions,
 	type OnConnect,
 	type OnNodesChange,
@@ -20,13 +21,18 @@ import {
 	Background,
 } from '@xyflow/react';
 import { useTheme } from 'next-themes';
+import { FlowNode } from '@/components/item/test-flow';
 
 const initialNodes: Node[] = [
-	{ id: '1', data: { label: 'Node 1' }, position: { x: 5, y: 5 } },
-	{ id: '2', data: { label: 'Node 2' }, position: { x: 5, y: 100 } },
+	{ id: '1', data: { label: 'Node 1' }, position: { x: 5, y: 5 }, type: 'flowNode' },
+	{ id: '2', data: { label: 'Node 2' }, position: { x: 5, y: 100 }, type: 'flowNode' },
 ];
 
 const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }];
+
+const nodeTypes: NodeTypes = {
+	flowNode: FlowNode,
+};
 
 const fitViewOptions: FitViewOptions = {
 	padding: 0.2,
@@ -68,6 +74,7 @@ export function Flow()
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
+				nodeTypes={nodeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
