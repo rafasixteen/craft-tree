@@ -1,7 +1,7 @@
 'use client';
 
 import '@xyflow/react/dist/style.css';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
 	ReactFlow,
 	addEdge,
@@ -44,12 +44,24 @@ const onNodeDrag: OnNodeDrag = (_, node) =>
 export function Flow()
 {
 	const { theme } = useTheme();
+	const [mounted, setMounted] = useState(false);
 	const [nodes, setNodes] = useState<Node[]>(initialNodes);
 	const [edges, setEdges] = useState<Edge[]>(initialEdges);
+
+	useEffect(() =>
+	{
+		setMounted(true);
+	}, []);
 
 	const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
 	const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
 	const onConnect: OnConnect = useCallback((connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
+
+	// Prevent hydration mismatch by only rendering theme-dependent content after mount
+	if (!mounted)
+	{
+		return <div style={{ width: '100%', height: '100%' }} />;
+	}
 
 	return (
 		<div style={{ width: '100%', height: '100%' }}>

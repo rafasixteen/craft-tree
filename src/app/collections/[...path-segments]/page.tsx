@@ -7,9 +7,10 @@ import { getRecipeById, getRecipeIngredients } from '@/domain/recipe';
 import { getFolderById } from '@/domain/folder';
 import { getItemById } from '@/domain/item';
 import { FolderView } from '@/components/folder';
-import { ItemView, getRecipeTreeData } from '@/components/item';
+import { ItemView } from '@/components/item';
 import { RecipeView } from '@/components/recipe';
 import { CollectionView } from '@/components/collections';
+import { getRecipeTreeData } from '@/components/item/recipe-tree';
 
 //TODO: Fix this logic
 

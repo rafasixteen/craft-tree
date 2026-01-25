@@ -1,7 +1,7 @@
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
 import { Item } from '@/domain/item';
-import { RecipeTree, RecipeTreeNode } from '@/components/item';
+import { RecipeTree, RecipeTreeNode } from '@/components/item/recipe-tree';
 
 /**
  * Production requirements for a single item/recipe

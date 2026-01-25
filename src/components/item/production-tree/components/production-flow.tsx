@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Ingredient } from '@/domain/ingredient';
-import { RecipeTreeNode, RecipeTree } from '@/components/item';
-import { ProductionCalculator } from '../utils';
+import { RecipeTreeNode, RecipeTree } from '@/components/item/recipe-tree';
+import { ProductionCalculator } from '@/components/item/production-tree';
 
 interface ProductionFlowProps
 {

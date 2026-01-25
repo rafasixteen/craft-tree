@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
-import { RecipeTreeFlow, ProductionFlowReact } from '@/components/item';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Ingredient } from '@/domain/ingredient';
-import { Flow } from '@/components/item';
+import { ProductionFlowReact } from '@/components/item/production-tree';
+import { RecipeTreeFlow } from '@/components/item/recipe-tree';
+import { Flow } from '@/components/item/test-flow';
 
 type ItemViewTabs = 'recipe-tree' | 'production-tree' | 'test-flow';
 
