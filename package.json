@@ -21,6 +21,7 @@
 		"@headless-tree/core": "^1.6.2",
 		"@headless-tree/react": "^1.6.2",
 		"@libsql/client": "^0.17.0",
+		"@xyflow/react": "^12.10.0",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"dotenv": "^17.2.3",

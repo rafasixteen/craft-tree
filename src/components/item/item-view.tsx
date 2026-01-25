@@ -3,10 +3,13 @@
 import { useState } from 'react';
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
-import { RecipeTreeComponent, ProductionFlow } from '@/components/item';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RecipeTreeFlow, ProductionFlowReact } from '@/components/item';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Ingredient } from '@/domain/ingredient';
+import { Flow } from '@/components/item';
+
+type ItemViewTabs = 'recipe-tree' | 'production-tree' | 'test-flow';
 
 interface ItemViewProps
 {
@@ -18,36 +21,33 @@ interface ItemViewProps
 
 export function ItemView({ item, allRecipes, allIngredients, allItems }: ItemViewProps)
 {
-	const [activeTab, setActiveTab] = useState('tree');
-	const hasRecipes = allRecipes.has(item.id) && (allRecipes.get(item.id)?.length || 0) > 0;
+	const [tab, setTab] = useState<ItemViewTabs>('test-flow');
 
 	return (
-		<div className="space-y-6">
-			<Card>
+		<Card className="h-full">
+			<Tabs className="h-full" value={tab} onValueChange={(value) => setTab(value as ItemViewTabs)}>
 				<CardHeader>
-					<CardTitle>{item.name}</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<p className="text-sm text-muted-foreground">{hasRecipes ? 'This item can be crafted using the recipes below.' : 'This item has no recipes.'}</p>
-				</CardContent>
-			</Card>
-
-			{hasRecipes && (
-				<Tabs value={activeTab} onValueChange={setActiveTab}>
-					<TabsList>
-						<TabsTrigger value="tree">Recipe Tree</TabsTrigger>
-						<TabsTrigger value="production">Production</TabsTrigger>
+					<TabsList variant="line">
+						<TabsTrigger value="recipe-tree">Recipe Tree</TabsTrigger>
+						<TabsTrigger value="production-tree">Production</TabsTrigger>
+						<TabsTrigger value="test-flow">Test Flow</TabsTrigger>
 					</TabsList>
+				</CardHeader>
 
-					<TabsContent value="tree" className="space-y-6">
-						<RecipeTreeComponent item={item} quantity={1} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
+				<CardContent className="h-full">
+					<TabsContent value="recipe-tree" className="h-full">
+						<RecipeTreeFlow item={item} quantity={1} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
 					</TabsContent>
 
-					<TabsContent value="production" className="space-y-6">
-						<ProductionFlow item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
+					<TabsContent value="production-tree" className="h-full">
+						<ProductionFlowReact item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
 					</TabsContent>
-				</Tabs>
-			)}
-		</div>
+
+					<TabsContent value="test-flow" className="h-full">
+						<Flow />
+					</TabsContent>
+				</CardContent>
+			</Tabs>
+		</Card>
 	);
 }
