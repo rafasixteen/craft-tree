@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Ingredient } from '@/domain/ingredient';
 import { ProductionFlowReact } from '@/components/item/production-tree';
 import { RecipeTreeFlow } from '@/components/item/recipe-tree';
-import { Flow } from '@/components/item/test-flow';
+import { RecipeTreeFlowV2 } from '@/components/item/recipe-tree-v2';
 
 type ItemViewTabs = 'recipe-tree' | 'production-tree' | 'test-flow';
 
@@ -45,7 +45,7 @@ export function ItemView({ item, allRecipes, allIngredients, allItems }: ItemVie
 					</TabsContent>
 
 					<TabsContent value="test-flow" className="h-full">
-						<Flow />
+						<RecipeTreeFlowV2 item={item} />
 					</TabsContent>
 				</CardContent>
 			</Tabs>
