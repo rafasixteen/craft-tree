@@ -25,30 +25,26 @@ export function ItemView({ item, allRecipes, allIngredients, allItems }: ItemVie
 	const [tab, setTab] = useState<ItemViewTabs>('test-flow');
 
 	return (
-		<Card className="h-full">
-			<Tabs className="h-full" value={tab} onValueChange={(value) => setTab(value as ItemViewTabs)}>
-				<CardHeader>
-					<TabsList variant="line">
-						<TabsTrigger value="recipe-tree">Recipe Tree</TabsTrigger>
-						<TabsTrigger value="production-tree">Production</TabsTrigger>
-						<TabsTrigger value="test-flow">Test Flow</TabsTrigger>
-					</TabsList>
-				</CardHeader>
+		<Tabs className="h-full" value={tab} onValueChange={(value) => setTab(value as ItemViewTabs)}>
+			<div className="flex items-center border-b px-1.75">
+				<TabsList variant="line">
+					<TabsTrigger value="recipe-tree">Recipe Tree</TabsTrigger>
+					<TabsTrigger value="production-tree">Production</TabsTrigger>
+					<TabsTrigger value="test-flow">Test Flow</TabsTrigger>
+				</TabsList>
+			</div>
 
-				<CardContent className="h-full">
-					<TabsContent value="recipe-tree" className="h-full">
-						<RecipeTreeFlow item={item} quantity={1} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
-					</TabsContent>
+			<TabsContent value="recipe-tree" className="h-full">
+				<RecipeTreeFlow item={item} quantity={1} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
+			</TabsContent>
 
-					<TabsContent value="production-tree" className="h-full">
-						<ProductionFlowReact item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
-					</TabsContent>
+			<TabsContent value="production-tree" className="h-full">
+				<ProductionFlowReact item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />
+			</TabsContent>
 
-					<TabsContent value="test-flow" className="h-full">
-						<RecipeTreeFlowV2 item={item} />
-					</TabsContent>
-				</CardContent>
-			</Tabs>
-		</Card>
+			<TabsContent value="test-flow" className="h-full">
+				<RecipeTreeFlowV2 item={item} />
+			</TabsContent>
+		</Tabs>
 	);
 }

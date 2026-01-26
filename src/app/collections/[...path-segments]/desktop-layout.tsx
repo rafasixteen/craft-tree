@@ -4,6 +4,9 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { Sidebar } from '@/components/layout';
 import { BreadcrumbTrail } from '@/components';
 
+const SIDEBAR_DEFAULT_WIDTH_PERCENTAGE = 45;
+const CONTENT_DEFAULT_WIDTH_PERCENTAGE = 55;
+
 interface DesktopLayoutProps
 {
 	children: React.ReactNode;
@@ -19,26 +22,24 @@ export function DesktopLayout({ children, path, defaultLayout, layoutId }: Deskt
 		document.cookie = `${layoutId}=${JSON.stringify(layout)}; path=/; max-age=31536000`;
 	}
 
+	const sidebarSize = defaultLayout?.[0] ?? SIDEBAR_DEFAULT_WIDTH_PERCENTAGE;
+	const contentSize = defaultLayout?.[1] ?? CONTENT_DEFAULT_WIDTH_PERCENTAGE;
+
 	return (
 		<div className="hidden md:flex h-full w-full flex-col">
 			<ResizablePanelGroup direction="horizontal" className="flex-1" onLayout={onLayoutChanged}>
 				{/* Left panel – sidebar */}
-				<ResizablePanel collapsible minSize={20} defaultSize={defaultLayout?.[0] ?? 45}>
+				<ResizablePanel collapsible minSize={20} defaultSize={sidebarSize}>
 					<Sidebar />
 				</ResizablePanel>
 
 				<ResizableHandle withHandle />
 
 				{/* Right panel – page content */}
-				<ResizablePanel defaultSize={defaultLayout?.[1] ?? 55} minSize={30}>
-					<div className="h-full overflow-y-auto no-scrollbar">
-						<div className="flex h-full flex-col min-h-0">
-							<div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-								<BreadcrumbTrail path={path} />
-							</div>
-
-							<div className="flex-1 min-h-0">{children}</div>
-						</div>
+				<ResizablePanel defaultSize={contentSize} minSize={30}>
+					<div className="flex h-full flex-col overflow-y-auto no-scrollbar min-h-0">
+						<BreadcrumbTrail path={path} className="flex h-10 items-center border-b px-4" />
+						<div className="flex-1 min-h-0">{children}</div>
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>
