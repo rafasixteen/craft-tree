@@ -91,8 +91,6 @@ export function RecipeTreeFlowV2({ item }: RecipeTreeFlowProps)
 
 export function buildNode(itemId: string, position = { x: 0, y: 0 }): Node<RecipeTreeNodeData>
 {
-	console.log(`Building node for item ID: ${itemId} at position (${position.x}, ${position.y})`);
-
 	return {
 		id: itemId,
 		type: 'flow-node',

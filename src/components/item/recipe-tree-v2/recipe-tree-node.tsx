@@ -37,7 +37,7 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 
 	useEffect(() =>
 	{
-		if (!item || !recipe || !recipes || !ingredients) return;
+		if (!ingredients) return;
 
 		for (const ingredient of ingredients)
 		{
@@ -49,9 +49,9 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 			const newNode = buildNode(ingredient.itemId, position);
 			flow.addNodes(newNode);
 		}
-	}, [item, recipe, recipes, ingredients]);
+	}, [ingredients]);
 
-	if (!item || !recipe || !recipes || !ingredients)
+	if (!item)
 	{
 		return null;
 	}
@@ -68,8 +68,6 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 		flow.updateNodeData(itemId, { itemId, recipeIndex: nextIndex });
 	};
 
-	// console.log('item', item, 'recipe', recipe, 'ingredients', ingredients);
-
 	return (
 		<Card className="w-40">
 			<CardHeader className="flex flex-col gap-2">
@@ -79,32 +77,36 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 						<p className="font-semibold text-sm">{item.name}</p>
 					</div>
 				</div>
-				<div>
-					<p className="text-xs text-muted-foreground truncate">{recipe ? recipe.name : ''}</p>
-					<p className="text-xs text-muted-foreground">
-						[{recipeIndex + 1}/{recipes.length}]
-					</p>
-				</div>
+				{recipes && (
+					<div>
+						<p className="text-xs text-muted-foreground truncate">{recipe ? recipe.name : ''}</p>
+						<p className="text-xs text-muted-foreground">
+							[{recipeIndex + 1}/{recipes.length}]
+						</p>
+					</div>
+				)}
 				<div className="flex items-center justify-between gap-2">
-					<Button variant="ghost" onClick={handlePreviousRecipe} size="sm">
+					<Button variant="ghost" onClick={handlePreviousRecipe} size="icon">
 						<ArrowLeftIcon />
 					</Button>
-					<Button variant="ghost" onClick={handleNextRecipe} size="sm">
+					<Button variant="ghost" onClick={handleNextRecipe} size="icon">
 						<ArrowRightIcon />
 					</Button>
 				</div>
-				<div className="border-t pt-2">
-					<p className="text-xs font-semibold mb-1">Ingredients:</p>
-					<div className="space-y-1">
-						{ingredients.map((ingredient) => (
-							<div key={ingredient.id} className="text-xs text-muted-foreground">
-								<span>
-									{nodes[ingredient.itemId]?.name} x{ingredient.quantity}
-								</span>
-							</div>
-						))}
+				{ingredients && (
+					<div className="border-t pt-2">
+						<p className="text-xs font-semibold mb-1">Ingredients:</p>
+						<div className="space-y-1">
+							{ingredients.map((ingredient) => (
+								<div key={ingredient.id} className="text-xs text-muted-foreground">
+									<span>
+										{nodes[ingredient.itemId]?.name} x{ingredient.quantity}
+									</span>
+								</div>
+							))}
+						</div>
 					</div>
-				</div>
+				)}
 			</CardHeader>
 		</Card>
 	);
