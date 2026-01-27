@@ -53,13 +53,6 @@ export function RecipeTreeFlowV2({ item }: RecipeTreeFlowProps)
 	const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-	const buildNode = (item: Item): Node<RecipeTreeNodeData> => ({
-		id: item.id,
-		type: 'flow-node',
-		data: { item: item.id },
-		position: { x: 0, y: 0 },
-	});
-
 	useEffect(() =>
 	{
 		setMounted(true);
@@ -67,7 +60,7 @@ export function RecipeTreeFlowV2({ item }: RecipeTreeFlowProps)
 
 	useEffect(() =>
 	{
-		setNodes((nds) => nds.concat(buildNode(item)));
+		setNodes((nds) => nds.concat(buildNode(item.id, { x: 0, y: 0 })));
 	}, [item]);
 
 	if (!mounted)
@@ -94,4 +87,16 @@ export function RecipeTreeFlowV2({ item }: RecipeTreeFlowProps)
 			</ReactFlow>
 		</div>
 	);
+}
+
+export function buildNode(itemId: string, position = { x: 0, y: 0 }): Node<RecipeTreeNodeData>
+{
+	console.log(`Building node for item ID: ${itemId} at position (${position.x}, ${position.y})`);
+
+	return {
+		id: itemId,
+		type: 'flow-node',
+		data: { itemId: itemId, recipeIndex: 0 },
+		position,
+	};
 }

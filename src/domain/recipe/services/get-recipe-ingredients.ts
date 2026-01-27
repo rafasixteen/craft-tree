@@ -7,5 +7,7 @@ import db from '@/db/client';
 
 export async function getRecipeIngredients(recipeId: string): Promise<Ingredient[]>
 {
+	console.log(`Fetching ingredients for recipe ID: ${recipeId}`);
+
 	return await db.select().from(ingredientsTable).where(eq(ingredientsTable.recipeId, recipeId));
 }
