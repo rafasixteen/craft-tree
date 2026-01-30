@@ -9,12 +9,12 @@ import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { renameCollection } from '@/domain/collection';
-import { renameFolder } from '@/domain/folder';
+import { renameFolder, reorderFolders } from '@/domain/folder';
 import { nameSchema } from '@/domain/shared';
 import { Node } from '@/domain/tree';
 import { usePathname, useRouter } from 'next/navigation';
-import { renameItem } from '@/domain/item';
-import { updateRecipe } from '@/domain/recipe';
+import { renameItem, reorderItems } from '@/domain/item';
+import { reorderRecipes, updateRecipe } from '@/domain/recipe';
 import { getItem, getItemChildren } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionsContext } from '@/providers/collections-context';
@@ -39,7 +39,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	const pathname = usePathname();
 
 	const { activeCollection: collection } = useCollectionsContext();
-	const { nodes, mutateNodes } = useTreeNodes();
+	const { nodes, mutateNodes, refresh } = useTreeNodes();
 
 	const [expandedItems, setExpandedItems] = useLocalStorage<string[]>(`tree-expanded-items-${collection.id}`, []);
 
@@ -122,9 +122,77 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			const itemName = item.getItemName().toLowerCase();
 			return itemName.includes(search.toLowerCase());
 		},
+		canDrop(items, target)
+		{
+			const targetNode = target.item.getItemData();
+
+			for (const item of items)
+			{
+				const itemNode = item.getItemData();
+
+				if (itemNode.type === 'recipe' && targetNode.id !== item.getParent()?.getId())
+				{
+					return false;
+				}
+
+				if (itemNode.type === 'item' && targetNode.type === 'item')
+				{
+					return false;
+				}
+
+				if (itemNode.type === 'item' && targetNode.type === 'recipe')
+				{
+					return false;
+				}
+			}
+
+			return true;
+		},
 		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
 		{
 			updateNode({ nodeId: parentItem.getId(), children: newChildrenIds });
+
+			const parentNode = parentItem.getItemData();
+			const childrenNodes = newChildrenIds.map((id) => nodes[id]);
+
+			const recipeIds: string[] = [];
+			const itemIds: string[] = [];
+			const folderIds: string[] = [];
+
+			for (const node of childrenNodes)
+			{
+				switch (node.type)
+				{
+					case 'recipe':
+						recipeIds.push(node.id);
+						break;
+					case 'item':
+						itemIds.push(node.id);
+						break;
+					case 'folder':
+						folderIds.push(node.id);
+						break;
+					default:
+						throw new Error(`Cannot move node of type '${node.type}'`);
+				}
+			}
+
+			console.log('Reordering in parent', parentNode.name, {
+				recipes: recipeIds.map((id) => nodes[id].name),
+				items: itemIds.map((id) => nodes[id].name),
+				folders: folderIds.map((id) => nodes[id].name),
+			});
+
+			const parentNodeId = parentNode.type === 'collection' ? null : parentNode.id;
+
+			Promise.all([
+				recipeIds.length ? reorderRecipes({ itemId: parentNode.id, orderedRecipeIds: recipeIds }) : null,
+				itemIds.length ? reorderItems({ folderId: parentNodeId, orderedItemIds: itemIds }) : null,
+				folderIds.length ? reorderFolders({ parentFolderId: parentNodeId, orderedFolderIds: folderIds }) : null,
+			]).then(() =>
+			{
+				refresh();
+			});
 		}),
 		onRename: async (item, newName) =>
 		{

@@ -13,8 +13,10 @@ export const recipesTable = pgTable(
 			.references(() => itemsTable.id, { onDelete: 'cascade' })
 			.notNull(),
 
+		order: integer().notNull(),
+
 		quantity: integer().notNull(),
 		time: integer().notNull(),
 	},
-	(table) => [uniqueIndex().on(table.itemId, table.slug)],
+	(table) => [uniqueIndex().on(table.itemId, table.slug), uniqueIndex().on(table.itemId, table.order)],
 );

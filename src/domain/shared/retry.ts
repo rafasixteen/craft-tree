@@ -14,8 +14,8 @@ export async function withUniqueSlugRetry<T>(baseSlug: string, operation: Unique
 		}
 		catch (error: any)
 		{
-			// Postgres unique constraint violation
-			if (error.cause.code === '23505')
+			// Postgres unique slug constraint violation
+			if (error.cause.code === '23505' && error.cause.constraint.includes('slug'))
 			{
 				suffix++;
 				continue;
