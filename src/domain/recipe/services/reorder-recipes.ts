@@ -4,22 +4,28 @@ import { recipesTable } from '@/db/schema';
 import { and, eq } from 'drizzle-orm';
 import db from '@/db/client';
 
+interface RecipeOrder
+{
+	id: string;
+	order: number;
+}
+
 interface ReorderRecipesArgs
 {
 	itemId: string;
-	orderedRecipeIds: string[];
+	recipeOrders: RecipeOrder[];
 }
 
-export async function reorderRecipes({ itemId, orderedRecipeIds }: ReorderRecipesArgs)
+export async function reorderRecipes({ itemId, recipeOrders }: ReorderRecipesArgs)
 {
 	await db.transaction(async (tx) =>
 	{
-		for (let i = 0; i < orderedRecipeIds.length; i++)
+		for (const { id, order } of recipeOrders)
 		{
 			await tx
 				.update(recipesTable)
-				.set({ order: i })
-				.where(and(eq(recipesTable.id, orderedRecipeIds[i]), eq(recipesTable.itemId, itemId)));
+				.set({ order })
+				.where(and(eq(recipesTable.id, id), eq(recipesTable.itemId, itemId)));
 		}
 	});
 }

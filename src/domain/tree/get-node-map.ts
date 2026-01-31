@@ -7,6 +7,7 @@ export async function getNodeMap(collection: Collection): Promise<NodeMap>
 	{
 		const rows = await getTreeNodes(collection.id);
 		const nodes: NodeMap = {};
+		const orderMap = new Map<string, number>();
 
 		// Initialize root nodes
 		const collectionNode = createNode(collection.id, collection.name, collection.slug, 'collection', collection);
@@ -26,6 +27,11 @@ export async function getNodeMap(collection: Collection): Promise<NodeMap>
 			if (row.folder_id && !nodes[row.folder_id])
 			{
 				nodes[row.folder_id] = createNode(row.folder_id, row.folder_name, row.folder_slug, 'folder', collection);
+				orderMap.set(row.folder_id, row.folder_order);
+			}
+			else if (row.folder_id && !orderMap.has(row.folder_id))
+			{
+				orderMap.set(row.folder_id, row.folder_order);
 			}
 
 			// Track folder hierarchy
@@ -42,12 +48,28 @@ export async function getNodeMap(collection: Collection): Promise<NodeMap>
 			if (row.item_id && !nodes[row.item_id])
 			{
 				nodes[row.item_id] = createNode(row.item_id, row.item_name!, row.item_slug!, 'item', collection);
+				if (row.item_order !== null)
+				{
+					orderMap.set(row.item_id, row.item_order);
+				}
+			}
+			else if (row.item_id && row.item_order !== null && !orderMap.has(row.item_id))
+			{
+				orderMap.set(row.item_id, row.item_order);
 			}
 
 			// Create recipe node if needed
 			if (row.recipe_id && !nodes[row.recipe_id])
 			{
 				nodes[row.recipe_id] = createNode(row.recipe_id, row.recipe_name!, row.recipe_slug!, 'recipe', collection);
+				if (row.recipe_order !== null)
+				{
+					orderMap.set(row.recipe_id, row.recipe_order);
+				}
+			}
+			else if (row.recipe_id && row.recipe_order !== null && !orderMap.has(row.recipe_id))
+			{
+				orderMap.set(row.recipe_id, row.recipe_order);
 			}
 		}
 
@@ -84,6 +106,32 @@ export async function getNodeMap(collection: Collection): Promise<NodeMap>
 			const item = nodes[row.item_id];
 			if (item) addChild(item, row.recipe_id);
 		}
+
+		const compareChildren = (a: string, b: string) =>
+		{
+			const orderA = orderMap.get(a);
+			const orderB = orderMap.get(b);
+
+			if (orderA !== undefined && orderB !== undefined && orderA !== orderB)
+			{
+				return orderA - orderB;
+			}
+
+			if (orderA === undefined && orderB !== undefined) return 1;
+			if (orderA !== undefined && orderB === undefined) return -1;
+
+			const nameA = nodes[a]?.name ?? '';
+			const nameB = nodes[b]?.name ?? '';
+			return nameA.localeCompare(nameB);
+		};
+
+		Object.values(nodes).forEach((node) =>
+		{
+			if (node.children && node.children.length > 1)
+			{
+				node.children.sort(compareChildren);
+			}
+		});
 
 		return nodes;
 	}

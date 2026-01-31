@@ -18,5 +18,8 @@ export const recipesTable = pgTable(
 		quantity: integer().notNull(),
 		time: integer().notNull(),
 	},
-	(table) => [uniqueIndex().on(table.itemId, table.slug), uniqueIndex().on(table.itemId, table.order)],
+	(table) => [
+		uniqueIndex().on(table.itemId, table.slug),
+		// uniqueIndex().on(table.itemId, table.order)
+	],
 );

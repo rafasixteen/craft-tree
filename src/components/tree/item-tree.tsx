@@ -9,11 +9,11 @@ import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { renameCollection } from '@/domain/collection';
-import { renameFolder, reorderFolders } from '@/domain/folder';
+import { renameFolder, moveAndReorderFolders } from '@/domain/folder';
 import { nameSchema } from '@/domain/shared';
 import { Node } from '@/domain/tree';
 import { usePathname, useRouter } from 'next/navigation';
-import { renameItem, reorderItems } from '@/domain/item';
+import { renameItem, moveAndReorderItems } from '@/domain/item';
 import { reorderRecipes, updateRecipe } from '@/domain/recipe';
 import { getItem, getItemChildren } from './item-tree.utils';
 import { getVisibleItems, shouldShowItem } from './item-tree.search';
@@ -152,43 +152,38 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 		{
 			updateNode({ nodeId: parentItem.getId(), children: newChildrenIds });
 
-			const parentNode = parentItem.getItemData();
-			const childrenNodes = newChildrenIds.map((id) => nodes[id]);
+			const recipes: { id: string; order: number }[] = [];
+			const items: { id: string; order: number }[] = [];
+			const folders: { id: string; order: number }[] = [];
 
-			const recipeIds: string[] = [];
-			const itemIds: string[] = [];
-			const folderIds: string[] = [];
-
-			for (const node of childrenNodes)
+			for (let i = 0; i < newChildrenIds.length; i++)
 			{
+				const nodeId = newChildrenIds[i];
+				const node = nodes[nodeId];
+
 				switch (node.type)
 				{
 					case 'recipe':
-						recipeIds.push(node.id);
+						recipes.push({ id: node.id, order: i });
 						break;
 					case 'item':
-						itemIds.push(node.id);
+						items.push({ id: node.id, order: i });
 						break;
 					case 'folder':
-						folderIds.push(node.id);
+						folders.push({ id: node.id, order: i });
 						break;
 					default:
 						throw new Error(`Cannot move node of type '${node.type}'`);
 				}
 			}
 
-			console.log('Reordering in parent', parentNode.name, {
-				recipes: recipeIds.map((id) => nodes[id].name),
-				items: itemIds.map((id) => nodes[id].name),
-				folders: folderIds.map((id) => nodes[id].name),
-			});
-
+			const parentNode = parentItem.getItemData();
 			const parentNodeId = parentNode.type === 'collection' ? null : parentNode.id;
 
 			Promise.all([
-				recipeIds.length ? reorderRecipes({ itemId: parentNode.id, orderedRecipeIds: recipeIds }) : null,
-				itemIds.length ? reorderItems({ folderId: parentNodeId, orderedItemIds: itemIds }) : null,
-				folderIds.length ? reorderFolders({ parentFolderId: parentNodeId, orderedFolderIds: folderIds }) : null,
+				recipes.length ? reorderRecipes({ itemId: parentNode.id, recipeOrders: recipes }) : null,
+				items.length ? moveAndReorderItems({ newFolderId: parentNodeId, itemOrders: items }) : null,
+				folders.length ? moveAndReorderFolders({ newParentFolderId: parentNodeId, folderOrders: folders }) : null,
 			]).then(() =>
 			{
 				refresh();

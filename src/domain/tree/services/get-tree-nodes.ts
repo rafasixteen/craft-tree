@@ -8,16 +8,19 @@ interface FolderTreeRow
 	folder_id: string;
 	folder_name: string;
 	folder_slug: string;
+	folder_order: number;
 
 	parent_folder_id: string | null;
 
 	item_id: string | null;
 	item_name: string | null;
 	item_slug: string | null;
+	item_order: number | null;
 
 	recipe_id: string | null;
 	recipe_name: string | null;
 	recipe_slug: string | null;
+	recipe_order: number | null;
 }
 
 export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[]>
@@ -29,6 +32,7 @@ export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[
 					f.id,
 					f.name,
 					f.slug,
+					f.order,
 					f.parent_folder_id,
 					f.collection_id
 				FROM
@@ -41,6 +45,7 @@ export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[
 					child.id,
 					child.name,
 					child.slug,
+					child.order,
 					child.parent_folder_id,
 					child.collection_id
 				FROM
@@ -52,13 +57,16 @@ export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[
 			ft.id AS folder_id,
 			ft.name AS folder_name,
 			ft.slug AS folder_slug,
+			ft.order AS folder_order,
 			ft.parent_folder_id AS parent_folder_id,
 			i.id AS item_id,
 			i.name AS item_name,
 			i.slug AS item_slug,
+			i.order AS item_order,
 			r.id AS recipe_id,
 			r.name AS recipe_name,
-			r.slug AS recipe_slug
+			r.slug AS recipe_slug,
+			r.order AS recipe_order
 		FROM
 			folder_tree ft
 			LEFT JOIN items i ON i.folder_id = ft.id
@@ -69,13 +77,16 @@ export async function getTreeNodes(collectionId: string): Promise<FolderTreeRow[
 			NULL AS folder_id,
 			NULL AS folder_name,
 			NULL AS folder_slug,
+			NULL AS folder_order,
 			NULL AS parent_folder_id,
 			i.id AS item_id,
 			i.name AS item_name,
 			i.slug AS item_slug,
+			i.order AS item_order,
 			r.id AS recipe_id,
 			r.name AS recipe_name,
-			r.slug AS recipe_slug
+			r.slug AS recipe_slug,
+			r.order AS recipe_order
 		FROM
 			items i
 			LEFT JOIN recipes r ON r.item_id = i.id

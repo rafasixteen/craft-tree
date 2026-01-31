@@ -1,5 +1,5 @@
 import { pgTable, text, uuid, uniqueIndex, foreignKey, integer } from 'drizzle-orm/pg-core';
-import { isNull, isNotNull } from 'drizzle-orm';
+import { isNull, isNotNull, sql } from 'drizzle-orm';
 import { collectionsTable } from '@/db/schema';
 
 export const foldersTable = pgTable(
@@ -24,8 +24,6 @@ export const foldersTable = pgTable(
 		}).onDelete('cascade'),
 
 		uniqueIndex().on(table.collectionId, table.slug),
-
-		uniqueIndex().on(table.order).where(isNull(table.parentFolderId)),
-		uniqueIndex().on(table.parentFolderId, table.order).where(isNotNull(table.parentFolderId)),
+		// uniqueIndex().on(table.order, table.parentFolderId),
 	],
 );

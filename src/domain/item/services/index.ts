@@ -4,4 +4,4 @@ export * from './get-item-by-id';
 export * from './get-recipe-by-index';
 export * from './get-recipes';
 export * from './rename-item';
-export * from './reorder-items';
+export * from './move-and-reorder-items';
