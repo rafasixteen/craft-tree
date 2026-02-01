@@ -17,10 +17,16 @@ export const filterFeature: FeatureImplementation = {
 			const allItems = tree.getItems();
 			const directMatches = tree.getSearchMatchingItems();
 
-			// If no search, return all items
-			if (directMatches.length === 0)
+			// If no search value, return all items
+			if (tree.getSearchValue().trim().length === 0)
 			{
 				return allItems;
+			}
+
+			// If no search matches, return no items
+			if (directMatches.length === 0)
+			{
+				return [];
 			}
 
 			const visibleItemIds = new Set<string>();

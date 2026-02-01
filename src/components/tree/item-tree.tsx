@@ -2,7 +2,7 @@
 
 import { useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { filterFeature, removeDefaultExpandFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
@@ -30,7 +30,9 @@ import {
 	renamingFeature,
 	createOnDropHandler,
 	propMemoizationFeature,
+	ItemInstance,
 } from '@headless-tree/core';
+import { useDebounceCallback } from '@/hooks/use-debounce-callback';
 
 interface ItemTreeProps
 {
@@ -125,7 +127,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		isSearchMatchingItem: (search, item) =>
 		{
 			const itemName = item.getItemName().toLowerCase();
-			return itemName.startsWith(search.toLowerCase());
+			return itemName.includes(search.toLowerCase());
 		},
 		canDrop(items, target)
 		{
@@ -277,8 +279,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 
 	const { setSearch, expandAll } = tree;
 
-	const searchValue = tree.getSearchValue();
-	const filteredItems = tree.getFilteredItems();
+	const [localSearchValue, setLocalSearchValue] = useState('');
 
 	useEffect(() =>
 	{
@@ -532,13 +533,12 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		prevNodesRef.current = { ...nodes };
 	}, [nodes, pathname, router, collection.id]);
 
-	const handleSearchChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) =>
+	const performSearch = useCallback(
+		(searchValue: string) =>
 		{
-			const value = e.target.value;
-			setSearch(value || null);
+			setSearch(searchValue);
 
-			if (value && value.length > 0)
+			if (searchValue.length > 0)
 			{
 				expandAll();
 			}
@@ -546,27 +546,24 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		[setSearch, expandAll],
 	);
 
-	const displayNodes = () =>
-	{
-		if (searchValue && filteredItems.length === 0)
-		{
-			return <p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>;
-		}
+	const debouncedSearch = useDebounceCallback(performSearch, 300);
 
-		return filteredItems.map((item) =>
+	const onSearchChanged = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) =>
 		{
-			return <ItemTreeNode key={item.getId()} item={item} />;
-		});
-	};
-
-	console.log('ItemTree rendered');
+			const value = e.target.value;
+			setLocalSearchValue(value);
+			debouncedSearch(value);
+		},
+		[debouncedSearch],
+	);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col gap-2">
 			<div className="flex gap-2">
 				{/* Search Bar */}
 				<div className="relative flex-1">
-					<Input className="peer ps-9" value={tree.getSearchValue() || ''} onChange={handleSearchChange} type="search" placeholder="Filter items..." />
+					<Input className="peer ps-9" value={localSearchValue} onChange={onSearchChanged} type="search" placeholder="Filter items..." />
 					<div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
 						<FilterIcon className="size-4" />
 					</div>
@@ -575,9 +572,28 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 
 			{/* Tree */}
 			<Tree indent={indent} tree={tree} className="no-scrollbar h-full min-h-0 overflow-y-auto">
-				{displayNodes()}
+				<TreeNodes searchValue={tree.getSearchValue()} items={tree.getFilteredItems()} />
 				<TreeDragLine />
 			</Tree>
 		</div>
 	);
+}
+
+interface TreeNodesProps
+{
+	searchValue: string;
+	items: ItemInstance<Node>[];
+}
+
+function TreeNodes({ searchValue, items }: TreeNodesProps)
+{
+	if (searchValue && items.length === 0)
+	{
+		return <p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>;
+	}
+
+	return items.map((item) =>
+	{
+		return <ItemTreeNode key={item.getId()} item={item} />;
+	});
 }
