@@ -72,14 +72,14 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 		<Card className="w-40">
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-2">
-					<div className="w-8 h-8 bg-muted rounded border flex items-center justify-center text-xs font-mono">{item.name.substring(0, 2).toUpperCase()}</div>
-					<div className="flex-1 min-w-0">
-						<p className="font-semibold text-sm">{item.name}</p>
+					<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{item.name.substring(0, 2).toUpperCase()}</div>
+					<div className="min-w-0 flex-1">
+						<p className="text-sm font-semibold">{item.name}</p>
 					</div>
 				</div>
 				{recipes && (
 					<div>
-						<p className="text-xs text-muted-foreground truncate">{recipe ? recipe.name : ''}</p>
+						<p className="truncate text-xs text-muted-foreground">{recipe ? recipe.name : ''}</p>
 						<p className="text-xs text-muted-foreground">
 							[{recipeIndex + 1}/{recipes.length}]
 						</p>
@@ -95,7 +95,7 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 				</div>
 				{ingredients && (
 					<div className="border-t pt-2">
-						<p className="text-xs font-semibold mb-1">Ingredients:</p>
+						<p className="mb-1 text-xs font-semibold">Ingredients:</p>
 						<div className="space-y-1">
 							{ingredients.map((ingredient) => (
 								<div key={ingredient.id} className="text-xs text-muted-foreground">

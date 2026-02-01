@@ -26,7 +26,7 @@ export function DesktopLayout({ children, path, defaultLayout, layoutId }: Deskt
 	const contentSize = defaultLayout?.[1] ?? CONTENT_DEFAULT_WIDTH_PERCENTAGE;
 
 	return (
-		<div className="hidden md:flex h-full w-full flex-col">
+		<div className="hidden size-full flex-col md:flex">
 			<ResizablePanelGroup direction="horizontal" className="flex-1" onLayout={onLayoutChanged}>
 				{/* Left panel – sidebar */}
 				<ResizablePanel collapsible minSize={20} defaultSize={sidebarSize}>
@@ -37,9 +37,9 @@ export function DesktopLayout({ children, path, defaultLayout, layoutId }: Deskt
 
 				{/* Right panel – page content */}
 				<ResizablePanel defaultSize={contentSize} minSize={30}>
-					<div className="flex h-full flex-col overflow-y-auto no-scrollbar min-h-0">
+					<div className="no-scrollbar flex h-full min-h-0 flex-col overflow-y-auto">
 						<BreadcrumbTrail path={path} className="flex h-10 items-center border-b px-4" />
-						<div className="flex-1 min-h-0">{children}</div>
+						<div className="min-h-0 flex-1">{children}</div>
 					</div>
 				</ResizablePanel>
 			</ResizablePanelGroup>

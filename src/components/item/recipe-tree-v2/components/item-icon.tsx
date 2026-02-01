@@ -2,12 +2,12 @@ import { Item } from '@/domain/item';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
-const iconVariants = cva('flex items-center justify-center rounded border font-mono font-semibold', {
+const iconVariants = cva('flex items-center justify-center rounded-sm border font-mono font-semibold', {
 	variants: {
 		size: {
-			sm: 'w-6 h-6 text-xs',
-			md: 'w-8 h-8 text-xs',
-			lg: 'w-10 h-10 text-sm',
+			sm: 'size-6 text-xs',
+			md: 'size-8 text-xs',
+			lg: 'size-10 text-sm',
 		},
 		variant: {
 			default: 'bg-muted',
@@ -25,22 +25,22 @@ const iconVariants = cva('flex items-center justify-center rounded border font-m
 const badgeVariants = cva('absolute flex items-center justify-center rounded-full font-bold', {
 	variants: {
 		size: {
-			xs: 'w-3 h-3 text-[8px]',
-			sm: 'w-4 h-4 text-xs',
-			md: 'w-5 h-5 text-xs',
-			lg: 'w-6 h-6 text-sm',
+			xs: 'size-3 text-[8px]',
+			sm: 'size-4 text-xs',
+			md: 'size-5 text-xs',
+			lg: 'size-6 text-sm',
 		},
 		variant: {
 			default: 'bg-primary text-primary-foreground',
 			secondary: 'bg-secondary text-secondary-foreground',
-			destructive: 'bg-destructive text-destructive-foreground',
+			destructive: 'text-destructive-foreground bg-destructive',
 			'no-bg': 'bg-transparent text-foreground',
 		},
 		position: {
-			'top-right': 'top-[var(--y)] right-[var(--x)] translate-x-1/2 -translate-y-1/2',
-			'top-left': 'top-[var(--y)] left-[var(--x)] -translate-x-1/2 -translate-y-1/2',
-			'bottom-right': 'bottom-[var(--y)] right-[var(--x)] translate-x-1/2 translate-y-1/2',
-			'bottom-left': 'bottom-[var(--y)] left-[var(--x)] -translate-x-1/2 translate-y-1/2',
+			'top-right': 'top-(--y) right-(--x) translate-x-1/2 -translate-y-1/2',
+			'top-left': 'top-(--y) left-(--x) -translate-1/2',
+			'bottom-right': 'right-(--x) bottom-(--y) translate-1/2',
+			'bottom-left': 'bottom-(--y) left-(--x) -translate-x-1/2 translate-y-1/2',
 		},
 		offset: {
 			center: '[--x:50%] [--y:50%]',

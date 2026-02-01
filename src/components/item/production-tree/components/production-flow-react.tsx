@@ -150,7 +150,7 @@ export function ProductionFlowReact({ item, allRecipes, allIngredients, allItems
 					<CardTitle>Production Requirements</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div className="h-150 w-full bg-muted/20 rounded-lg">
+					<div className="h-150 w-full rounded-lg bg-muted/20">
 						<ReactFlow
 							nodes={nodesState}
 							edges={edgesState}

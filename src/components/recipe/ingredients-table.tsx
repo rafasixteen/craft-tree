@@ -135,8 +135,8 @@ export function IngredientsTable({ ingredients, recipe, onIngredientsChange }: I
 	};
 
 	return (
-		<div className="rounded-md border flex-1 flex flex-col overflow-hidden">
-			<div className="overflow-y-auto flex-1 no-scrollbar">
+		<div className="flex flex-1 flex-col overflow-hidden rounded-md border">
+			<div className="no-scrollbar flex-1 overflow-y-auto">
 				<Table>
 					<TableHeader className="bg-muted/50">
 						<TableRow>
@@ -150,7 +150,7 @@ export function IngredientsTable({ ingredients, recipe, onIngredientsChange }: I
 			</div>
 			{editMode && (
 				<div className="border-t">
-					<div className="text-center py-3 cursor-pointer hover:bg-muted/50" onClick={addIngredient}>
+					<div className="cursor-pointer py-3 text-center hover:bg-muted/50" onClick={addIngredient}>
 						Add Ingredient
 					</div>
 				</div>

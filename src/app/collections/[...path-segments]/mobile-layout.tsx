@@ -87,25 +87,25 @@ export function MobileLayout({ children, path }: MobileLayoutProps)
 	};
 
 	return (
-		<div className="md:hidden flex flex-col h-full w-full">
-			<Tabs value={tabValue} onValueChange={(v) => setTabValue(v as MobileTab)} className="flex flex-col h-full w-full">
+		<div className="flex size-full flex-col md:hidden">
+			<Tabs value={tabValue} onValueChange={(v) => setTabValue(v as MobileTab)} className="flex size-full flex-col">
 				{/* Main content area with horizontal pager */}
 				<div className="flex-1 overflow-hidden" ref={containerRef} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
-					<div className="flex h-full w-full" style={containerStyle}>
+					<div className="flex size-full" style={containerStyle}>
 						{/* Sidebar Pane */}
-						<div className="h-full w-full shrink-0">
+						<div className="size-full shrink-0">
 							<Sidebar />
 						</div>
 
 						{/* Content Pane */}
-						<div className="h-full w-full shrink-0">
+						<div className="size-full shrink-0">
 							<div className="h-full overflow-y-auto">
-								<div className="flex h-full flex-col min-h-0">
+								<div className="flex h-full min-h-0 flex-col">
 									<div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 										<BreadcrumbTrail path={path} />
 									</div>
 
-									<div className="flex-1 min-h-0">{children}</div>
+									<div className="min-h-0 flex-1">{children}</div>
 								</div>
 							</div>
 						</div>
@@ -114,11 +114,11 @@ export function MobileLayout({ children, path }: MobileLayoutProps)
 
 				{/* Bottom Tab Bar */}
 				<TabsList className="h-14 w-full bg-background" variant="line">
-					<TabsTrigger value="sidebar" className="flex flex-col items-center justify-center gap-1 flex-1 h-full data-[state=active]:bg-muted/50">
+					<TabsTrigger value="sidebar" className="flex h-full flex-1 flex-col items-center justify-center gap-1 data-[state=active]:bg-muted/50">
 						<span className="text-xs font-medium">Sidebar</span>
 					</TabsTrigger>
 
-					<TabsTrigger value="content" className="flex flex-col items-center justify-center gap-1 flex-1 h-full data-[state=active]:bg-muted/50">
+					<TabsTrigger value="content" className="flex h-full flex-1 flex-col items-center justify-center gap-1 data-[state=active]:bg-muted/50">
 						<span className="text-xs font-medium">Content</span>
 					</TabsTrigger>
 				</TabsList>

@@ -64,10 +64,10 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 	};
 
 	return (
-		<TreeItem className="data-[visible=false]:hidden group" data-visible={visible} item={item} asChild>
+		<TreeItem className="group data-[visible=false]:hidden" data-visible={visible} item={item} asChild>
 			<Link href={href} onClick={handleLinkClick}>
 				<TreeItemLabel onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} onTouchCancel={handlePressEnd}>
-					<div className="flex items-center justify-between flex-1 gap-2">
+					<div className="flex flex-1 items-center justify-between gap-2">
 						<span className="flex items-center gap-2">
 							<Icon item={item} />
 							<Name item={item} />
@@ -153,7 +153,7 @@ function ActionsDropdown({
 	return (
 		<DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
 			<DropdownMenuTrigger asChild>
-				<ButtonSpan variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
+				<ButtonSpan variant="ghost" size="icon" className="opacity-0 transition-opacity group-hover:opacity-100">
 					<EllipsisVerticalIcon className="size-4" />
 				</ButtonSpan>
 			</DropdownMenuTrigger>

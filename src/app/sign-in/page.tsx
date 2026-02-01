@@ -37,21 +37,21 @@ export default function SignInPage()
 		<div className="relative h-full overflow-hidden">
 			{/* Animated background elements */}
 			<div className="absolute inset-0 overflow-hidden">
-				<div className="absolute top-0 right-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
+				<div className="absolute top-0 right-1/4 size-48 animate-pulse rounded-full bg-primary/10 opacity-20 mix-blend-multiply blur-3xl filter sm:size-96" />
 				<div
-					className="absolute bottom-40 left-1/4 w-48 h-48 sm:w-96 sm:h-96 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+					className="absolute bottom-40 left-1/4 size-48 animate-pulse rounded-full bg-secondary/10 opacity-20 mix-blend-multiply blur-3xl filter sm:size-96"
 					style={{ animationDelay: '2s' }}
 				/>
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 sm:gap-6 p-4 sm:p-6 md:p-10">
-				<div className="w-full max-w-sm animate-fade-in" style={{ animationDelay: '0.2s' }}>
+			<div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 p-4 sm:gap-6 sm:p-6 md:p-10">
+				<div className="animate-fade-in w-full max-w-sm" style={{ animationDelay: '0.2s' }}>
 					<SignInForm />
 				</div>
 				<p
 					className={cn(
-						'text-xs sm:text-sm text-destructive text-center transition-opacity duration-500 h-5 animate-fade-in',
+						'animate-fade-in h-5 text-center text-xs text-destructive transition-opacity duration-500 sm:text-sm',
 						errorMessage && visible ? 'opacity-100' : 'opacity-0',
 					)}
 					style={{ animationDelay: '0.2s' }}

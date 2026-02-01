@@ -25,12 +25,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 {
 	return (
 		<html lang="en" className={inter.variable} suppressHydrationWarning>
-			<body className={cn(geistSans.variable, geistMono.variable, 'antialiased flex h-screen')}>
+			<body className={cn(geistSans.variable, geistMono.variable, 'flex h-screen antialiased')}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<SessionProvider>
-						<div className="flex flex-col flex-1 ">
+						<div className="flex flex-1 flex-col">
 							<Header />
-							<main className="flex-1 min-h-0">{children}</main>
+							<main className="min-h-0 flex-1">{children}</main>
 							<Footer />
 						</div>
 					</SessionProvider>

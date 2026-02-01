@@ -110,7 +110,7 @@ export function RecipeTreeFlow({ item, quantity = 1, allRecipes, allIngredients,
 					<CardTitle>Crafting Tree</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<div className="h-150 w-full bg-muted/20 rounded-lg">
+					<div className="h-150 w-full rounded-lg bg-muted/20">
 						<ReactFlow
 							nodes={nodesState}
 							edges={edgesState}
@@ -130,7 +130,7 @@ export function RecipeTreeFlow({ item, quantity = 1, allRecipes, allIngredients,
 			</Card>
 
 			{/* Total Cost and Leftovers */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 				{/* Total Cost */}
 				<Card>
 					<CardHeader>
@@ -143,12 +143,12 @@ export function RecipeTreeFlow({ item, quantity = 1, allRecipes, allIngredients,
 						{totalCostItems.length > 0 ? (
 							<div className="space-y-2">
 								{totalCostItems.map(({ item: costItem, quantity: qty }) => (
-									<div key={costItem.id} className="flex items-center gap-2 p-2 rounded bg-muted/50">
-										<div className="w-6 h-6 bg-background rounded border flex items-center justify-center text-xs font-mono">
+									<div key={costItem.id} className="flex items-center gap-2 rounded-sm bg-muted/50 p-2">
+										<div className="flex size-6 items-center justify-center rounded-sm border bg-background font-mono text-xs">
 											{costItem.name.substring(0, 1).toUpperCase()}
 										</div>
-										<span className="text-sm flex-1">{costItem.name}</span>
-										<span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-mono font-bold">{qty}</span>
+										<span className="flex-1 text-sm">{costItem.name}</span>
+										<span className="rounded-sm bg-primary/10 px-2 py-1 font-mono text-xs font-bold text-primary">{qty}</span>
 									</div>
 								))}
 							</div>
@@ -170,12 +170,12 @@ export function RecipeTreeFlow({ item, quantity = 1, allRecipes, allIngredients,
 						{leftoverItems.length > 0 ? (
 							<div className="space-y-2">
 								{leftoverItems.map(({ item: leftoverItem, quantity: qty }) => (
-									<div key={leftoverItem.id} className="flex items-center gap-2 p-2 rounded bg-yellow-50 dark:bg-yellow-950">
-										<div className="w-6 h-6 bg-background rounded border flex items-center justify-center text-xs font-mono">
+									<div key={leftoverItem.id} className="flex items-center gap-2 rounded-sm bg-yellow-50 p-2 dark:bg-yellow-950">
+										<div className="flex size-6 items-center justify-center rounded-sm border bg-background font-mono text-xs">
 											{leftoverItem.name.substring(0, 1).toUpperCase()}
 										</div>
-										<span className="text-sm flex-1">{leftoverItem.name}</span>
-										<span className="text-xs bg-yellow-200 dark:bg-yellow-800 px-2 py-1 rounded font-mono font-bold">{qty}</span>
+										<span className="flex-1 text-sm">{leftoverItem.name}</span>
+										<span className="rounded-sm bg-yellow-200 px-2 py-1 font-mono text-xs font-bold dark:bg-yellow-800">{qty}</span>
 									</div>
 								))}
 							</div>

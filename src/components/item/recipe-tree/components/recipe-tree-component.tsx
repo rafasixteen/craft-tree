@@ -41,11 +41,11 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 
 				{/* Render children */}
 				{node.children.length > 0 && (
-					<div className="flex items-start gap-8 mt-4 relative">
+					<div className="relative mt-4 flex items-start gap-8">
 						{/* Horizontal connector line */}
 						{node.children.length > 1 && (
 							<div
-								className="absolute top-0 left-0 right-0 h-0.5 bg-border transform -translate-y-4"
+								className="absolute inset-x-0 top-0 h-0.5 -translate-y-4 transform bg-border"
 								style={{
 									left: '50%',
 									transform: 'translateX(-50%) translateY(-1rem)',
@@ -57,7 +57,7 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 						{node.children.map((child: any, idx: any) => (
 							<div key={`${child.item.id}-${idx}`} className="relative">
 								{/* Vertical connector to horizontal line */}
-								{node.children.length > 1 && <div className="absolute left-1/2 -top-4 w-0.5 h-4 bg-border -translate-x-1/2" />}
+								{node.children.length > 1 && <div className="absolute -top-4 left-1/2 h-4 w-0.5 -translate-x-1/2 bg-border" />}
 								{renderNode(child)}
 							</div>
 						))}
@@ -79,12 +79,12 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 					<CardTitle>Crafting Tree</CardTitle>
 				</CardHeader>
 				<CardContent className="overflow-x-auto">
-					<div className="flex justify-center min-w-max p-8">{renderNode(treeResult.root)}</div>
+					<div className="flex min-w-max justify-center p-8">{renderNode(treeResult.root)}</div>
 				</CardContent>
 			</Card>
 
 			{/* Total Cost and Leftovers */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 				{/* Total Cost */}
 				<Card>
 					<CardHeader>
@@ -97,12 +97,12 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 						{totalCostItems.length > 0 ? (
 							<div className="space-y-2">
 								{totalCostItems.map(({ item: costItem, quantity: qty }) => (
-									<div key={costItem.id} className="flex items-center gap-2 p-2 rounded bg-muted/50">
-										<div className="w-6 h-6 bg-background rounded border flex items-center justify-center text-xs font-mono">
+									<div key={costItem.id} className="flex items-center gap-2 rounded-sm bg-muted/50 p-2">
+										<div className="flex size-6 items-center justify-center rounded-sm border bg-background font-mono text-xs">
 											{costItem.name.substring(0, 1).toUpperCase()}
 										</div>
-										<span className="text-sm flex-1">{costItem.name}</span>
-										<span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-mono font-bold">{qty}</span>
+										<span className="flex-1 text-sm">{costItem.name}</span>
+										<span className="rounded-sm bg-primary/10 px-2 py-1 font-mono text-xs font-bold text-primary">{qty}</span>
 									</div>
 								))}
 							</div>
@@ -124,12 +124,12 @@ export function RecipeTreeComponent({ item, quantity = 1, allRecipes, allIngredi
 						{leftoverItems.length > 0 ? (
 							<div className="space-y-2">
 								{leftoverItems.map(({ item: leftoverItem, quantity: qty }) => (
-									<div key={leftoverItem.id} className="flex items-center gap-2 p-2 rounded bg-yellow-50 dark:bg-yellow-950">
-										<div className="w-6 h-6 bg-background rounded border flex items-center justify-center text-xs font-mono">
+									<div key={leftoverItem.id} className="flex items-center gap-2 rounded-sm bg-yellow-50 p-2 dark:bg-yellow-950">
+										<div className="flex size-6 items-center justify-center rounded-sm border bg-background font-mono text-xs">
 											{leftoverItem.name.substring(0, 1).toUpperCase()}
 										</div>
-										<span className="text-sm flex-1">{leftoverItem.name}</span>
-										<span className="text-xs bg-yellow-200 dark:bg-yellow-800 px-2 py-1 rounded font-mono font-bold">{qty}</span>
+										<span className="flex-1 text-sm">{leftoverItem.name}</span>
+										<span className="rounded-sm bg-yellow-200 px-2 py-1 font-mono text-xs font-bold dark:bg-yellow-800">{qty}</span>
 									</div>
 								))}
 							</div>

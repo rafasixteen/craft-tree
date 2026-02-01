@@ -14,7 +14,7 @@ interface RecipeInfoProps
 export function RecipeInfo({ recipe, ingredients }: RecipeInfoProps)
 {
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex h-full flex-col">
 			<div className="grid grid-cols-2 gap-3">
 				<Field>
 					<FieldLabel htmlFor="recipe-quantity">Quantity</FieldLabel>

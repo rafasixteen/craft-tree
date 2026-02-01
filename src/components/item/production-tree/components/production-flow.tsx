@@ -45,13 +45,13 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 			<div key={`${node.item.id}-${node.depth}`} className="flex flex-col items-center">
 				{/* Node Card */}
 				<Card className="relative min-w-[200px]">
-					<CardContent className="pt-4 space-y-3">
+					<CardContent className="space-y-3 pt-4">
 						{/* Item and Recipe Name */}
 						<div className="flex items-center gap-2">
-							<div className="w-8 h-8 bg-muted rounded border flex items-center justify-center text-xs font-mono">{node.item.name.substring(0, 2).toUpperCase()}</div>
-							<div className="flex-1 min-w-0">
-								<p className="font-semibold text-sm">{node.item.name}</p>
-								{node.recipe && <p className="text-xs text-muted-foreground truncate">{node.recipe.name}</p>}
+							<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{node.item.name.substring(0, 2).toUpperCase()}</div>
+							<div className="min-w-0 flex-1">
+								<p className="text-sm font-semibold">{node.item.name}</p>
+								{node.recipe && <p className="truncate text-xs text-muted-foreground">{node.recipe.name}</p>}
 							</div>
 						</div>
 
@@ -73,11 +73,11 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 								<div className="grid grid-cols-2 gap-2">
 									<div>
 										<p className="text-xs text-muted-foreground">Per Min</p>
-										<p className="font-mono font-semibold text-sm">{requirement.requiredRatePerMinute.toFixed(1)}</p>
+										<p className="font-mono text-sm font-semibold">{requirement.requiredRatePerMinute.toFixed(1)}</p>
 									</div>
 									<div>
 										<p className="text-xs text-muted-foreground">Per Sec</p>
-										<p className="font-mono font-semibold text-sm">{(requirement.requiredRatePerMinute / 60).toFixed(3)}</p>
+										<p className="font-mono text-sm font-semibold">{(requirement.requiredRatePerMinute / 60).toFixed(3)}</p>
 									</div>
 								</div>
 
@@ -94,10 +94,10 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 
 						{/* Recipe Carousel */}
 						{availableRecipes > 1 && (
-							<div className="border-t pt-2 flex justify-between items-center">
+							<div className="flex items-center justify-between border-t pt-2">
 								<button
 									onClick={() => handleRecipeChange(node.item.id, node.selectedRecipeIndex === 0 ? availableRecipes - 1 : (node.selectedRecipeIndex || 0) - 1)}
-									className="p-1 hover:bg-muted rounded"
+									className="rounded-sm p-1 hover:bg-muted"
 								>
 									{'<'}
 								</button>
@@ -106,7 +106,7 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 								</span>
 								<button
 									onClick={() => handleRecipeChange(node.item.id, node.selectedRecipeIndex === availableRecipes - 1 ? 0 : (node.selectedRecipeIndex || 0) + 1)}
-									className="p-1 hover:bg-muted rounded"
+									className="rounded-sm p-1 hover:bg-muted"
 								>
 									{'>'}
 								</button>
@@ -117,7 +117,7 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 
 				{/* Render children in a grid */}
 				{node.children.length > 0 && (
-					<div className="flex items-start gap-8 mt-4">
+					<div className="mt-4 flex items-start gap-8">
 						{node.children.map((child, idx) => (
 							<div key={`${child.item.id}-${idx}`}>{renderProductionNode(child)}</div>
 						))}
@@ -151,7 +151,7 @@ export function ProductionFlow({ item, allRecipes, allIngredients, allItems }: P
 					<CardTitle>Production Requirements</CardTitle>
 				</CardHeader>
 				<CardContent className="overflow-x-auto">
-					<div className="flex justify-center min-w-max p-8">{renderProductionNode(recipeTree.build().root)}</div>
+					<div className="flex min-w-max justify-center p-8">{renderProductionNode(recipeTree.build().root)}</div>
 				</CardContent>
 			</Card>
 

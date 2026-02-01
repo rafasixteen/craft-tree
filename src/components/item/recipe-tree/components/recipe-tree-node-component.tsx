@@ -36,31 +36,31 @@ export function RecipeTreeNodeComponent({ node, availableRecipes = 1, onRecipeCh
 
 	return (
 		<div className="flex flex-col items-center gap-1">
-			<Card className={cn('relative flex items-center gap-2 px-3 py-2 min-w-[120px]', node.recipe ? 'bg-card' : 'bg-muted')}>
+			<Card className={cn('relative flex min-w-[120px] items-center gap-2 px-3 py-2', node.recipe ? 'bg-card' : 'bg-muted')}>
 				{/* Recipe carousel controls */}
 				{hasMultipleRecipes && (
 					<>
 						<Button
 							variant="ghost"
 							size="icon"
-							className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-6 -translate-x-1/2 bg-background rounded-full shadow-sm"
+							className="absolute top-1/2 left-0 size-6 -translate-1/2 rounded-full bg-background shadow-sm"
 							onClick={handlePrevRecipe}
 						>
-							<ChevronLeft className="h-4 w-4" />
+							<ChevronLeft className="size-4" />
 						</Button>
 						<Button
 							variant="ghost"
 							size="icon"
-							className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-6 translate-x-1/2 bg-background rounded-full shadow-sm"
+							className="absolute top-1/2 right-0 size-6 translate-x-1/2 -translate-y-1/2 rounded-full bg-background shadow-sm"
 							onClick={handleNextRecipe}
 						>
-							<ChevronRight className="h-4 w-4" />
+							<ChevronRight className="size-4" />
 						</Button>
 					</>
 				)}
 
 				{/* Item icon placeholder - you can replace this with actual item icons */}
-				<div className="w-8 h-8 bg-muted rounded border flex items-center justify-center text-xs font-mono">{node.item.name.substring(0, 2).toUpperCase()}</div>
+				<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{node.item.name.substring(0, 2).toUpperCase()}</div>
 
 				{/* Quantity badge */}
 				<div className="flex items-center gap-1">
@@ -70,14 +70,14 @@ export function RecipeTreeNodeComponent({ node, availableRecipes = 1, onRecipeCh
 
 				{/* Recipe indicator */}
 				{hasMultipleRecipes && (
-					<div className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+					<div className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
 						{currentRecipeIndex + 1}
 					</div>
 				)}
 			</Card>
 
 			{/* Vertical line connector */}
-			{node.children.length > 0 && <div className="w-0.5 h-4 bg-border" />}
+			{node.children.length > 0 && <div className="h-4 w-0.5 bg-border" />}
 		</div>
 	);
 }

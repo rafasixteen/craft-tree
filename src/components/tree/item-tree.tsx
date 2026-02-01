@@ -573,7 +573,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			</div>
 
 			{/* Tree */}
-			<Tree indent={indent} tree={tree} className="    no-scrollbar h-full min-h-0 overflow-y-auto">
+			<Tree indent={indent} tree={tree} className="no-scrollbar h-full min-h-0 overflow-y-auto">
 				{displayNodes()}
 				<TreeDragLine />
 			</Tree>

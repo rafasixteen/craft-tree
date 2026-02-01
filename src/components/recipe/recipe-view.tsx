@@ -88,14 +88,14 @@ export function RecipeView({ recipe, ingredients }: RecipeViewProps)
 	};
 
 	return (
-		<Card className="w-full h-full flex flex-col min-h-0 bg-transparent ring-0">
-			<CardContent className="flex-1 flex flex-col overflow-hidden min-h-0 ">
-				<Tabs value={tab} className="flex-1 flex flex-col overflow-hidden min-h-0">
+		<Card className="flex size-full min-h-0 flex-col bg-transparent ring-0">
+			<CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden">
+				<Tabs value={tab} className="flex min-h-0 flex-1 flex-col overflow-hidden">
 					<TabsContent value="info" className="flex-1">
 						<RecipeInfo recipe={recipe} ingredients={ingredients} />
 					</TabsContent>
 
-					<TabsContent value="edit" className="flex-1 overflow-hidden min-h-0">
+					<TabsContent value="edit" className="min-h-0 flex-1 overflow-hidden">
 						<RecipeEdit recipe={draftRecipe} ingredients={draftIngredients} onRecipeChange={setDraftRecipe} onIngredientsChange={setDraftIngredients} />
 					</TabsContent>
 				</Tabs>

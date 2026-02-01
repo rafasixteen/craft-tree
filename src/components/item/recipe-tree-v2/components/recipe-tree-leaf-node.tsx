@@ -18,12 +18,12 @@ export function RecipeTreeLeafNode({ id, data }: RecipeTreeLeafNodeProps)
 
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-2">
-					<div className="w-8 h-8 bg-muted rounded border flex items-center justify-center text-xs font-mono">{item.name.substring(0, 2).toUpperCase()}</div>
-					<div className="flex-1 min-w-0">
-						<p className="font-semibold text-sm">{item.name}</p>
+					<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{item.name.substring(0, 2).toUpperCase()}</div>
+					<div className="min-w-0 flex-1">
+						<p className="text-sm font-semibold">{item.name}</p>
 					</div>
 				</div>
-				<div className="border-t pt-2 w-full flex justify-center">
+				<div className="flex w-full justify-center border-t pt-2">
 					<p className="text-xs text-muted-foreground italic">Base ingredient</p>
 				</div>
 			</CardHeader>

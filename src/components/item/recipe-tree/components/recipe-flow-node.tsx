@@ -21,14 +21,14 @@ export const RecipeFlowNode = memo((props: NodeProps) =>
 			{/* Top handle for inputs */}
 			<Handle type="target" position={Position.Top} className="bg-primary!" />
 
-			<Card className="min-w-50 shadow-md border-2">
-				<CardContent className="pt-4 space-y-3">
+			<Card className="min-w-50 border-2 shadow-md">
+				<CardContent className="space-y-3 pt-4">
 					{/* Item and Recipe Name */}
 					<div className="flex items-center gap-2">
-						<div className="w-8 h-8 bg-muted rounded border flex items-center justify-center text-xs font-mono">{node.item.name.substring(0, 2).toUpperCase()}</div>
-						<div className="flex-1 min-w-0">
-							<p className="font-semibold text-sm">{node.item.name}</p>
-							{node.recipe && <p className="text-xs text-muted-foreground truncate">{node.recipe.name}</p>}
+						<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{node.item.name.substring(0, 2).toUpperCase()}</div>
+						<div className="min-w-0 flex-1">
+							<p className="text-sm font-semibold">{node.item.name}</p>
+							{node.recipe && <p className="truncate text-xs text-muted-foreground">{node.recipe.name}</p>}
 						</div>
 					</div>
 
@@ -41,12 +41,12 @@ export const RecipeFlowNode = memo((props: NodeProps) =>
 							</div>
 							<div>
 								<p className="text-xs text-muted-foreground">Produced per Craft</p>
-								<p className="text-sm font-mono">{node.recipe.quantity}</p>
+								<p className="font-mono text-sm">{node.recipe.quantity}</p>
 							</div>
 							{node.recipe.time !== null && (
 								<div>
 									<p className="text-xs text-muted-foreground">Craft Time</p>
-									<p className="text-sm font-mono">{node.recipe.time}s</p>
+									<p className="font-mono text-sm">{node.recipe.time}s</p>
 								</div>
 							)}
 							<div>
@@ -58,10 +58,10 @@ export const RecipeFlowNode = memo((props: NodeProps) =>
 
 					{/* Recipe Carousel */}
 					{availableRecipes > 1 && (
-						<div className="border-t pt-2 flex justify-between items-center">
+						<div className="flex items-center justify-between border-t pt-2">
 							<button
 								onClick={() => onRecipeChange(node.item.id, node.selectedRecipeIndex === 0 ? availableRecipes - 1 : (node.selectedRecipeIndex || 0) - 1)}
-								className="p-1 hover:bg-muted rounded transition-colors"
+								className="rounded-sm p-1 transition-colors hover:bg-muted"
 								aria-label="Previous recipe"
 							>
 								←
@@ -71,7 +71,7 @@ export const RecipeFlowNode = memo((props: NodeProps) =>
 							</span>
 							<button
 								onClick={() => onRecipeChange(node.item.id, node.selectedRecipeIndex === availableRecipes - 1 ? 0 : (node.selectedRecipeIndex || 0) + 1)}
-								className="p-1 hover:bg-muted rounded transition-colors"
+								className="rounded-sm p-1 transition-colors hover:bg-muted"
 								aria-label="Next recipe"
 							>
 								→

@@ -6,29 +6,29 @@ import { Button } from '@/components/ui/button';
 export default function CollectionNotFound()
 {
 	return (
-		<div className="relative flex h-full flex-col items-center justify-center text-center overflow-hidden">
+		<div className="relative flex h-full flex-col items-center justify-center overflow-hidden text-center">
 			{/* Animated background elements */}
-			<div className="absolute inset-0 overflow-hidden pointer-events-none">
-				<div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
-				<div className="absolute bottom-20 right-10 w-72 h-72 bg-secondary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000" />
+			<div className="pointer-events-none absolute inset-0 overflow-hidden">
+				<div className="absolute top-20 left-10 size-72 animate-pulse rounded-full bg-primary/10 opacity-20 mix-blend-multiply blur-3xl filter" />
+				<div className="animation-delay-2000 absolute right-10 bottom-20 size-72 animate-pulse rounded-full bg-secondary/10 opacity-20 mix-blend-multiply blur-3xl filter" />
 			</div>
 
 			{/* Content */}
 			<div className="relative z-10 space-y-6">
 				{/* 404 Number with animation */}
 				<div className="space-y-2">
-					<div className="text-7xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent animate-bounce">404</div>
+					<div className="animate-bounce bg-linear-to-r from-primary to-secondary bg-clip-text text-7xl font-bold text-transparent">404</div>
 					<p className="text-lg font-semibold text-muted-foreground">Collection Not Found</p>
 				</div>
 
 				{/* Description */}
-				<div className="space-y-2 max-w-md">
-					<p className="text-foreground/80 animate-fade-in">The collection you&apos;re looking for doesn&apos;t exist.</p>
+				<div className="max-w-md space-y-2">
+					<p className="animate-fade-in text-foreground/80">The collection you&apos;re looking for doesn&apos;t exist.</p>
 					<p className="text-sm text-muted-foreground">Let&apos;s get you back on track!</p>
 				</div>
 
 				{/* Action buttons */}
-				<div className="flex gap-3 justify-center flex-wrap pt-4">
+				<div className="flex flex-wrap justify-center gap-3 pt-4">
 					<Button asChild>
 						<Link href="/collections">Collections</Link>
 					</Button>

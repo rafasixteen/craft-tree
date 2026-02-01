@@ -31,8 +31,8 @@ export function RecipeEdit({ recipe, ingredients, onRecipeChange, onIngredientsC
 	};
 
 	return (
-		<div className="flex flex-col h-full min-h-0">
-			<div className="flex-1 flex flex-col overflow-hidden">
+		<div className="flex h-full min-h-0 flex-col">
+			<div className="flex flex-1 flex-col overflow-hidden">
 				<div className="grid grid-cols-3 gap-3">
 					<Field orientation="responsive">
 						<FieldLabel htmlFor="recipe-name">Name</FieldLabel>

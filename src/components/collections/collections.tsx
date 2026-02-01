@@ -46,11 +46,11 @@ export function Collections()
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button className="flex items-center gap-2 p-2 w-full rounded-lg" variant="ghost">
-					<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+				<Button className="flex w-full items-center gap-2 rounded-lg py-7" variant="ghost">
+					<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
 						<Wallet className="size-4" />
 					</div>
-					<div className="grid flex-1 text-left text-sm leading-tight">
+					<div className="grid flex-1 text-left text-sm/tight">
 						<span className="truncate font-medium">{activeCollection.name}</span>
 						<span className="truncate text-xs">{activeCollection.slug}</span>
 					</div>
@@ -60,18 +60,18 @@ export function Collections()
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) rounded-lg" align="start" side="bottom" sideOffset={6}>
-				<DropdownMenuLabel className="text-muted-foreground text-xs">Collections</DropdownMenuLabel>
+				<DropdownMenuLabel className="text-xs text-muted-foreground">Collections</DropdownMenuLabel>
 				{collections.map((collection) => (
 					<DropdownMenuItem key={collection.slug} className="gap-2 p-2" onClick={() => setActiveCollection(collection)}>
 						{collection.name}
 					</DropdownMenuItem>
 				))}
 				<DropdownMenuSeparator />
-				<DropdownMenuItem className="gap-2 p-2 flex items-center" onClick={addCollection} disabled={isPending}>
+				<DropdownMenuItem className="flex items-center gap-2 p-2" onClick={addCollection} disabled={isPending}>
 					<div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
 						<Plus className="size-4" />
 					</div>
-					<div className="text-muted-foreground font-medium">{isPending ? 'Adding…' : 'Create collection'}</div>
+					<div className="font-medium text-muted-foreground">{isPending ? 'Adding…' : 'Create collection'}</div>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>

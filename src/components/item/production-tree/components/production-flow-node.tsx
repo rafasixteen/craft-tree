@@ -33,14 +33,14 @@ export const ProductionFlowNode = memo((props: NodeProps) =>
 			{/* Top handle for inputs */}
 			<Handle type="target" position={Position.Top} className="bg-blue-500!" />
 
-			<Card className="min-w-55 shadow-md border-2">
-				<CardContent className="pt-4 space-y-3">
+			<Card className="min-w-55 border-2 shadow-md">
+				<CardContent className="space-y-3 pt-4">
 					{/* Item and Recipe Name */}
 					<div className="flex items-center gap-2">
-						<div className="w-8 h-8 bg-muted rounded border flex items-center justify-center text-xs font-mono">{node.item.name.substring(0, 2).toUpperCase()}</div>
-						<div className="flex-1 min-w-0">
-							<p className="font-semibold text-sm">{node.item.name}</p>
-							{node.recipe && <p className="text-xs text-muted-foreground truncate">{node.recipe.name}</p>}
+						<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{node.item.name.substring(0, 2).toUpperCase()}</div>
+						<div className="min-w-0 flex-1">
+							<p className="text-sm font-semibold">{node.item.name}</p>
+							{node.recipe && <p className="truncate text-xs text-muted-foreground">{node.recipe.name}</p>}
 						</div>
 					</div>
 
@@ -49,7 +49,7 @@ export const ProductionFlowNode = memo((props: NodeProps) =>
 						<div className="space-y-2 border-t pt-3">
 							{/* Manufacturer Count */}
 							{requirement.recipeId && (
-								<div className="bg-blue-50 dark:bg-blue-950/30 p-2 rounded">
+								<div className="rounded-sm bg-blue-50 p-2 dark:bg-blue-950/30">
 									<p className="text-xs text-muted-foreground">Manufacturers Needed</p>
 									<p className="text-lg font-bold text-blue-600 dark:text-blue-400">{Math.ceil(requirement.manufacturersNeeded)}</p>
 									<p className="text-xs text-muted-foreground">
@@ -60,19 +60,19 @@ export const ProductionFlowNode = memo((props: NodeProps) =>
 
 							{/* Production Rate */}
 							<div className="grid grid-cols-2 gap-2">
-								<div className="bg-muted/50 p-2 rounded">
+								<div className="rounded-sm bg-muted/50 p-2">
 									<p className="text-xs text-muted-foreground">Per Min</p>
-									<p className="font-mono font-semibold text-sm">{requirement.requiredRatePerMinute.toFixed(1)}</p>
+									<p className="font-mono text-sm font-semibold">{requirement.requiredRatePerMinute.toFixed(1)}</p>
 								</div>
-								<div className="bg-muted/50 p-2 rounded">
+								<div className="rounded-sm bg-muted/50 p-2">
 									<p className="text-xs text-muted-foreground">Per Sec</p>
-									<p className="font-mono font-semibold text-sm">{(requirement.requiredRatePerMinute / 60).toFixed(3)}</p>
+									<p className="font-mono text-sm font-semibold">{(requirement.requiredRatePerMinute / 60).toFixed(3)}</p>
 								</div>
 							</div>
 
 							{/* Cycle Info */}
 							{requirement.recipeId && (
-								<div className="text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+								<div className="rounded-sm bg-muted/30 p-2 text-xs text-muted-foreground">
 									<p>
 										{requirement.producedPerCycle}/cycle @ {requirement.cycleTimeSeconds}s
 									</p>
@@ -83,10 +83,10 @@ export const ProductionFlowNode = memo((props: NodeProps) =>
 
 					{/* Recipe Carousel */}
 					{availableRecipes > 1 && (
-						<div className="border-t pt-2 flex justify-between items-center">
+						<div className="flex items-center justify-between border-t pt-2">
 							<button
 								onClick={() => onRecipeChange(node.item.id, node.selectedRecipeIndex === 0 ? availableRecipes - 1 : (node.selectedRecipeIndex || 0) - 1)}
-								className="p-1 hover:bg-muted rounded transition-colors"
+								className="rounded-sm p-1 transition-colors hover:bg-muted"
 								aria-label="Previous recipe"
 							>
 								←
@@ -96,7 +96,7 @@ export const ProductionFlowNode = memo((props: NodeProps) =>
 							</span>
 							<button
 								onClick={() => onRecipeChange(node.item.id, node.selectedRecipeIndex === availableRecipes - 1 ? 0 : (node.selectedRecipeIndex || 0) + 1)}
-								className="p-1 hover:bg-muted rounded transition-colors"
+								className="rounded-sm p-1 transition-colors hover:bg-muted"
 								aria-label="Next recipe"
 							>
 								→

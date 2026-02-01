@@ -51,14 +51,14 @@ export function SignInForm({ className, ...props }: React.ComponentProps<'div'>)
 			<FieldGroup>
 				<div className="flex flex-col items-center gap-1 text-center">
 					<h1 className="text-2xl font-bold">Sign in to your account</h1>
-					<p className="text-muted-foreground text-sm text-balance">Choose one of the following providers</p>
+					<p className="text-sm text-balance text-muted-foreground">Choose one of the following providers</p>
 				</div>
 
 				<FieldSeparator />
 
-				<div className="flex flex-wrap gap-3 justify-center">
+				<div className="flex flex-wrap justify-center gap-3">
 					{providers.map((provider) => (
-						<Button key={provider.id} type="button" className="flex items-center justify-center min-w-30" onClick={() => signIn(provider.id, { callbackUrl: '/' })}>
+						<Button key={provider.id} type="button" className="flex min-w-30 items-center justify-center" onClick={() => signIn(provider.id, { callbackUrl: '/' })}>
 							{provider.icon}
 							{provider.name}
 						</Button>
