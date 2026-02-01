@@ -16,10 +16,9 @@ import Link from 'next/link';
 interface ItemTreeNodeProps
 {
 	item: ItemInstance<Node>;
-	visible: boolean;
 }
 
-export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
+export function ItemTreeNode({ item }: ItemTreeNodeProps)
 {
 	const { isMobile } = useIsMobile();
 	const { nodes } = useTreeNodes();
@@ -64,7 +63,7 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 	}, []);
 
 	return (
-		<TreeItem className="group data-[visible=false]:hidden" data-visible={visible} item={item} asChild>
+		<TreeItem className="group" item={item} asChild>
 			<Link href={href} onClick={handleLinkClick}>
 				<TreeItemLabel onTouchStart={handlePressStart} onTouchEnd={handlePressEnd} onTouchCancel={handlePressEnd}>
 					<div className="flex flex-1 items-center justify-between gap-2">

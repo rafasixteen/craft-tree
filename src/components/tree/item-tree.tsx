@@ -1,10 +1,10 @@
 'use client';
 
-import { AssistiveTreeDescription, useTree } from '@headless-tree/react';
+import { useTree } from '@headless-tree/react';
 import { ItemTreeNode } from '@/components/tree';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { removeDefaultExpandFeature } from '@/components/tree/features';
+import { filterFeature, removeDefaultExpandFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { renameItem, moveAndReorderItems } from '@/domain/item';
 import { reorderRecipes, updateRecipe } from '@/domain/recipe';
 import { getItem, getItemChildren } from './item-tree.utils';
-import { getVisibleItems, shouldShowItem } from './item-tree.search';
 import { useCollectionsContext } from '@/providers/collections-context';
 import { useTreeNodes } from '@/providers';
 import { getNodePath } from '@/domain/tree';
@@ -85,6 +84,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			hotkeysCoreFeature,
 			selectionFeature,
 			searchFeature,
+			filterFeature,
 			expandAllFeature,
 			dragAndDropFeature,
 			keyboardDragAndDropFeature,
@@ -125,7 +125,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		isSearchMatchingItem: (search, item) =>
 		{
 			const itemName = item.getItemName().toLowerCase();
-			return itemName.includes(search.toLowerCase());
+			return itemName.startsWith(search.toLowerCase());
 		},
 		canDrop(items, target)
 		{
@@ -275,24 +275,16 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		indent,
 	});
 
-	const searchValue = tree.getSearchValue();
-	const matchingItems = tree.getSearchMatchingItems();
-	const visibleItems = getVisibleItems(searchValue || '', matchingItems, tree, nodes);
+	const { setSearch, expandAll } = tree;
 
-	useEffect(() =>
-	{
-		if (searchValue && searchValue.length > 0)
-		{
-			tree.expandAll();
-		}
-	}, [searchValue]);
+	const searchValue = tree.getSearchValue();
+	const filteredItems = tree.getFilteredItems();
 
 	useEffect(() =>
 	{
 		tree.rebuildTree();
 	}, [nodes]);
 
-	// Synchronize pathname with current node slugs after renames and deletions
 	useEffect(() =>
 	{
 		// Only run when we're viewing a specific path (not just the collection root)
@@ -540,25 +532,34 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		prevNodesRef.current = { ...nodes };
 	}, [nodes, pathname, router, collection.id]);
 
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-	{
-		const value = e.target.value;
-		tree.setSearch(value || null);
-	};
+	const handleSearchChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) =>
+		{
+			const value = e.target.value;
+			setSearch(value || null);
+
+			if (value && value.length > 0)
+			{
+				expandAll();
+			}
+		},
+		[setSearch, expandAll],
+	);
 
 	const displayNodes = () =>
 	{
-		if (searchValue && visibleItems.size === 0)
+		if (searchValue && filteredItems.length === 0)
 		{
 			return <p className="px-3 py-4 text-center text-sm">No items found for &quot;{searchValue}&quot;</p>;
 		}
 
-		return tree.getItems().map((item) =>
+		return filteredItems.map((item) =>
 		{
-			const isVisible = shouldShowItem(item.getId(), searchValue || '', visibleItems);
-			return <ItemTreeNode key={item.getId()} item={item} visible={isVisible} />;
+			return <ItemTreeNode key={item.getId()} item={item} />;
 		});
 	};
+
+	console.log('ItemTree rendered');
 
 	return (
 		<div className="flex h-full min-h-0 flex-col gap-2">
