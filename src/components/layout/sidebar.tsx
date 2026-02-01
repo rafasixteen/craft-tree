@@ -4,7 +4,7 @@ import { ItemTree } from '@/components/tree';
 export function Sidebar()
 {
 	return (
-		<div className="flex flex-col p-2 gap-2">
+		<div className="flex h-full flex-col gap-2 p-2">
 			<Collections />
 			<ItemTree />
 		</div>

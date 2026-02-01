@@ -53,6 +53,7 @@
 		"drizzle-kit": "^0.31.8",
 		"eslint": "^9",
 		"eslint-config-next": "16.1.1",
+		"eslint-plugin-better-tailwindcss": "^4.0.2",
 		"prettier": "^3.7.4",
 		"prettier-plugin-brace-style": "^0.8.2",
 		"tailwindcss": "^4",

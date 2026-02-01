@@ -33,7 +33,12 @@ import {
 	propMemoizationFeature,
 } from '@headless-tree/core';
 
-export function ItemTree({ indent = 16 }: { indent?: number })
+interface ItemTreeProps
+{
+	indent?: number;
+}
+
+export function ItemTree({ indent = 16 }: ItemTreeProps)
 {
 	const router = useRouter();
 	const pathname = usePathname();
@@ -556,7 +561,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 	};
 
 	return (
-		<div className="flex h-full flex-col gap-2">
+		<div className="flex h-full min-h-0 flex-col gap-2">
 			<div className="flex gap-2">
 				{/* Search Bar */}
 				<div className="relative flex-1">
@@ -568,8 +573,7 @@ export function ItemTree({ indent = 16 }: { indent?: number })
 			</div>
 
 			{/* Tree */}
-			<Tree indent={indent} tree={tree}>
-				<AssistiveTreeDescription tree={tree} />
+			<Tree indent={indent} tree={tree} className="    no-scrollbar h-full min-h-0 overflow-y-auto">
 				{displayNodes()}
 				<TreeDragLine />
 			</Tree>

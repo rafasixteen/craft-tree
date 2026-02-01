@@ -1,5 +1,4 @@
 import { pgTable, text, uuid, uniqueIndex, foreignKey, integer } from 'drizzle-orm/pg-core';
-import { isNull, isNotNull, sql } from 'drizzle-orm';
 import { collectionsTable } from '@/db/schema';
 
 export const foldersTable = pgTable(

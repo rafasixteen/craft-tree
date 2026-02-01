@@ -13,7 +13,7 @@ const iconVariants = cva('flex items-center justify-center rounded border font-m
 			default: 'bg-muted',
 			primary: 'bg-primary text-primary-foreground',
 			secondary: 'bg-secondary text-secondary-foreground',
-			destructive: 'bg-destructive text-destructive-foreground',
+			destructive: 'bg-destructive',
 		},
 	},
 	defaultVariants: {
