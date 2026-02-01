@@ -7,7 +7,7 @@ import { FolderIcon, FolderOpenIcon, EllipsisVerticalIcon, CuboidIcon, CookingPo
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { useTreeNodes } from '@/providers';
 import { FolderDropdown, ItemDropdown, RecipeDropdown, CollectionDropdown } from '@/components/tree/dropdowns';
 import useIsMobile from '@/hooks/use-is-mobile';
@@ -30,10 +30,10 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 	const node = item.getItemData();
 	const isRenaming = item.isRenaming();
 
-	const path = getNodePath(nodes, node);
+	const path = useMemo(() => getNodePath(nodes, node.id), [nodes, node.id]);
 	const href = isRenaming ? '#' : '/collections/' + path.join('/');
 
-	const handlePressStart = () =>
+	const handlePressStart = useCallback(() =>
 	{
 		if (!isRenaming)
 		{
@@ -42,18 +42,18 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 				setDropdownOpen(true);
 			}, 500);
 		}
-	};
+	}, [isRenaming]);
 
-	const handlePressEnd = () =>
+	const handlePressEnd = useCallback(() =>
 	{
 		if (longPressTimerRef.current)
 		{
 			clearTimeout(longPressTimerRef.current);
 			longPressTimerRef.current = null;
 		}
-	};
+	}, []);
 
-	const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) =>
+	const handleLinkClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) =>
 	{
 		// Prevent link navigation when using modifier keys (shift/ctrl)
 		// This allows the tree's multi-select behavior to work
@@ -61,7 +61,7 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 		{
 			e.preventDefault();
 		}
-	};
+	}, []);
 
 	return (
 		<TreeItem className="group data-[visible=false]:hidden" data-visible={visible} item={item} asChild>
@@ -80,7 +80,12 @@ export function ItemTreeNode({ item, visible }: ItemTreeNodeProps)
 	);
 }
 
-function Icon({ item }: { item: ItemInstance<Node> })
+interface IconProps
+{
+	item: ItemInstance<Node>;
+}
+
+function Icon({ item }: IconProps)
 {
 	const className = 'pointer-events-none size-4 text-muted-foreground';
 
@@ -109,7 +114,12 @@ function Icon({ item }: { item: ItemInstance<Node> })
 	}
 }
 
-function Name({ item }: { item: ItemInstance<Node> })
+interface NameProps
+{
+	item: ItemInstance<Node>;
+}
+
+function Name({ item }: NameProps)
 {
 	const inputRef = useRef<HTMLInputElement | null>(null);
 	const isRenaming = item.isRenaming();
@@ -126,17 +136,15 @@ function Name({ item }: { item: ItemInstance<Node> })
 	return isRenaming ? <Input {...item.getRenameInputProps()} ref={inputRef} autoFocus /> : <p className="text-xs">{item.getItemName()}</p>;
 }
 
-function ActionsDropdown({
-	item,
-	isMobile,
-	dropdownOpen,
-	setDropdownOpen,
-}: {
+interface ActionsDropdownProps
+{
 	item: ItemInstance<Node>;
 	isMobile: boolean;
 	dropdownOpen: boolean;
 	setDropdownOpen: (open: boolean) => void;
-})
+}
+
+const ActionsDropdown = memo(function ActionsDropdown({ item, isMobile, dropdownOpen, setDropdownOpen }: ActionsDropdownProps)
 {
 	const dropdownComponentMap = {
 		collection: CollectionDropdown,
@@ -146,20 +154,25 @@ function ActionsDropdown({
 	} as const;
 
 	const node = item.getItemData();
-	const DropdownContent = dropdownComponentMap[node.type as keyof typeof dropdownComponentMap];
+	const DropdownContent = useMemo(() => dropdownComponentMap[node.type as keyof typeof dropdownComponentMap], [node.type]);
 
-	if (!DropdownContent) return null;
-
-	return (
-		<DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-			<DropdownMenuTrigger asChild>
-				<ButtonSpan variant="ghost" size="icon" className="opacity-0 transition-opacity group-hover:opacity-100">
-					<EllipsisVerticalIcon className="size-4" />
-				</ButtonSpan>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" side={isMobile ? 'left' : 'right'}>
-				<DropdownContent item={item} />
-			</DropdownMenuContent>
-		</DropdownMenu>
-	);
-}
+	if (DropdownContent)
+	{
+		return (
+			<DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+				<DropdownMenuTrigger asChild>
+					<ButtonSpan variant="ghost" size="icon" className="opacity-0 transition-opacity group-hover:opacity-100">
+						<EllipsisVerticalIcon className="size-4" />
+					</ButtonSpan>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="start" side={isMobile ? 'left' : 'right'}>
+					<DropdownContent item={item} />
+				</DropdownMenuContent>
+			</DropdownMenu>
+		);
+	}
+	else
+	{
+		return null;
+	}
+});

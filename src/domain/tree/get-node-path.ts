@@ -1,9 +1,9 @@
 import { Node, NodeMap } from '@/domain/tree';
 
-export function getNodePath(nodes: NodeMap, node: Node): string[]
+export function getNodePath(nodes: NodeMap, nodeId: string): string[]
 {
 	const path: string[] = [];
-	let current: Node | null = node;
+	let current: Node | null = nodes[nodeId] || null;
 
 	while (current)
 	{
