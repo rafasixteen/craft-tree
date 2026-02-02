@@ -15,13 +15,16 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
-	// const { item, recipes, ingredientsMap, isRoot, selectedRecipeIndex } = data;
-
 	const { itemId } = data;
 
-	const { loading, item: rootItem, itemsById, recipesByItemId, getSelectedRecipeIndex, setSelectedRecipeIndex } = useRecipeTreeContext();
+	const { loading, item: rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectPreviousRecipe, selectNextRecipe } = useRecipeTreeContext();
 
 	const updateNodeInternals = useUpdateNodeInternals();
+
+	useEffect(() =>
+	{
+		updateNodeInternals(id);
+	}, [id, updateNodeInternals]);
 
 	if (loading)
 	{
@@ -29,32 +32,24 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 	}
 
 	const selectedRecipeIndex = getSelectedRecipeIndex(id);
-	const item = itemsById.get(itemId)!;
-	const recipes = recipesByItemId.get(itemId) || [];
-	const selectedRecipe = recipes[selectedRecipeIndex];
-	const isRoot = rootItem?.id === item.id;
-
-	useEffect(() =>
+	const item = getItem(itemId);
+	const recipes = getRecipes(itemId);
+	const boundedRecipeIndex = Math.min(selectedRecipeIndex, Math.max(recipes.length - 1, 0));
+	const selectedRecipe = recipes[boundedRecipeIndex];
+	if (!item || !selectedRecipe)
 	{
-		updateNodeInternals(id);
-	}, [id, updateNodeInternals]);
+		return null;
+	}
+	const isRoot = rootItem?.id === item.id;
 
 	function previousRecipe()
 	{
-		if (recipes.length > 0)
-		{
-			const prevIndex = (selectedRecipeIndex - 1 + recipes.length) % recipes.length;
-			setSelectedRecipeIndex(id, prevIndex);
-		}
+		selectPreviousRecipe(id, itemId);
 	}
 
 	function nextRecipe()
 	{
-		if (recipes.length > 0)
-		{
-			const nextIndex = (selectedRecipeIndex + 1) % recipes.length;
-			setSelectedRecipeIndex(id, nextIndex);
-		}
+		selectNextRecipe(id, itemId);
 	}
 
 	return (
@@ -86,7 +81,7 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
-					{(selectedRecipeIndex || 0) + 1} / {recipes.length}
+					{boundedRecipeIndex + 1} / {recipes.length}
 				</span>
 				<Button variant="ghost" onClick={nextRecipe} size="icon">
 					<ArrowRightIcon />

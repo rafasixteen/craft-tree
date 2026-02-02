@@ -12,14 +12,14 @@ export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
 {
 	const { itemId } = data;
 
-	const { loading, itemsById } = useRecipeTreeContext();
+	const { loading, getItem } = useRecipeTreeContext();
 
 	if (loading)
 	{
 		return null;
 	}
 
-	const item = itemsById.get(itemId);
+	const item = getItem(itemId);
 
 	if (!item)
 	{

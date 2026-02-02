@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode, useMemo } from 'react';
-import { Item, getItemById, getRecipes } from '@/domain/item';
+import { Item, getItemById, getRecipes as fetchRecipes } from '@/domain/item';
 import { Recipe, getRecipeIngredients } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
 
@@ -35,44 +35,24 @@ interface RecipeTreeContextValue
 	error: Error | null;
 
 	/**
-	 * All items in the tree by item id.
-	 */
-	itemsById: Map<string, Item>;
-
-	/**
-	 * All recipes keyed by item id.
-	 */
-	recipesByItemId: Map<string, Recipe[]>;
-
-	/**
-	 * All ingredients keyed by recipe id.
-	 */
-	ingredientsByRecipeId: Map<string, Ingredient[]>;
-
-	/**
-	 * Current recipe selections for each node.
-	 */
-	selections: RecipeSelections;
-
-	/**
 	 * Reload the tree data for the current item.
 	 */
 	reload: () => Promise<void>;
 
 	/**
-	 * Replace or insert an item in the map.
+	 * Get an item by id from the tree.
 	 */
-	setItem: (item: Item) => void;
+	getItem: (itemId: string) => Item | undefined;
 
 	/**
-	 * Replace recipes for an item in the map.
+	 * Get recipes for an item id from the tree.
 	 */
-	setRecipesForItem: (itemId: string, recipes: Recipe[]) => void;
+	getRecipes: (itemId: string) => Recipe[];
 
 	/**
-	 * Replace ingredients for a recipe in the map.
+	 * Get ingredients for a recipe id from the tree.
 	 */
-	setIngredientsForRecipe: (recipeId: string, ingredients: Ingredient[]) => void;
+	getIngredients: (recipeId: string) => Ingredient[];
 
 	/**
 	 * Get the selected recipe index for a node.
@@ -80,9 +60,14 @@ interface RecipeTreeContextValue
 	getSelectedRecipeIndex: (nodeId: string) => number;
 
 	/**
-	 * Set the selected recipe index for a node.
+	 * Select the previous recipe for a node.
 	 */
-	setSelectedRecipeIndex: (nodeId: string, index: number) => void;
+	selectPreviousRecipe: (nodeId: string, itemId: string) => void;
+
+	/**
+	 * Select the next recipe for a node.
+	 */
+	selectNextRecipe: (nodeId: string, itemId: string) => void;
 
 	/**
 	 * Traverse the recipe tree and invoke a callback for each node.
@@ -168,43 +153,65 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 		[selections],
 	);
 
-	const setSelectedRecipeIndex = useCallback((nodeId: string, index: number) =>
-	{
-		setSelections((prev) => ({
-			...prev,
-			[nodeId]: index,
-		}));
-	}, []);
+	const getItem = useCallback((itemId: string) => itemsById.get(itemId), [itemsById]);
 
-	const setItem = useCallback((nextItem: Item) =>
-	{
-		setItemsById((prev) =>
-		{
-			const next = new Map(prev);
-			next.set(nextItem.id, nextItem);
-			return next;
-		});
-	}, []);
+	const getRecipes = useCallback((itemId: string) => recipesByItemId.get(itemId) ?? [], [recipesByItemId]);
 
-	const setRecipesForItem = useCallback((itemId: string, recipes: Recipe[]) =>
-	{
-		setRecipesByItemId((prev) =>
-		{
-			const next = new Map(prev);
-			next.set(itemId, recipes);
-			return next;
-		});
-	}, []);
+	const getIngredients = useCallback((recipeId: string) => ingredientsByRecipeId.get(recipeId) ?? [], [ingredientsByRecipeId]);
 
-	const setIngredientsForRecipe = useCallback((recipeId: string, ingredients: Ingredient[]) =>
-	{
-		setIngredientsByRecipeId((prev) =>
+	const selectPreviousRecipe = useCallback(
+		(nodeId: string, itemId: string) =>
 		{
-			const next = new Map(prev);
-			next.set(recipeId, ingredients);
-			return next;
-		});
-	}, []);
+			const recipes = recipesByItemId.get(itemId) ?? [];
+			if (recipes.length === 0)
+			{
+				return;
+			}
+
+			setSelections((prev) =>
+			{
+				const currentIndex = prev[nodeId] ?? 0;
+				const nextIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+				if (nextIndex === currentIndex)
+				{
+					return prev;
+				}
+
+				return {
+					...prev,
+					[nodeId]: nextIndex,
+				};
+			});
+		},
+		[recipesByItemId],
+	);
+
+	const selectNextRecipe = useCallback(
+		(nodeId: string, itemId: string) =>
+		{
+			const recipes = recipesByItemId.get(itemId) ?? [];
+			if (recipes.length === 0)
+			{
+				return;
+			}
+
+			setSelections((prev) =>
+			{
+				const currentIndex = prev[nodeId] ?? 0;
+				const nextIndex = (currentIndex + 1) % recipes.length;
+				if (nextIndex === currentIndex)
+				{
+					return prev;
+				}
+
+				return {
+					...prev,
+					[nodeId]: nextIndex,
+				};
+			});
+		},
+		[recipesByItemId],
+	);
 
 	const reload = useCallback(async () =>
 	{
@@ -246,7 +253,7 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 				visited.add(currentItem.id);
 				nextItemsById.set(currentItem.id, currentItem);
 
-				const recipes = await getRecipes(currentItem.id);
+				const recipes = await fetchRecipes(currentItem.id);
 				nextRecipesByItemId.set(currentItem.id, recipes);
 
 				for (const recipe of recipes)
@@ -364,34 +371,16 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 			item,
 			loading,
 			error,
-			itemsById,
-			recipesByItemId,
-			ingredientsByRecipeId,
 			reload,
-			setItem,
-			setRecipesForItem,
-			setIngredientsForRecipe,
-			selections,
+			getItem,
+			getRecipes,
+			getIngredients,
 			getSelectedRecipeIndex,
-			setSelectedRecipeIndex,
+			selectPreviousRecipe,
+			selectNextRecipe,
 			traverseTree,
 		}),
-		[
-			item,
-			loading,
-			error,
-			itemsById,
-			recipesByItemId,
-			ingredientsByRecipeId,
-			reload,
-			setItem,
-			setRecipesForItem,
-			setIngredientsForRecipe,
-			selections,
-			getSelectedRecipeIndex,
-			setSelectedRecipeIndex,
-			traverseTree,
-		],
+		[item, loading, error, reload, getItem, getRecipes, getIngredients, getSelectedRecipeIndex, selectPreviousRecipe, selectNextRecipe, traverseTree],
 	);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
