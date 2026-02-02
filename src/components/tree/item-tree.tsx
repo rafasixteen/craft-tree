@@ -45,32 +45,12 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 	const pathname = usePathname();
 
 	const { activeCollection: collection } = useCollectionsContext();
-	const { nodes, mutateNodes, refresh } = useTreeNodes();
+	const { nodes, mutateNode, refresh } = useTreeNodes();
 
 	const [expandedItems, setExpandedItems] = useLocalStorage<string[]>(`tree-expanded-items-${collection.id}`, []);
 
 	// Track the previous nodes to detect slug changes
 	const prevNodesRef = useRef<Record<string, Node>>({});
-
-	const updateNode = ({ nodeId, name, slug, children }: { nodeId: string; name?: string; slug?: string; children?: string[] }) =>
-	{
-		mutateNodes(
-			(prevNodes) =>
-			{
-				if (!prevNodes) return prevNodes;
-				return {
-					...prevNodes,
-					[nodeId]: {
-						...prevNodes[nodeId],
-						...(name !== undefined && { name }),
-						...(slug !== undefined && { slug }),
-						...(children !== undefined && { children }),
-					},
-				};
-			},
-			{ revalidate: false },
-		);
-	};
 
 	const tree = useTree<Node>({
 		state: {
@@ -127,7 +107,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		isSearchMatchingItem: (search, item) =>
 		{
 			const itemName = item.getItemName().toLowerCase();
-			return itemName.includes(search.toLowerCase());
+			return itemName.startsWith(search.toLowerCase());
 		},
 		canDrop(items, target)
 		{
@@ -157,7 +137,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		},
 		onDrop: createOnDropHandler((parentItem, newChildrenIds) =>
 		{
-			updateNode({ nodeId: parentItem.getId(), children: newChildrenIds });
+			mutateNode(parentItem.getId(), { children: newChildrenIds }, { revalidate: false });
 
 			const recipes: { id: string; order: number }[] = [];
 			const items: { id: string; order: number }[] = [];
@@ -199,78 +179,33 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		onRename: async (item, newName) =>
 		{
 			const parsedName = await nameSchema.parseAsync(newName);
-
 			const node = item.getItemData();
 
 			// Optimistic UI update
-			updateNode({ nodeId: node.id, name: parsedName });
+			mutateNode(node.id, { name: parsedName }, { revalidate: false });
 
-			switch (node.type)
+			// Rename based on node type
+			const renamed = await (async () =>
 			{
-				case 'collection':
+				switch (node.type)
 				{
-					const renamedCollection = await renameCollection({
-						collectionId: node.id,
-						newName: parsedName,
-					});
-
-					updateNode({
-						nodeId: node.id,
-						name: renamedCollection.name,
-						slug: renamedCollection.slug,
-					});
-
-					break;
+					case 'collection':
+						return renameCollection({ collectionId: node.id, newName: parsedName });
+					case 'folder':
+						return renameFolder({ folderId: node.id, newName: parsedName });
+					case 'item':
+						return renameItem({ itemId: node.id, newName: parsedName });
+					case 'recipe':
+						return updateRecipe({ id: node.id, data: { name: parsedName } });
+					default:
+						return null;
 				}
-				case 'folder':
-				{
-					const renamedFolder = await renameFolder({
-						folderId: node.id,
-						newName: parsedName,
-					});
+			})();
 
-					updateNode({
-						nodeId: node.id,
-						name: renamedFolder.name,
-						slug: renamedFolder.slug,
-					});
-
-					break;
-				}
-				case 'item':
-				{
-					const renamedItem = await renameItem({
-						itemId: node.id,
-						newName: parsedName,
-					});
-
-					updateNode({
-						nodeId: node.id,
-						name: renamedItem.name,
-						slug: renamedItem.slug,
-					});
-
-					break;
-				}
-				case 'recipe':
-				{
-					const renamedRecipe = await updateRecipe({
-						id: node.id,
-						data: {
-							name: parsedName,
-						},
-					});
-
-					updateNode({
-						nodeId: node.id,
-						name: renamedRecipe.name,
-						slug: renamedRecipe.slug,
-					});
-
-					break;
-				}
-				default:
-					break;
+			// Update with actual values from server
+			if (renamed)
+			{
+				mutateNode(node.id, { name: renamed.name, slug: renamed.slug }, { revalidate: false });
 			}
 		},
 		rootItemId: `dummy-${collection.id}`,
@@ -316,7 +251,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			if (previousNode && currentNode && previousNode.slug !== currentNode.slug)
 			{
 				// Check if this node or any ancestor is in the current path
-				const currentPath = getNodePath(nodes, currentNode);
+				const currentPath = getNodePath(nodes, currentNode.id);
 
 				// If any part of the current path matches a segment that changed, we need to update
 				let isInCurrentPath = false;
@@ -424,7 +359,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 
 						if (redirectTarget)
 						{
-							const newPath = getNodePath(nodes, redirectTarget);
+							const newPath = getNodePath(nodes, redirectTarget.id);
 							const newPathname = `/collections/${newPath.join('/')}`;
 							router.replace(newPathname);
 							// Update previous nodes and exit early
@@ -519,7 +454,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			// If we found the node, redirect to its current path
 			if (currentNode)
 			{
-				const actualPath = getNodePath(nodes, currentNode);
+				const actualPath = getNodePath(nodes, currentNode.id);
 				const newPathname = `/collections/${actualPath.join('/')}`;
 
 				if (newPathname !== pathname)
@@ -546,7 +481,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 		[setSearch, expandAll],
 	);
 
-	const debouncedSearch = useDebounceCallback(performSearch, 300);
+	const debouncedSearch = useDebounceCallback(performSearch, 500);
 
 	const onSearchChanged = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) =>
