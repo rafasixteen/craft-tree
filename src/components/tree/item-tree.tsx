@@ -1,27 +1,26 @@
 'use client';
 
+import { useCallback, useEffect, useRef, useState, memo } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTree } from '@headless-tree/react';
-import { ItemTreeNode } from '@/components/tree';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { filterFeature, removeDefaultExpandFeature } from '@/components/tree/features';
 import { Tree, TreeDragLine } from '@/components/ui/tree';
-import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { ItemTreeNode } from '@/components/tree';
+import { filterFeature, removeDefaultExpandFeature, expandFeature } from '@/components/tree/features';
 import { renameCollection } from '@/domain/collection';
 import { renameFolder, moveAndReorderFolders } from '@/domain/folder';
-import { nameSchema } from '@/domain/shared';
-import { Node } from '@/domain/tree';
-import { usePathname, useRouter } from 'next/navigation';
 import { renameItem, moveAndReorderItems } from '@/domain/item';
 import { reorderRecipes, updateRecipe } from '@/domain/recipe';
-import { getItem, getItemChildren } from './item-tree.utils';
-import { useCollectionsContext } from '@/providers/collections-context';
-import { useTreeNodesContext } from '@/providers';
-import { getNodePath } from '@/domain/tree';
+import { Node, getNodePath } from '@/domain/tree';
+import { nameSchema } from '@/domain/shared';
+import { useTreeNodesContext, useCollectionsContext } from '@/providers';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useDebounceCallback } from '@/hooks/use-debounce-callback';
+import { FilterIcon, ChevronDownIcon } from 'lucide-react';
+import { getItem, getItemChildren } from './item-tree.utils';
 import {
-	expandAllFeature,
 	hotkeysCoreFeature,
 	searchFeature,
 	selectionFeature,
@@ -32,6 +31,7 @@ import {
 	createOnDropHandler,
 	propMemoizationFeature,
 	ItemInstance,
+	TreeInstance,
 } from '@headless-tree/core';
 
 interface ItemTreeProps
@@ -69,7 +69,7 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 			selectionFeature,
 			searchFeature,
 			filterFeature,
-			expandAllFeature,
+			expandFeature,
 			dragAndDropFeature,
 			keyboardDragAndDropFeature,
 			renamingFeature,
@@ -503,6 +503,8 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 						<FilterIcon className="size-4" />
 					</div>
 				</div>
+
+				<DropdownMenuComponent tree={tree} />
 			</div>
 
 			{/* Tree */}
@@ -532,3 +534,40 @@ function TreeNodes({ searchValue, items }: TreeNodesProps)
 		return <ItemTreeNode key={item.getId()} item={item} />;
 	});
 }
+
+interface DropdownMenuProps
+{
+	tree: TreeInstance<Node>;
+}
+
+const DropdownMenuComponent = memo(function DropdownMenuComponent({ tree }: DropdownMenuProps)
+{
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="ghost" size="icon" title="Expand/Collapse Options">
+					<ChevronDownIcon className="size-4" />
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="start" side="right" className="w-40">
+				<DropdownMenuSub>
+					<DropdownMenuSubTrigger>Expand</DropdownMenuSubTrigger>
+					<DropdownMenuSubContent>
+						<DropdownMenuItem onClick={() => tree.expandAll()}>All</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => tree.expand('folder')}>Folders</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => tree.expand('item')}>Items</DropdownMenuItem>
+					</DropdownMenuSubContent>
+				</DropdownMenuSub>
+
+				<DropdownMenuSub>
+					<DropdownMenuSubTrigger>Collapse</DropdownMenuSubTrigger>
+					<DropdownMenuSubContent>
+						<DropdownMenuItem onClick={() => tree.collapseAll()}>All</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => tree.collapse('folder')}>Folders</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => tree.collapse('item')}>Items</DropdownMenuItem>
+					</DropdownMenuSubContent>
+				</DropdownMenuSub>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+});
