@@ -1,5 +1,5 @@
 import { Node } from '@xyflow/react';
-import { RecipeTreeLeafNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree-v2';
+import { RecipeTreeLeafNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree';
 
 interface BuildLeafNodeParams
 {

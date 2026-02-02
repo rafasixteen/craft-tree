@@ -1,9 +1,11 @@
+'use client';
+
 import { Card, CardFooter, CardHeader } from '@/components/ui/card';
 import { Position, Handle, Node, Edge, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, PackageIcon, ClockIcon } from 'lucide-react';
-import { ItemIcon, RecipeTreeNodeData } from '@/components/item/recipe-tree-v2';
+import { ItemIcon, RecipeTreeNodeData } from '@/components/item/recipe-tree';
 
 interface RecipeTreeNodeProps
 {
@@ -13,7 +15,7 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
-	const { item, recipes, ingredients, isRoot, selectedRecipeIndex } = data;
+	const { item, recipes, ingredientsMap, isRoot, selectedRecipeIndex } = data;
 
 	const selectedRecipe = recipes[selectedRecipeIndex];
 

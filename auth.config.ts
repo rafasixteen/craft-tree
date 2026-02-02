@@ -12,4 +12,7 @@ const googleProvider = Google({
 	clientSecret: process.env.AUTH_GOOGLE_SECRET!,
 });
 
-export default { providers: [discordProvider, googleProvider] } satisfies NextAuthConfig;
+export default {
+	providers: [discordProvider, googleProvider],
+	trustHost: true,
+} satisfies NextAuthConfig;

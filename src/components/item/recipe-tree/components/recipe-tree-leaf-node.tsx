@@ -1,6 +1,6 @@
 import { Card, CardHeader } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
-import { RecipeTreeLeafNodeData } from '../types';
+import { RecipeTreeLeafNodeData } from '@/components/item/recipe-tree';
 
 interface RecipeTreeLeafNodeProps
 {

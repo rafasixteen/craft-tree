@@ -46,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",
+		"@types/lodash.debounce": "^4.0.9",
 		"@types/node": "^20",
 		"@types/pg": "^8.16.0",
 		"@types/react": "^19",

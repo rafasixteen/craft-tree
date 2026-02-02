@@ -9,7 +9,7 @@ interface RecipeTreeEdgeProps
 	targetY: number;
 }
 
-export function RecipeTreeEdgeV2({ id, sourceX, sourceY, targetX, targetY }: RecipeTreeEdgeProps)
+export function RecipeTreeEdge({ id, sourceX, sourceY, targetX, targetY }: RecipeTreeEdgeProps)
 {
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,

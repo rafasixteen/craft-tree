@@ -20,7 +20,7 @@ export interface RecipeTreeNodeData extends Record<string, unknown>
 	/**
 	 * A mapping of each recipe to its corresponding ingredients.
 	 */
-	ingredients: Map<Recipe, Ingredient[]>;
+	ingredientsMap: Map<Recipe, Ingredient[]>;
 
 	/**
 	 * The index of the currently selected recipe in the {@link recipes} array.

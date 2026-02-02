@@ -1,190 +1,265 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
-import { ReactFlow, Node, Edge, Background, Controls, MiniMap, useNodesState, useEdgesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { Item } from '@/domain/item';
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+import { RecipeTreeNode, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components/item/recipe-tree/components';
+import { RecipeTreeNodeData, RecipeTreeLeafNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree/types';
+import { buildEdge, buildNode, buildLeafNode } from '@/components/item/recipe-tree/utils';
+import { getItemById, getRecipes, Item } from '@/domain/item';
+import { getRecipeIngredients, Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
-import { Recipe } from '@/domain/recipe';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RecipeTree, RecipeTreeNode } from '../utils/recipe-tree';
-import { RecipeFlowNode, RecipeFlowNodeData } from './recipe-flow-node';
+import { useTreeNodesContext } from '@/providers';
+import {
+	ReactFlow,
+	type Node,
+	type Edge,
+	type NodeTypes,
+	type EdgeTypes,
+	type FitViewOptions,
+	type DefaultEdgeOptions,
+	Controls,
+	Background,
+	useNodesState,
+	useEdgesState,
+} from '@xyflow/react';
+
+const nodeTypes: NodeTypes = {
+	[RecipeTreeNodeType.NODE]: RecipeTreeNode,
+	[RecipeTreeNodeType.LEAF]: RecipeTreeLeafNode,
+};
+
+const edgeTypes: EdgeTypes = {
+	'flow-edge': RecipeTreeEdge,
+};
+
+const fitViewOptions: FitViewOptions = {
+	padding: 0.2,
+};
+
+const defaultEdgeOptions: DefaultEdgeOptions = {
+	animated: false,
+	type: 'flow-edge',
+};
 
 interface RecipeTreeFlowProps
 {
 	item: Item;
-	quantity?: number;
-	allRecipes: Map<string, Recipe[]>;
-	allIngredients: Map<string, Ingredient[]>;
-	allItems: Map<string, Item>;
 }
 
-const nodeTypes = {
-	recipeNode: RecipeFlowNode,
-};
-
-export function RecipeTreeFlow({ item, quantity = 1, allRecipes, allIngredients, allItems }: RecipeTreeFlowProps)
+export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
 {
-	const [treeInstance] = useState(() => new RecipeTree(item, quantity, allRecipes, allIngredients, allItems));
-	const [treeResult, setTreeResult] = useState(() => treeInstance.build());
+	const { theme } = useTheme();
+	const [mounted, setMounted] = useState(false);
 
-	const handleRecipeChange = useCallback(
-		(itemId: string, recipeIndex: number) =>
-		{
-			const newResult = treeInstance.updateRecipeSelection(itemId, recipeIndex);
-			setTreeResult(newResult);
-		},
-		[treeInstance],
-	);
+	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>>([]);
+	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	// Convert tree structure to ReactFlow nodes and edges
-	const { nodes, edges } = useMemo(() =>
+	const { nodes: treeNodes } = useTreeNodesContext();
+
+	useEffect(() =>
 	{
-		const nodesList: Node<RecipeFlowNodeData>[] = [];
-		const edgesList: Edge[] = [];
-		let nodeIdCounter = 0;
+		setMounted(true);
+	}, []);
 
-		const processNode = (treeNode: RecipeTreeNode, parentId: string | null, xOffset: number, yOffset: number): string =>
+	useEffect(() =>
+	{
+		async function buildRecipeTree()
 		{
-			const nodeId = `node-${nodeIdCounter++}`;
-			const availableRecipes = treeInstance.getRecipesForItem(treeNode.item.id).length;
+			const nodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[] = [];
+			const edges: Edge[] = [];
+			const visited = new Set<string>();
 
-			// Add node
-			nodesList.push({
-				id: nodeId,
-				type: 'recipeNode',
-				position: { x: xOffset, y: yOffset },
-				data: {
-					node: treeNode,
-					availableRecipes,
-					onRecipeChange: handleRecipeChange,
-				},
+			let nodeIdCounter = 0;
+
+			async function processItem(item: Item, parentNodeId: string | null, recipeIndex: number): Promise<void>
+			{
+				const itemKey = `${item.id}`;
+
+				if (visited.has(itemKey))
+				{
+					return;
+				}
+
+				visited.add(itemKey);
+				const nodeId = `node_${nodeIdCounter++}`;
+
+				// Get recipes for this item
+				const recipes = await getRecipes(item.id);
+
+				if (recipes.length === 0)
+				{
+					// Item has no recipes, create a leaf node
+					const leafNode = buildLeafNode({
+						nodeId: nodeId,
+						data: {
+							item: item,
+						},
+					});
+
+					nodes.push(leafNode);
+
+					if (parentNodeId)
+					{
+						edges.push(buildEdge(parentNodeId, nodeId));
+					}
+
+					return;
+				}
+
+				const ingredientsMap: Map<Recipe, Ingredient[]> = new Map();
+
+				for (const recipe of recipes)
+				{
+					const ingredients = await getRecipeIngredients(recipe.id);
+					ingredientsMap.set(recipe, ingredients);
+				}
+
+				// Get the selected recipe (bounded by available recipes)
+				const selectedRecipeIndex = Math.min(recipeIndex, recipes.length - 1);
+				const selectedRecipe = recipes[selectedRecipeIndex];
+				const ingredients = ingredientsMap.get(selectedRecipe);
+
+				if (!ingredients)
+				{
+					throw new Error(`No ingredients found for recipe id: ${selectedRecipe.id}`);
+				}
+
+				const node = buildNode({
+					nodeId: nodeId,
+					data: {
+						item: item,
+						recipes: recipes,
+						ingredientsMap: ingredientsMap,
+						selectedRecipeIndex: selectedRecipeIndex,
+						isRoot: parentNodeId === null,
+					},
+				});
+
+				nodes.push(node);
+
+				// Connect to parent
+				if (parentNodeId)
+				{
+					edges.push(buildEdge(parentNodeId, nodeId));
+				}
+
+				// Recursively process ingredient items
+				for (const ingredient of ingredients)
+				{
+					const ingredientItem = await getItemById(ingredient.itemId);
+					await processItem(ingredientItem, nodeId, 0);
+				}
+			}
+
+			// Build tree data
+			await processItem(item, null, 0);
+
+			// Calculate positions
+			calculateTreePositions(nodes, edges);
+
+			setNodes(nodes);
+			setEdges(edges);
+		}
+
+		function calculateTreePositions(nodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[], edges: Edge[]): void
+		{
+			// Build parent-child relationships
+			const childrenMap = new Map<string, string[]>();
+			edges.forEach((edge) =>
+			{
+				if (!childrenMap.has(edge.source))
+				{
+					childrenMap.set(edge.source, []);
+				}
+				childrenMap.get(edge.source)!.push(edge.target);
 			});
 
-			// Add edge from parent
-			if (parentId)
-			{
-				edgesList.push({
-					id: `edge-${parentId}-${nodeId}`,
-					source: parentId,
-					target: nodeId,
-					animated: true,
-					style: { stroke: 'hsl(var(--primary))' },
-				});
-			}
+			// Calculate tree layout based on node dimensions
+			const nodeWidth = 160; // w-40 in Tailwind = 10rem = 160px
+			const nodeHeight = 130; // Estimated average height
+			const horizontalOffset = 80; // Space between nodes horizontally
+			const verticalOffset = 60; // Space between levels
 
-			// Process children
-			if (treeNode.children.length > 0)
-			{
-				const childSpacing = 300; // Horizontal space between child nodes
-				const childYOffset = yOffset + 200; // Vertical space between levels
-				const totalChildWidth = (treeNode.children.length - 1) * childSpacing;
-				let childXOffset = xOffset - totalChildWidth / 2;
+			const horizontalSpacing = nodeWidth + horizontalOffset;
+			const verticalSpacing = nodeHeight + verticalOffset;
+			const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
-				treeNode.children.forEach((childNode) =>
+			// Calculate subtree width for each node (bottom-up)
+			function getSubtreeWidth(nodeId: string): number
+			{
+				const children = childrenMap.get(nodeId) || [];
+				if (children.length === 0)
 				{
-					processNode(childNode, nodeId, childXOffset, childYOffset);
-					childXOffset += childSpacing;
+					return 1; // Leaf node has width of 1
+				}
+
+				const childWidths = children.map((childId) => getSubtreeWidth(childId));
+				return childWidths.reduce((sum, width) => sum + width, 0);
+			}
+
+			// Position nodes (top-down, left-to-right)
+			function positionNode(nodeId: string, x: number, y: number): void
+			{
+				const node = nodeMap.get(nodeId);
+				if (!node) return;
+
+				node.position = { x, y };
+
+				const children = childrenMap.get(nodeId) || [];
+				if (children.length === 0) return;
+
+				// Calculate total width needed for all children
+				const childWidths = children.map((childId) => getSubtreeWidth(childId));
+				const totalWidth = childWidths.reduce((sum, width) => sum + width, 0);
+
+				// Position children centered under parent
+				let currentX = x - ((totalWidth - 1) * horizontalSpacing) / 2;
+
+				children.forEach((childId, index) =>
+				{
+					const childWidth = childWidths[index];
+					const childCenterOffset = ((childWidth - 1) * horizontalSpacing) / 2;
+
+					positionNode(childId, currentX + childCenterOffset, y + verticalSpacing);
+
+					currentX += childWidth * horizontalSpacing;
 				});
 			}
 
-			return nodeId;
-		};
+			// Find root node (node with no incoming edges)
+			const rootNode = nodes.find((n) => n.data.isRoot);
+			if (rootNode)
+			{
+				positionNode(rootNode.id, 0, 0);
+			}
+		}
 
-		processNode(treeResult.root, null, 400, 0);
+		buildRecipeTree();
+	}, [item, setNodes, setEdges, treeNodes]);
 
-		return { nodes: nodesList, edges: edgesList };
-	}, [treeResult, treeInstance, handleRecipeChange]);
-
-	const [nodesState, , onNodesChange] = useNodesState(nodes);
-	const [edgesState, , onEdgesChange] = useEdgesState(edges);
-
-	const totalCostItems = Array.from(treeResult.totalCost.values()).sort((a, b) => a.item.name.localeCompare(b.item.name));
-	const leftoverItems = Array.from(treeResult.leftovers.values()).sort((a, b) => a.item.name.localeCompare(b.item.name));
+	if (!mounted)
+	{
+		return null;
+	}
 
 	return (
-		<div className="w-full space-y-6">
-			{/* Recipe Tree Visualization */}
-			<Card>
-				<CardHeader>
-					<CardTitle>Crafting Tree</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<div className="h-150 w-full rounded-lg bg-muted/20">
-						<ReactFlow
-							nodes={nodesState}
-							edges={edgesState}
-							onNodesChange={onNodesChange}
-							onEdgesChange={onEdgesChange}
-							nodeTypes={nodeTypes}
-							fitView
-							minZoom={0.1}
-							maxZoom={2}
-						>
-							<Background />
-							<Controls />
-							<MiniMap />
-						</ReactFlow>
-					</div>
-				</CardContent>
-			</Card>
-
-			{/* Total Cost and Leftovers */}
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-				{/* Total Cost */}
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<span className="text-xl">🔍</span>
-							Total Cost
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						{totalCostItems.length > 0 ? (
-							<div className="space-y-2">
-								{totalCostItems.map(({ item: costItem, quantity: qty }) => (
-									<div key={costItem.id} className="flex items-center gap-2 rounded-sm bg-muted/50 p-2">
-										<div className="flex size-6 items-center justify-center rounded-sm border bg-background font-mono text-xs">
-											{costItem.name.substring(0, 1).toUpperCase()}
-										</div>
-										<span className="flex-1 text-sm">{costItem.name}</span>
-										<span className="rounded-sm bg-primary/10 px-2 py-1 font-mono text-xs font-bold text-primary">{qty}</span>
-									</div>
-								))}
-							</div>
-						) : (
-							<p className="text-sm text-muted-foreground">No items needed</p>
-						)}
-					</CardContent>
-				</Card>
-
-				{/* Leftovers */}
-				<Card>
-					<CardHeader>
-						<CardTitle className="flex items-center gap-2">
-							<span className="text-xl">📦</span>
-							Leftovers
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						{leftoverItems.length > 0 ? (
-							<div className="space-y-2">
-								{leftoverItems.map(({ item: leftoverItem, quantity: qty }) => (
-									<div key={leftoverItem.id} className="flex items-center gap-2 rounded-sm bg-yellow-50 p-2 dark:bg-yellow-950">
-										<div className="flex size-6 items-center justify-center rounded-sm border bg-background font-mono text-xs">
-											{leftoverItem.name.substring(0, 1).toUpperCase()}
-										</div>
-										<span className="flex-1 text-sm">{leftoverItem.name}</span>
-										<span className="rounded-sm bg-yellow-200 px-2 py-1 font-mono text-xs font-bold dark:bg-yellow-800">{qty}</span>
-									</div>
-								))}
-							</div>
-						) : (
-							<p className="text-sm text-muted-foreground">No leftovers</p>
-						)}
-					</CardContent>
-				</Card>
-			</div>
+		<div style={{ width: '100%', height: '100%' }}>
+			<ReactFlow
+				nodes={nodes}
+				edges={edges}
+				nodeTypes={nodeTypes}
+				edgeTypes={edgeTypes}
+				onNodesChange={onNodesChange}
+				onEdgesChange={onEdgesChange}
+				fitView
+				fitViewOptions={fitViewOptions}
+				defaultEdgeOptions={defaultEdgeOptions}
+				colorMode={theme === 'dark' ? 'dark' : 'light'}
+			>
+				<Controls />
+				<Background gap={12} size={1} />
+			</ReactFlow>
 		</div>
 	);
 }

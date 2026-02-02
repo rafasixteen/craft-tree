@@ -10,7 +10,6 @@ import { FolderView } from '@/components/folder';
 import { ItemView } from '@/components/item';
 import { RecipeView } from '@/components/recipe';
 import { CollectionView } from '@/components/collections';
-import { getRecipeTreeData } from '@/components/item/recipe-tree';
 
 //TODO: Fix this logic
 
@@ -60,9 +59,7 @@ export default async function Page({ params }: PageProps)
 		{
 			const item = await getItemById(node.id);
 			if (!item) return notFound();
-
-			const { allRecipes, allIngredients, allItems } = await getRecipeTreeData(item.id);
-			return <ItemView item={item} allRecipes={allRecipes} allIngredients={allIngredients} allItems={allItems} />;
+			return <ItemView item={item} />;
 		}
 		case 'recipe':
 		{

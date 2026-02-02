@@ -13,6 +13,12 @@ export async function GET()
 	}
 
 	const userId = await getUserId(session.user.email);
+	
+	if (!userId)
+	{
+		return NextResponse.redirect(new URL('/sign-in', process.env.NEXT_PUBLIC_APP_URL));
+	}
+
 	const collections = await getUserCollections(userId);
 
 	const firstCollection = collections[0] ?? (await createCollection({ name: 'New Collection', userId }));
