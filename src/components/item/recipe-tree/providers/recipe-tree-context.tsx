@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode, useMemo } from 'react';
 import { Item, getItemById, getRecipes } from '@/domain/item';
 import { Recipe, getRecipeIngredients } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
@@ -87,24 +87,13 @@ interface RecipeTreeContextValue
 	/**
 	 * Traverse the recipe tree and invoke a callback for each node.
 	 */
-	traverseTree: (visitor: RecipeTreeVisitor, options?: RecipeTreeTraverseOptions) => Promise<void>;
+	traverseTree: (visitor: RecipeTreeVisitor) => Promise<void>;
 }
 
 /**
  * Visitor callback signature for traversing the recipe tree.
  */
 export type RecipeTreeVisitor = (context: RecipeTreeVisitContext) => void | Promise<void>;
-
-/**
- * Options for traversing the recipe tree.
- */
-export interface RecipeTreeTraverseOptions
-{
-	/**
-	 * Use the selected recipe index for traversal. Defaults to true.
-	 */
-	useSelectedRecipeIndex?: boolean;
-}
 
 /**
  * Context provided to the visitor during traversal.
@@ -122,29 +111,29 @@ export interface RecipeTreeVisitContext
 	item: Item;
 
 	/**
-	 * Parent node id, if any.
+	 * Parent node id, can be null if the current item is the root.
 	 */
 	parentNodeId: string | null;
 
 	/**
-	 * All recipes for the current item.
+	 * Recipe information for the current item. Only present if the item has recipes.
 	 */
-	recipes: Recipe[];
+	recipe?: {
+		/**
+		 * All recipes for the current item.
+		 */
+		recipes: Recipe[];
 
-	/**
-	 * Selected recipe index used for traversal.
-	 */
-	selectedRecipeIndex: number;
+		/**
+		 * Selected recipe.
+		 */
+		selectedRecipe: Recipe;
 
-	/**
-	 * Selected recipe, if any.
-	 */
-	selectedRecipe?: Recipe;
-
-	/**
-	 * Ingredients for the selected recipe.
-	 */
-	ingredients: Ingredient[];
+		/**
+		 * Ingredients for the selected recipe.
+		 */
+		ingredients: Ingredient[];
+	};
 
 	/**
 	 * Current depth in the tree.
@@ -296,28 +285,13 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 		void reload();
 	}, [reload]);
 
-	const value: RecipeTreeContextValue = {
-		item,
-		loading,
-		error,
-		itemsById,
-		recipesByItemId,
-		ingredientsByRecipeId,
-		reload,
-		setItem,
-		setRecipesForItem,
-		setIngredientsForRecipe,
-		selections,
-		getSelectedRecipeIndex,
-		setSelectedRecipeIndex,
-		traverseTree: async (visitor: RecipeTreeVisitor, options?: RecipeTreeTraverseOptions) =>
+	const traverseTree = useCallback(
+		async (visitor: RecipeTreeVisitor) =>
 		{
 			if (!item)
 			{
 				return;
 			}
-
-			const useSelectedRecipeIndex = options?.useSelectedRecipeIndex ?? true;
 
 			async function traverse(currentItem: Item, parentNodeId: string | null, ancestors: Set<string>, path: string, depth: number): Promise<void>
 			{
@@ -333,19 +307,22 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 
 				const nodeId = path ? `node_${path}_${currentItem.id}` : `node_${currentItem.id}`;
 				const recipes = recipesByItemId.get(currentItem.id) ?? [];
-				const selectedRecipeIndex = useSelectedRecipeIndex ? (selections[nodeId] ?? 0) : 0;
+				const selectedRecipeIndex = selections[nodeId] ?? 0;
 				const boundedRecipeIndex = Math.min(selectedRecipeIndex, Math.max(recipes.length - 1, 0));
 				const selectedRecipe = recipes[boundedRecipeIndex];
-				const ingredients = selectedRecipe ? (ingredientsByRecipeId.get(selectedRecipe.id) ?? []) : [];
+				const ingredients = selectedRecipe ? (ingredientsByRecipeId.get(selectedRecipe.id) ?? []) : null;
 
 				await visitor({
 					nodeId,
 					item: currentItem,
 					parentNodeId,
-					recipes,
-					selectedRecipeIndex: boundedRecipeIndex,
-					selectedRecipe,
-					ingredients,
+					recipe: selectedRecipe
+						? {
+								recipes,
+								selectedRecipe,
+								ingredients: ingredients ?? [],
+							}
+						: undefined,
 					depth,
 					path,
 				});
@@ -357,6 +334,11 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 
 				const nextAncestors = new Set(ancestors);
 				nextAncestors.add(currentItem.id);
+
+				if (!ingredients)
+				{
+					return;
+				}
 
 				for (let ingredientIndex = 0; ingredientIndex < ingredients.length; ingredientIndex++)
 				{
@@ -374,7 +356,43 @@ export function RecipeTreeProvider({ item, children }: { item: Item | null; chil
 
 			await traverse(item, null, new Set(), '', 0);
 		},
-	};
+		[item, recipesByItemId, ingredientsByRecipeId, itemsById, selections],
+	);
+
+	const value = useMemo<RecipeTreeContextValue>(
+		() => ({
+			item,
+			loading,
+			error,
+			itemsById,
+			recipesByItemId,
+			ingredientsByRecipeId,
+			reload,
+			setItem,
+			setRecipesForItem,
+			setIngredientsForRecipe,
+			selections,
+			getSelectedRecipeIndex,
+			setSelectedRecipeIndex,
+			traverseTree,
+		}),
+		[
+			item,
+			loading,
+			error,
+			itemsById,
+			recipesByItemId,
+			ingredientsByRecipeId,
+			reload,
+			setItem,
+			setRecipesForItem,
+			setIngredientsForRecipe,
+			selections,
+			getSelectedRecipeIndex,
+			setSelectedRecipeIndex,
+			traverseTree,
+		],
+	);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }

@@ -7,9 +7,6 @@ import { RecipeTreeNode, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components
 import { RecipeTreeNodeData, RecipeTreeLeafNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree/types';
 import { buildEdge, buildNode, buildLeafNode } from '@/components/item/recipe-tree/utils';
 import { useRecipeTreeContext } from '@/components/item/recipe-tree';
-import { Item } from '@/domain/item';
-import { Recipe } from '@/domain/recipe';
-import { Ingredient } from '@/domain/ingredient';
 import {
 	ReactFlow,
 	type Node,
@@ -50,7 +47,7 @@ export function RecipeTreeFlow()
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	const { loading, traverseTree, ingredientsByRecipeId, item } = useRecipeTreeContext();
+	const { loading, traverseTree, item } = useRecipeTreeContext();
 
 	useEffect(() =>
 	{
@@ -76,9 +73,9 @@ export function RecipeTreeFlow()
 			const nextNodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[] = [];
 			const nextEdges: Edge[] = [];
 
-			await traverseTree(async ({ nodeId, item, parentNodeId, recipes, selectedRecipeIndex }) =>
+			await traverseTree(async ({ nodeId, item, parentNodeId, recipe }) =>
 			{
-				if (recipes.length === 0)
+				if (!recipe)
 				{
 					const leafNode = buildLeafNode({
 						nodeId: nodeId,
@@ -86,24 +83,18 @@ export function RecipeTreeFlow()
 							itemId: item.id,
 						},
 					});
+
 					nextNodes.push(leafNode);
 				}
 				else
 				{
-					const ingredientsMap: Map<Recipe, Ingredient[]> = new Map();
-					for (const recipe of recipes)
-					{
-						const ingredients = ingredientsByRecipeId.get(recipe.id) ?? [];
-						ingredientsMap.set(recipe, ingredients);
-					}
-
 					const node = buildNode({
 						nodeId: nodeId,
 						data: {
 							itemId: item.id,
-							isRoot: parentNodeId === null,
 						},
 					});
+
 					nextNodes.push(node);
 				}
 
@@ -113,7 +104,6 @@ export function RecipeTreeFlow()
 				}
 			});
 
-			// Calculate positions
 			calculateTreePositions(nextNodes, nextEdges);
 
 			setNodes(nextNodes);
@@ -186,7 +176,7 @@ export function RecipeTreeFlow()
 			}
 
 			// Find root node (node with no incoming edges)
-			const rootNode = nodes.find((n) => n.data.isRoot);
+			const rootNode = nodes.find((node) => !edges.some((edge) => edge.target === node.id));
 			if (rootNode)
 			{
 				positionNode(rootNode.id, 0, 0);
@@ -194,7 +184,7 @@ export function RecipeTreeFlow()
 		}
 
 		buildRecipeTree();
-	}, [item, loading, traverseTree, ingredientsByRecipeId, setNodes, setEdges]);
+	}, [item, loading, traverseTree]);
 
 	if (!mounted)
 	{
