@@ -68,20 +68,23 @@ export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
 		{
 			const nodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[] = [];
 			const edges: Edge[] = [];
-			const visited = new Set<string>();
 
 			let nodeIdCounter = 0;
 
-			async function processItem(item: Item, parentNodeId: string | null, recipeIndex: number): Promise<void>
+			async function processItem(item: Item, parentNodeId: string | null, recipeIndex: number, ancestors: Set<string>): Promise<void>
 			{
 				const itemKey = `${item.id}`;
 
-				if (visited.has(itemKey))
+				if (ancestors.has(itemKey))
 				{
+					console.warn(
+						`Recipe tree cycle detected: item "${item.name}" (${item.id}) appears again in its own ancestor chain. ` +
+							`This indicates a circular dependency between recipes (e.g., A requires B, and B requires A). ` +
+							`The recursion for this branch is stopped to prevent an infinite loop.`,
+					);
 					return;
 				}
 
-				visited.add(itemKey);
 				const nodeId = `node_${nodeIdCounter++}`;
 
 				// Get recipes for this item
@@ -145,15 +148,18 @@ export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
 				}
 
 				// Recursively process ingredient items
+				const nextAncestors = new Set(ancestors);
+				nextAncestors.add(itemKey);
+
 				for (const ingredient of ingredients)
 				{
 					const ingredientItem = await getItemById(ingredient.itemId);
-					await processItem(ingredientItem, nodeId, 0);
+					await processItem(ingredientItem, nodeId, 0, nextAncestors);
 				}
 			}
 
 			// Build tree data
-			await processItem(item, null, 0);
+			await processItem(item, null, 0, new Set());
 
 			// Calculate positions
 			calculateTreePositions(nodes, edges);
