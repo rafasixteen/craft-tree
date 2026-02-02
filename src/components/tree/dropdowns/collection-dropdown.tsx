@@ -5,7 +5,7 @@ import { PencilIcon, FilesIcon, TrashIcon, CuboidIcon, FolderIcon } from 'lucide
 import { createFolder } from '@/domain/folder';
 import { createItem } from '@/domain/item';
 import { deleteCollection } from '@/domain/collection';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { redirect } from 'next/navigation';
 import { Node } from '@/domain/tree';
 import { ItemInstance } from '@headless-tree/core';
@@ -21,7 +21,7 @@ export function CollectionDropdown({ item }: CollectionDropdownProps)
 	const tree = item.getTree();
 	const treeConfig = tree.getConfig();
 
-	const { refresh } = useTreeNodes();
+	const { refresh } = useTreeNodesContext();
 
 	const handleAddItem = async (e: React.MouseEvent) =>
 	{

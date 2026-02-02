@@ -4,7 +4,7 @@ import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdow
 import { PencilIcon, FilesIcon, TrashIcon, CuboidIcon, FolderIcon } from 'lucide-react';
 import { createFolder, deleteFolder } from '@/domain/folder';
 import { createItem } from '@/domain/item';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { Node } from '@/domain/tree';
 import { ItemInstance } from '@headless-tree/core';
 
@@ -19,7 +19,7 @@ export function FolderDropdown({ item }: FolderDropdownProps)
 	const tree = item.getTree();
 	const treeConfig = tree.getConfig();
 
-	const { refresh } = useTreeNodes();
+	const { refresh } = useTreeNodesContext();
 
 	const handleAddItem = async (e: React.MouseEvent) =>
 	{

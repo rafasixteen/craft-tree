@@ -3,7 +3,7 @@ import { Recipe } from '@/domain/recipe';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from '@/components/ui/combobox';
 import { Node } from '@/domain/tree';
 import { XIcon } from 'lucide-react';
@@ -17,7 +17,7 @@ interface IngredientsTableProps
 
 export function IngredientsTable({ ingredients, recipe, onIngredientsChange }: IngredientsTableProps)
 {
-	const { nodes } = useTreeNodes();
+	const { nodes } = useTreeNodesContext();
 
 	const editMode = onIngredientsChange !== undefined && recipe !== undefined;
 

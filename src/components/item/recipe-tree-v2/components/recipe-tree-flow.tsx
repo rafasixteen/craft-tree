@@ -9,7 +9,7 @@ import { buildEdge, buildNode, buildLeafNode } from '@/components/item/recipe-tr
 import { getItemById, getRecipes, Item } from '@/domain/item';
 import { getRecipeIngredients, Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import {
 	ReactFlow,
 	type Node,
@@ -55,7 +55,7 @@ export function RecipeTreeFlowV2({ item }: RecipeTreeFlowProps)
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	const { nodes: treeNodes } = useTreeNodes();
+	const { nodes: treeNodes } = useTreeNodesContext();
 
 	useEffect(() =>
 	{

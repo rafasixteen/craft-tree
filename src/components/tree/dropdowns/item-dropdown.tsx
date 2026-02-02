@@ -4,7 +4,7 @@ import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdow
 import { PencilIcon, FilesIcon, TrashIcon, CookingPotIcon } from 'lucide-react';
 import { createRecipe } from '@/domain/recipe';
 import { deleteItem } from '@/domain/item';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { Node } from '@/domain/tree';
 import { ItemInstance } from '@headless-tree/core';
 
@@ -19,7 +19,7 @@ export function ItemDropdown({ item }: ItemDropdownProps)
 	const tree = item.getTree();
 	const treeConfig = tree.getConfig();
 
-	const { refresh } = useTreeNodes();
+	const { refresh } = useTreeNodesContext();
 
 	const handleAddRecipe = async (e: React.MouseEvent) =>
 	{

@@ -17,8 +17,9 @@ import { renameItem, moveAndReorderItems } from '@/domain/item';
 import { reorderRecipes, updateRecipe } from '@/domain/recipe';
 import { getItem, getItemChildren } from './item-tree.utils';
 import { useCollectionsContext } from '@/providers/collections-context';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { getNodePath } from '@/domain/tree';
+import { useDebounceCallback } from '@/hooks/use-debounce-callback';
 import {
 	expandAllFeature,
 	hotkeysCoreFeature,
@@ -32,7 +33,6 @@ import {
 	propMemoizationFeature,
 	ItemInstance,
 } from '@headless-tree/core';
-import { useDebounceCallback } from '@/hooks/use-debounce-callback';
 
 interface ItemTreeProps
 {
@@ -45,12 +45,14 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 	const pathname = usePathname();
 
 	const { activeCollection: collection } = useCollectionsContext();
-	const { nodes, mutateNode, refresh } = useTreeNodes();
+	const { nodes, mutateNode, refresh } = useTreeNodesContext();
 
 	const [expandedItems, setExpandedItems] = useLocalStorage<string[]>(`tree-expanded-items-${collection.id}`, []);
 
 	// Track the previous nodes to detect slug changes
 	const prevNodesRef = useRef<Record<string, Node>>({});
+
+	const [localSearchValue, setLocalSearchValue] = useState('');
 
 	const tree = useTree<Node>({
 		state: {
@@ -213,8 +215,6 @@ export function ItemTree({ indent = 16 }: ItemTreeProps)
 	});
 
 	const { setSearch, expandAll } = tree;
-
-	const [localSearchValue, setLocalSearchValue] = useState('');
 
 	useEffect(() =>
 	{

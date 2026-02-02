@@ -3,7 +3,7 @@
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { PencilIcon, FilesIcon, TrashIcon } from 'lucide-react';
 import { deleteRecipe } from '@/domain/recipe';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { ItemInstance } from '@headless-tree/core';
 import { Node } from '@/domain/tree';
 
@@ -16,7 +16,7 @@ export function RecipeDropdown({ item }: RecipeDropdownProps)
 {
 	const node = item.getItemData();
 
-	const { refresh } = useTreeNodes();
+	const { refresh } = useTreeNodesContext();
 
 	const handleRename = (e: React.MouseEvent) =>
 	{

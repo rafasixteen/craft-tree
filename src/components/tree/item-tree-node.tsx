@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ButtonSpan } from '@/components/ui/button-span';
 import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 import { FolderDropdown, ItemDropdown, RecipeDropdown, CollectionDropdown } from '@/components/tree/dropdowns';
 import useIsMobile from '@/hooks/use-is-mobile';
 import Link from 'next/link';
@@ -21,7 +21,7 @@ interface ItemTreeNodeProps
 export function ItemTreeNode({ item }: ItemTreeNodeProps)
 {
 	const { isMobile } = useIsMobile();
-	const { nodes } = useTreeNodes();
+	const { nodes } = useTreeNodesContext();
 
 	const [dropdownOpen, setDropdownOpen] = useState(false);
 	const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);

@@ -69,9 +69,9 @@ export function TreeNodesProvider({ children, initialNodes }: { children: React.
 	return <TreeNodesContext.Provider value={value}>{children}</TreeNodesContext.Provider>;
 }
 
-export function useTreeNodes()
+export function useTreeNodesContext()
 {
 	const context = useContext(TreeNodesContext);
-	if (!context) throw new Error('useTreeNodes must be used within a TreeNodesProvider');
+	if (!context) throw new Error('useTreeNodesContext must be used within a TreeNodesProvider');
 	return context;
 }

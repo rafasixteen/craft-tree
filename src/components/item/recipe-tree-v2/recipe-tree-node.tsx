@@ -8,7 +8,7 @@ import { buildNode } from '@/components/item/recipe-tree-v2';
 import { useItemRecipe } from '@/hooks/use-item-recipe';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
-import { useTreeNodes } from '@/providers';
+import { useTreeNodesContext } from '@/providers';
 
 export interface RecipeTreeNodeData extends Record<string, unknown>
 {
@@ -30,7 +30,7 @@ export function RecipeTreeNodeV2({ data }: RecipeTreeNodeProps)
 	const { data: recipe } = useItemRecipe(itemId, recipeIndex);
 	const { data: ingredients } = useRecipeIngredients(recipe?.id);
 
-	const { nodes } = useTreeNodes();
+	const { nodes } = useTreeNodesContext();
 
 	const flow = useReactFlow<Node<RecipeTreeNodeData>, Edge>();
 	const node = flow.getNode(itemId)!;
