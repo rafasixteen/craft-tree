@@ -83,7 +83,7 @@ export function RecipeTreeFlow()
 					const leafNode = buildLeafNode({
 						nodeId: nodeId,
 						data: {
-							item: item,
+							itemId: item.id,
 						},
 					});
 					nextNodes.push(leafNode);
@@ -100,10 +100,7 @@ export function RecipeTreeFlow()
 					const node = buildNode({
 						nodeId: nodeId,
 						data: {
-							item: item,
-							recipes: recipes,
-							ingredientsMap: ingredientsMap,
-							selectedRecipeIndex: selectedRecipeIndex,
+							itemId: item.id,
 							isRoot: parentNodeId === null,
 						},
 					});

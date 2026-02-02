@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardFooter, CardHeader } from '@/components/ui/card';
-import { Position, Handle, Node, Edge, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+import { Position, Handle, useUpdateNodeInternals } from '@xyflow/react';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, PackageIcon, ClockIcon } from 'lucide-react';
@@ -15,13 +15,24 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
-	const { item, recipes, ingredientsMap, isRoot, selectedRecipeIndex } = data;
+	// const { item, recipes, ingredientsMap, isRoot, selectedRecipeIndex } = data;
 
-	const {itemsById, setSelectedRecipeIndex} = useRecipeTreeContext();
+	const { itemId } = data;
 
-	const selectedRecipe = recipes[selectedRecipeIndex];
+	const { loading, item: rootItem, itemsById, recipesByItemId, getSelectedRecipeIndex, setSelectedRecipeIndex } = useRecipeTreeContext();
 
 	const updateNodeInternals = useUpdateNodeInternals();
+
+	if (loading)
+	{
+		return null;
+	}
+
+	const selectedRecipeIndex = getSelectedRecipeIndex(id);
+	const item = itemsById.get(itemId)!;
+	const recipes = recipesByItemId.get(itemId) || [];
+	const selectedRecipe = recipes[selectedRecipeIndex];
+	const isRoot = rootItem?.id === item.id;
 
 	useEffect(() =>
 	{

@@ -1,6 +1,6 @@
 import { Card, CardHeader } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
-import { RecipeTreeLeafNodeData } from '@/components/item/recipe-tree';
+import { RecipeTreeLeafNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
 
 interface RecipeTreeLeafNodeProps
 {
@@ -8,9 +8,23 @@ interface RecipeTreeLeafNodeProps
 	data: RecipeTreeLeafNodeData;
 }
 
-export function RecipeTreeLeafNode({ id, data }: RecipeTreeLeafNodeProps)
+export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
 {
-	const { item } = data;
+	const { itemId } = data;
+
+	const { loading, itemsById } = useRecipeTreeContext();
+
+	if (loading)
+	{
+		return null;
+	}
+
+	const item = itemsById.get(itemId);
+
+	if (!item)
+	{
+		return null;
+	}
 
 	return (
 		<Card className="w-40">
