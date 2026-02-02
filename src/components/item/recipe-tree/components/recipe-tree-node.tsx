@@ -5,7 +5,7 @@ import { Position, Handle, Node, Edge, useReactFlow, useUpdateNodeInternals } fr
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, PackageIcon, ClockIcon } from 'lucide-react';
-import { ItemIcon, RecipeTreeNodeData } from '@/components/item/recipe-tree';
+import { ItemIcon, RecipeTreeNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
 
 interface RecipeTreeNodeProps
 {
@@ -17,9 +17,10 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
 	const { item, recipes, ingredientsMap, isRoot, selectedRecipeIndex } = data;
 
+	const {itemsById, setSelectedRecipeIndex} = useRecipeTreeContext();
+
 	const selectedRecipe = recipes[selectedRecipeIndex];
 
-	const flow = useReactFlow<Node<RecipeTreeNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 
 	useEffect(() =>
@@ -32,7 +33,7 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 		if (recipes.length > 0)
 		{
 			const prevIndex = (selectedRecipeIndex - 1 + recipes.length) % recipes.length;
-			flow.updateNodeData(id, { selectedRecipeIndex: prevIndex });
+			setSelectedRecipeIndex(id, prevIndex);
 		}
 	}
 
@@ -41,7 +42,7 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 		if (recipes.length > 0)
 		{
 			const nextIndex = (selectedRecipeIndex + 1) % recipes.length;
-			flow.updateNodeData(id, { selectedRecipeIndex: nextIndex });
+			setSelectedRecipeIndex(id, nextIndex);
 		}
 	}
 

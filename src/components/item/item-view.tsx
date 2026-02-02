@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Item } from '@/domain/item';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RecipeTreeFlow } from '@/components/item/recipe-tree';
+import { RecipeTreeFlow, RecipeTreeProvider } from '@/components/item/recipe-tree';
 
 type ItemViewTabs = 'recipe-tree';
 
@@ -25,7 +25,9 @@ export function ItemView({ item }: ItemViewProps)
 			</div>
 
 			<TabsContent value="recipe-tree" className="h-full">
-				<RecipeTreeFlow item={item} />
+				<RecipeTreeProvider item={item}>
+					<RecipeTreeFlow />
+				</RecipeTreeProvider>
 			</TabsContent>
 		</Tabs>
 	);

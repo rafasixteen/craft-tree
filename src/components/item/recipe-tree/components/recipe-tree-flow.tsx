@@ -6,10 +6,10 @@ import { useTheme } from 'next-themes';
 import { RecipeTreeNode, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components/item/recipe-tree/components';
 import { RecipeTreeNodeData, RecipeTreeLeafNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree/types';
 import { buildEdge, buildNode, buildLeafNode } from '@/components/item/recipe-tree/utils';
-import { getItemById, getRecipes, Item } from '@/domain/item';
-import { getRecipeIngredients, Recipe } from '@/domain/recipe';
+import { useRecipeTreeContext } from '@/components/item/recipe-tree';
+import { Item } from '@/domain/item';
+import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
-import { useTreeNodesContext } from '@/providers';
 import {
 	ReactFlow,
 	type Node,
@@ -42,12 +42,7 @@ const defaultEdgeOptions: DefaultEdgeOptions = {
 	type: 'flow-edge',
 };
 
-interface RecipeTreeFlowProps
-{
-	item: Item;
-}
-
-export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
+export function RecipeTreeFlow()
 {
 	const { theme } = useTheme();
 	const [mounted, setMounted] = useState(false);
@@ -55,7 +50,7 @@ export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	const { nodes: treeNodes } = useTreeNodesContext();
+	const { loading, traverseTree, ingredientsByRecipeId, item } = useRecipeTreeContext();
 
 	useEffect(() =>
 	{
@@ -66,106 +61,66 @@ export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
 	{
 		async function buildRecipeTree()
 		{
-			const nodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[] = [];
-			const edges: Edge[] = [];
-
-			let nodeIdCounter = 0;
-
-			async function processItem(item: Item, parentNodeId: string | null, recipeIndex: number, ancestors: Set<string>): Promise<void>
+			if (!item)
 			{
-				const itemKey = `${item.id}`;
+				setNodes([]);
+				setEdges([]);
+				return;
+			}
 
-				if (ancestors.has(itemKey))
-				{
-					console.warn(
-						`Recipe tree cycle detected: item "${item.name}" (${item.id}) appears again in its own ancestor chain. ` +
-							`This indicates a circular dependency between recipes (e.g., A requires B, and B requires A). ` +
-							`The recursion for this branch is stopped to prevent an infinite loop.`,
-					);
-					return;
-				}
+			if (loading)
+			{
+				return;
+			}
 
-				const nodeId = `node_${nodeIdCounter++}`;
+			const nextNodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[] = [];
+			const nextEdges: Edge[] = [];
 
-				// Get recipes for this item
-				const recipes = await getRecipes(item.id);
-
+			await traverseTree(async ({ nodeId, item, parentNodeId, recipes, selectedRecipeIndex }) =>
+			{
 				if (recipes.length === 0)
 				{
-					// Item has no recipes, create a leaf node
 					const leafNode = buildLeafNode({
 						nodeId: nodeId,
 						data: {
 							item: item,
 						},
 					});
-
-					nodes.push(leafNode);
-
-					if (parentNodeId)
+					nextNodes.push(leafNode);
+				}
+				else
+				{
+					const ingredientsMap: Map<Recipe, Ingredient[]> = new Map();
+					for (const recipe of recipes)
 					{
-						edges.push(buildEdge(parentNodeId, nodeId));
+						const ingredients = ingredientsByRecipeId.get(recipe.id) ?? [];
+						ingredientsMap.set(recipe, ingredients);
 					}
 
-					return;
+					const node = buildNode({
+						nodeId: nodeId,
+						data: {
+							item: item,
+							recipes: recipes,
+							ingredientsMap: ingredientsMap,
+							selectedRecipeIndex: selectedRecipeIndex,
+							isRoot: parentNodeId === null,
+						},
+					});
+					nextNodes.push(node);
 				}
 
-				const ingredientsMap: Map<Recipe, Ingredient[]> = new Map();
-
-				for (const recipe of recipes)
-				{
-					const ingredients = await getRecipeIngredients(recipe.id);
-					ingredientsMap.set(recipe, ingredients);
-				}
-
-				// Get the selected recipe (bounded by available recipes)
-				const selectedRecipeIndex = Math.min(recipeIndex, recipes.length - 1);
-				const selectedRecipe = recipes[selectedRecipeIndex];
-				const ingredients = ingredientsMap.get(selectedRecipe);
-
-				if (!ingredients)
-				{
-					throw new Error(`No ingredients found for recipe id: ${selectedRecipe.id}`);
-				}
-
-				const node = buildNode({
-					nodeId: nodeId,
-					data: {
-						item: item,
-						recipes: recipes,
-						ingredientsMap: ingredientsMap,
-						selectedRecipeIndex: selectedRecipeIndex,
-						isRoot: parentNodeId === null,
-					},
-				});
-
-				nodes.push(node);
-
-				// Connect to parent
 				if (parentNodeId)
 				{
-					edges.push(buildEdge(parentNodeId, nodeId));
+					nextEdges.push(buildEdge(parentNodeId, nodeId));
 				}
-
-				// Recursively process ingredient items
-				const nextAncestors = new Set(ancestors);
-				nextAncestors.add(itemKey);
-
-				for (const ingredient of ingredients)
-				{
-					const ingredientItem = await getItemById(ingredient.itemId);
-					await processItem(ingredientItem, nodeId, 0, nextAncestors);
-				}
-			}
-
-			// Build tree data
-			await processItem(item, null, 0, new Set());
+			});
 
 			// Calculate positions
-			calculateTreePositions(nodes, edges);
+			calculateTreePositions(nextNodes, nextEdges);
 
-			setNodes(nodes);
-			setEdges(edges);
+			setNodes(nextNodes);
+			setEdges(nextEdges);
 		}
 
 		function calculateTreePositions(nodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[], edges: Edge[]): void
@@ -242,7 +197,7 @@ export function RecipeTreeFlow({ item }: RecipeTreeFlowProps)
 		}
 
 		buildRecipeTree();
-	}, [item, setNodes, setEdges, treeNodes]);
+	}, [item, loading, traverseTree, ingredientsByRecipeId, setNodes, setEdges]);
 
 	if (!mounted)
 	{
