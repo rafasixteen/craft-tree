@@ -13,7 +13,7 @@ interface RecipeTreeNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
+export function RecipeTreeRootNode({ id, data }: RecipeTreeNodeProps)
 {
 	const { itemId } = data;
 
@@ -26,13 +26,19 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 		updateNodeInternals(id);
 	}, [id, updateNodeInternals]);
 
-	const item = getItem(itemId)!;
+	const item = getItem(itemId);
 	const recipes = getRecipes(itemId);
 
 	const selectedRecipeIndex = getSelectedRecipeIndex(id);
 	const selectedRecipe = recipes[selectedRecipeIndex];
 
 	const calculation = calculateRecipe(id, itemId);
+
+	if (!item)
+	{
+		console.warn(`Item with id ${itemId} not found for root node.`);
+		return null;
+	}
 
 	const isRoot = rootItem.id === item.id;
 

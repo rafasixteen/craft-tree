@@ -3,9 +3,9 @@
 import '@xyflow/react/dist/style.css';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { RecipeTreeNode, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components/item/recipe-tree/components';
-import { RecipeTreeNodeData, RecipeTreeLeafNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree/types';
-import { buildEdge, buildNode, buildLeafNode } from '@/components/item/recipe-tree/utils';
+import { RecipeTreeRootNode, RecipeTreeNode, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components/item/recipe-tree/components';
+import { RecipeTreeNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree/types';
+import { buildEdge, buildNode } from '@/components/item/recipe-tree/utils';
 import { useRecipeTreeContext } from '@/components/item/recipe-tree';
 import {
 	ReactFlow,
@@ -22,6 +22,7 @@ import {
 } from '@xyflow/react';
 
 const nodeTypes: NodeTypes = {
+	[RecipeTreeNodeType.ROOT]: RecipeTreeRootNode,
 	[RecipeTreeNodeType.NODE]: RecipeTreeNode,
 	[RecipeTreeNodeType.LEAF]: RecipeTreeLeafNode,
 };
@@ -44,7 +45,7 @@ export function RecipeTreeFlow()
 	const { theme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
-	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>>([]);
+	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
 	const { loading, traverseTree, rootItem } = useRecipeTreeContext();
@@ -63,33 +64,35 @@ export function RecipeTreeFlow()
 				return;
 			}
 
-			const nextNodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[] = [];
+			const nextNodes: Node<RecipeTreeNodeData>[] = [];
 			const nextEdges: Edge[] = [];
 
 			await traverseTree(async ({ nodeId, item, parentNodeId, recipe }) =>
 			{
-				if (!recipe)
+				function getNodeType(): RecipeTreeNodeType
 				{
-					const leafNode = buildLeafNode({
-						nodeId: nodeId,
-						data: {
-							itemId: item.id,
-						},
-					});
+					if (item.id === rootItem.id)
+					{
+						return RecipeTreeNodeType.ROOT;
+					}
 
-					nextNodes.push(leafNode);
-				}
-				else
-				{
-					const node = buildNode({
-						nodeId: nodeId,
-						data: {
-							itemId: item.id,
-						},
-					});
+					if (!recipe)
+					{
+						return RecipeTreeNodeType.LEAF;
+					}
 
-					nextNodes.push(node);
+					return RecipeTreeNodeType.NODE;
 				}
+
+				const node = buildNode({
+					nodeId: nodeId,
+					nodeType: getNodeType(),
+					data: {
+						itemId: item.id,
+					},
+				});
+
+				nextNodes.push(node);
 
 				if (parentNodeId)
 				{
@@ -103,7 +106,7 @@ export function RecipeTreeFlow()
 			setEdges(nextEdges);
 		}
 
-		function calculateTreePositions(nodes: Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>[], edges: Edge[]): void
+		function calculateTreePositions(nodes: Node<RecipeTreeNodeData>[], edges: Edge[]): void
 		{
 			// Build parent-child relationships
 			const childrenMap = new Map<string, string[]>();
@@ -117,8 +120,8 @@ export function RecipeTreeFlow()
 			});
 
 			// Calculate tree layout based on node dimensions
-			const nodeWidth = 160; // w-40 in Tailwind = 10rem = 160px
-			const nodeHeight = 130; // Estimated average height
+			const nodeWidth = 200; // w-40 in Tailwind = 10rem = 160px
+			const nodeHeight = 180; // Estimated average height
 			const horizontalOffset = 80; // Space between nodes horizontally
 			const verticalOffset = 60; // Space between levels
 

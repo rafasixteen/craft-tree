@@ -4,16 +4,17 @@ import { RecipeTreeNodeData, RecipeTreeNodeType } from '@/components/item/recipe
 interface BuildNodeParams
 {
 	nodeId: string;
+	nodeType: RecipeTreeNodeType;
 	data: RecipeTreeNodeData;
 }
 
 export function buildNode(params: BuildNodeParams): Node<RecipeTreeNodeData>
 {
-	const { nodeId, data } = params;
+	const { nodeId, nodeType, data } = params;
 
 	return {
 		id: nodeId,
-		type: RecipeTreeNodeType.NODE,
+		type: nodeType,
 		data: data,
 		position: { x: 0, y: 0 },
 	};

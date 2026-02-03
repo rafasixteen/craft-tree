@@ -1,11 +1,11 @@
 import { Card, CardHeader } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
-import { RecipeTreeLeafNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
+import { useRecipeTreeContext, RecipeTreeNodeData } from '@/components/item/recipe-tree';
 
 interface RecipeTreeLeafNodeProps
 {
 	id: string;
-	data: RecipeTreeLeafNodeData;
+	data: RecipeTreeNodeData;
 }
 
 export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
