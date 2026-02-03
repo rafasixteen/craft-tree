@@ -88,7 +88,7 @@ export function RecipeTreeFlow()
 					nodeId: nodeId,
 					nodeType: getNodeType(),
 					data: {
-						itemId: item.id,
+						item: item,
 					},
 				});
 

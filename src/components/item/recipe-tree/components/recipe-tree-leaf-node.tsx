@@ -10,18 +10,11 @@ interface RecipeTreeLeafNodeProps
 
 export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
 {
-	const { itemId } = data;
+	const { item } = data;
 
-	const { loading, getItem } = useRecipeTreeContext();
+	const { loading } = useRecipeTreeContext();
 
 	if (loading)
-	{
-		return null;
-	}
-
-	const item = getItem(itemId);
-
-	if (!item)
 	{
 		return null;
 	}

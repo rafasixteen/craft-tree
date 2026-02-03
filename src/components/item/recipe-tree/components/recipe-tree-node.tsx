@@ -15,30 +15,25 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
-	const { itemId } = data;
+	const { item } = data;
 
-	const { rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectRecipe, calculateRecipe } = useRecipeTreeContext();
+	const { loading, getRecipes, getSelectedRecipeIndex, selectRecipe, calculateRecipe } = useRecipeTreeContext();
 
-	const updateNodeInternals = useUpdateNodeInternals();
-
-	useEffect(() =>
-	{
-		updateNodeInternals(id);
-	}, [id, updateNodeInternals]);
-
-	const item = getItem(itemId)!;
-	const recipes = getRecipes(itemId);
+	const recipes = getRecipes(item.id);
 
 	const selectedRecipeIndex = getSelectedRecipeIndex(id);
 	const selectedRecipe = recipes[selectedRecipeIndex];
 
-	const calculation = calculateRecipe(id, itemId);
+	const calculation = calculateRecipe(id, item.id);
 
-	const isRoot = rootItem.id === item.id;
+	if (loading)
+	{
+		return null;
+	}
 
 	return (
 		<Card className="w-50">
-			{!isRoot && <Handle type="target" position={Position.Top} />}
+			<Handle type="target" position={Position.Top} />
 
 			<CardHeader className="flex items-center gap-2">
 				<ItemIcon item={item} />
