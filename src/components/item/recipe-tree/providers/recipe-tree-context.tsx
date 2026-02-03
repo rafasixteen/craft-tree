@@ -11,7 +11,7 @@ interface RecipeTreeContextValue
 	/**
 	 * Root item used to build the tree data.
 	 */
-	rootItem: Item | null;
+	rootItem: Item;
 
 	/**
 	 * Whether the tree data is currently loading.

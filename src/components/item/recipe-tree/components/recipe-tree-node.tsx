@@ -17,7 +17,7 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
 	const { itemId } = data;
 
-	const { loading, rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectPreviousRecipe, selectNextRecipe } = useRecipeTreeContext();
+	const { rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectRecipe } = useRecipeTreeContext();
 
 	const updateNodeInternals = useUpdateNodeInternals();
 
@@ -26,31 +26,13 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 		updateNodeInternals(id);
 	}, [id, updateNodeInternals]);
 
-	if (loading)
-	{
-		return null;
-	}
+	const item = getItem(itemId)!;
+	const recipes = getRecipes(itemId);
 
 	const selectedRecipeIndex = getSelectedRecipeIndex(id);
-	const item = getItem(itemId);
-	const recipes = getRecipes(itemId);
-	const boundedRecipeIndex = Math.min(selectedRecipeIndex, Math.max(recipes.length - 1, 0));
-	const selectedRecipe = recipes[boundedRecipeIndex];
-	if (!item || !selectedRecipe)
-	{
-		return null;
-	}
-	const isRoot = rootItem?.id === item.id;
+	const selectedRecipe = recipes[selectedRecipeIndex];
 
-	function previousRecipe()
-	{
-		selectPreviousRecipe(id, itemId);
-	}
-
-	function nextRecipe()
-	{
-		selectNextRecipe(id, itemId);
-	}
+	const isRoot = rootItem.id === item.id;
 
 	return (
 		<Card className="w-50">
@@ -77,13 +59,13 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 			</CardHeader>
 
 			<CardFooter className="justify-between">
-				<Button variant="ghost" onClick={previousRecipe} size="icon">
+				<Button variant="ghost" onClick={() => selectRecipe(id, item.id, -1)} size="icon">
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
-					{boundedRecipeIndex + 1} / {recipes.length}
+					{selectedRecipeIndex + 1} / {recipes.length}
 				</span>
-				<Button variant="ghost" onClick={nextRecipe} size="icon">
+				<Button variant="ghost" onClick={() => selectRecipe(id, item.id, +1)} size="icon">
 					<ArrowRightIcon />
 				</Button>
 			</CardFooter>
