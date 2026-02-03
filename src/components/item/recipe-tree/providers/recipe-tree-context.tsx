@@ -267,6 +267,11 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 	const traverseTree = useCallback(
 		async function traverseTree(visitor: RecipeTreeVisitor)
 		{
+			function buildNodeId(currentPath: string, itemId: string): string
+			{
+				return currentPath ? `node_${currentPath}_${itemId}` : `node_${itemId}`;
+			}
+
 			async function traverse(currentItem: Item, parentNodeId: string | null, ancestors: Set<string>, path: string, depth: number): Promise<void>
 			{
 				if (ancestors.has(currentItem.id))
@@ -279,11 +284,10 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 					return;
 				}
 
-				const nodeId = path ? `node_${path}_${currentItem.id}` : `node_${currentItem.id}`;
+				const nodeId = buildNodeId(path, currentItem.id);
 				const recipes = recipesMap.get(currentItem.id) ?? [];
 				const selectedRecipeIndex = nodeRecipeSelections.get(nodeId) ?? 0;
-				const boundedRecipeIndex = Math.min(selectedRecipeIndex, Math.max(recipes.length - 1, 0));
-				const selectedRecipe = recipes[boundedRecipeIndex];
+				const selectedRecipe = recipes[selectedRecipeIndex];
 				const ingredients = selectedRecipe ? (ingredientsMap.get(selectedRecipe.id) ?? []) : null;
 
 				await visitor({
@@ -314,9 +318,8 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 					return;
 				}
 
-				for (let ingredientIndex = 0; ingredientIndex < ingredients.length; ingredientIndex++)
+				for (const ingredient of ingredients)
 				{
-					const ingredient = ingredients[ingredientIndex];
 					const childItem = itemsMap.get(ingredient.itemId);
 
 					if (!childItem)
@@ -324,7 +327,7 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 						continue;
 					}
 
-					const nextPath = `${path}${path ? '_' : ''}${boundedRecipeIndex}_${ingredientIndex}`;
+					const nextPath = `${path}${path ? '_' : ''}${selectedRecipe.id}_${ingredient.itemId}`;
 					await traverse(childItem, nodeId, nextAncestors, nextPath, depth + 1);
 				}
 			}
