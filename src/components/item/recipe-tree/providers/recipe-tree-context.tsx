@@ -230,32 +230,32 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 
 			try
 			{
-				const { items, recipes, ingredients } = await getRecipeTreeData(item.id);
+				const { items: fetchedItems, recipes: fetchedRecipes, ingredients: fetchedIngredients } = await getRecipeTreeData(item.id);
 
-				const nextItemsById = new Map<string, Item>(items.map((entry) => [entry.id, entry]));
-				const nextRecipesByItemId = new Map<string, Recipe[]>();
-				const nextIngredientsByRecipeId = new Map<string, Ingredient[]>();
+				const itemsMap = new Map<Item["id"], Item>(fetchedItems.map((entry) => [entry.id, entry]));
+				const recipesMap = new Map<Item["id"], Recipe[]>();
+				const ingredientsMap = new Map<Recipe["id"], Ingredient[]>();
 
-				for (const recipe of recipes)
+				for (const recipe of fetchedRecipes)
 				{
-					const existing = nextRecipesByItemId.get(recipe.itemId) ?? [];
-					nextRecipesByItemId.set(recipe.itemId, [...existing, recipe]);
+					const existing = recipesMap.get(recipe.itemId) ?? [];
+					recipesMap.set(recipe.itemId, [...existing, recipe]);
 				}
 
-				for (const ingredient of ingredients)
+				for (const ingredient of fetchedIngredients)
 				{
-					const existing = nextIngredientsByRecipeId.get(ingredient.recipeId) ?? [];
-					nextIngredientsByRecipeId.set(ingredient.recipeId, [...existing, ingredient]);
+					const existing = ingredientsMap.get(ingredient.recipeId) ?? [];
+					ingredientsMap.set(ingredient.recipeId, [...existing, ingredient]);
 				}
 
-				if (!nextItemsById.has(item.id))
+				if (!itemsMap.has(item.id))
 				{
-					nextItemsById.set(item.id, item);
+					itemsMap.set(item.id, item);
 				}
 
-				setItemsMap(nextItemsById);
-				setRecipesMap(nextRecipesByItemId);
-				setIngredientsMap(nextIngredientsByRecipeId);
+				setItemsMap(itemsMap);
+				setRecipesMap(recipesMap);
+				setIngredientsMap(ingredientsMap);
 				setNodeRecipeSelections(new Map());
 			}
 			catch (err)
