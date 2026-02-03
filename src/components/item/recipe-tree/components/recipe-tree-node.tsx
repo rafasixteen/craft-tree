@@ -1,8 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Position, Handle, useUpdateNodeInternals } from '@xyflow/react';
-import { useEffect } from 'react';
+import { Position, Handle } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, PackageIcon, ClockIcon } from 'lucide-react';
 import { ItemIcon, RecipeTreeNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
@@ -13,23 +12,20 @@ interface RecipeTreeNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
+export function RecipeTreeNode({ id, data: { item } }: RecipeTreeNodeProps)
 {
-	const { item } = data;
-
 	const { loading, getRecipes, getSelectedRecipeIndex, selectRecipe, calculateRecipe } = useRecipeTreeContext();
-
-	const recipes = getRecipes(item.id);
-
-	const selectedRecipeIndex = getSelectedRecipeIndex(id);
-	const selectedRecipe = recipes[selectedRecipeIndex];
-
-	const calculation = calculateRecipe(id, item.id);
 
 	if (loading)
 	{
 		return null;
 	}
+
+	const calculation = calculateRecipe(id, item.id);
+
+	const recipes = getRecipes(item.id);
+	const selectedRecipeIndex = getSelectedRecipeIndex(id);
+	const selectedRecipe = recipes[selectedRecipeIndex];
 
 	return (
 		<Card className="w-50">

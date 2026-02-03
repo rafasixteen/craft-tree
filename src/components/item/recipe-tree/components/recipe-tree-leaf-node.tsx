@@ -1,6 +1,7 @@
-import { Card, CardHeader } from '@/components/ui/card';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
 import { useRecipeTreeContext, RecipeTreeNodeData } from '@/components/item/recipe-tree';
+import { PackageIcon, ClockIcon } from 'lucide-react';
 
 interface RecipeTreeLeafNodeProps
 {
@@ -8,16 +9,16 @@ interface RecipeTreeLeafNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
+export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodeProps)
 {
-	const { item } = data;
-
-	const { loading } = useRecipeTreeContext();
+	const { loading, calculateRecipe } = useRecipeTreeContext();
 
 	if (loading)
 	{
 		return null;
 	}
+
+	const calculation = calculateRecipe(id, item.id);
 
 	return (
 		<Card className="w-40">
@@ -30,10 +31,16 @@ export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
 						<p className="text-sm font-semibold">{item.name}</p>
 					</div>
 				</div>
-				<div className="flex w-full justify-center border-t pt-2">
-					<p className="text-xs text-muted-foreground italic">Base ingredient</p>
-				</div>
 			</CardHeader>
+			<CardContent className="flex">
+				<div className="flex-1">
+					<p className="text-xs text-muted-foreground">Total</p>
+					<div className="flex items-center gap-1 text-muted-foreground">
+						<PackageIcon className="size-3" />
+						<span>{calculation.totalQuantity}x</span>
+					</div>
+				</div>
+			</CardContent>
 		</Card>
 	);
 }
