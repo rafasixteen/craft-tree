@@ -17,7 +17,7 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
 	const { itemId } = data;
 
-	const { rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectRecipe } = useRecipeTreeContext();
+	const { rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectRecipe, calculateRecipe } = useRecipeTreeContext();
 
 	const updateNodeInternals = useUpdateNodeInternals();
 
@@ -31,6 +31,8 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 
 	const selectedRecipeIndex = getSelectedRecipeIndex(id);
 	const selectedRecipe = recipes[selectedRecipeIndex];
+
+	const calculation = calculateRecipe(id, itemId);
 
 	const isRoot = rootItem.id === item.id;
 
@@ -49,11 +51,11 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 				<div className="flex-1">
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<PackageIcon className="size-3" />
-						<span>{selectedRecipe.quantity}x</span>
+						<span>{calculation.totalQuantity}x</span>
 					</div>
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<ClockIcon className="size-3" />
-						<span>{selectedRecipe.time}s</span>
+						<span>{calculation.totalTime}s</span>
 					</div>
 				</div>
 			</CardHeader>

@@ -5,6 +5,7 @@ import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
 import { getRecipeTreeData } from '@/components/item/recipe-tree';
+import { RecipeCalculator, RecipeCalculation } from '@/components/item/recipe-tree/utils';
 
 interface RecipeTreeContextValue
 {
@@ -69,6 +70,11 @@ interface RecipeTreeContextValue
 	 * Traverse the recipe tree and invoke a callback for each node.
 	 */
 	traverseTree: (visitor: RecipeTreeVisitor) => Promise<void>;
+
+	/**
+	 * Calculate the total time and quantities for a node.
+	 */
+	calculateRecipe: (nodeId: string, itemId: string) => RecipeCalculation;
 }
 
 const RecipeTreeContext = createContext<RecipeTreeContextValue | undefined>(undefined);
@@ -264,6 +270,19 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 		[item],
 	);
 
+	const calculator = useMemo(
+		() => new RecipeCalculator(getRecipes, getItem, getIngredients, getSelectedRecipeIndex),
+		[getRecipes, getItem, getIngredients, getSelectedRecipeIndex],
+	);
+
+	const calculateRecipe = useCallback(
+		function calculateRecipe(nodeId: string, itemId: string): RecipeCalculation
+		{
+			return calculator.calculateForNode(nodeId, itemId);
+		},
+		[calculator],
+	);
+
 	const traverseTree = useCallback(
 		async function traverseTree(visitor: RecipeTreeVisitor)
 		{
@@ -356,8 +375,23 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 			selectPreviousRecipe,
 			selectNextRecipe,
 			traverseTree,
+			calculateRecipe,
 		}),
-		[item, loading, error, reload, getItem, getRecipes, getIngredients, getSelectedRecipeIndex, selectRecipe, selectPreviousRecipe, selectNextRecipe, traverseTree],
+		[
+			item,
+			loading,
+			error,
+			reload,
+			getItem,
+			getRecipes,
+			getIngredients,
+			getSelectedRecipeIndex,
+			selectRecipe,
+			selectPreviousRecipe,
+			selectNextRecipe,
+			traverseTree,
+			calculateRecipe,
+		],
 	);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
