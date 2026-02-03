@@ -47,7 +47,7 @@ export function RecipeTreeFlow()
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData | RecipeTreeLeafNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	const { loading, traverseTree, item } = useRecipeTreeContext();
+	const { loading, traverseTree, rootItem } = useRecipeTreeContext();
 
 	useEffect(() =>
 	{
@@ -58,13 +58,6 @@ export function RecipeTreeFlow()
 	{
 		async function buildRecipeTree()
 		{
-			if (!item)
-			{
-				setNodes([]);
-				setEdges([]);
-				return;
-			}
-
 			if (loading)
 			{
 				return;
@@ -184,7 +177,7 @@ export function RecipeTreeFlow()
 		}
 
 		buildRecipeTree();
-	}, [item, loading, traverseTree]);
+	}, [rootItem, loading, traverseTree]);
 
 	if (!mounted)
 	{

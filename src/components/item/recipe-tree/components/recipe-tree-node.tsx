@@ -17,7 +17,7 @@ export function RecipeTreeNode({ id, data }: RecipeTreeNodeProps)
 {
 	const { itemId } = data;
 
-	const { loading, item: rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectPreviousRecipe, selectNextRecipe } = useRecipeTreeContext();
+	const { loading, rootItem, getItem, getRecipes, getSelectedRecipeIndex, selectPreviousRecipe, selectNextRecipe } = useRecipeTreeContext();
 
 	const updateNodeInternals = useUpdateNodeInternals();
 
