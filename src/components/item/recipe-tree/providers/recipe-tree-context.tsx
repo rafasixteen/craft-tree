@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useCallback, useEffect, ReactNode,
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
-import { getRecipeTreeData } from '@/components/item/recipe-tree';
+import { getRecipeTreeDataV2 } from '@/components/item/recipe-tree';
 import { RecipeCalculator, RecipeCalculation } from '@/components/item/recipe-tree/utils';
 
 interface RecipeTreeContextValue
@@ -230,28 +230,7 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 
 			try
 			{
-				const { items: fetchedItems, recipes: fetchedRecipes, ingredients: fetchedIngredients } = await getRecipeTreeData(item.id);
-
-				const itemsMap = new Map<Item["id"], Item>(fetchedItems.map((entry) => [entry.id, entry]));
-				const recipesMap = new Map<Item["id"], Recipe[]>();
-				const ingredientsMap = new Map<Recipe["id"], Ingredient[]>();
-
-				for (const recipe of fetchedRecipes)
-				{
-					const existing = recipesMap.get(recipe.itemId) ?? [];
-					recipesMap.set(recipe.itemId, [...existing, recipe]);
-				}
-
-				for (const ingredient of fetchedIngredients)
-				{
-					const existing = ingredientsMap.get(ingredient.recipeId) ?? [];
-					ingredientsMap.set(ingredient.recipeId, [...existing, ingredient]);
-				}
-
-				if (!itemsMap.has(item.id))
-				{
-					itemsMap.set(item.id, item);
-				}
+				const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(item.id);
 
 				setItemsMap(itemsMap);
 				setRecipesMap(recipesMap);
