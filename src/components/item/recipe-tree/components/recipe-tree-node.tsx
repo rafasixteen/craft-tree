@@ -12,7 +12,7 @@ interface RecipeTreeNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeNode({ id, data: { item } }: RecipeTreeNodeProps)
+export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
 {
 	const { loading, tree } = useRecipeTreeContext();
 
@@ -29,7 +29,7 @@ export function RecipeTreeNode({ id, data: { item } }: RecipeTreeNodeProps)
 		return null;
 	}
 
-	if (!node.recipe)
+	if (node.recipes.length === 0)
 	{
 		console.assert(false, `RecipeTreeNode: Node with id "${id}" has no recipe data.`);
 		return null;
@@ -40,8 +40,7 @@ export function RecipeTreeNode({ id, data: { item } }: RecipeTreeNodeProps)
 		totalTime: undefined,
 	};
 
-	const recipes = node.recipe.recipes;
-	const selectedRecipe = node.recipe.selectedRecipe;
+	const selectedRecipe = node.recipes[node.selectedRecipeIndex];
 
 	return (
 		<Card className="w-50">
@@ -50,9 +49,9 @@ export function RecipeTreeNode({ id, data: { item } }: RecipeTreeNodeProps)
 			<CardHeader className="flex items-center gap-2">
 				<ItemIcon item={item} />
 
-				<div className="flex-2">
-					<p className="text-sm font-semibold">{item.name}</p>
-					<p className="text-xs text-muted-foreground">{selectedRecipe.name}</p>
+				<div className="min-w-0 flex-1">
+					<p className="truncate text-sm font-semibold">{item.name}</p>
+					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 				</div>
 			</CardHeader>
 			<CardContent className="flex">
@@ -80,13 +79,13 @@ export function RecipeTreeNode({ id, data: { item } }: RecipeTreeNodeProps)
 				</div>
 			</CardContent>
 			<CardFooter className="justify-between">
-				<Button variant="ghost" onClick={() => node.selectRecipe(-1)} size="icon">
+				<Button variant="ghost" onClick={() => tree.selectRecipe(id, -1)} size="icon">
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
-					{node.getSelectedRecipeIndex() + 1} / {recipes.length}
+					{node.selectedRecipeIndex + 1} / {node.recipes.length}
 				</span>
-				<Button variant="ghost" onClick={() => node.selectRecipe(+1)} size="icon">
+				<Button variant="ghost" onClick={() => tree.selectRecipe(id, +1)} size="icon">
 					<ArrowRightIcon />
 				</Button>
 			</CardFooter>

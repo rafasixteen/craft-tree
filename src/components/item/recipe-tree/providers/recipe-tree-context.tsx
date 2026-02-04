@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, ReactNode, useMemo } from 'react';
+import { createContext, useSyncExternalStore, useContext, useState, useCallback, useEffect, ReactNode, useMemo } from 'react';
 import { Item } from '@/domain/item';
 import { RecipeTree } from '@/components/item/recipe-tree/utils';
 
@@ -44,7 +44,8 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 
 			try
 			{
-				setTree(await RecipeTree.fromItem(item));
+				const newTree = await RecipeTree.fromItem(item);
+				setTree(newTree);
 			}
 			catch (err)
 			{
@@ -83,6 +84,15 @@ export function useRecipeTreeContext(): RecipeTreeContextValue
 	{
 		throw new Error('useRecipeTreeContext must be used within a RecipeTreeProvider');
 	}
+
+	const tree = context.tree;
+
+	useSyncExternalStore(
+		(listener) => tree?.subscribe(listener) ?? (() =>
+		{}),
+		() => tree?.getVersion() ?? 0,
+		() => tree?.getVersion() ?? 0,
+	);
 
 	return context;
 }

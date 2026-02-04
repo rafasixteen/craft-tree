@@ -29,7 +29,7 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeNodeProps)
 		return null;
 	}
 
-	if (!node.recipe)
+	if (node.recipes.length === 0)
 	{
 		console.assert(false, `RecipeTreeNode: Node with id "${id}" has no recipe data.`);
 		return null;
@@ -40,8 +40,7 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeNodeProps)
 		totalTime: undefined,
 	};
 
-	const recipes = node.recipe.recipes;
-	const selectedRecipe = node.recipe.selectedRecipe;
+	const selectedRecipe = node.recipes[node.selectedRecipeIndex];
 
 	return (
 		<Card className="w-50">
@@ -80,13 +79,13 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeNodeProps)
 				</div>
 			</CardContent>
 			<CardFooter className="justify-between">
-				<Button variant="ghost" onClick={() => node.selectRecipe(-1)} size="icon">
+				<Button variant="ghost" onClick={() => tree.selectRecipe(id, -1)} size="icon">
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
-					{node.getSelectedRecipeIndex() + 1} / {recipes.length}
+					{node.selectedRecipeIndex + 1} / {node.recipes.length}
 				</span>
-				<Button variant="ghost" onClick={() => node.selectRecipe(+1)} size="icon">
+				<Button variant="ghost" onClick={() => tree.selectRecipe(id, +1)} size="icon">
 					<ArrowRightIcon />
 				</Button>
 			</CardFooter>

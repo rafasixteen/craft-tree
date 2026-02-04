@@ -3,10 +3,10 @@
 import '@xyflow/react/dist/style.css';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { RecipeTreeRootNode, RecipeTreeNode, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components/item/recipe-tree/components';
+import { RecipeTreeRootNode, RecipeTreeNodeComp, RecipeTreeLeafNode, RecipeTreeEdge } from '@/components/item/recipe-tree/components';
 import { RecipeTreeNodeData, RecipeTreeNodeType } from '@/components/item/recipe-tree/types';
 import { buildEdge, buildNode } from '@/components/item/recipe-tree/utils';
-import { useRecipeTreeContext } from '@/components/item/recipe-tree';
+import { useRecipeTreeContext } from '@/components/item/recipe-tree/providers';
 import {
 	ReactFlow,
 	type Node,
@@ -23,7 +23,7 @@ import {
 
 const nodeTypes: NodeTypes = {
 	[RecipeTreeNodeType.ROOT]: RecipeTreeRootNode,
-	[RecipeTreeNodeType.NODE]: RecipeTreeNode,
+	[RecipeTreeNodeType.NODE]: RecipeTreeNodeComp,
 	[RecipeTreeNodeType.LEAF]: RecipeTreeLeafNode,
 };
 
@@ -76,17 +76,17 @@ export function RecipeTreeFlow()
 			{
 				function getNodeType(): RecipeTreeNodeType
 				{
-					if (node.id === tree.root.id)
+					if (node.id === tree!.root.id)
 					{
 						return RecipeTreeNodeType.ROOT;
 					}
 
-					if (!node.recipe)
+					if (node.recipes.length > 0)
 					{
-						return RecipeTreeNodeType.LEAF;
+						return RecipeTreeNodeType.NODE;
 					}
 
-					return RecipeTreeNodeType.NODE;
+					return RecipeTreeNodeType.LEAF;
 				}
 
 				const flowNode = buildNode({
@@ -100,6 +100,7 @@ export function RecipeTreeFlow()
 				nextNodes.push(flowNode);
 
 				const parentNode = node.getParent();
+
 				if (parentNode)
 				{
 					nextEdges.push(buildEdge(parentNode.id, node.id));
