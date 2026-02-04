@@ -287,6 +287,66 @@ class RecipeTree
 		this.rebuildSubtree(node);
 	}
 
+	public getTotalQuantity(node: RecipeTreeNode): number
+	{
+		if (node.parent === null)
+		{
+			const selectedRecipeIndex = node.getSelectedRecipeIndex();
+
+			if (selectedRecipeIndex === -1)
+			{
+				return 0;
+			}
+
+			const selectedRecipe = node.recipes[selectedRecipeIndex];
+			return selectedRecipe.quantity;
+		}
+		else
+		{
+			const parentTotalQuantity = this.getTotalQuantity(node.parent);
+			const parentSelectedRecipeIndex = node.parent.getSelectedRecipeIndex();
+
+			if (parentSelectedRecipeIndex === -1)
+			{
+				return 0;
+			}
+
+			const parentSelectedRecipe = node.parent.recipes[parentSelectedRecipeIndex];
+			const ingredient = this._ingredientsMap.get(parentSelectedRecipe.id)?.find((ing) => ing.itemId === node.item.id);
+
+			return parentTotalQuantity * ingredient!.quantity;
+		}
+	}
+
+	public getNodeTime(node: RecipeTreeNode): number
+	{
+		const selectedRecipeIndex = node.getSelectedRecipeIndex();
+
+		if (selectedRecipeIndex === -1)
+		{
+			return 0;
+		}
+
+		const recipe = node.recipes[selectedRecipeIndex];
+		const nodeTotalQuantity = this.getTotalQuantity(node);
+		const nodeTime = nodeTotalQuantity * recipe.time;
+
+		return nodeTime;
+	}
+
+	public getTotalTime(node: RecipeTreeNode): number
+	{
+		let totalTime = this.getNodeTime(node);
+
+		for (const child of node.children)
+		{
+			const childTime = this.getTotalTime(child);
+			totalTime += childTime;
+		}
+
+		return totalTime;
+	}
+
 	public incrementVersion(): void
 	{
 		this._version++;

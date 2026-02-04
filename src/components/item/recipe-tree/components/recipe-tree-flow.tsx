@@ -64,8 +64,6 @@ export function RecipeTreeFlow()
 				return;
 			}
 
-			console.log('Rebuilding recipe tree flow...');
-
 			const nextNodes: Node<RecipeTreeNodeData>[] = [];
 			const nextEdges: Edge[] = [];
 

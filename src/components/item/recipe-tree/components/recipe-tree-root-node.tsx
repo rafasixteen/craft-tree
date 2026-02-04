@@ -3,7 +3,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
 import { PackageIcon, ClockIcon } from 'lucide-react';
-import { ItemIcon, RecipeCarousel, RecipeTreeNodeData } from '@/components/item/recipe-tree';
+import { ItemIcon, RecipeCarousel, RecipeTreeNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
 
 interface RecipeTreeNodeProps
 {
@@ -13,9 +13,11 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeRootNode({ id, data: { node } }: RecipeTreeNodeProps)
 {
+	const { tree } = useRecipeTreeContext();
+
 	const calculation = {
-		totalQuantity: undefined,
-		totalTime: undefined,
+		totalQuantity: tree!.getTotalQuantity(node),
+		totalTime: tree!.getTotalTime(node),
 	};
 
 	const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];

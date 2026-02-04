@@ -3,7 +3,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
 import { PackageIcon, ClockIcon } from 'lucide-react';
-import { ItemIcon, RecipeCarousel, RecipeTreeNodeData } from '@/components/item/recipe-tree';
+import { ItemIcon, RecipeCarousel, RecipeTreeNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
 
 interface RecipeTreeNodeProps
 {
@@ -13,14 +13,12 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 {
-	if (node.recipes.length === 0)
-	{
-		return <p>Node has no recipes.</p>;
-	}
+	const { tree } = useRecipeTreeContext();
 
 	const calculation = {
-		totalQuantity: undefined,
-		totalTime: undefined,
+		totalQuantity: tree!.getTotalQuantity(node),
+		totalTime: tree!.getTotalTime(node),
+		nodeTime: tree!.getNodeTime(node),
 	};
 
 	const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];
@@ -45,7 +43,9 @@ export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 					</div>
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<ClockIcon className="size-3" />
-						<span>{calculation.totalTime}s</span>
+						<span>
+							{calculation.totalTime}s / {calculation.nodeTime}s
+						</span>
 					</div>
 				</div>
 				<div className="flex-1">
