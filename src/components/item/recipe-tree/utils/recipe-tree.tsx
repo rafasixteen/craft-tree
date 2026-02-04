@@ -3,8 +3,6 @@ import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
 import { getRecipeTreeDataV2 } from '@/components/item/recipe-tree';
 
-type TreeListener = () => void;
-
 /**
  * Determines the order in which nodes are visited during a DFS traversal.
  */
@@ -133,8 +131,6 @@ class RecipeTree
 
 	private _version = 0;
 
-	private _listeners = new Set<TreeListener>();
-
 	private constructor()
 	{}
 
@@ -142,50 +138,12 @@ class RecipeTree
 	{
 		const tree = new RecipeTree();
 
-		// Fetch raw data
 		const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(itemId);
 
 		tree._itemsMap = itemsMap;
 		tree._recipesMap = recipesMap;
 		tree._ingredientsMap = ingredientsMap;
 
-		// Helper to build a node and its subtree recursively
-		const buildNode = (item: Item, parent: RecipeTreeNode | null): RecipeTreeNode =>
-		{
-			const recipes = recipesMap.get(item.id) ?? [];
-			const node = RecipeTreeNode.create(item, parent, recipes);
-
-			// Register in the tree immediately
-			tree.addNode(node);
-
-			// Attach to parent if it exists
-			if (parent)
-			{
-				tree.addChild(parent, node);
-			}
-
-			if (recipes.length > 0)
-			{
-				const selectedRecipe = recipes[node.getSelectedRecipeIndex()];
-				const ingredients = ingredientsMap.get(selectedRecipe.id) ?? [];
-
-				for (const ingredient of ingredients)
-				{
-					const childItem = itemsMap.get(ingredient.itemId);
-
-					if (!childItem)
-					{
-						continue;
-					}
-
-					buildNode(childItem, node);
-				}
-			}
-
-			return node;
-		};
-
-		// Build root node
 		const rootItem = itemsMap.get(itemId);
 
 		if (!rootItem)
@@ -193,7 +151,7 @@ class RecipeTree
 			throw new Error(`RecipeTree: Item with id "${itemId}" not found in itemsMap`);
 		}
 
-		tree._root = buildNode(rootItem, null);
+		tree._root = tree.buildNode(rootItem, null);
 
 		return tree;
 	}
@@ -210,13 +168,10 @@ class RecipeTree
 
 	public addNode(node: RecipeTreeNode): void
 	{
-		if (this._nodes.has(node.id))
+		if (!this._nodes.has(node.id))
 		{
-			throw new Error(`RecipeTree: node with id "${node.id}" already exists`);
+			this._nodes.set(node.id, node);
 		}
-
-		this._nodes.set(node.id, node);
-		this.notify();
 	}
 
 	public removeNode(node: RecipeTreeNode): void
@@ -239,16 +194,11 @@ class RecipeTree
 			},
 			DFSOrder.POST,
 		);
-
-		this.notify();
 	}
 
 	public addChild(parent: RecipeTreeNode, child: RecipeTreeNode): void
 	{
-		if (!this._nodes.has(parent.id))
-		{
-			throw new Error(`RecipeTree: parent node "${parent.id}" is not registered`);
-		}
+		this.addNode(parent);
 
 		if (child.parent && child.parent !== parent)
 		{
@@ -265,12 +215,7 @@ class RecipeTree
 			parent._addChild(child);
 		}
 
-		if (!this._nodes.has(child.id))
-		{
-			this._nodes.set(child.id, child);
-		}
-
-		this.notify();
+		this.addNode(child);
 	}
 
 	public removeChild(parent: RecipeTreeNode, child: RecipeTreeNode): void
@@ -295,8 +240,6 @@ class RecipeTree
 			},
 			DFSOrder.POST,
 		);
-
-		this.notify();
 	}
 
 	public dfs(startNode: RecipeTreeNode, callback: (node: RecipeTreeNode) => void, order: DFSOrder = DFSOrder.PRE): void
@@ -341,7 +284,12 @@ class RecipeTree
 		const newIndex = (((currentIndex + delta) % node.recipes.length) + node.recipes.length) % node.recipes.length;
 		node._setSelectedRecipeIndex(newIndex);
 
-		this.notify();
+		this.rebuildSubtree(node);
+	}
+
+	public incrementVersion(): void
+	{
+		this._version++;
 	}
 
 	public getVersion(): number
@@ -349,19 +297,62 @@ class RecipeTree
 		return this._version;
 	}
 
-	public subscribe(listener: TreeListener): () => void
+	private buildNode(item: Item, parent: RecipeTreeNode | null): RecipeTreeNode
 	{
-		this._listeners.add(listener);
-		return () => this._listeners.delete(listener);
+		const recipes = this._recipesMap.get(item.id) ?? [];
+		const node = RecipeTreeNode.create(item, parent, recipes);
+
+		this.addNode(node);
+
+		if (parent)
+		{
+			this.addChild(parent, node);
+		}
+
+		if (recipes.length > 0)
+		{
+			const selectedRecipe = recipes[node.getSelectedRecipeIndex()];
+			const ingredients = this._ingredientsMap.get(selectedRecipe.id) ?? [];
+
+			for (const ingredient of ingredients)
+			{
+				const childItem = this._itemsMap.get(ingredient.itemId);
+
+				if (!childItem)
+				{
+					continue;
+				}
+
+				this.buildNode(childItem, node);
+			}
+		}
+
+		return node;
 	}
 
-	private notify(): void
+	private rebuildSubtree(node: RecipeTreeNode): void
 	{
-		this._version += 1;
-
-		for (const listener of this._listeners)
+		while (node.children.length > 0)
 		{
-			listener();
+			this.removeChild(node, node.children[0]);
+		}
+
+		if (node.recipes.length > 0)
+		{
+			const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];
+			const ingredients = this._ingredientsMap.get(selectedRecipe.id) ?? [];
+
+			for (const ingredient of ingredients)
+			{
+				const childItem = this._itemsMap.get(ingredient.itemId);
+
+				if (!childItem)
+				{
+					continue;
+				}
+
+				this.buildNode(childItem, node);
+			}
 		}
 	}
 }

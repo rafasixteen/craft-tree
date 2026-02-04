@@ -5,6 +5,7 @@ import { Position, Handle } from '@xyflow/react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, PackageIcon, ClockIcon } from 'lucide-react';
 import { ItemIcon, RecipeTreeNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
+import { useCallback } from 'react';
 
 interface RecipeTreeNodeProps
 {
@@ -15,6 +16,30 @@ interface RecipeTreeNodeProps
 export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 {
 	const { tree } = useRecipeTreeContext();
+
+	const previousRecipe = useCallback(
+		function previousRecipe()
+		{
+			if (tree)
+			{
+				tree.selectRecipe(id, -1);
+				tree.incrementVersion();
+			}
+		},
+		[tree, id],
+	);
+
+	const nextRecipe = useCallback(
+		function nextRecipe()
+		{
+			if (tree)
+			{
+				tree.selectRecipe(id, +1);
+				tree.incrementVersion();
+			}
+		},
+		[tree, id],
+	);
 
 	if (node.recipes.length === 0)
 	{
@@ -65,13 +90,13 @@ export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 				</div>
 			</CardContent>
 			<CardFooter className="justify-between">
-				<Button variant="ghost" onClick={() => tree?.selectRecipe(id, -1)} size="icon">
+				<Button variant="ghost" onClick={previousRecipe} size="icon">
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
 					{node.getSelectedRecipeIndex() + 1} / {node.recipes.length}
 				</span>
-				<Button variant="ghost" onClick={() => tree?.selectRecipe(id, +1)} size="icon">
+				<Button variant="ghost" onClick={nextRecipe} size="icon">
 					<ArrowRightIcon />
 				</Button>
 			</CardFooter>

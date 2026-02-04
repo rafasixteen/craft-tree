@@ -64,6 +64,8 @@ export function RecipeTreeFlow()
 				return;
 			}
 
+			console.log('Rebuilding recipe tree flow...');
+
 			const nextNodes: Node<RecipeTreeNodeData>[] = [];
 			const nextEdges: Edge[] = [];
 
@@ -180,7 +182,7 @@ export function RecipeTreeFlow()
 		}
 
 		buildRecipeTree();
-	}, [loading, tree]);
+	}, [loading, tree, tree?.getVersion()]);
 
 	if (!mounted)
 	{
