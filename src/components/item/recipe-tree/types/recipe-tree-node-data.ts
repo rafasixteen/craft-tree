@@ -1,6 +1,6 @@
-import { Item } from '@/domain/item';
+import { RecipeTreeNode } from '@/components/item/recipe-tree';
 
 export interface RecipeTreeNodeData extends Record<string, unknown>
 {
-	item: Item;
+	node: RecipeTreeNode;
 }

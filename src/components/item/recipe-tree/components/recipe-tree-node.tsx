@@ -12,25 +12,13 @@ interface RecipeTreeNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
+export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 {
-	const { loading, tree } = useRecipeTreeContext();
-
-	if (loading || !tree)
-	{
-		return null;
-	}
-
-	const node = tree.getNodeById(id);
-
-	if (!node)
-	{
-		return null;
-	}
+	const { tree } = useRecipeTreeContext();
 
 	if (node.recipes.length === 0)
 	{
-		return null;
+		return <p>Node has no recipes.</p>;
 	}
 
 	const calculation = {
@@ -45,10 +33,10 @@ export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
 			<Handle type="target" position={Position.Top} />
 
 			<CardHeader className="flex items-center gap-2">
-				<ItemIcon item={item} />
+				<ItemIcon item={node.item} />
 
 				<div className="min-w-0 flex-1">
-					<p className="truncate text-sm font-semibold">{item.name}</p>
+					<p className="truncate text-sm font-semibold">{node.item.name}</p>
 					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 				</div>
 			</CardHeader>
@@ -77,13 +65,13 @@ export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
 				</div>
 			</CardContent>
 			<CardFooter className="justify-between">
-				<Button variant="ghost" onClick={() => tree.selectRecipe(id, -1)} size="icon">
+				<Button variant="ghost" onClick={() => tree?.selectRecipe(id, -1)} size="icon">
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
 					{node.getSelectedRecipeIndex() + 1} / {node.recipes.length}
 				</span>
-				<Button variant="ghost" onClick={() => tree.selectRecipe(id, +1)} size="icon">
+				<Button variant="ghost" onClick={() => tree?.selectRecipe(id, +1)} size="icon">
 					<ArrowRightIcon />
 				</Button>
 			</CardFooter>

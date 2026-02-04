@@ -27,6 +27,8 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 
 	useEffect(() =>
 	{
+		let cancelled = false;
+
 		setLoading(true);
 		setError(undefined);
 
@@ -34,19 +36,34 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 		{
 			try
 			{
-				setTree(await RecipeTree.create(item.id));
+				const newTree = await RecipeTree.create(item.id);
+				if (!cancelled)
+				{
+					setTree(newTree);
+				}
 			}
 			catch (err)
 			{
-				setError(err);
+				if (!cancelled)
+				{
+					setError(err);
+				}
 			}
 			finally
 			{
-				setLoading(false);
+				if (!cancelled)
+				{
+					setLoading(false);
+				}
 			}
 		}
 
 		load();
+
+		return () =>
+		{
+			cancelled = true;
+		};
 	}, [item.id]);
 
 	const value = useMemo<RecipeTreeContextValue>(

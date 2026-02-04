@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
-import { useRecipeTreeContext, RecipeTreeNodeData } from '@/components/item/recipe-tree';
+import { RecipeTreeNodeData } from '@/components/item/recipe-tree';
 import { PackageIcon } from 'lucide-react';
 
 interface RecipeTreeLeafNodeProps
@@ -9,15 +9,8 @@ interface RecipeTreeLeafNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodeProps)
+export function RecipeTreeLeafNode({ data: { node } }: RecipeTreeLeafNodeProps)
 {
-	const { loading } = useRecipeTreeContext();
-
-	if (loading)
-	{
-		return null;
-	}
-
 	const calculation = {
 		totalQuantity: undefined,
 		totalTime: undefined,
@@ -29,9 +22,9 @@ export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodePro
 
 			<CardHeader className="flex flex-col gap-2">
 				<div className="flex items-center gap-2">
-					<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{item.name.substring(0, 2).toUpperCase()}</div>
+					<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{node.item.name.substring(0, 2).toUpperCase()}</div>
 					<div className="min-w-0 flex-1">
-						<p className="text-sm font-semibold">{item.name}</p>
+						<p className="text-sm font-semibold">{node.item.name}</p>
 					</div>
 				</div>
 			</CardHeader>

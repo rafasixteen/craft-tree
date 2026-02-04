@@ -59,12 +59,7 @@ export function RecipeTreeFlow()
 	{
 		function buildRecipeTree()
 		{
-			if (loading)
-			{
-				return;
-			}
-
-			if (!tree)
+			if (loading || !tree)
 			{
 				return;
 			}
@@ -93,7 +88,7 @@ export function RecipeTreeFlow()
 					nodeId: node.id,
 					nodeType: getNodeType(),
 					data: {
-						item: node.item,
+						node: node,
 					},
 				});
 
