@@ -2,10 +2,8 @@
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
-import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, PackageIcon, ClockIcon } from 'lucide-react';
-import { ItemIcon, RecipeTreeNodeData, useRecipeTreeContext } from '@/components/item/recipe-tree';
-import { useCallback } from 'react';
+import { PackageIcon, ClockIcon } from 'lucide-react';
+import { ItemIcon, RecipeCarousel, RecipeTreeNodeData } from '@/components/item/recipe-tree';
 
 interface RecipeTreeNodeProps
 {
@@ -15,8 +13,6 @@ interface RecipeTreeNodeProps
 
 export function RecipeTreeRootNode({ id, data: { node } }: RecipeTreeNodeProps)
 {
-	const { tree } = useRecipeTreeContext();
-
 	const calculation = {
 		totalQuantity: undefined,
 		totalTime: undefined,
@@ -24,38 +20,13 @@ export function RecipeTreeRootNode({ id, data: { node } }: RecipeTreeNodeProps)
 
 	const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];
 
-	const previousRecipe = useCallback(
-		function previousRecipe()
-		{
-			if (tree)
-			{
-				tree.selectRecipe(id, -1);
-				tree.incrementVersion();
-			}
-		},
-		[tree, id],
-	);
-
-	const nextRecipe = useCallback(
-		function nextRecipe()
-		{
-			if (tree)
-			{
-				tree.selectRecipe(id, +1);
-				tree.incrementVersion();
-			}
-		},
-		[tree, id],
-	);
-
 	return (
 		<Card className="w-50">
 			<CardHeader className="flex items-center gap-2">
-				<ItemIcon item={node.item} />
-
-				<div className="flex-2">
-					<p className="text-sm font-semibold">{node.item.name}</p>
-					<p className="text-xs text-muted-foreground">{selectedRecipe.name}</p>
+				<ItemIcon itemName={node.item.name} />
+				<div className="min-w-0 flex-1">
+					<p className="truncate text-sm font-semibold">{node.item.name}</p>
+					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 				</div>
 			</CardHeader>
 			<CardContent className="flex">
@@ -83,15 +54,7 @@ export function RecipeTreeRootNode({ id, data: { node } }: RecipeTreeNodeProps)
 				</div>
 			</CardContent>
 			<CardFooter className="justify-between">
-				<Button variant="ghost" onClick={previousRecipe} size="icon">
-					<ArrowLeftIcon />
-				</Button>
-				<span className="text-xs text-muted-foreground">
-					{node.getSelectedRecipeIndex() + 1} / {node.recipes.length}
-				</span>
-				<Button variant="ghost" onClick={nextRecipe} size="icon">
-					<ArrowRightIcon />
-				</Button>
+				<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={node.getSelectedRecipeIndex()} />
 			</CardFooter>
 
 			<Handle type="source" position={Position.Bottom} />

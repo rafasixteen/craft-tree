@@ -60,15 +60,15 @@ const badgeVariants = cva('absolute flex items-center justify-center rounded-ful
 
 interface ItemIconProps extends React.HTMLAttributes<HTMLDivElement>
 {
-	item: Item;
+	itemName: Item['name'];
 	quantity?: number;
 	icon?: VariantProps<typeof iconVariants>;
 	badge?: VariantProps<typeof badgeVariants>;
 }
 
-export function ItemIcon({ item, quantity, icon, badge, ...props }: ItemIconProps)
+export function ItemIcon({ itemName, quantity, icon, badge, ...props }: ItemIconProps)
 {
-	const initials = item.name.substring(0, 2).toUpperCase();
+	const initials = itemName.substring(0, 2).toUpperCase();
 
 	const iconClassName = cn(iconVariants(icon));
 	const badgeClassName = cn(badgeVariants(badge));

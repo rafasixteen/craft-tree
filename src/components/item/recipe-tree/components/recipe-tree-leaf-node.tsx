@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
-import { RecipeTreeNodeData } from '@/components/item/recipe-tree';
+import { ItemIcon, RecipeTreeNodeData } from '@/components/item/recipe-tree';
 import { PackageIcon } from 'lucide-react';
 
 interface RecipeTreeLeafNodeProps
@@ -20,12 +20,10 @@ export function RecipeTreeLeafNode({ data: { node } }: RecipeTreeLeafNodeProps)
 		<Card className="w-40">
 			<Handle type="target" position={Position.Top} />
 
-			<CardHeader className="flex flex-col gap-2">
-				<div className="flex items-center gap-2">
-					<div className="flex size-8 items-center justify-center rounded-sm border bg-muted font-mono text-xs">{node.item.name.substring(0, 2).toUpperCase()}</div>
-					<div className="min-w-0 flex-1">
-						<p className="text-sm font-semibold">{node.item.name}</p>
-					</div>
+			<CardHeader className="flex gap-2">
+				<ItemIcon itemName={node.item.name} />
+				<div className="min-w-0 flex-1">
+					<p className="truncate text-sm font-semibold">{node.item.name}</p>
 				</div>
 			</CardHeader>
 			<CardContent className="flex">
