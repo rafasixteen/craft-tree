@@ -18,20 +18,15 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeNodeProps)
 
 	if (loading || !tree)
 	{
+		// console.log('loading or no tree');
 		return null;
 	}
 
-	const node = tree.getNodeById(id);
+	const node = tree!.getNodeById(id)!;
 
-	if (!node)
+	if (!node || node.recipes.length === 0)
 	{
-		console.assert(false, `RecipeTreeNode: Node with id "${id}" not found in the tree.`);
-		return null;
-	}
-
-	if (node.recipes.length === 0)
-	{
-		console.assert(false, `RecipeTreeNode: Node with id "${id}" has no recipe data.`);
+		// console.log('no node or no recipes');
 		return null;
 	}
 
@@ -40,12 +35,12 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeNodeProps)
 		totalTime: undefined,
 	};
 
-	const selectedRecipe = node.recipes[node.selectedRecipeIndex];
+	const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];
+
+	// console.log('render');
 
 	return (
 		<Card className="w-50">
-			<Handle type="target" position={Position.Top} />
-
 			<CardHeader className="flex items-center gap-2">
 				<ItemIcon item={item} />
 
@@ -83,7 +78,7 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeNodeProps)
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
-					{node.selectedRecipeIndex + 1} / {node.recipes.length}
+					{node.getSelectedRecipeIndex() + 1} / {node.recipes.length}
 				</span>
 				<Button variant="ghost" onClick={() => tree.selectRecipe(id, +1)} size="icon">
 					<ArrowRightIcon />

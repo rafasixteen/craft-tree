@@ -3,11 +3,6 @@ import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
 import { getRecipeTreeDataV2 } from '@/components/item/recipe-tree';
 
-interface RecipeWithIngredients extends Recipe
-{
-	ingredients: Ingredient[];
-}
-
 type TreeListener = () => void;
 
 /**
@@ -45,128 +40,263 @@ enum DFSOrder
 class RecipeTreeNode
 {
 	public readonly id: string;
-
-	public readonly parent: RecipeTreeNode | null;
-
-	private children: RecipeTreeNode[];
-
 	public readonly item: Item;
+	public readonly recipes: Recipe[];
 
-	public readonly recipes: RecipeWithIngredients[];
+	private _parent: RecipeTreeNode | null;
+	private _children: RecipeTreeNode[];
+	private _selectedRecipeIndex: number;
 
-	public selectedRecipeIndex: number;
-
-	public constructor(id: string, item: Item, parent: RecipeTreeNode | null, recipes: RecipeWithIngredients[], selectedRecipeIndex: number)
+	private constructor(id: string, item: Item, parent: RecipeTreeNode | null, recipes: Recipe[])
 	{
 		this.id = id;
 		this.item = item;
-		this.parent = parent;
-		this.children = [];
 		this.recipes = recipes;
-		this.selectedRecipeIndex = selectedRecipeIndex;
+
+		this._parent = parent;
+		this._children = [];
+		this._selectedRecipeIndex = recipes.length === 0 ? -1 : 0;
 	}
 
-	public getChildren(): RecipeTreeNode[]
+	public get parent(): RecipeTreeNode | null
 	{
-		return this.children;
+		return this._parent;
 	}
 
-	public setChildren(children: RecipeTreeNode[]): void
+	public get children(): readonly RecipeTreeNode[]
 	{
-		this.children = children;
-	}
-
-	public addChild(child: RecipeTreeNode): void
-	{
-		this.children.push(child);
-	}
-
-	public removeChild(child: RecipeTreeNode): void
-	{
-		this.children = this.children.filter((c) => c !== child);
-	}
-
-	public getParent(): RecipeTreeNode | null
-	{
-		return this.parent;
+		return this._children;
 	}
 
 	public getDepth(): number
 	{
-		return this.parent ? this.parent.getDepth() + 1 : 0;
+		return this._parent ? this._parent.getDepth() + 1 : 0;
 	}
 
 	public isLeaf(): boolean
 	{
-		return this.children.length === 0;
+		return this._children.length === 0;
 	}
 
 	public isRoot(): boolean
 	{
-		return this.parent === null;
+		return this._parent === null;
 	}
 
-	public static create(item: Item, parent: RecipeTreeNode | null, recipes: RecipeWithIngredients[], selectedRecipeIndex: number): RecipeTreeNode
+	public getSelectedRecipeIndex(): number
 	{
-		return new RecipeTreeNode(crypto.randomUUID(), item, parent, recipes, selectedRecipeIndex);
+		return this._selectedRecipeIndex;
+	}
+
+	_setParent(parent: RecipeTreeNode | null): void
+	{
+		this._parent = parent;
+	}
+
+	_addChild(child: RecipeTreeNode): void
+	{
+		this._children.push(child);
+	}
+
+	_removeChild(child: RecipeTreeNode): void
+	{
+		this._children = this._children.filter((c) => c !== child);
+	}
+
+	_setSelectedRecipeIndex(index: number): void
+	{
+		if (index < 0 || index >= this.recipes.length)
+		{
+			throw new Error(`RecipeTreeNode: selectedRecipeIndex out of bounds (${index})`);
+		}
+
+		this._selectedRecipeIndex = index;
+	}
+
+	static create(item: Item, parent: RecipeTreeNode | null, recipes: Recipe[]): RecipeTreeNode
+	{
+		return new RecipeTreeNode(crypto.randomUUID(), item, parent, recipes);
 	}
 }
 
 class RecipeTree
 {
-	public readonly root: RecipeTreeNode;
+	private _root!: RecipeTreeNode;
 
-	private nodes = new Map<RecipeTreeNode['id'], RecipeTreeNode>();
-	private version = 0;
+	private _itemsMap = new Map<Item['id'], Item>();
 
-	private listeners = new Set<TreeListener>();
+	private _recipesMap = new Map<Item['id'], Recipe[]>();
 
-	public constructor(rootNode: RecipeTreeNode)
+	private _ingredientsMap = new Map<Recipe['id'], Ingredient[]>();
+
+	private _nodes = new Map<RecipeTreeNode['id'], RecipeTreeNode>();
+
+	private _version = 0;
+
+	private _listeners = new Set<TreeListener>();
+
+	private constructor()
+	{}
+
+	static async create(itemId: Item['id']): Promise<RecipeTree>
 	{
-		this.root = rootNode;
-		this.registerNode(rootNode);
+		const tree = new RecipeTree();
+
+		// Fetch raw data
+		const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(itemId);
+
+		tree._itemsMap = itemsMap;
+		tree._recipesMap = recipesMap;
+		tree._ingredientsMap = ingredientsMap;
+
+		// Helper to build a node and its subtree recursively
+		const buildNode = (item: Item, parent: RecipeTreeNode | null): RecipeTreeNode =>
+		{
+			const recipes = recipesMap.get(item.id) ?? [];
+			const node = RecipeTreeNode.create(item, parent, recipes);
+
+			// Register in the tree immediately
+			tree.addNode(node);
+
+			// Attach to parent if it exists
+			if (parent)
+			{
+				tree.addChild(parent, node);
+			}
+
+			if (recipes.length > 0)
+			{
+				const selectedRecipe = recipes[node.getSelectedRecipeIndex()];
+				const ingredients = ingredientsMap.get(selectedRecipe.id) ?? [];
+
+				for (const ingredient of ingredients)
+				{
+					const childItem = itemsMap.get(ingredient.itemId);
+
+					if (!childItem)
+					{
+						continue;
+					}
+
+					buildNode(childItem, node);
+				}
+			}
+
+			return node;
+		};
+
+		// Build root node
+		const rootItem = itemsMap.get(itemId);
+
+		if (!rootItem)
+		{
+			throw new Error(`RecipeTree: Item with id "${itemId}" not found in itemsMap`);
+		}
+
+		tree._root = buildNode(rootItem, null);
+
+		return tree;
+	}
+
+	public get root(): RecipeTreeNode
+	{
+		return this._root;
 	}
 
 	public getNodeById(nodeId: RecipeTreeNode['id']): RecipeTreeNode | undefined
 	{
-		return this.nodes.get(nodeId);
+		return this._nodes.get(nodeId);
 	}
 
-	public registerNode(node: RecipeTreeNode): void
+	public addNode(node: RecipeTreeNode): void
 	{
-		this.nodes.set(node.id, node);
-	}
-
-	public getVersion(): number
-	{
-		return this.version;
-	}
-
-	public selectRecipe(nodeId: RecipeTreeNode['id'], delta: number): void
-	{
-		const node = this.getNodeById(nodeId);
-
-		if (!node)
+		if (this._nodes.has(node.id))
 		{
-			console.warn(false, `RecipeTree: Node with id "${nodeId}" not found in the tree.`);
-			return;
+			throw new Error(`RecipeTree: node with id "${node.id}" already exists`);
 		}
 
-		if (node.recipes.length === 0)
+		this._nodes.set(node.id, node);
+		this.notify();
+	}
+
+	public removeNode(node: RecipeTreeNode): void
+	{
+		if (!this._nodes.has(node.id))
 		{
 			return;
 		}
 
-		const newIndex = (((node.selectedRecipeIndex + delta) % node.recipes.length) + node.recipes.length) % node.recipes.length;
-		node.selectedRecipeIndex = newIndex;
+		if (node.parent)
+		{
+			node.parent._removeChild(node);
+		}
+
+		this.dfs(
+			node,
+			(n) =>
+			{
+				this._nodes.delete(n.id);
+			},
+			DFSOrder.POST,
+		);
 
 		this.notify();
 	}
 
-	public subscribe(listener: TreeListener): () => void
+	public addChild(parent: RecipeTreeNode, child: RecipeTreeNode): void
 	{
-		this.listeners.add(listener);
-		return () => this.listeners.delete(listener);
+		if (!this._nodes.has(parent.id))
+		{
+			throw new Error(`RecipeTree: parent node "${parent.id}" is not registered`);
+		}
+
+		if (child.parent && child.parent !== parent)
+		{
+			child.parent._removeChild(child);
+		}
+
+		if (child.parent !== parent)
+		{
+			child._setParent(parent);
+		}
+
+		if (!parent.children.includes(child))
+		{
+			parent._addChild(child);
+		}
+
+		if (!this._nodes.has(child.id))
+		{
+			this._nodes.set(child.id, child);
+		}
+
+		this.notify();
+	}
+
+	public removeChild(parent: RecipeTreeNode, child: RecipeTreeNode): void
+	{
+		if (!this._nodes.has(parent.id))
+		{
+			return;
+		}
+
+		if (child.parent !== parent)
+		{
+			return;
+		}
+
+		parent._removeChild(child);
+
+		this.dfs(
+			child,
+			(n) =>
+			{
+				this._nodes.delete(n.id);
+			},
+			DFSOrder.POST,
+		);
+
+		this.notify();
 	}
 
 	public dfs(startNode: RecipeTreeNode, callback: (node: RecipeTreeNode) => void, order: DFSOrder = DFSOrder.PRE): void
@@ -178,7 +308,7 @@ class RecipeTree
 				callback(node);
 			}
 
-			for (const child of node.getChildren())
+			for (const child of node.children)
 			{
 				traverse(child);
 			}
@@ -192,66 +322,47 @@ class RecipeTree
 		traverse(startNode);
 	}
 
+	public selectRecipe(nodeId: RecipeTreeNode['id'], delta: number): void
+	{
+		const node = this.getNodeById(nodeId);
+
+		if (!node)
+		{
+			console.warn(`RecipeTree: Node with id "${nodeId}" not found in the tree.`);
+			return;
+		}
+
+		if (node.recipes.length === 0)
+		{
+			return;
+		}
+
+		const currentIndex = node.getSelectedRecipeIndex();
+		const newIndex = (((currentIndex + delta) % node.recipes.length) + node.recipes.length) % node.recipes.length;
+		node._setSelectedRecipeIndex(newIndex);
+
+		this.notify();
+	}
+
+	public getVersion(): number
+	{
+		return this._version;
+	}
+
+	public subscribe(listener: TreeListener): () => void
+	{
+		this._listeners.add(listener);
+		return () => this._listeners.delete(listener);
+	}
+
 	private notify(): void
 	{
-		this.version += 1;
-		for (const listener of this.listeners)
+		this._version += 1;
+
+		for (const listener of this._listeners)
 		{
 			listener();
 		}
-	}
-
-	public static async fromItem(rootItem: Item): Promise<RecipeTree>
-	{
-		const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(rootItem.id);
-
-		const rootItemRecipes: RecipeWithIngredients[] = (recipesMap.get(rootItem.id) ?? []).map((recipe) => ({
-			...recipe,
-			ingredients: ingredientsMap.get(recipe.id) ?? [],
-		}));
-
-		const rootNode = RecipeTreeNode.create(rootItem, null, rootItemRecipes, 0);
-
-		const tree = new RecipeTree(rootNode);
-
-		// Recursively build the tree structure
-		const buildSubtree = (node: RecipeTreeNode): void =>
-		{
-			const selectedRecipe = node.recipes[node.selectedRecipeIndex];
-
-			if (!selectedRecipe)
-			{
-				return;
-			}
-
-			for (const ingredient of selectedRecipe.ingredients)
-			{
-				const childItem = itemsMap.get(ingredient.itemId);
-
-				if (!childItem)
-				{
-					continue;
-				}
-
-				const childItemRecipes: RecipeWithIngredients[] = (recipesMap.get(childItem.id) ?? []).map((recipe) => ({
-					...recipe,
-					ingredients: ingredientsMap.get(recipe.id) ?? [],
-				}));
-
-				const childNode = RecipeTreeNode.create(childItem, node, childItemRecipes, 0);
-
-				node.addChild(childNode);
-				tree.registerNode(childNode);
-
-				// Recursively build subtree for child
-				buildSubtree(childNode);
-			}
-		};
-
-		// Build the tree starting from root
-		buildSubtree(rootNode);
-
-		return tree;
 	}
 }
 

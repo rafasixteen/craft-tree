@@ -25,13 +25,11 @@ export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
 
 	if (!node)
 	{
-		console.assert(false, `RecipeTreeNode: Node with id "${id}" not found in the tree.`);
 		return null;
 	}
 
 	if (node.recipes.length === 0)
 	{
-		console.assert(false, `RecipeTreeNode: Node with id "${id}" has no recipe data.`);
 		return null;
 	}
 
@@ -40,7 +38,7 @@ export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
 		totalTime: undefined,
 	};
 
-	const selectedRecipe = node.recipes[node.selectedRecipeIndex];
+	const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];
 
 	return (
 		<Card className="w-50">
@@ -83,7 +81,7 @@ export function RecipeTreeNodeComp({ id, data: { item } }: RecipeTreeNodeProps)
 					<ArrowLeftIcon />
 				</Button>
 				<span className="text-xs text-muted-foreground">
-					{node.selectedRecipeIndex + 1} / {node.recipes.length}
+					{node.getSelectedRecipeIndex() + 1} / {node.recipes.length}
 				</span>
 				<Button variant="ghost" onClick={() => tree.selectRecipe(id, +1)} size="icon">
 					<ArrowRightIcon />

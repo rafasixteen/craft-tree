@@ -99,11 +99,9 @@ export function RecipeTreeFlow()
 
 				nextNodes.push(flowNode);
 
-				const parentNode = node.getParent();
-
-				if (parentNode)
+				if (node.parent)
 				{
-					nextEdges.push(buildEdge(parentNode.id, node.id));
+					nextEdges.push(buildEdge(node.parent.id, node.id));
 				}
 			});
 

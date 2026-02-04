@@ -1,24 +1,13 @@
 'use client';
 
-import { createContext, useSyncExternalStore, useContext, useState, useCallback, useEffect, ReactNode, useMemo } from 'react';
+import { createContext, useSyncExternalStore, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import { Item } from '@/domain/item';
-import { RecipeTree } from '@/components/item/recipe-tree/utils';
+import { RecipeTree } from '@/components/item/recipe-tree';
 
 interface RecipeTreeContextValue
 {
-	/**
-	 * The recipe tree structure.
-	 */
 	tree: RecipeTree | null;
-
-	/**
-	 * Whether the tree data is currently loading.
-	 */
 	loading: boolean;
-
-	/**
-	 * Error encountered while loading tree data.
-	 */
 	error?: unknown;
 }
 
@@ -36,16 +25,16 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<unknown | undefined>(undefined);
 
-	const reload = useCallback(
-		async function reload()
-		{
-			setLoading(true);
-			setError(undefined);
+	useEffect(() =>
+	{
+		setLoading(true);
+		setError(undefined);
 
+		async function load()
+		{
 			try
 			{
-				const newTree = await RecipeTree.fromItem(item);
-				setTree(newTree);
+				setTree(await RecipeTree.create(item.id));
 			}
 			catch (err)
 			{
@@ -55,14 +44,10 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 			{
 				setLoading(false);
 			}
-		},
-		[item],
-	);
+		}
 
-	useEffect(() =>
-	{
-		reload();
-	}, [reload]);
+		load();
+	}, [item.id]);
 
 	const value = useMemo<RecipeTreeContextValue>(
 		() => ({
