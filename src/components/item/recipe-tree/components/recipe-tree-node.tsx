@@ -24,7 +24,7 @@ export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 	const selectedRecipe = node.recipes[node.getSelectedRecipeIndex()];
 
 	return (
-		<Card className="w-50">
+		<Card className="w-52">
 			<Handle type="target" position={Position.Top} />
 
 			<CardHeader className="flex items-center gap-2">
@@ -34,29 +34,31 @@ export function RecipeTreeNodeComp({ id, data: { node } }: RecipeTreeNodeProps)
 					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 				</div>
 			</CardHeader>
-			<CardContent className="flex">
-				<div className="flex-1">
-					<p className="text-xs text-muted-foreground">Total</p>
+			<CardContent className="grid grid-cols-2 gap-3 text-xs">
+				<div className="min-w-0 space-y-1">
+					<div className="flex items-center gap-1 text-muted-foreground">
+						<span className="font-medium">Recipe</span>
+					</div>
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<PackageIcon className="size-3" />
-						<span>{calculation.totalQuantity}x</span>
+						<span className="truncate">{selectedRecipe.quantity}x</span>
 					</div>
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<ClockIcon className="size-3" />
-						<span>
-							{calculation.totalTime}s / {calculation.nodeTime}s
-						</span>
+						<span className="truncate">{selectedRecipe.time}s</span>
 					</div>
 				</div>
-				<div className="flex-1">
-					<p className="text-xs text-muted-foreground">Recipe</p>
+				<div className="min-w-0 space-y-1">
+					<div className="flex items-center gap-1 text-muted-foreground">
+						<span className="font-medium">Total</span>
+					</div>
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<PackageIcon className="size-3" />
-						<span>{selectedRecipe.quantity}x</span>
+						<span className="truncate">{calculation.totalQuantity}x</span>
 					</div>
 					<div className="flex items-center gap-1 text-muted-foreground">
 						<ClockIcon className="size-3" />
-						<span>{selectedRecipe.time}s</span>
+						<span className="truncate">{calculation.totalTime}s</span>
 					</div>
 				</div>
 			</CardContent>

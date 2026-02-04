@@ -18,7 +18,7 @@ export function RecipeTreeLeafNode({ data: { node } }: RecipeTreeLeafNodeProps)
 	};
 
 	return (
-		<Card className="w-40">
+		<Card className="w-44">
 			<Handle type="target" position={Position.Top} />
 
 			<CardHeader className="flex gap-2">
@@ -27,13 +27,13 @@ export function RecipeTreeLeafNode({ data: { node } }: RecipeTreeLeafNodeProps)
 					<p className="truncate text-sm font-semibold">{node.item.name}</p>
 				</div>
 			</CardHeader>
-			<CardContent className="flex">
-				<div className="flex-1">
-					<p className="text-xs text-muted-foreground">Total</p>
-					<div className="flex items-center gap-1 text-muted-foreground">
-						<PackageIcon className="size-3" />
-						<span>{calculation.totalQuantity}x</span>
-					</div>
+			<CardContent className="text-xs">
+				<div className="flex items-center gap-1 text-muted-foreground">
+					<span className="font-medium">Total</span>
+				</div>
+				<div className="mt-1 flex items-center gap-1 text-muted-foreground">
+					<PackageIcon className="size-3" />
+					<span className="truncate">{calculation.totalQuantity}x</span>
 				</div>
 			</CardContent>
 		</Card>
