@@ -119,41 +119,38 @@ class RecipeTreeNode
 
 class RecipeTree
 {
-	private _root!: RecipeTreeNode;
+	private readonly _root: RecipeTreeNode;
 
-	private _itemsMap = new Map<Item['id'], Item>();
+	private readonly _itemsMap: Map<Item['id'], Item>;
 
-	private _recipesMap = new Map<Item['id'], Recipe[]>();
+	private readonly _recipesMap: Map<Item['id'], Recipe[]>;
 
-	private _ingredientsMap = new Map<Recipe['id'], Ingredient[]>();
+	private readonly _ingredientsMap: Map<Recipe['id'], Ingredient[]>;
 
 	private _nodes = new Map<RecipeTreeNode['id'], RecipeTreeNode>();
 
 	private _version = 0;
 
-	private constructor()
-	{}
-
-	static async create(itemId: Item['id']): Promise<RecipeTree>
+	public constructor(items: Map<Item['id'], Item>, recipes: Map<Item['id'], Recipe[]>, ingredients: Map<Recipe['id'], Ingredient[]>, itemId: Item['id'])
 	{
-		const tree = new RecipeTree();
+		this._itemsMap = items;
+		this._recipesMap = recipes;
+		this._ingredientsMap = ingredients;
 
-		const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(itemId);
-
-		tree._itemsMap = itemsMap;
-		tree._recipesMap = recipesMap;
-		tree._ingredientsMap = ingredientsMap;
-
-		const rootItem = itemsMap.get(itemId);
+		const rootItem = items.get(itemId);
 
 		if (!rootItem)
 		{
-			throw new Error(`RecipeTree: Item with id "${itemId}" not found in itemsMap`);
+			throw new Error(`RecipeTree: Root item with id "${itemId}" not found in items map.`);
 		}
 
-		tree._root = tree.buildNode(rootItem, null);
+		this._root = this.buildNode(rootItem, null);
+	}
 
-		return tree;
+	static async create(itemId: Item['id']): Promise<RecipeTree>
+	{
+		const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(itemId);
+		return new RecipeTree(itemsMap, recipesMap, ingredientsMap, itemId);
 	}
 
 	public get root(): RecipeTreeNode
