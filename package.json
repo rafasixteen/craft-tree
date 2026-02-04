@@ -8,12 +8,12 @@
 		"start": "next start",
 		"lint": "eslint",
 		"format": "prettier . --write",
-		"codegen": "graphql-codegen",
 		"db:push": "drizzle-kit push",
 		"db:seed": "tsx ./src/db/seed.ts",
 		"db:studio": "drizzle-kit studio",
-		"db:migrations:generate": "drizzle-kit generate",
-		"db:migrations:migrate": "drizzle-kit migrate migrate"
+		"test": "vitest run",
+		"test:watch": "vitest --watch",
+		"test:coverage": "vitest run --coverage"
 	},
 	"dependencies": {
 		"@auth/drizzle-adapter": "^1.11.1",
@@ -46,20 +46,26 @@
 	},
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/react": "^16.3.2",
 		"@types/lodash.debounce": "^4.0.9",
 		"@types/node": "^20",
 		"@types/pg": "^8.16.0",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
+		"@vitejs/plugin-react": "^5.1.3",
 		"dotenv-expand": "^12.0.3",
 		"drizzle-kit": "^0.31.8",
 		"eslint": "^9",
 		"eslint-config-next": "16.1.1",
 		"eslint-plugin-better-tailwindcss": "^4.0.2",
+		"jsdom": "^28.0.0",
 		"prettier": "^3.7.4",
 		"prettier-plugin-brace-style": "^0.8.2",
 		"tailwindcss": "^4",
 		"tsx": "^4.21.0",
-		"typescript": "^5"
+		"typescript": "^5",
+		"vite-tsconfig-paths": "^6.0.5",
+		"vitest": "^4.0.18"
 	}
 }
