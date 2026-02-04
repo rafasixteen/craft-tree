@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Position, Handle } from '@xyflow/react';
 import { useRecipeTreeContext, RecipeTreeNodeData } from '@/components/item/recipe-tree';
-import { PackageIcon, ClockIcon } from 'lucide-react';
+import { PackageIcon } from 'lucide-react';
 
 interface RecipeTreeLeafNodeProps
 {
@@ -11,14 +11,17 @@ interface RecipeTreeLeafNodeProps
 
 export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodeProps)
 {
-	const { loading, calculateRecipe } = useRecipeTreeContext();
+	const { loading } = useRecipeTreeContext();
 
 	if (loading)
 	{
 		return null;
 	}
 
-	const calculation = calculateRecipe(id, item.id);
+	const calculation = {
+		totalQuantity: undefined,
+		totalTime: undefined,
+	};
 
 	return (
 		<Card className="w-40">

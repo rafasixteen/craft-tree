@@ -48,7 +48,7 @@ export function RecipeTreeFlow()
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	const { loading, traverseTree, rootItem } = useRecipeTreeContext();
+	const { loading, tree } = useRecipeTreeContext();
 
 	useEffect(() =>
 	{
@@ -57,9 +57,14 @@ export function RecipeTreeFlow()
 
 	useEffect(() =>
 	{
-		async function buildRecipeTree()
+		function buildRecipeTree()
 		{
 			if (loading)
+			{
+				return;
+			}
+
+			if (!tree)
 			{
 				return;
 			}
@@ -67,16 +72,16 @@ export function RecipeTreeFlow()
 			const nextNodes: Node<RecipeTreeNodeData>[] = [];
 			const nextEdges: Edge[] = [];
 
-			await traverseTree(async ({ nodeId, item, parentNodeId, recipe }) =>
+			tree.dfs(tree.root, (node) =>
 			{
 				function getNodeType(): RecipeTreeNodeType
 				{
-					if (item.id === rootItem.id)
+					if (node.id === tree.root.id)
 					{
 						return RecipeTreeNodeType.ROOT;
 					}
 
-					if (!recipe)
+					if (!node.recipe)
 					{
 						return RecipeTreeNodeType.LEAF;
 					}
@@ -84,19 +89,20 @@ export function RecipeTreeFlow()
 					return RecipeTreeNodeType.NODE;
 				}
 
-				const node = buildNode({
-					nodeId: nodeId,
+				const flowNode = buildNode({
+					nodeId: node.id,
 					nodeType: getNodeType(),
 					data: {
-						item: item,
+						item: node.item,
 					},
 				});
 
-				nextNodes.push(node);
+				nextNodes.push(flowNode);
 
-				if (parentNodeId)
+				const parentNode = node.getParent();
+				if (parentNode)
 				{
-					nextEdges.push(buildEdge(parentNodeId, nodeId));
+					nextEdges.push(buildEdge(parentNode.id, node.id));
 				}
 			});
 
@@ -180,7 +186,7 @@ export function RecipeTreeFlow()
 		}
 
 		buildRecipeTree();
-	}, [rootItem, loading, traverseTree]);
+	}, [loading, tree]);
 
 	if (!mounted)
 	{

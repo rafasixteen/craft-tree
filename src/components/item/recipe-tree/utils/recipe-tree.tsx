@@ -224,58 +224,41 @@ class RecipeTree
 		// Recursively build the tree structure
 		const buildSubtree = (node: RecipeTreeNode): void =>
 		{
-			const itemRecipes = recipesMap.get(node.item.id) ?? [];
+			const selectedRecipe = node.recipe?.selectedRecipe;
 
-			if (itemRecipes.length === 0)
+			if (!selectedRecipe)
 			{
 				return;
 			}
 
-			// For each recipe, add ingredient items as children
-			for (const recipe of itemRecipes)
+			const recipeIngredients = ingredientsMap.get(selectedRecipe.id) ?? [];
+
+			for (const ingredient of recipeIngredients)
 			{
-				const recipeIngredients = ingredientsMap.get(recipe.id) ?? [];
+				const childItem = itemsMap.get(ingredient.itemId);
 
-				for (const ingredient of recipeIngredients)
+				if (!childItem)
 				{
-					const childItem = itemsMap.get(ingredient.itemId);
+					continue;
+				}
 
-					if (!childItem)
-					{
-						continue;
-					}
+				const ingredientItemRecipes = recipesMap.get(childItem.id) ?? [];
+				const selectedIngItemRecipe = ingredientItemRecipes[0];
+				const selectedIngItemRecipeIngs = selectedIngItemRecipe ? (ingredientsMap.get(selectedIngItemRecipe.id) ?? []) : [];
 
-					const ingredientItemRecipes = recipesMap.get(childItem.id);
-
-					if (ingredientItemRecipes && ingredientItemRecipes.length > 0)
-					{
-						const selectedIngItemRecipe = ingredientItemRecipes[0];
-						const selectedIngItemRecipeIngs = ingredientsMap.get(selectedIngItemRecipe.id) ?? [];
-
-						const childNode = RecipeTreeNode.create(childItem, node, {
+				const childNode = selectedIngItemRecipe
+					? RecipeTreeNode.create(childItem, node, {
 							recipes: ingredientItemRecipes,
 							selectedRecipe: selectedIngItemRecipe,
 							ingredients: selectedIngItemRecipeIngs,
-						});
+						})
+					: RecipeTreeNode.create(childItem, node);
 
-						node.addChild(childNode);
-						tree.registerNode(childNode);
+				node.addChild(childNode);
+				tree.registerNode(childNode);
 
-						// Recursively build subtree for child
-						buildSubtree(childNode);
-					}
-					else
-					{
-						// Create child node with recipe and ingredients information
-						const childNode = RecipeTreeNode.create(childItem, node);
-
-						node.addChild(childNode);
-						tree.registerNode(childNode);
-
-						// Recursively build subtree for child
-						buildSubtree(childNode);
-					}
-				}
+				// Recursively build subtree for child
+				buildSubtree(childNode);
 			}
 		};
 
