@@ -1,6 +1,7 @@
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
+import { getRecipeTreeDataV2 } from '@/components/item/recipe-tree';
 
 /**
  * Determines the order in which nodes are visited during a DFS traversal.
@@ -139,6 +140,19 @@ class RecipeTreeNode
 
 		return this.recipe.recipes.indexOf(this.recipe.selectedRecipe);
 	}
+
+	static create(
+		item: Item,
+		parent: RecipeTreeNode | null,
+		recipe?: {
+			recipes: Recipe[];
+			selectedRecipe: Recipe;
+			ingredients: Ingredient[];
+		},
+	): RecipeTreeNode
+	{
+		return new RecipeTreeNode(crypto.randomUUID(), item, parent, recipe);
+	}
 }
 
 class RecipeTree
@@ -158,7 +172,7 @@ class RecipeTree
 		return this.nodes.get(nodeId);
 	}
 
-	private registerNode(node: RecipeTreeNode): void
+	registerNode(node: RecipeTreeNode): void
 	{
 		this.nodes.set(node.id, node);
 	}
@@ -188,28 +202,85 @@ class RecipeTree
 
 	static async fromItem(rootItem: Item): Promise<RecipeTree>
 	{
-		// TODO: implement DB logic to fetch recipes & ingredients
+		const { itemsMap, recipesMap, ingredientsMap } = await getRecipeTreeDataV2(rootItem.id);
 
-		// Example: create a root node with no recipes yet
-		const rootNode = new RecipeTreeNode(rootItem.id, rootItem, null);
+		// Create root node with recipe data
+		const rootItemRecipes = recipesMap.get(rootItem.id) ?? [];
+		const rootItemSelectedRecipe = rootItemRecipes[0];
+		const rootItemIngredients = rootItemSelectedRecipe ? (ingredientsMap.get(rootItemSelectedRecipe.id) ?? []) : [];
 
-		// Create the tree instance
+		const rootNodeRecipe = rootItemSelectedRecipe
+			? {
+					recipes: rootItemRecipes,
+					selectedRecipe: rootItemSelectedRecipe,
+					ingredients: rootItemIngredients,
+				}
+			: undefined;
+
+		const rootNode = RecipeTreeNode.create(rootItem, null, rootNodeRecipe);
+
 		const tree = new RecipeTree(rootNode);
 
-		// TODO: fetch child items/recipes/ingredients from DB
-		// and build nodes, then attach them using rootNode.addChild(childNode)
-		// and register nodes in tree.nodes map
-		//
-		// Example pseudo-code:
-		// const recipes = await fetchRecipes(rootItem.id)
-		// for (const recipe of recipes) {
-		//   const ingredients = await fetchIngredients(recipe.id)
-		//   for (const ingredient of ingredients) {
-		//      const childNode = new RecipeTreeNode(ingredient.id, ingredientItem, rootNode, 1, {recipes: [recipe], selectedRecipe: recipe, ingredients})
-		//      rootNode.addChild(childNode)
-		//      tree.registerNode(childNode)
-		//   }
-		// }
+		// Recursively build the tree structure
+		const buildSubtree = (node: RecipeTreeNode): void =>
+		{
+			const itemRecipes = recipesMap.get(node.item.id) ?? [];
+
+			if (itemRecipes.length === 0)
+			{
+				return;
+			}
+
+			// For each recipe, add ingredient items as children
+			for (const recipe of itemRecipes)
+			{
+				const recipeIngredients = ingredientsMap.get(recipe.id) ?? [];
+
+				for (const ingredient of recipeIngredients)
+				{
+					const childItem = itemsMap.get(ingredient.itemId);
+
+					if (!childItem)
+					{
+						continue;
+					}
+
+					const ingredientItemRecipes = recipesMap.get(childItem.id);
+
+					if (ingredientItemRecipes && ingredientItemRecipes.length > 0)
+					{
+						const selectedIngItemRecipe = ingredientItemRecipes[0];
+						const selectedIngItemRecipeIngs = ingredientsMap.get(selectedIngItemRecipe.id) ?? [];
+
+						const childNode = RecipeTreeNode.create(childItem, node, {
+							recipes: ingredientItemRecipes,
+							selectedRecipe: selectedIngItemRecipe,
+							ingredients: selectedIngItemRecipeIngs,
+						});
+
+						node.addChild(childNode);
+						tree.registerNode(childNode);
+
+						// Recursively build subtree for child
+						buildSubtree(childNode);
+					}
+					else
+					{
+						// Create child node with recipe and ingredients information
+						const childNode = RecipeTreeNode.create(childItem, node);
+
+						node.addChild(childNode);
+						tree.registerNode(childNode);
+
+						// Recursively build subtree for child
+						buildSubtree(childNode);
+					}
+				}
+			}
+		};
+
+		// Build the tree starting from root
+		buildSubtree(rootNode);
 
 		return tree;
 	}

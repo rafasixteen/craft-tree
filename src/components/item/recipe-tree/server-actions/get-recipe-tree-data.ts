@@ -14,6 +14,13 @@ export interface RecipeTreeData
 	ingredients: Ingredient[];
 }
 
+export interface RecipeTreeDataV2
+{
+	itemsMap: Map<string, Item>;
+	recipesMap: Map<string, Recipe[]>;
+	ingredientsMap: Map<string, Ingredient[]>;
+}
+
 export async function getRecipeTreeData(rootItemId: string): Promise<RecipeTreeData>
 {
 	const items: Item[] = [];
@@ -59,4 +66,27 @@ export async function getRecipeTreeData(rootItemId: string): Promise<RecipeTreeD
 	}
 
 	return { items, recipes, ingredients };
+}
+
+export async function getRecipeTreeDataV2(rootItemId: string): Promise<RecipeTreeDataV2>
+{
+	const { items, recipes, ingredients } = await getRecipeTreeData(rootItemId);
+
+	const itemsMap = new Map<string, Item>(items.map((item) => [item.id, item]));
+	const recipesMap = new Map<string, Recipe[]>();
+	const ingredientsMap = new Map<string, Ingredient[]>();
+
+	for (const recipe of recipes)
+	{
+		const existing = recipesMap.get(recipe.itemId) ?? [];
+		recipesMap.set(recipe.itemId, [...existing, recipe]);
+	}
+
+	for (const ingredient of ingredients)
+	{
+		const existing = ingredientsMap.get(ingredient.recipeId) ?? [];
+		ingredientsMap.set(ingredient.recipeId, [...existing, ingredient]);
+	}
+
+	return { itemsMap, recipesMap, ingredientsMap };
 }
