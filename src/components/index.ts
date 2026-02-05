@@ -1,6 +1,7 @@
 export * from './auth';
 export * from './collections';
 export * from './folder';
+export * from './inventory-tree';
 export * from './item';
 export * from './layout';
 export * from './recipe';

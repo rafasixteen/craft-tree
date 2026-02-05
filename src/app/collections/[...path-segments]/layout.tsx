@@ -9,6 +9,7 @@ import { cookies } from 'next/headers';
 import { getUserId } from '@/domain/user';
 import { getUserCollections } from '@/domain/collection';
 import React from 'react';
+import { getInventoryData, InventoryProvider } from '@/domain/inventory';
 
 interface LayoutProps
 {
@@ -43,17 +44,21 @@ export default async function Layout({ children, params }: LayoutProps)
 	const defaultLayoutString = cookieStore.get(LAYOUT_COOKIE_KEY)?.value;
 	const defaultLayout = defaultLayoutString ? (JSON.parse(defaultLayoutString) as number[]) : undefined;
 
+	const data = await getInventoryData(activeCollection.id);
+
 	return (
 		<CollectionsProvider collections={collections} activeCollection={activeCollection}>
-			<TreeNodesProvider initialNodes={initialNodes}>
-				{/* Desktop Layout - Resizable Panels */}
-				<DesktopLayout path={path} defaultLayout={defaultLayout} layoutId={LAYOUT_COOKIE_KEY}>
-					{children}
-				</DesktopLayout>
+			<InventoryProvider data={data}>
+				<TreeNodesProvider initialNodes={initialNodes}>
+					{/* Desktop Layout - Resizable Panels */}
+					<DesktopLayout path={path} defaultLayout={defaultLayout} layoutId={LAYOUT_COOKIE_KEY}>
+						{children}
+					</DesktopLayout>
 
-				{/* Mobile Layout - Toggle View */}
-				<MobileLayout path={path}>{children}</MobileLayout>
-			</TreeNodesProvider>
+					{/* Mobile Layout - Toggle View */}
+					<MobileLayout path={path}>{children}</MobileLayout>
+				</TreeNodesProvider>
+			</InventoryProvider>
 		</CollectionsProvider>
 	);
 }
