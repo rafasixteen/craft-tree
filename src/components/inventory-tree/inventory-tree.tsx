@@ -17,6 +17,7 @@ import {
 	keyboardDragAndDropFeature,
 	renamingFeature,
 	searchFeature,
+	expandAllFeature,
 	TreeInstance,
 	createOnDropHandler,
 } from '@headless-tree/core';
@@ -80,6 +81,7 @@ export function InventoryTree()
 			searchFeature,
 			filterFeature,
 			toggleFeature,
+			expandAllFeature,
 		],
 		getItemName(item)
 		{
@@ -139,6 +141,7 @@ export function InventoryTree()
 
 	useEffect(() =>
 	{
+		headlessTree.expandAll();
 		headlessTree.setSearch(debouncedSearch);
 
 		const params = new URLSearchParams();
@@ -175,7 +178,13 @@ export function InventoryTree()
 				<InventoryTreeNodes tree={headlessTree} />
 				<div
 					style={headlessTree.getDragLineStyle()}
-					className="bg-primary before:bg-background before:border-primary absolute z-30 -mt-px h-0.5 w-[unset] before:absolute before:-top-[3px] before:left-0 before:size-2 before:rounded-full before:border-2"
+					className="
+						absolute z-30 -mt-px h-0.5
+						bg-primary
+						before:absolute before:-top-0.75 before:left-0
+						before:size-2 before:rounded-full before:border-2
+						before:border-primary before:bg-background
+					"
 				/>
 			</div>
 		</>
