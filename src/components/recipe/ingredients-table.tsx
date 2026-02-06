@@ -3,10 +3,9 @@ import { Recipe } from '@/domain/recipe';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useTreeNodesContext } from '@/providers';
 import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from '@/components/ui/combobox';
-import { Node } from '@/domain/tree';
 import { XIcon } from 'lucide-react';
+import { InventoryTreeNode, useInventory } from '@/domain/inventory';
 
 interface IngredientsTableProps
 {
@@ -17,18 +16,18 @@ interface IngredientsTableProps
 
 export function IngredientsTable({ ingredients, recipe, onIngredientsChange }: IngredientsTableProps)
 {
-	const { nodes } = useTreeNodesContext();
+	const { inventory } = useInventory();
 
 	const editMode = onIngredientsChange !== undefined && recipe !== undefined;
 
 	const getIngredientName = (ingredient: Ingredient) =>
 	{
-		return nodes[ingredient.itemId]?.name ?? ingredient.itemId;
+		return inventory.nodes[ingredient.itemId]?.name ?? ingredient.itemId;
 	};
 
 	const getComboboxItems = (currentIndex: number) =>
 	{
-		return Object.values(nodes).filter((node) =>
+		return Object.values(inventory.nodes).filter((node) =>
 		{
 			const isItem = node.type === 'item';
 			const isNotSelected = !ingredients.some((ing, index) => index !== currentIndex && ing.itemId === node.id);
@@ -73,10 +72,10 @@ export function IngredientsTable({ ingredients, recipe, onIngredientsChange }: I
 
 	const ingredientComboBox = (ingredient: Ingredient, index: number) =>
 	{
-		const items: Node[] = getComboboxItems(index);
-		const value = nodes[ingredient.itemId] ?? null;
+		const items: InventoryTreeNode[] = getComboboxItems(index);
+		const value = inventory.nodes[ingredient.itemId] ?? null;
 
-		const onValueChange = (node: Node | null) =>
+		const onValueChange = (node: InventoryTreeNode | null) =>
 		{
 			updateIngredient(index, { itemId: node?.id ?? '' });
 		};

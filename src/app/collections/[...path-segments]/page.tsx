@@ -1,15 +1,9 @@
-import { notFound } from 'next/navigation';
-import { auth } from '@/auth';
-import { getUserId } from '@/domain/user';
-import { getUserCollections } from '@/domain/collection';
-import { findNodeByPath, getNodeMap } from '@/domain/tree';
-import { getRecipeById, getRecipeIngredients } from '@/domain/recipe';
-import { getFolderById } from '@/domain/folder';
-import { getItemById } from '@/domain/item';
-import { FolderView } from '@/components/folder';
-import { ItemView } from '@/components/item';
-import { RecipeView } from '@/components/recipe';
-import { CollectionView } from '@/components/collections';
+'use client';
+
+import { useMemo } from 'react';
+import { usePathname } from 'next/navigation';
+import { useInventory } from '@/domain/inventory';
+import { ItemView } from '@/components';
 
 //TODO: Fix this logic
 
@@ -20,60 +14,31 @@ import { CollectionView } from '@/components/collections';
 // resolves to "test" and the findNodeByPath maps the segments new-collection/test
 // to the node of type "folder", because it is incapable of telling wether we want an item or folder.
 
-interface PageProps
+export default function Page()
 {
-	params: Promise<{ 'path-segments': string[] }>;
-}
+	const pathname = usePathname();
 
-export default async function Page({ params }: PageProps)
-{
-	const { 'path-segments': pathSegments } = await params;
-	if (!Array.isArray(pathSegments)) return notFound();
+	const { findNodeByPath } = useInventory();
 
-	const session = await auth();
-	if (!session?.user?.email) return notFound();
+	const nodePathname = pathname.replace('/collections/', '');
+	const node = useMemo(() => findNodeByPath(nodePathname.split('/')), [nodePathname, findNodeByPath]);
 
-	const userId = await getUserId(session.user.email);
-	const collections = await getUserCollections(userId!);
-
-	const collectionSlug = pathSegments[0];
-	const activeCollection = collections.find((collection) => collection.slug === collectionSlug);
-	if (!activeCollection) return notFound();
-
-	const nodes = await getNodeMap(activeCollection);
-	const node = findNodeByPath(nodes, pathSegments);
-
-	if (!node) return <p>Node not found</p>;
+	if (!node)
+	{
+		return <p>Node not found</p>;
+	}
 
 	switch (node.type)
 	{
-		case 'collection':
-			return <CollectionView collection={activeCollection} />;
-		case 'folder':
-		{
-			const folder = await getFolderById(node.id);
-			if (!folder) return notFound();
-			return <FolderView folder={folder} />;
-		}
 		case 'item':
 		{
-			const item = await getItemById(node.id);
-			if (!item) return notFound();
-			return <ItemView item={item} />;
+			return <ItemView itemId={node.id} />;
 		}
-		case 'recipe':
-		{
-			const recipe = await getRecipeById(node.id);
-			const ingredients = await getRecipeIngredients(node.id);
-
-			if (!recipe || !ingredients)
-			{
-				return notFound();
-			}
-
-			return <RecipeView recipe={recipe} ingredients={ingredients} />;
-		}
+		// case 'recipe':
+		// {
+		// 	return <RecipeView itemId={node.id} />;
+		// }
 		default:
-			return notFound();
+			return <pre>{JSON.stringify(node, null, 2)}</pre>;
 	}
 }

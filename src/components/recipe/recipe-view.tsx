@@ -8,7 +8,6 @@ import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { RecipeInfo } from './recipe-info';
 import { RecipeEdit } from './recipe-edit';
-import { useTreeNodesContext } from '@/providers';
 import { useRouter } from 'next/navigation';
 
 type RecipeViewTab = 'info' | 'edit';
@@ -22,7 +21,6 @@ interface RecipeViewProps
 export function RecipeView({ recipe, ingredients }: RecipeViewProps)
 {
 	const router = useRouter();
-	const { refresh } = useTreeNodesContext();
 
 	const [tab, setTab] = useState<RecipeViewTab>('info');
 	const [draftRecipe, setDraftRecipe] = useState<Recipe>(() => ({ ...recipe }));
@@ -56,7 +54,6 @@ export function RecipeView({ recipe, ingredients }: RecipeViewProps)
 			},
 		});
 
-		await refresh();
 		router.refresh();
 
 		setTab('info');

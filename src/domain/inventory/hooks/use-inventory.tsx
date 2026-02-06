@@ -16,6 +16,7 @@ interface InventoryContext
 	deleteNode: (node: InventoryTreeNode) => Promise<void>;
 	setChildren: (parentNodeId: InventoryTreeNode['id'], childIds: InventoryTreeNode['id'][]) => Promise<void>;
 	getNodePath: (node: InventoryTreeNode) => string[];
+	findNodeByPath: (pathSegments: string[]) => InventoryTreeNode | null;
 }
 
 const InventoryContext = createContext<InventoryContext | undefined>(undefined);
@@ -242,7 +243,18 @@ export function InventoryProvider({ children, data }: InventoryProviderProps)
 		[inventory],
 	);
 
-	const value = useMemo(() => ({ inventory, addNode, renameNode, deleteNode, setChildren, getNodePath }), [inventory, addNode, renameNode, deleteNode, setChildren, getNodePath]);
+	const findNodeByPath = useCallback(
+		function findNodeByPath(pathSegments: string[]): InventoryTreeNode | null
+		{
+			return InventoryActions.findNodeByPath(inventory, pathSegments);
+		},
+		[inventory],
+	);
+
+	const value = useMemo(
+		() => ({ inventory, addNode, renameNode, deleteNode, setChildren, getNodePath, findNodeByPath }),
+		[inventory, addNode, renameNode, deleteNode, setChildren, getNodePath, findNodeByPath],
+	);
 
 	return <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>;
 }

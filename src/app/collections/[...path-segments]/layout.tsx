@@ -1,8 +1,6 @@
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
 import { CollectionsProvider } from '@/providers/collections-context';
-import { TreeNodesProvider } from '@/providers/tree-nodes-context';
-import { getNodeMap } from '@/domain/tree';
 import { DesktopLayout } from './desktop-layout';
 import { MobileLayout } from './mobile-layout';
 import { cookies } from 'next/headers';
@@ -33,8 +31,6 @@ export default async function Layout({ children, params }: LayoutProps)
 
 	if (!activeCollection) notFound();
 
-	const initialNodes = await getNodeMap(activeCollection);
-
 	const path = pathSegments.map((segment, index) => ({
 		name: segment,
 		href: `/collections/` + pathSegments.slice(0, index + 1).join('/'),
@@ -49,15 +45,13 @@ export default async function Layout({ children, params }: LayoutProps)
 	return (
 		<CollectionsProvider collections={collections} activeCollection={activeCollection}>
 			<InventoryProvider data={data}>
-				<TreeNodesProvider initialNodes={initialNodes}>
-					{/* Desktop Layout - Resizable Panels */}
-					<DesktopLayout path={path} defaultLayout={defaultLayout} layoutId={LAYOUT_COOKIE_KEY}>
-						{children}
-					</DesktopLayout>
+				{/* Desktop Layout - Resizable Panels */}
+				<DesktopLayout path={path} defaultLayout={defaultLayout} layoutId={LAYOUT_COOKIE_KEY}>
+					{children}
+				</DesktopLayout>
 
-					{/* Mobile Layout - Toggle View */}
-					<MobileLayout path={path}>{children}</MobileLayout>
-				</TreeNodesProvider>
+				{/* Mobile Layout - Toggle View */}
+				<MobileLayout path={path}>{children}</MobileLayout>
 			</InventoryProvider>
 		</CollectionsProvider>
 	);

@@ -15,11 +15,11 @@ const RecipeTreeContext = createContext<RecipeTreeContextValue | undefined>(unde
 
 interface RecipeTreeProviderProps
 {
-	item: Item;
+	itemId: Item['id'];
 	children: ReactNode;
 }
 
-export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
+export function RecipeTreeProvider({ itemId, children }: RecipeTreeProviderProps)
 {
 	const [tree, setTree] = useState<RecipeTree | null>(null);
 	const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 		{
 			try
 			{
-				const newTree = await RecipeTree.create(item.id);
+				const newTree = await RecipeTree.create(itemId);
 				if (!cancelled)
 				{
 					setTree(newTree);
@@ -64,7 +64,7 @@ export function RecipeTreeProvider({ item, children }: RecipeTreeProviderProps)
 		{
 			cancelled = true;
 		};
-	}, [item.id]);
+	}, [itemId]);
 
 	const value = useMemo<RecipeTreeContextValue>(
 		() => ({

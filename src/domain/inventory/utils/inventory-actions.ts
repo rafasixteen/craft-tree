@@ -174,6 +174,49 @@ export function getNodePath(state: InventoryTreeState, nodeId: string): string[]
 	return path;
 }
 
+export function findNodeByPath(state: InventoryTreeState, pathSegments: string[]): InventoryTreeNode | null
+{
+	if (pathSegments.length === 0)
+	{
+		return null;
+	}
+
+	const root = state.nodes[state.rootNodeId];
+
+	if (!root || root.slug !== pathSegments[0])
+	{
+		return null;
+	}
+
+	let current: InventoryTreeNode = root;
+
+	for (const segment of pathSegments.slice(1))
+	{
+		if (!current.children || current.children.length === 0)
+		{
+			return null;
+		}
+
+		const matchingChildId = current.children.find((childId) => state.nodes[childId]?.slug === segment);
+
+		if (!matchingChildId)
+		{
+			return null;
+		}
+
+		const matchingChild = state.nodes[matchingChildId];
+
+		if (!matchingChild)
+		{
+			return null;
+		}
+
+		current = matchingChild;
+	}
+
+	return current;
+}
+
 function isDescendant(nodes: InventoryTreeState['nodes'], parentId: string, nodeId: string): boolean
 {
 	const parent = nodes[parentId];
