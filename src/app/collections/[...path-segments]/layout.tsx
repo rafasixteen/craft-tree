@@ -1,13 +1,12 @@
 import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
-import { CollectionsProvider } from '@/providers/collections-context';
 import { DesktopLayout } from './desktop-layout';
 import { MobileLayout } from './mobile-layout';
 import { cookies } from 'next/headers';
 import { getUserId } from '@/domain/user';
-import { getUserCollections } from '@/domain/collection';
-import React from 'react';
+import { getUserCollections, CollectionsProvider } from '@/domain/collection';
 import { getInventoryData, InventoryProvider } from '@/domain/inventory';
+import React from 'react';
 
 interface LayoutProps
 {

@@ -3,13 +3,13 @@
 import { Collection } from '@/domain/collection';
 import React, { createContext, useContext } from 'react';
 
-interface CollectionsContextType
+interface CollectionsContext
 {
 	collections: Collection[];
 	activeCollection: Collection;
 }
 
-const CollectionsContext = createContext<CollectionsContextType | undefined>(undefined);
+const CollectionsContext = createContext<CollectionsContext | undefined>(undefined);
 
 interface CollectionsProviderProps
 {
@@ -23,9 +23,14 @@ export function CollectionsProvider({ children, collections, activeCollection }:
 	return <CollectionsContext.Provider value={{ collections, activeCollection }}>{children}</CollectionsContext.Provider>;
 }
 
-export function useCollectionsContext()
+export function useCollections()
 {
 	const context = useContext(CollectionsContext);
-	if (!context) throw new Error('useCollectionsContext must be used within a CollectionsProvider');
+
+	if (!context)
+	{
+		throw new Error('useCollections must be used within a CollectionsProvider');
+	}
+
 	return context;
 }

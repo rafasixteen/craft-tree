@@ -5,15 +5,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Button } from '../ui/button';
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { createCollection } from '@/domain/collection/services/create-collection';
+import { createCollection, useCollections } from '@/domain/collection';
 import { Collection } from '@/domain/collection';
-import { useCollectionsContext } from '@/providers/collections-context';
 
 export function Collections()
 {
 	const router = useRouter();
 
-	const { collections, activeCollection } = useCollectionsContext();
+	const { collections, activeCollection } = useCollections();
 	const [isPending, startTransition] = useTransition();
 
 	function setActiveCollection(collection: Collection)
