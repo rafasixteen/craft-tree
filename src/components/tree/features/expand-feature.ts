@@ -3,7 +3,7 @@ import { Node } from '@/domain/tree';
 
 declare module '@headless-tree/core'
 {
-	export interface TreeInstance<T extends Node>
+	export interface TreeInstance<T>
 	{
 		expandAll: () => void;
 		collapseAll: () => void;
