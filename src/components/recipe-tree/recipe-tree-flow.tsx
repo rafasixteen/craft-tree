@@ -7,8 +7,8 @@ import { useTheme } from 'next-themes';
 import ELK from 'elkjs/lib/elk.bundled.js';
 import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, DefaultEdgeOptions } from '@xyflow/react';
-import { RecipeTreeInternalNode, RecipeTreeRootNode, RecipeTreeLeafNode, RecipeTreeNodeData, RecipeTreeEdge } from '@/components/recipe-tree';
-import { useRecipeTree, RecipeTreeNode, DfsCallback, DfsGetChildren } from '@/domain/recipe-tree';
+import { RecipeTreeInternalNode, RecipeTreeRootNode, RecipeTreeLeafNode, RecipeTreeNodeData } from '@/components/recipe-tree';
+import { useRecipeTree, RecipeTreeNode } from '@/domain/recipe-tree';
 
 const elk = new ELK();
 
@@ -23,7 +23,7 @@ const elkOptions = {
 	'elk.spacing.nodeNode': '80',
 };
 
-const getLayoutedElements = async (nodes: Node<RecipeTreeNodeData>[], edges: Edge[]) =>
+async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edge[])
 {
 	const nodeWidth = 150;
 	const nodeHeight = 50;
@@ -60,7 +60,7 @@ const getLayoutedElements = async (nodes: Node<RecipeTreeNodeData>[], edges: Edg
 		console.error('Layout error:', error);
 		return { nodes, edges };
 	}
-};
+}
 
 type NodeType = 'root-node' | 'internal-node' | 'leaf-node';
 
@@ -96,64 +96,61 @@ export function RecipeTreeFlow()
 			return;
 		}
 
-		const initializeLayout = async () =>
+		const newNodes: Node<RecipeTreeNodeData>[] = [];
+		const newEdges: Edge[] = [];
+
+		function getChildren(node: RecipeTreeNode): RecipeTreeNode['id'][]
 		{
-			const newNodes: Node<RecipeTreeNodeData>[] = [];
-			const newEdges: Edge[] = [];
+			// TODO: Can we order the children by how they appear in the recipe's ingredient list?
 
-			const getChildren: DfsGetChildren = (node) =>
+			// no selected recipe → no children
+			if (node.selectedRecipeIndex === null) return [];
+
+			const recipe = node.recipes[node.selectedRecipeIndex];
+			const ingredients = node.ingredients[recipe.id] ?? [];
+
+			if (!node.children || node.children.length === 0)
 			{
-				// no selected recipe → no children
-				if (node.selectedRecipeIndex === null) return [];
+				return [];
+			}
 
-				const recipe = node.recipes[node.selectedRecipeIndex];
-				const ingredients = node.ingredients[recipe.id] ?? [];
+			// Use the tree's child node ids, slicing by recipe order to match the builder.
+			let startIndex = 0;
 
-				if (!node.children || node.children.length === 0)
-				{
-					return [];
-				}
-
-				// Use the tree's child node ids, slicing by recipe order to match the builder.
-				let startIndex = 0;
-
-				for (let i = 0; i < node.selectedRecipeIndex; i++)
-				{
-					const priorRecipe = node.recipes[i];
-					startIndex += node.ingredients[priorRecipe.id]?.length ?? 0;
-				}
-
-				const endIndex = startIndex + ingredients.length;
-				const recipeChildren = node.children.slice(startIndex, endIndex);
-
-				return Array.from(new Set(recipeChildren));
-			};
-
-			const callback: DfsCallback = (node) =>
+			for (let i = 0; i < node.selectedRecipeIndex; i++)
 			{
-				const type: NodeType = node.parentId === null ? 'root-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
+				const priorRecipe = node.recipes[i];
+				startIndex += node.ingredients[priorRecipe.id]?.length ?? 0;
+			}
 
-				// Build the React Flow node
-				const flowNode = buildNode(node, type);
+			const endIndex = startIndex + ingredients.length;
+			const recipeChildren = node.children.slice(startIndex, endIndex);
 
-				if (node.parentId)
-				{
-					newEdges.push(buildEdge(node.parentId, node.id));
-				}
+			return Array.from(new Set(recipeChildren));
+		}
 
-				newNodes.push(flowNode);
-			};
+		function callback(node: RecipeTreeNode): void
+		{
+			const type: NodeType = node.parentId === null ? 'root-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
 
-			dfs(recipeTree.rootNodeId, callback, getChildren, 'pre');
+			// Build the React Flow node
+			const flowNode = buildNode(node, type);
 
-			// Apply elkjs layout
-			const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(newNodes, newEdges);
+			if (node.parentId)
+			{
+				newEdges.push(buildEdge(node.parentId, node.id));
+			}
 
+			newNodes.push(flowNode);
+		}
+
+		dfs(recipeTree.rootNodeId, callback, getChildren, 'pre');
+
+		getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
+		{
 			setNodes(layoutedNodes);
 			setEdges(layoutedEdges);
-		};
-
-		initializeLayout();
+		});
 	}, [recipeTree]);
 
 	useEffect(() =>
