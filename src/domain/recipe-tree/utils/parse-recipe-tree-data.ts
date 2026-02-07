@@ -28,18 +28,17 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 
 	const ingredientItemIds = new Set(ingredients.map((ingredient) => ingredient.itemId));
 	const rootItem = items.find((item) => !ingredientItemIds.has(item.id)) ?? items[0];
-	const rootItemId = rootItem.id;
 
 	const nodes: Record<RecipeTreeNode['id'], RecipeTreeNode> = {};
 	let nodeCounter = 0;
 
-	function buildNode(itemId: string, parentId: RecipeTreeNode['id'] | null, path: Set<string>): RecipeTreeNode | null
+	function buildNode(itemId: string, parentId: RecipeTreeNode['id'] | null): RecipeTreeNode
 	{
 		const item = itemsById.get(itemId);
 
 		if (!item)
 		{
-			return null;
+			throw new Error(`parseRecipeTreeData: Building node with itemId "${itemId}" not found in recipe tree data.`);
 		}
 
 		const nodeId = `node-${++nodeCounter}`;
@@ -63,33 +62,19 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 
 		nodes[nodeId] = node;
 
-		if (path.has(itemId))
-		{
-			return node;
-		}
-
-		const nextPath = new Set(path);
-		nextPath.add(itemId);
-
-		const childItemIds = new Set<string>();
-
 		for (const recipe of nodeRecipes)
 		{
-			const recipeIngredients = nodeIngredients[recipe.id] ?? [];
+			const ingredients = nodeIngredients[recipe.id] ?? [];
 
-			for (const ingredient of recipeIngredients)
+			for (const ingredient of ingredients)
 			{
-				childItemIds.add(ingredient.itemId);
-			}
-		}
+				const childItem = itemsById.get(ingredient.itemId);
 
-		for (const childItemId of childItemIds)
-		{
-			const childNode = buildNode(childItemId, nodeId, nextPath);
-
-			if (childNode)
-			{
-				node.children?.push(childNode.id);
+				if (childItem)
+				{
+					const childNode = buildNode(childItem.id, nodeId);
+					node.children?.push(childNode.id);
+				}
 			}
 		}
 
@@ -101,12 +86,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 		return node;
 	}
 
-	const rootNode = buildNode(rootItemId, null, new Set());
-
-	if (!rootNode)
-	{
-		throw new Error('parseRecipeTreeData: Root item not found in recipe tree data.');
-	}
+	const rootNode = buildNode(rootItem.id, null);
 
 	return { rootNodeId: rootNode.id, nodes };
 }

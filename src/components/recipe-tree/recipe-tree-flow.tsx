@@ -25,7 +25,7 @@ const elkOptions = {
 
 const getLayoutedElements = async (nodes: Node<RecipeTreeNodeData>[], edges: Edge[]) =>
 {
-	const nodeWidth = 200;
+	const nodeWidth = 150;
 	const nodeHeight = 50;
 
 	const graph = {
@@ -109,17 +109,24 @@ export function RecipeTreeFlow()
 				const recipe = node.recipes[node.selectedRecipeIndex];
 				const ingredients = node.ingredients[recipe.id] ?? [];
 
-				// map child item IDs → child node IDs
-				const childrenNodeIds = ingredients
-					.map((ingredient) => ingredient.itemId)
-					.map((itemId) =>
-					{
-						const childNode = Object.values(recipeTree.nodes).find((n) => n.item.id === itemId);
-						return childNode ? childNode.id : null;
-					})
-					.filter((id): id is string => id !== null);
+				if (!node.children || node.children.length === 0)
+				{
+					return [];
+				}
 
-				return childrenNodeIds;
+				// Use the tree's child node ids, slicing by recipe order to match the builder.
+				let startIndex = 0;
+
+				for (let i = 0; i < node.selectedRecipeIndex; i++)
+				{
+					const priorRecipe = node.recipes[i];
+					startIndex += node.ingredients[priorRecipe.id]?.length ?? 0;
+				}
+
+				const endIndex = startIndex + ingredients.length;
+				const recipeChildren = node.children.slice(startIndex, endIndex);
+
+				return Array.from(new Set(recipeChildren));
 			};
 
 			const callback: DfsCallback = (node) =>
