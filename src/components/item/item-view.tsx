@@ -1,7 +1,8 @@
 'use client';
 
 import { Item } from '@/domain/item';
-import { RecipeTreeFlow, RecipeTreeProvider } from '@/components/item/recipe-tree';
+import { RecipeTreeProvider } from '@/domain/recipe-tree';
+import { RecipeTreeFlow } from '@/components/recipe-tree';
 
 interface ItemViewProps
 {
