@@ -39,6 +39,17 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 		[recipeTree],
 	);
 
+	function changeRecipe(nodeId: RecipeTreeNode['id'], delta: number): void
+	{
+		if (!recipeTree)
+		{
+			throw new Error('Recipe tree data is not available.');
+		}
+
+		// TODO: Allow recipe tree to be settable.
+		const newState = RecipeTreeActions.changeRecipe(recipeTree, nodeId, delta);
+	}
+
 	const value = useMemo(() => ({ recipeTree, error, dfs }), [recipeTree, error, dfs]);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
