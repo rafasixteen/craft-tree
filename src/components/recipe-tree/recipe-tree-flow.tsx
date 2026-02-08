@@ -4,11 +4,11 @@ import '@xyflow/react/dist/style.css';
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import ELK from 'elkjs/lib/elk.bundled.js';
 import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, DefaultEdgeOptions } from '@xyflow/react';
 import { RecipeTreeInternalNode, RecipeTreeRootNode, RecipeTreeLeafNode, RecipeTreeNodeData } from '@/components/recipe-tree';
 import { useRecipeTree, RecipeTreeNode } from '@/domain/recipe-tree';
+import ELK from 'elkjs/lib/elk.bundled.js';
 
 const elk = new ELK();
 
@@ -101,35 +101,6 @@ export function RecipeTreeFlow()
 		const newNodes: Node<RecipeTreeNodeData>[] = [];
 		const newEdges: Edge[] = [];
 
-		function getChildren(node: RecipeTreeNode): RecipeTreeNode['id'][]
-		{
-			// no selected recipe → no children
-			if (node.selectedRecipeIndex === -1) return [];
-
-			const recipe = node.recipes[node.selectedRecipeIndex];
-			const ingredients = node.ingredients[recipe.id] ?? [];
-
-			if (!node.children || node.children.length === 0)
-			{
-				return [];
-			}
-
-			// Use the tree's child node ids, slicing by recipe order to match the builder.
-			let startIndex = 0;
-
-			for (let i = 0; i < node.selectedRecipeIndex; i++)
-			{
-				const priorRecipe = node.recipes[i];
-				startIndex += node.ingredients[priorRecipe.id]?.length ?? 0;
-			}
-
-			const endIndex = startIndex + ingredients.length;
-			const recipeChildren = node.children.slice(startIndex, endIndex);
-
-			const uniqueChildren = Array.from(new Set(recipeChildren));
-			return uniqueChildren;
-		}
-
 		function callback(node: RecipeTreeNode): void
 		{
 			const type: NodeType = node.parentId === null ? 'root-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
@@ -142,7 +113,7 @@ export function RecipeTreeFlow()
 			}
 		}
 
-		dfs(recipeTree.rootNodeId, callback, getChildren, 'pre');
+		dfs(recipeTree.rootNodeId, callback, 'pre');
 
 		getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
 		{

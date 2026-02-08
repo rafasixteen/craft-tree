@@ -5,15 +5,7 @@ export type DfsOrder = 'pre' | 'post';
 
 export type DfsCallback = (node: RecipeTreeNode) => void;
 
-export type DfsGetChildren = (node: RecipeTreeNode) => RecipeTreeNode['id'][];
-
-export function dfs(
-	state: RecipeTreeState,
-	startNodeId: RecipeTreeNode['id'],
-	callback: DfsCallback,
-	getChildren: DfsGetChildren = (n) => n.children || [],
-	order: DfsOrder = 'pre',
-): void
+export function dfs(state: RecipeTreeState, startNodeId: RecipeTreeNode['id'], callback: DfsCallback, order: DfsOrder = 'pre'): void
 {
 	visit(ensureNode(state, startNodeId));
 
@@ -24,7 +16,7 @@ export function dfs(
 			callback(node);
 		}
 
-		for (const childId of getChildren(node))
+		for (const childId of getChildren(state, node.id))
 		{
 			visit(ensureNode(state, childId));
 		}
@@ -51,6 +43,37 @@ export function changeRecipe(state: RecipeTreeState, nodeId: RecipeTreeNode['id'
 		const newIndex = (((node.selectedRecipeIndex + delta) % length) + length) % length;
 		node.selectedRecipeIndex = newIndex;
 	});
+}
+
+export function getChildren(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): RecipeTreeNode['id'][]
+{
+	const node = ensureNode(state, nodeId);
+
+	// no selected recipe → no children
+	if (node.selectedRecipeIndex === -1) return [];
+
+	const recipe = node.recipes[node.selectedRecipeIndex];
+	const ingredients = node.ingredients[recipe.id] ?? [];
+
+	if (!node.children || node.children.length === 0)
+	{
+		return [];
+	}
+
+	// Use the tree's child node ids, slicing by recipe order to match the builder.
+	let startIndex = 0;
+
+	for (let i = 0; i < node.selectedRecipeIndex; i++)
+	{
+		const priorRecipe = node.recipes[i];
+		startIndex += node.ingredients[priorRecipe.id]?.length ?? 0;
+	}
+
+	const endIndex = startIndex + ingredients.length;
+	const recipeChildren = node.children.slice(startIndex, endIndex);
+
+	const uniqueChildren = Array.from(new Set(recipeChildren));
+	return uniqueChildren;
 }
 
 export function getResolvedQuantity(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): number
@@ -90,6 +113,37 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: RecipeTreeNo
 
 		return node.recipes[selectedRecipeIndex].quantity;
 	}
+}
+
+export function getResolvedTime(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): number
+{
+	let totalTime = getNodeTime(state, nodeId);
+
+	for (const child of getChildren(state, nodeId))
+	{
+		const childTime = getResolvedTime(state, child);
+		totalTime += childTime;
+	}
+
+	return totalTime;
+}
+
+export function getNodeTime(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): number
+{
+	const node = ensureNode(state, nodeId);
+
+	const selectedRecipeIndex = node.selectedRecipeIndex;
+
+	if (selectedRecipeIndex === -1)
+	{
+		return 0;
+	}
+
+	const recipe = node.recipes[selectedRecipeIndex];
+	const nodeTotalQuantity = getResolvedQuantity(state, nodeId);
+	const nodeTime = nodeTotalQuantity * recipe.time;
+
+	return nodeTime;
 }
 
 function ensureNode(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): RecipeTreeNode
