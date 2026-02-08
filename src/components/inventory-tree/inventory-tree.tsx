@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useInventory, InventoryTreeNode } from '@/domain/inventory';
 import { useTree } from '@headless-tree/react';
 import { InventoryTreeNodeComp, filterFeature, toggleFeature } from '@/components/inventory-tree';
-import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useLocalStorage } from 'usehooks-ts';
 import { FilterIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
