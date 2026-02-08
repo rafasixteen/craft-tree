@@ -1,5 +1,5 @@
-import { RecipeTreeNodeData, RecipeCarousel } from '@/components/recipe-tree';
-import { Card, CardFooter } from '@/components/ui/card';
+import { RecipeTreeNodeData, RecipeCarousel, NodeIcon } from '@/components/recipe-tree';
+import { Card, CardFooter, CardHeader } from '@/components/ui/card';
 import { Handle, Position } from '@xyflow/react';
 
 interface RecipeTreeNodeProps
@@ -20,7 +20,13 @@ export function RecipeTreeInternalNode({ id, data }: RecipeTreeNodeProps)
 	return (
 		<Card size="sm" className="p-2">
 			<Handle type="target" position={Position.Top} />
-			<p>Node {item.name}</p>
+			<CardHeader className="flex items-center gap-2">
+				<NodeIcon itemName={item.name} />
+				<div className="min-w-0">
+					<p className="truncate text-sm font-semibold">{item.name}</p>
+					<p className="truncate text-xs text-muted-foreground">{recipes[selectedRecipeIndex].name}</p>
+				</div>
+			</CardHeader>
 			<CardFooter>
 				<RecipeCarousel nodeId={id} recipes={recipes} selectedRecipeIndex={selectedRecipeIndex} />
 			</CardFooter>

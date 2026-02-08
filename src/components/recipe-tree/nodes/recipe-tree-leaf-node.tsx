@@ -1,5 +1,5 @@
-import { RecipeTreeNodeData } from '@/components/recipe-tree';
-import { Card } from '@/components/ui/card';
+import { NodeIcon, RecipeTreeNodeData } from '@/components/recipe-tree';
+import { Card, CardHeader } from '@/components/ui/card';
 import { Handle, Position } from '@xyflow/react';
 
 interface RecipeTreeLeafNodeProps
@@ -8,14 +8,19 @@ interface RecipeTreeLeafNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeLeafNode({ id, data }: RecipeTreeLeafNodeProps)
+export function RecipeTreeLeafNode({ data }: RecipeTreeLeafNodeProps)
 {
 	const { item } = data;
 
 	return (
 		<Card>
 			<Handle type="target" position={Position.Top} />
-			<p>Leaf Node {item.name}</p>
+			<CardHeader className="flex items-center gap-2">
+				<NodeIcon itemName={item.name} />
+				<div className="min-w-0">
+					<p className="truncate text-sm font-semibold">{item.name}</p>
+				</div>
+			</CardHeader>
 		</Card>
 	);
 }

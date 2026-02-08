@@ -103,8 +103,6 @@ export function RecipeTreeFlow()
 
 		function getChildren(node: RecipeTreeNode): RecipeTreeNode['id'][]
 		{
-			// TODO: Can we order the children by how they appear in the recipe's ingredient list?
-
 			// no selected recipe → no children
 			if (node.selectedRecipeIndex === -1) return [];
 
@@ -128,22 +126,20 @@ export function RecipeTreeFlow()
 			const endIndex = startIndex + ingredients.length;
 			const recipeChildren = node.children.slice(startIndex, endIndex);
 
-			return Array.from(new Set(recipeChildren));
+			const uniqueChildren = Array.from(new Set(recipeChildren));
+			return uniqueChildren;
 		}
 
 		function callback(node: RecipeTreeNode): void
 		{
 			const type: NodeType = node.parentId === null ? 'root-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
 
-			// Build the React Flow node
-			const flowNode = buildNode(node, type);
+			newNodes.push(buildNode(node, type));
 
 			if (node.parentId)
 			{
 				newEdges.push(buildEdge(node.parentId, node.id));
 			}
-
-			newNodes.push(flowNode);
 		}
 
 		dfs(recipeTree.rootNodeId, callback, getChildren, 'pre');

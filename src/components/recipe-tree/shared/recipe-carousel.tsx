@@ -32,7 +32,7 @@ export function RecipeCarousel({ nodeId, recipes, selectedRecipeIndex }: RecipeC
 	);
 
 	return (
-		<>
+		<div className="flex w-full items-center justify-between">
 			<Button variant="ghost" onClick={previousRecipe} size="icon">
 				<ArrowLeftIcon />
 			</Button>
@@ -42,6 +42,6 @@ export function RecipeCarousel({ nodeId, recipes, selectedRecipeIndex }: RecipeC
 			<Button variant="ghost" onClick={nextRecipe} size="icon">
 				<ArrowRightIcon />
 			</Button>
-		</>
+		</div>
 	);
 }
