@@ -55,7 +55,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 			item,
 			recipes: nodeRecipes,
 			ingredients: nodeIngredients,
-			selectedRecipeIndex: nodeRecipes.length > 0 ? 0 : null,
+			selectedRecipeIndex: nodeRecipes.length > 0 ? 0 : -1,
 			parentId,
 			children: [],
 		};

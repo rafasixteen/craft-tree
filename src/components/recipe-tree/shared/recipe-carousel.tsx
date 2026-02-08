@@ -1,7 +1,8 @@
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
-import { useCallback, memo } from 'react';
+import { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Recipe } from '@/domain/recipe';
+import { useRecipeTree } from '@/domain/recipe-tree';
 
 interface RecipeCarouselProps
 {
@@ -10,22 +11,24 @@ interface RecipeCarouselProps
 	selectedRecipeIndex: number;
 }
 
-export const RecipeCarousel = memo(function RecipeCarousel({ nodeId, recipes, selectedRecipeIndex }: RecipeCarouselProps)
+export function RecipeCarousel({ nodeId, recipes, selectedRecipeIndex }: RecipeCarouselProps)
 {
+	const { changeRecipe } = useRecipeTree();
+
 	const previousRecipe = useCallback(
 		function previousRecipe()
 		{
-			console.log('Previous recipe');
+			changeRecipe(nodeId, -1);
 		},
-		[nodeId],
+		[nodeId, changeRecipe],
 	);
 
 	const nextRecipe = useCallback(
 		function nextRecipe()
 		{
-			console.log('Next recipe');
+			changeRecipe(nodeId, 1);
 		},
-		[nodeId],
+		[nodeId, changeRecipe],
 	);
 
 	return (
@@ -41,4 +44,4 @@ export const RecipeCarousel = memo(function RecipeCarousel({ nodeId, recipes, se
 			</Button>
 		</>
 	);
-});
+}

@@ -25,6 +25,8 @@ const elkOptions = {
 
 async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edge[])
 {
+	// TODO: We should layout nodes based on their measured size.
+
 	const nodeWidth = 150;
 	const nodeHeight = 50;
 
@@ -104,7 +106,7 @@ export function RecipeTreeFlow()
 			// TODO: Can we order the children by how they appear in the recipe's ingredient list?
 
 			// no selected recipe → no children
-			if (node.selectedRecipeIndex === null) return [];
+			if (node.selectedRecipeIndex === -1) return [];
 
 			const recipe = node.recipes[node.selectedRecipeIndex];
 			const ingredients = node.ingredients[recipe.id] ?? [];

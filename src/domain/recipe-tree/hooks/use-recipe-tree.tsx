@@ -1,4 +1,4 @@
-import { useMemo, createContext, useContext, useCallback } from 'react';
+import { useMemo, createContext, useContext, useCallback, useEffect, useState } from 'react';
 import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData } from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
 import { DfsOrder, DfsCallback, DfsGetChildren } from '@/domain/recipe-tree';
@@ -10,6 +10,7 @@ interface RecipeTreeContext
 	recipeTree: RecipeTreeState | null;
 	error: Error | null;
 	dfs: (startNodeId: RecipeTreeNode['id'], callback: DfsCallback, getChildren?: DfsGetChildren, order?: DfsOrder) => void;
+	changeRecipe: (nodeId: RecipeTreeNode['id'], delta: number) => void;
 }
 
 const RecipeTreeContext = createContext<RecipeTreeContext | undefined>(undefined);
@@ -24,7 +25,18 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 {
 	const { data: rawData, error } = useSWR(['recipe-tree', itemId], () => getRecipeTreeData(itemId), { revalidateOnFocus: false });
 
-	const recipeTree = useMemo(() => (rawData ? parseRecipeTreeData(rawData) : null), [rawData]);
+	const [recipeTree, setRecipeTree] = useState<RecipeTreeState | null>(null);
+
+	useEffect(() =>
+	{
+		if (!rawData)
+		{
+			setRecipeTree(null);
+			return;
+		}
+
+		setRecipeTree(parseRecipeTreeData(rawData));
+	}, [rawData]);
 
 	const dfs = useCallback(
 		function dfs(startNodeId: RecipeTreeNode['id'], callback: DfsCallback, getChildren: DfsGetChildren = (n) => n.children || [], order: DfsOrder = 'pre'): void
@@ -41,16 +53,18 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 
 	function changeRecipe(nodeId: RecipeTreeNode['id'], delta: number): void
 	{
-		if (!recipeTree)
+		setRecipeTree((prev) =>
 		{
-			throw new Error('Recipe tree data is not available.');
-		}
+			if (!prev)
+			{
+				throw new Error('Recipe tree data is not available.');
+			}
 
-		// TODO: Allow recipe tree to be settable.
-		const newState = RecipeTreeActions.changeRecipe(recipeTree, nodeId, delta);
+			return RecipeTreeActions.changeRecipe(prev, nodeId, delta);
+		});
 	}
 
-	const value = useMemo(() => ({ recipeTree, error, dfs }), [recipeTree, error, dfs]);
+	const value = useMemo(() => ({ recipeTree, error, dfs, changeRecipe }), [recipeTree, error, dfs, changeRecipe]);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }

@@ -8,7 +8,7 @@ export interface RecipeTreeNode
 	item: Item;
 	recipes: Recipe[];
 	ingredients: Record<Recipe['id'], Ingredient[]>;
-	selectedRecipeIndex: number | null;
+	selectedRecipeIndex: number;
 	parentId: RecipeTreeNode['id'] | null;
 	children?: RecipeTreeNode['id'][];
 }
