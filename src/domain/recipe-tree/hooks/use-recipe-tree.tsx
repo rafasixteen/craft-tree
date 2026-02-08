@@ -11,6 +11,7 @@ interface RecipeTreeContext
 	error: Error | null;
 	dfs: (startNodeId: RecipeTreeNode['id'], callback: DfsCallback, getChildren?: DfsGetChildren, order?: DfsOrder) => void;
 	changeRecipe: (nodeId: RecipeTreeNode['id'], delta: number) => void;
+	getResolvedQuantity: (nodeId: RecipeTreeNode['id']) => number;
 }
 
 const RecipeTreeContext = createContext<RecipeTreeContext | undefined>(undefined);
@@ -64,7 +65,20 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 		});
 	}
 
-	const value = useMemo(() => ({ recipeTree, error, dfs, changeRecipe }), [recipeTree, error, dfs, changeRecipe]);
+	const getResolvedQuantity = useCallback(
+		function getResolvedQuantity(nodeId: RecipeTreeNode['id']): number
+		{
+			if (!recipeTree)
+			{
+				throw new Error('Recipe tree data is not available.');
+			}
+
+			return RecipeTreeActions.getResolvedQuantity(recipeTree, nodeId);
+		},
+		[recipeTree],
+	);
+
+	const value = useMemo(() => ({ recipeTree, error, dfs, changeRecipe, getResolvedQuantity }), [recipeTree, error, dfs, changeRecipe, getResolvedQuantity]);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }
