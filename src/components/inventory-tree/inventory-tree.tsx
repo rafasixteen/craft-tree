@@ -141,20 +141,28 @@ export function InventoryTree()
 
 	useEffect(() =>
 	{
-		headlessTree.expandAll();
 		headlessTree.setSearch(debouncedSearch);
 
-		const params = new URLSearchParams();
+		const currentQuery = searchParams.toString();
+		const params = new URLSearchParams(currentQuery);
 
 		if (debouncedSearch)
 		{
 			params.set('search', debouncedSearch);
 		}
+		else
+		{
+			params.delete('search');
+		}
 
-		const queryString = params.toString();
+		const nextQuery = params.toString();
+		if (nextQuery === currentQuery)
+		{
+			return;
+		}
 
-		router.replace(queryString ? `${pathname}?${queryString}` : pathname);
-	}, [debouncedSearch, headlessTree, pathname, router]);
+		router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname);
+	}, [debouncedSearch, headlessTree, pathname, router, searchParams]);
 
 	useEffect(() =>
 	{
