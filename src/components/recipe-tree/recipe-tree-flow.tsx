@@ -21,8 +21,8 @@ const elkOptions = {
 	'elk.layered.considerModelOrder': 'true',
 	'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
 	'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
-	'elk.layered.spacing.nodeNodeBetweenLayers': '120',
-	'elk.spacing.nodeNode': '80',
+	'elk.layered.spacing.nodeNodeBetweenLayers': '60',
+	'elk.spacing.nodeNode': '50',
 };
 
 async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edge[])
