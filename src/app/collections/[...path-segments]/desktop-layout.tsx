@@ -27,7 +27,7 @@ export function DesktopLayout({ children, path, defaultLayout, layoutId }: Deskt
 
 	return (
 		<div className="hidden size-full flex-col md:flex">
-			<ResizablePanelGroup direction="horizontal" className="flex-1" onLayout={onLayoutChanged}>
+			<ResizablePanelGroup id={layoutId} direction="horizontal" className="flex-1" onLayout={onLayoutChanged}>
 				{/* Left panel – sidebar */}
 				<ResizablePanel collapsible minSize={20} defaultSize={sidebarSize}>
 					<Sidebar />
