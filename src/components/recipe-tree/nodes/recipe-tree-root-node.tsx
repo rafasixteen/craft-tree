@@ -31,7 +31,7 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeRootNodePro
 	const nodeTime = NodeHelpers.getNodeTime(recipeTree, id);
 
 	return (
-		<Card size="sm" className="p-2">
+		<Card size="sm">
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />
 				<div className="min-w-0">

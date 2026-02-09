@@ -31,7 +31,7 @@ export function RecipeTreeInternalNode({ id, data: { item } }: RecipeTreeNodePro
 	const nodeTime = NodeHelpers.getNodeTime(recipeTree, id);
 
 	return (
-		<Card size="sm" className="p-2">
+		<Card size="sm">
 			<Handle type="target" position={Position.Top} />
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />

@@ -23,7 +23,7 @@ export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodePro
 	const resolvedQuantity = NodeHelpers.getResolvedQuantity(recipeTree, id);
 
 	return (
-		<Card>
+		<Card size="sm">
 			<Handle type="target" position={Position.Top} />
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />
