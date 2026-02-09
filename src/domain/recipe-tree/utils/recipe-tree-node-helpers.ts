@@ -53,7 +53,7 @@ export function findSelectedRecipe(node: RecipeTreeNode): Recipe | null
 
 	if (!recipe)
 	{
-		throw new Error(`Selected recipe with id "${node.selectedRecipeId}" not found in node "${node.id}".`);
+		throw new Error(`Selected recipe with id "${node.selectedRecipeId}" not found in node with item "${node.item.name}".`);
 	}
 
 	return recipe;
@@ -77,7 +77,6 @@ export function findSelectedRecipe(node: RecipeTreeNode): Recipe | null
  * @throws Will throw an error if:
  *   - The node or its parent cannot be found in the state.
  *   - A parent node has no selected recipe.
- *   - The ingredient for this node is missing in the parent’s selected recipe.
  *   - The node itself has no selected recipe.
  *
  * @returns The total resolved quantity required for this node.
@@ -93,15 +92,15 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: RecipeTreeNo
 
 		if (!parentSelectedRecipe)
 		{
-			throw new Error(`Parent node with id "${parentNode.id}" has no selected recipe.`);
+			throw new Error(`Parent node with item "${parentNode.item.name}" has no selected recipe.`);
 		}
 
 		const parentSelectedRecipeIngredients = parentNode.ingredients[parentSelectedRecipe.id];
-		const ingredient = parentSelectedRecipeIngredients.find((ing) => ing.itemId === node.item.id);
+		const ingredient = parentSelectedRecipeIngredients?.find((ing) => ing.itemId === node.item.id);
 
 		if (!ingredient)
 		{
-			throw new Error(`Ingredient for item "${node.item.id}" not found in parent node with id "${parentNode.id}".`);
+			return 0;
 		}
 
 		return getResolvedQuantity(state, parentNode.id) * ingredient.quantity;
@@ -112,7 +111,7 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: RecipeTreeNo
 
 		if (!selectedRecipe)
 		{
-			throw new Error(`Node with id "${node.id}" has no selected recipe.`);
+			throw new Error(`Node with item "${node.item.name}" has no selected recipe.`);
 		}
 
 		return selectedRecipe.quantity;
