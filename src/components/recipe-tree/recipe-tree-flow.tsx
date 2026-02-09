@@ -18,6 +18,8 @@ const elkOptions = {
 	'elk.algorithm': 'layered',
 	'elk.direction': 'DOWN',
 	'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
+	'elk.layered.considerModelOrder': 'true',
+	'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
 	'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
 	'elk.layered.spacing.nodeNodeBetweenLayers': '120',
 	'elk.spacing.nodeNode': '80',
