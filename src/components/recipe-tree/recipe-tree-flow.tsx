@@ -4,7 +4,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position } from '@xyflow/react';
+import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position, useNodesInitialized, useReactFlow } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, DefaultEdgeOptions } from '@xyflow/react';
 import { RecipeTreeInternalNode, RecipeTreeRootNode, RecipeTreeLeafNode, RecipeTreeNodeData } from '@/components/recipe-tree';
 import { useRecipeTree, RecipeTreeNode } from '@/domain/recipe-tree';
@@ -27,10 +27,38 @@ const elkOptions = {
 
 async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edge[])
 {
-	// TODO: We should layout nodes based on their measured size.
+	function getNodeWidth(node: Node<RecipeTreeNodeData>): number
+	{
+		if (!node.measured)
+		{
+			throw new Error(`Node ${node.id} is not measured yet.`);
+		}
 
-	const nodeWidth = 150;
-	const nodeHeight = 50;
+		if (!node.measured.width)
+		{
+			throw new Error(`Node ${node.id} has no measured width.`);
+		}
+
+		return node.measured.width;
+	}
+
+	function getNodeHeight(node: Node<RecipeTreeNodeData>): number
+	{
+		if (!node.measured)
+		{
+			throw new Error(`Node ${node.id} is not measured yet.`);
+		}
+
+		if (!node.measured.height)
+		{
+			throw new Error(`Node ${node.id} has no measured height.`);
+		}
+
+		return node.measured.height;
+	}
+
+	const biggestNodeWidth = Math.max(...nodes.map(getNodeWidth));
+	const biggestNodeHeight = Math.max(...nodes.map(getNodeHeight));
 
 	const graph = {
 		id: 'root',
@@ -39,8 +67,8 @@ async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edg
 			...node,
 			targetPosition: Position.Top,
 			sourcePosition: Position.Bottom,
-			width: nodeWidth,
-			height: nodeHeight,
+			width: biggestNodeWidth,
+			height: biggestNodeHeight,
 		})),
 		edges: edges.map((edge) => ({
 			id: edge.id,
@@ -52,9 +80,32 @@ async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edg
 	try
 	{
 		const layoutedGraph = await elk.layout(graph);
+
+		const rootNode = layoutedGraph.children!.find((node) =>
+		{
+			const hasIncomingEdge = edges.some((edge) => edge.target === node.id);
+			return !hasIncomingEdge;
+		});
+
+		if (!rootNode)
+		{
+			throw new Error('Root node not found in layouted graph.');
+		}
+
+		if (rootNode.x === undefined || rootNode.y === undefined)
+		{
+			throw new Error('Root node has undefined position.');
+		}
+
+		const offsetX = rootNode.x;
+		const offsetY = rootNode.y;
+
 		const layoutedNodes = layoutedGraph.children!.map((node) => ({
 			...node,
-			position: { x: node.x ?? 0, y: node.y ?? 0 },
+			position: {
+				x: node.x! - offsetX,
+				y: node.y! - offsetY,
+			},
 		}));
 
 		return { nodes: layoutedNodes, edges };
@@ -91,7 +142,21 @@ export function RecipeTreeFlow()
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
+	const { getNodes, getEdges } = useReactFlow<Node<RecipeTreeNodeData>, Edge>();
+	const nodesInitialized = useNodesInitialized();
 	const { recipeTree, dfs } = useRecipeTree();
+
+	useEffect(() =>
+	{
+		if (nodesInitialized)
+		{
+			getLayoutedElements(getNodes(), getEdges()).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
+			{
+				setNodes(layoutedNodes);
+				setEdges(layoutedEdges);
+			});
+		}
+	}, [nodesInitialized]);
 
 	useEffect(() =>
 	{
@@ -129,11 +194,8 @@ export function RecipeTreeFlow()
 
 		dfs(recipeTree.rootNodeId, callback, getSelectedRecipeChildren, 'pre');
 
-		getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
-		{
-			setNodes(layoutedNodes);
-			setEdges(layoutedEdges);
-		});
+		setNodes(newNodes);
+		setEdges(newEdges);
 	}, [recipeTree]);
 
 	useEffect(() =>
