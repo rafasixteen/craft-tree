@@ -1,4 +1,4 @@
-import { pgTable, uuid, integer, text, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, integer, text, uniqueIndex, index } from 'drizzle-orm/pg-core';
 import { itemsTable } from '@/db/schema';
 
 export const recipesTable = pgTable(
@@ -20,6 +20,8 @@ export const recipesTable = pgTable(
 	},
 	(table) => [
 		uniqueIndex().on(table.itemId, table.slug),
+		index().on(table.itemId),
+		index().on(table.itemId, table.order),
 		// uniqueIndex().on(table.itemId, table.order)
 	],
 );

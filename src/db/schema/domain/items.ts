@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, uniqueIndex, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, uniqueIndex, integer, index } from 'drizzle-orm/pg-core';
 import { collectionsTable, foldersTable } from '@/db/schema';
 
 export const itemsTable = pgTable(
@@ -21,6 +21,9 @@ export const itemsTable = pgTable(
 	},
 	(table) => [
 		uniqueIndex().on(table.collectionId, table.slug),
+		index().on(table.collectionId),
+		index().on(table.folderId),
+		index().on(table.collectionId, table.folderId, table.order),
 		// uniqueIndex().on(table.folderId, table.order)
 	],
 );

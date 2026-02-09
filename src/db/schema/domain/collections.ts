@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, uniqueIndex, index } from 'drizzle-orm/pg-core';
 import { usersTable } from '@/db/schema';
 
 export const collectionsTable = pgTable(
@@ -13,5 +13,5 @@ export const collectionsTable = pgTable(
 			.references(() => usersTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
-	(table) => [uniqueIndex().on(table.userId, table.slug)],
+	(table) => [uniqueIndex().on(table.userId, table.slug), index().on(table.userId), index().on(table.slug)],
 );
