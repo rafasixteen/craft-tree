@@ -23,12 +23,12 @@ export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodePro
 	const resolvedQuantity = NodeHelpers.getResolvedQuantity(recipeTree, id);
 
 	return (
-		<Card size="sm">
+		<Card className="max-w-80 min-w-40">
 			<Handle type="target" position={Position.Top} />
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />
-				<div className="min-w-0">
-					<p className="truncate text-sm font-semibold">{item.name}</p>
+				<div>
+					<p className="text-sm font-semibold">{item.name}</p>
 				</div>
 			</CardHeader>
 			<CardContent className="flex gap-2 text-xs text-muted-foreground">

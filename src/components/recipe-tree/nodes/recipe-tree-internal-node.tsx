@@ -31,12 +31,12 @@ export function RecipeTreeInternalNode({ id, data: { item } }: RecipeTreeNodePro
 	const nodeTime = NodeHelpers.getNodeTime(recipeTree, id);
 
 	return (
-		<Card size="sm">
+		<Card className="max-w-80 min-w-40">
 			<Handle type="target" position={Position.Top} />
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />
 				<div className="min-w-0">
-					<p className="truncate text-sm font-semibold">{item.name}</p>
+					<p className="text-sm font-semibold">{item.name}</p>
 					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 				</div>
 			</CardHeader>
