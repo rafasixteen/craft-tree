@@ -220,6 +220,7 @@ export function RecipeTreeFlow()
 				fitViewOptions={fitViewOptions}
 				defaultEdgeOptions={defaultEdgeOptions}
 				colorMode={theme === 'dark' ? 'dark' : 'light'}
+				nodesDraggable={false}
 			>
 				<Controls />
 				<Background gap={12} size={1} />
