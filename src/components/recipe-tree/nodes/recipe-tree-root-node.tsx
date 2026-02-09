@@ -22,31 +22,43 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeRootNodePro
 	const node = NodeHelpers.ensureNode(recipeTree, id);
 	const selectedRecipe = NodeHelpers.findSelectedRecipe(node);
 
-	if (selectedRecipe === null)
+	if (selectedRecipe)
 	{
-		throw new Error('Root node must have a selected recipe');
+		const resolvedQuantity = NodeHelpers.getResolvedQuantity(recipeTree, id);
+		const nodeTime = NodeHelpers.getNodeTime(recipeTree, id);
+
+		return (
+			<Card className="max-w-80 min-w-40">
+				<CardHeader className="flex items-center gap-2">
+					<NodeIcon itemName={item.name} />
+					<div className="min-w-0">
+						<p className="text-sm font-semibold">{item.name}</p>
+						<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
+					</div>
+				</CardHeader>
+				<CardContent className="flex gap-2 text-xs text-muted-foreground">
+					<NodeStats title="Recipe" quantity={selectedRecipe.quantity} time={selectedRecipe.time} />
+					<NodeStats title="Total" quantity={resolvedQuantity} time={nodeTime} />
+				</CardContent>
+				<CardFooter>
+					<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={NodeHelpers.findSelectedRecipeIndex(node)} />
+				</CardFooter>
+				<Handle type="source" position={Position.Bottom} />
+			</Card>
+		);
 	}
-
-	const resolvedQuantity = NodeHelpers.getResolvedQuantity(recipeTree, id);
-	const nodeTime = NodeHelpers.getNodeTime(recipeTree, id);
-
-	return (
-		<Card className="max-w-80 min-w-40">
-			<CardHeader className="flex items-center gap-2">
-				<NodeIcon itemName={item.name} />
-				<div className="min-w-0">
-					<p className="text-sm font-semibold">{item.name}</p>
-					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
-				</div>
-			</CardHeader>
-			<CardContent className="flex gap-2 text-xs text-muted-foreground">
-				<NodeStats title="Recipe" quantity={selectedRecipe.quantity} time={selectedRecipe.time} />
-				<NodeStats title="Total" quantity={resolvedQuantity} time={nodeTime} />
-			</CardContent>
-			<CardFooter>
-				<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={NodeHelpers.findSelectedRecipeIndex(node)} />
-			</CardFooter>
-			<Handle type="source" position={Position.Bottom} />
-		</Card>
-	);
+	else
+	{
+		return (
+			<Card className="max-w-80 min-w-40">
+				<CardHeader className="flex items-center gap-2">
+					<NodeIcon itemName={item.name} />
+					<div className="min-w-0">
+						<p className="text-sm font-semibold">{item.name}</p>
+						<p className="truncate text-xs text-muted-foreground">No recipes</p>
+					</div>
+				</CardHeader>
+			</Card>
+		);
+	}
 }
