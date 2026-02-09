@@ -2,6 +2,7 @@ import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, NodeStats } from '@/compo
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useRecipeTree } from '@/domain/recipe-tree';
 import { Handle, Position } from '@xyflow/react';
+import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helpers';
 
 interface RecipeTreeNodeProps
 {
@@ -9,18 +10,25 @@ interface RecipeTreeNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeInternalNode({ id, data }: RecipeTreeNodeProps)
+export function RecipeTreeInternalNode({ id, data: { item } }: RecipeTreeNodeProps)
 {
-	const { item, recipes, selectedRecipeIndex } = data;
+	const { recipeTree } = useRecipeTree();
 
-	const { getResolvedQuantity, getNodeTime } = useRecipeTree();
-
-	if (selectedRecipeIndex === -1)
+	if (!recipeTree)
 	{
-		throw new Error('Internal node must have a selected recipe index');
+		return null;
 	}
 
-	const selectedRecipe = recipes[selectedRecipeIndex];
+	const node = NodeHelpers.ensureNode(recipeTree, id);
+	const selectedRecipe = NodeHelpers.findSelectedRecipe(node);
+
+	if (selectedRecipe === null)
+	{
+		throw new Error('Internal node must have a selected recipe');
+	}
+
+	const resolvedQuantity = NodeHelpers.getResolvedQuantity(recipeTree, id);
+	const nodeTime = NodeHelpers.getNodeTime(recipeTree, id);
 
 	return (
 		<Card size="sm" className="p-2">
@@ -29,15 +37,15 @@ export function RecipeTreeInternalNode({ id, data }: RecipeTreeNodeProps)
 				<NodeIcon itemName={item.name} />
 				<div className="min-w-0">
 					<p className="truncate text-sm font-semibold">{item.name}</p>
-					<p className="truncate text-xs text-muted-foreground">{recipes[selectedRecipeIndex].name}</p>
+					<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 				</div>
 			</CardHeader>
 			<CardContent className="flex gap-2 text-xs text-muted-foreground">
 				<NodeStats title="Recipe" quantity={selectedRecipe.quantity} time={selectedRecipe.time} />
-				<NodeStats title="Total" quantity={getResolvedQuantity(id)} time={getNodeTime(id)} />
+				<NodeStats title="Total" quantity={resolvedQuantity} time={nodeTime} />
 			</CardContent>
 			<CardFooter>
-				<RecipeCarousel nodeId={id} recipes={recipes} selectedRecipeIndex={selectedRecipeIndex} />
+				<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={NodeHelpers.findSelectedRecipeIndex(node)} />
 			</CardFooter>
 			<Handle type="source" position={Position.Bottom} />
 		</Card>

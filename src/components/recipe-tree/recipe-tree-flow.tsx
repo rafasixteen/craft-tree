@@ -113,7 +113,19 @@ export function RecipeTreeFlow()
 			}
 		}
 
-		dfs(recipeTree.rootNodeId, callback, 'pre');
+		function getSelectedRecipeChildren(node: RecipeTreeNode): RecipeTreeNode['id'][]
+		{
+			if (node.selectedRecipeId === null)
+			{
+				return [];
+			}
+			else
+			{
+				return node.children[node.selectedRecipeId];
+			}
+		}
+
+		dfs(recipeTree.rootNodeId, callback, getSelectedRecipeChildren, 'pre');
 
 		getLayoutedElements(newNodes, newEdges).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
 		{
@@ -162,7 +174,7 @@ function buildNode(node: RecipeTreeNode, type: NodeType): Node<RecipeTreeNodeDat
 			item: node.item,
 			recipes: node.recipes,
 			ingredients: node.ingredients,
-			selectedRecipeIndex: node.selectedRecipeIndex,
+			selectedRecipeId: node.selectedRecipeId,
 		},
 	};
 }

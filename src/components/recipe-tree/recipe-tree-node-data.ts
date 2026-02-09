@@ -7,5 +7,5 @@ export interface RecipeTreeNodeData extends Record<string, unknown>
 	item: Item;
 	recipes: Recipe[];
 	ingredients: Record<Recipe['id'], Ingredient[]>;
-	selectedRecipeIndex: number;
+	selectedRecipeId: Recipe['id'] | null;
 }

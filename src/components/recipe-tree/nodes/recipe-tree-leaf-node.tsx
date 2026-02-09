@@ -2,7 +2,8 @@ import { NodeIcon, RecipeTreeNodeData } from '@/components/recipe-tree';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useRecipeTree } from '@/domain/recipe-tree';
 import { Handle, Position } from '@xyflow/react';
-import { ClockIcon, PackageIcon } from 'lucide-react';
+import { PackageIcon } from 'lucide-react';
+import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helpers';
 
 interface RecipeTreeLeafNodeProps
 {
@@ -10,11 +11,16 @@ interface RecipeTreeLeafNodeProps
 	data: RecipeTreeNodeData;
 }
 
-export function RecipeTreeLeafNode({ id, data }: RecipeTreeLeafNodeProps)
+export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodeProps)
 {
-	const { item } = data;
+	const { recipeTree } = useRecipeTree();
 
-	const { getResolvedQuantity} = useRecipeTree();
+	if (!recipeTree)
+	{
+		return null;
+	}
+
+	const resolvedQuantity = NodeHelpers.getResolvedQuantity(recipeTree, id);
 
 	return (
 		<Card>
@@ -30,7 +36,7 @@ export function RecipeTreeLeafNode({ id, data }: RecipeTreeLeafNodeProps)
 					<p>Quantity</p>
 					<div className="flex items-center gap-1">
 						<PackageIcon className="size-3" />
-						<span>{getResolvedQuantity(id)}x</span>
+						<span>{resolvedQuantity}x</span>
 					</div>
 				</div>
 			</CardContent>

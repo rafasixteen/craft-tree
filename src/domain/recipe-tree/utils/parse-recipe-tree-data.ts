@@ -1,4 +1,3 @@
-import { Ingredient } from '@/domain/ingredient';
 import { RecipeTreeData, RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
 
 export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
@@ -11,23 +10,8 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 	}
 
 	const itemsById = new Map(items.map((item) => [item.id, item]));
-	const recipesByItemId = new Map<string, RecipeTreeNode['recipes']>();
-	const ingredientsByRecipeId = new Map<string, Ingredient[]>();
-
-	for (const recipe of recipes)
-	{
-		const existing = recipesByItemId.get(recipe.itemId) ?? [];
-		recipesByItemId.set(recipe.itemId, [...existing, recipe]);
-	}
-
-	for (const ingredient of ingredients)
-	{
-		const existing = ingredientsByRecipeId.get(ingredient.recipeId) ?? [];
-		ingredientsByRecipeId.set(ingredient.recipeId, [...existing, ingredient]);
-	}
-
-	const ingredientItemIds = new Set(ingredients.map((ingredient) => ingredient.itemId));
-	const rootItem = items.find((item) => !ingredientItemIds.has(item.id)) ?? items[0];
+	const recipesByItemId = groupBy(recipes, (r) => r.itemId);
+	const ingredientsByRecipeId = groupBy(ingredients, (i) => i.recipeId);
 
 	const nodes: Record<RecipeTreeNode['id'], RecipeTreeNode> = {};
 	let nodeCounter = 0;
@@ -38,16 +22,19 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 
 		if (!item)
 		{
-			throw new Error(`parseRecipeTreeData: Building node with itemId "${itemId}" not found in recipe tree data.`);
+			throw new Error(`parseRecipeTreeData: Item with id "${itemId}" not found.`);
 		}
 
 		const nodeId = `node-${++nodeCounter}`;
-		const nodeRecipes = recipesByItemId.get(itemId) ?? [];
+		const nodeRecipes = recipesByItemId[itemId] ?? [];
+
 		const nodeIngredients: RecipeTreeNode['ingredients'] = {};
+		const nodeChildren: RecipeTreeNode['children'] = {};
 
 		for (const recipe of nodeRecipes)
 		{
-			nodeIngredients[recipe.id] = ingredientsByRecipeId.get(recipe.id) ?? [];
+			nodeIngredients[recipe.id] = ingredientsByRecipeId[recipe.id] ?? [];
+			nodeChildren[recipe.id] = [];
 		}
 
 		const node: RecipeTreeNode = {
@@ -55,38 +42,63 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 			item,
 			recipes: nodeRecipes,
 			ingredients: nodeIngredients,
-			selectedRecipeIndex: nodeRecipes.length > 0 ? 0 : -1,
+			selectedRecipeId: nodeRecipes[0]?.id ?? null,
 			parentId,
-			children: [],
+			children: nodeChildren,
 		};
 
 		nodes[nodeId] = node;
 
 		for (const recipe of nodeRecipes)
 		{
-			const ingredients = nodeIngredients[recipe.id] ?? [];
+			const recipeIngredients = nodeIngredients[recipe.id];
 
-			for (const ingredient of ingredients)
+			for (const ingredient of recipeIngredients)
 			{
-				const childItem = itemsById.get(ingredient.itemId);
-
-				if (childItem)
+				if (!itemsById.has(ingredient.itemId))
 				{
-					const childNode = buildNode(childItem.id, nodeId);
-					node.children?.push(childNode.id);
+					throw new Error(`parseRecipeTreeData: Ingredient refers to unknown item "${ingredient.itemId}" (recipe "${recipe.id}", parent item "${item.id}").`);
 				}
-			}
-		}
 
-		if (node.children && node.children.length === 0)
-		{
-			delete node.children;
+				const childNode = buildNode(ingredient.itemId, nodeId);
+				node.children[recipe.id].push(childNode.id);
+			}
 		}
 
 		return node;
 	}
 
-	const rootNode = buildNode(rootItem.id, null);
+	const rootItemId = findRootItemId(items, ingredients);
+	const rootNode = buildNode(rootItemId, null);
 
-	return { rootNodeId: rootNode.id, nodes };
+	return {
+		rootNodeId: rootNode.id,
+		nodes: nodes,
+	};
+}
+
+function groupBy<T, K extends string>(items: T[], keyFn: (item: T) => K): Record<K, T[]>
+{
+	return items.reduce(
+		(acc, item) =>
+		{
+			const key = keyFn(item);
+			(acc[key] ??= []).push(item);
+			return acc;
+		},
+		{} as Record<K, T[]>,
+	);
+}
+
+function findRootItemId(items: RecipeTreeData['items'], ingredients: RecipeTreeData['ingredients']): string
+{
+	const ingredientItemIds = new Set(ingredients.map((i) => i.itemId));
+	const rootItem = items.find((item) => !ingredientItemIds.has(item.id));
+
+	if (!rootItem)
+	{
+		throw new Error('parseRecipeTreeData: Could not determine root item.');
+	}
+
+	return rootItem.id;
 }
