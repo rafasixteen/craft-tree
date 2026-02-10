@@ -229,6 +229,7 @@ export function RecipeTreeFlow()
 				defaultEdgeOptions={defaultEdgeOptions}
 				colorMode={theme === 'dark' ? 'dark' : 'light'}
 				nodesDraggable={false}
+				deleteKeyCode={null}
 			>
 				<Controls />
 				<Background gap={12} size={1} />
