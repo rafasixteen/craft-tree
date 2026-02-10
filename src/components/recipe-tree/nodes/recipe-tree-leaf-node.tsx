@@ -1,8 +1,6 @@
-import { NodeIcon, RecipeTreeNodeData } from '@/components/recipe-tree';
+import { NodeIcon, NodeStats, RecipeTreeNodeData } from '@/components/recipe-tree';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { useRecipeTree } from '@/domain/recipe-tree';
 import { Handle, Position } from '@xyflow/react';
-import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helpers';
 
 interface RecipeTreeLeafNodeProps
 {
@@ -12,17 +10,8 @@ interface RecipeTreeLeafNodeProps
 
 export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodeProps)
 {
-	const { recipeTree } = useRecipeTree();
-
-	if (!recipeTree)
-	{
-		return null;
-	}
-
-	const throughput = NodeHelpers.getNodeDemand(recipeTree, id);
-
 	return (
-		<Card className="max-w-80 min-w-40">
+		<Card className="max-w-80 min-w-50">
 			<Handle type="target" position={Position.Top} />
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />
@@ -31,9 +20,7 @@ export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodePro
 				</div>
 			</CardHeader>
 			<CardContent className="flex gap-2 text-xs text-muted-foreground">
-				<p>
-					throughput: {throughput.amount} per {throughput.per}
-				</p>
+				<NodeStats nodeId={id} />
 			</CardContent>
 		</Card>
 	);

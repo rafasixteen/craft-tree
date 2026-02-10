@@ -1,4 +1,4 @@
-import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, ProductionRateControl } from '@/components/recipe-tree';
+import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, ProductionRateControl, NodeStats } from '@/components/recipe-tree';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Handle, Position } from '@xyflow/react';
 import { useRecipeTree } from '@/domain/recipe-tree';
@@ -26,7 +26,7 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeRootNodePro
 	if (selectedRecipe)
 	{
 		return (
-			<Card className="max-w-80 min-w-40">
+			<Card className="max-w-80 min-w-50">
 				<CardHeader className="flex items-center gap-2">
 					<NodeIcon itemName={item.name} />
 					<div className="min-w-0">
@@ -44,8 +44,9 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeRootNodePro
 						</div>
 					</div>
 				</CardHeader>
-				<CardContent className="text-xs text-muted-foreground">
+				<CardContent className="space-y-1.5 text-xs text-muted-foreground">
 					<ProductionRateControl rate={recipeTree.rate} onChange={setRate} className="nopan" />
+					<NodeStats nodeId={id} />
 				</CardContent>
 				<CardFooter>
 					<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={NodeHelpers.findSelectedRecipeIndex(node)} />

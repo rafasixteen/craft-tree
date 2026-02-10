@@ -1,4 +1,4 @@
-import { RecipeTreeNodeData, RecipeCarousel, NodeIcon } from '@/components/recipe-tree';
+import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, NodeStats } from '@/components/recipe-tree';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useRecipeTree } from '@/domain/recipe-tree';
 import { PackageIcon, ClockIcon } from 'lucide-react';
@@ -28,10 +28,8 @@ export function RecipeTreeInternalNode({ id, data: { item } }: RecipeTreeNodePro
 		throw new Error('Internal node must have a selected recipe');
 	}
 
-	const throughput = NodeHelpers.getNodeDemand(recipeTree, id);
-
 	return (
-		<Card className="max-w-80 min-w-40">
+		<Card className="max-w-80 min-w-50">
 			<Handle type="target" position={Position.Top} />
 			<CardHeader className="flex items-center gap-2">
 				<NodeIcon itemName={item.name} />
@@ -51,9 +49,7 @@ export function RecipeTreeInternalNode({ id, data: { item } }: RecipeTreeNodePro
 				</div>
 			</CardHeader>
 			<CardContent className="flex gap-2 text-xs text-muted-foreground">
-				<p>
-					throughput: {throughput.amount} per {throughput.per}
-				</p>
+				<NodeStats nodeId={id} />
 			</CardContent>
 			<CardFooter>
 				<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={NodeHelpers.findSelectedRecipeIndex(node)} />
