@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position, useNodesInitialized, useReactFlow } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, DefaultEdgeOptions } from '@xyflow/react';
-import { RecipeTreeInternalNode, RecipeTreeRootNode, RecipeTreeLeafNode, RecipeTreeNodeData } from '@/components/recipe-tree';
+import { RecipeTreeInternalNode, RecipeTreeLeafNode, RecipeTreeNodeData, RateControlNode } from '@/components/recipe-tree';
 import { useRecipeTree, RecipeTreeNode } from '@/domain/recipe-tree';
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -117,7 +117,7 @@ async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edg
 type NodeType = 'root-node' | 'internal-node' | 'leaf-node';
 
 const nodeTypes = {
-	'root-node': RecipeTreeRootNode,
+	'root-node': RateControlNode,
 	'internal-node': RecipeTreeInternalNode,
 	'leaf-node': RecipeTreeLeafNode,
 } satisfies Record<NodeType, React.ComponentType<any>>;
@@ -165,12 +165,11 @@ export function RecipeTreeFlow()
 		const newNodes: Node<RecipeTreeNodeData>[] = [];
 		const newEdges: Edge[] = [];
 
+		// Add all recipe tree nodes as before
 		function callback(node: RecipeTreeNode): void
 		{
-			const type: NodeType = node.parentId === null ? 'root-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
-
+			const type: NodeType = node.parentId === null ? 'internal-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
 			newNodes.push(buildNode(node, type));
-
 			if (node.parentId)
 			{
 				newEdges.push(buildEdge(node.parentId, node.id));
@@ -189,20 +188,20 @@ export function RecipeTreeFlow()
 			}
 		}
 
+		const rateControlNodeId = 'rate-control-root';
+		newNodes.push(buildRateControlNode(rateControlNodeId) as Node<RecipeTreeNodeData>);
+		newEdges.push(buildRateControlEdge(rateControlNodeId, recipeTree.rootNodeId));
+
 		dfs(recipeTree.rootNodeId, callback, getSelectedRecipeChildren, 'pre');
 
 		setNodes((prev) =>
 		{
-			// TODO: Maybe add a more robust way to check if the nodes have changed. For example, we could check if the node ids and their selected recipe ids are the same.
-			//If the nodes have not changed, keep the same node objects to preserve their position and avoid flashing.
 			if (prev.length === newNodes.length && prev.every((prevNode, index) => prevNode.id === newNodes[index].id))
 			{
 				return prev;
 			}
-
 			return newNodes;
 		});
-
 		setEdges(newEdges);
 	}, [recipeTree]);
 
@@ -259,5 +258,24 @@ function buildEdge(parentId: RecipeTreeNode['id'], childId: RecipeTreeNode['id']
 		id: `edge_${parentId}_${childId}`,
 		source: parentId,
 		target: childId,
+	};
+}
+
+function buildRateControlNode(nodeId: string): Node
+{
+	return {
+		id: nodeId,
+		type: 'root-node',
+		position: { x: 0, y: 0 },
+		data: {},
+	};
+}
+
+function buildRateControlEdge(rateControlId: Node['id'], rootId: RecipeTreeNode['id']): Edge
+{
+	return {
+		id: `edge_${rateControlId}_${rootId}`,
+		source: rateControlId,
+		target: rootId,
 	};
 }
