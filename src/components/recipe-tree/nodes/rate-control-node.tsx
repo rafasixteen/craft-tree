@@ -1,8 +1,7 @@
-import { RecipeTreeNodeData, NodeIcon, ProductionRateControl } from '@/components/recipe-tree';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { ProductionRateControl } from '@/components/recipe-tree';
+import { Card, CardContent } from '@/components/ui/card';
 import { Handle, Position } from '@xyflow/react';
 import { useRecipeTree } from '@/domain/recipe-tree';
-import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helpers';
 
 interface RateControlNodeProps
 {
