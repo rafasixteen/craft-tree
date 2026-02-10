@@ -1,7 +1,7 @@
 import type { TimeUnit, ProductionRate } from '@/domain/recipe-tree';
 import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group';
-import { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from '@/components/ui/button-group';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +46,7 @@ export function ProductionRateControl({ rate, onChange, ...props }: ProductionRa
 				</InputGroupAddon>
 			</InputGroup>
 
-			<ButtonGroup className="grid grid-cols-3 rounded-md border border-input bg-input/20 p-0.5 dark:bg-input/30">
+			<ButtonGroup className="grid w-full grid-cols-3 rounded-md border border-input bg-input/20 p-0.5 dark:bg-input/30">
 				{UNIT_OPTIONS.map((unit) => (
 					<Button key={unit.value} variant={rate.per === unit.value ? 'default' : 'ghost'} onClick={() => onUnitChange(unit.value)}>
 						{unit.label}

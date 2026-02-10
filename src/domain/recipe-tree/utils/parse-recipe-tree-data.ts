@@ -72,6 +72,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 	const rootNode = buildNode(rootItemId, null);
 
 	return {
+		rate: { amount: 1, per: 'second' },
 		rootNodeId: rootNode.id,
 		nodes: nodes,
 	};

@@ -1,6 +1,7 @@
 import { Item } from '@/domain/item';
 import { Recipe } from '@/domain/recipe';
 import { Ingredient } from '@/domain/ingredient';
+import { ProductionRate } from '@/domain/recipe-tree';
 
 export interface RecipeTreeNode
 {
@@ -42,6 +43,11 @@ export interface RecipeTreeNode
 
 export interface RecipeTreeState
 {
+	/**
+	 * Target production rate for the root item.
+	 */
+	rate: ProductionRate;
+
 	/**
 	 * The id of the root node in the tree.
 	 */

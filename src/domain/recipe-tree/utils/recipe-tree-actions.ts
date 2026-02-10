@@ -1,4 +1,4 @@
-import { RecipeTreeState, RecipeTreeNode } from '@/domain/recipe-tree';
+import { RecipeTreeState, RecipeTreeNode, ProductionRate } from '@/domain/recipe-tree';
 import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helpers';
 import { produce } from 'immer';
 
@@ -46,5 +46,13 @@ export function changeRecipe(state: RecipeTreeState, nodeId: RecipeTreeNode['id'
 		const length = node.recipes.length;
 		const newIndex = (((selectedRecipeIndex + delta) % length) + length) % length;
 		node.selectedRecipeId = node.recipes[newIndex].id;
+	});
+}
+
+export function setRate(state: RecipeTreeState, rate: ProductionRate): RecipeTreeState
+{
+	return produce(state, (draft) =>
+	{
+		draft.rate = rate;
 	});
 }

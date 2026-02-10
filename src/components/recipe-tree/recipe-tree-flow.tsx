@@ -57,9 +57,6 @@ async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edg
 		return node.measured.height;
 	}
 
-	const biggestNodeWidth = Math.max(...nodes.map(getNodeWidth));
-	const biggestNodeHeight = Math.max(...nodes.map(getNodeHeight));
-
 	const graph = {
 		id: 'root',
 		layoutOptions: elkOptions,
@@ -67,8 +64,8 @@ async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edg
 			...node,
 			targetPosition: Position.Top,
 			sourcePosition: Position.Bottom,
-			width: biggestNodeWidth,
-			height: biggestNodeHeight,
+			width: getNodeWidth(node),
+			height: getNodeHeight(node),
 		})),
 		edges: edges.map((edge) => ({
 			id: edge.id,
@@ -194,7 +191,18 @@ export function RecipeTreeFlow()
 
 		dfs(recipeTree.rootNodeId, callback, getSelectedRecipeChildren, 'pre');
 
-		setNodes(newNodes);
+		setNodes((prev) =>
+		{
+			// TODO: Maybe add a more robust way to check if the nodes have changed. For example, we could check if the node ids and their selected recipe ids are the same.
+			//If the nodes have not changed, keep the same node objects to preserve their position and avoid flashing.
+			if (prev.length === newNodes.length && prev.every((prevNode, index) => prevNode.id === newNodes[index].id))
+			{
+				return prev;
+			}
+
+			return newNodes;
+		});
+
 		setEdges(newEdges);
 	}, [recipeTree]);
 

@@ -1,4 +1,4 @@
-import { RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
+import { ProductionRate, RecipeTreeNode, RecipeTreeState, TimeUnit, convertProductionRate } from '@/domain/recipe-tree';
 import { Recipe } from '@/domain/recipe/types';
 
 // TODO: Calculate the Bill Of Materials (BOM) for a given node,
@@ -89,27 +89,7 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: RecipeTreeNo
 {
 	const node = ensureNode(state, nodeId);
 
-	if (node.parentId)
-	{
-		const parentNode = ensureNode(state, node.parentId);
-		const parentSelectedRecipe = findSelectedRecipe(parentNode);
-
-		if (!parentSelectedRecipe)
-		{
-			throw new Error(`Parent node with item "${parentNode.item.name}" has no selected recipe.`);
-		}
-
-		const parentSelectedRecipeIngredients = parentNode.ingredients[parentSelectedRecipe.id];
-		const ingredient = parentSelectedRecipeIngredients?.find((ing) => ing.itemId === node.item.id);
-
-		if (!ingredient)
-		{
-			return 0;
-		}
-
-		return getResolvedQuantity(state, parentNode.id) * ingredient.quantity;
-	}
-	else
+	if (!node.parentId)
 	{
 		const selectedRecipe = findSelectedRecipe(node);
 
@@ -120,6 +100,24 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: RecipeTreeNo
 
 		return selectedRecipe.quantity;
 	}
+
+	const parent = ensureNode(state, node.parentId);
+	const parentRecipe = findSelectedRecipe(parent);
+
+	if (!parentRecipe)
+	{
+		throw new Error(`Parent node with item "${parent.item.name}" has no selected recipe.`);
+	}
+
+	const ingredients = parent.ingredients[parentRecipe.id];
+	const ingredient = ingredients?.find((ing) => ing.itemId === node.item.id);
+
+	if (!ingredient)
+	{
+		return 0;
+	}
+
+	return getResolvedQuantity(state, parent.id) * ingredient.quantity;
 }
 
 /**
@@ -185,4 +183,55 @@ export function getNodeTime(state: RecipeTreeState, nodeId: RecipeTreeNode['id']
 	{
 		return 0;
 	}
+}
+
+/**
+ * Calculates the throughput of a given recipe in terms of production rate per second.
+ * @param recipe The recipe for which to calculate the throughput.
+ * @param unit The time unit to express the throughput in (default is 'second').
+ * @returns The production rate of the recipe in the specified time unit.
+ */
+export function getRecipeThroughput(recipe: Recipe, unit: TimeUnit = 'second'): ProductionRate
+{
+	const quantityPerSecond = recipe.quantity / recipe.time;
+	const rate: ProductionRate = { amount: quantityPerSecond, per: 'second' };
+	return convertProductionRate(rate, unit);
+}
+
+/**
+ * Calculates the demand of a given node in terms of production rate.
+ * @param state The current state of the recipe tree.
+ * @param nodeId The ID of the node to calculate demand for.
+ * @param unit The time unit to express the demand in (default is 'second').
+ * @returns The production rate demand of the node in the specified time unit.
+ */
+export function getNodeDemand(state: RecipeTreeState, nodeId: RecipeTreeNode['id'], unit: TimeUnit = 'second'): ProductionRate
+{
+	const root = ensureNode(state, state.rootNodeId);
+	const rootRecipe = findSelectedRecipe(root);
+
+	if (!rootRecipe || rootRecipe.quantity <= 0)
+	{
+		throw new Error('Root node has no selected recipe.');
+	}
+
+	const requiredCount = getResolvedQuantity(state, nodeId);
+	const ratio = requiredCount / rootRecipe.quantity;
+
+	return convertProductionRate({ amount: state.rate.amount * ratio, per: state.rate.per }, unit);
+}
+
+export function getRequiredFactories(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): number
+{
+	const recipe = findSelectedRecipe(ensureNode(state, nodeId));
+
+	if (!recipe)
+	{
+		throw new Error(`Node with id "${nodeId}" has no selected recipe.`);
+	}
+
+	const demand = getNodeDemand(state, nodeId, 'second').amount;
+	const recipeThroughput = getRecipeThroughput(recipe, 'second').amount;
+
+	return demand / recipeThroughput;
 }

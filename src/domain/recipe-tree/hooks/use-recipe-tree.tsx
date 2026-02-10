@@ -1,5 +1,5 @@
 import { useMemo, createContext, useContext, useCallback, useEffect, useState } from 'react';
-import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData } from '@/domain/recipe-tree';
+import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData, ProductionRate } from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
 import { DfsOrder, DfsCallback, DfsGetChildren } from '@/domain/recipe-tree';
 import * as RecipeTreeActions from '@/domain/recipe-tree/utils/recipe-tree-actions';
@@ -11,6 +11,7 @@ interface RecipeTreeContext
 	error: Error | null;
 	dfs: (startNodeId: RecipeTreeNode['id'], callback: DfsCallback, getChildren: DfsGetChildren, order?: DfsOrder) => void;
 	changeRecipe: (nodeId: RecipeTreeNode['id'], delta: number) => void;
+	setRate: (rate: ProductionRate) => void;
 }
 
 const RecipeTreeContext = createContext<RecipeTreeContext | undefined>(undefined);
@@ -51,7 +52,7 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 		[recipeTree],
 	);
 
-	function changeRecipe(nodeId: RecipeTreeNode['id'], delta: number): void
+	const changeRecipe = useCallback(function changeRecipe(nodeId: RecipeTreeNode['id'], delta: number): void
 	{
 		setRecipeTree((prev) =>
 		{
@@ -62,9 +63,22 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 
 			return RecipeTreeActions.changeRecipe(prev, nodeId, delta);
 		});
-	}
+	}, []);
 
-	const value = useMemo(() => ({ recipeTree, error, dfs, changeRecipe }), [recipeTree, error, dfs, changeRecipe]);
+	const setRate = useCallback(function setRate(rate: ProductionRate): void
+	{
+		setRecipeTree((prev) =>
+		{
+			if (!prev)
+			{
+				throw new Error('Recipe tree data is not available.');
+			}
+
+			return RecipeTreeActions.setRate(prev, rate);
+		});
+	}, []);
+
+	const value = useMemo(() => ({ recipeTree, error, dfs, changeRecipe, setRate }), [recipeTree, error, dfs, changeRecipe, setRate]);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }
