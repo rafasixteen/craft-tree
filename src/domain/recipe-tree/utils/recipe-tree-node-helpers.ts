@@ -186,10 +186,23 @@ export function getNodeTime(state: RecipeTreeState, nodeId: RecipeTreeNode['id']
 }
 
 /**
- * Calculates the throughput of a given recipe in terms of production rate per second.
- * @param recipe The recipe for which to calculate the throughput.
+ * Calculates the production capacity of a single producer executing a recipe.
+ *
+ * This represents how many units of the recipe’s output are produced per
+ * time unit, assuming the producer is running continuously.
+ *
+ * @param recipe The recipe to compute throughput for.
  * @param unit The time unit to express the throughput in (default is 'second').
- * @returns The production rate of the recipe in the specified time unit.
+ *             For example, 'minute' or 'hour'.
+ *
+ * @returns The production rate of one producer running this recipe in the
+ *          specified time unit.
+ *
+ * @example
+ * // Recipe produces 10 items in 5 seconds
+ * const recipe = { quantity: 10, time: 5 };
+ * getRecipeThroughput(recipe, 'second'); // { amount: 2, per: 'second' }
+ * getRecipeThroughput(recipe, 'minute'); // { amount: 120, per: 'minute' }
  */
 export function getRecipeThroughput(recipe: Recipe, unit: TimeUnit = 'second'): ProductionRate
 {
@@ -199,13 +212,24 @@ export function getRecipeThroughput(recipe: Recipe, unit: TimeUnit = 'second'): 
 }
 
 /**
- * Calculates the demand of a given node in terms of production rate.
- * @param state The current state of the recipe tree.
- * @param nodeId The ID of the node to calculate demand for.
- * @param unit The time unit to express the demand in (default is 'second').
- * @returns The production rate demand of the node in the specified time unit.
+ * Computes the required output rate (demand) of a node’s item, expressed
+ * relative to the root node’s target production rate.
+ *
+ * Demand is calculated by determining how many units of the node’s item
+ * are required per unit of root output, based on the selected recipes
+ * throughout the tree, and then scaling that ratio by the global target rate.
+ *
+ * The returned production rate always uses the same time unit as
+ * `state.rate.per`.
+ *
+ * @param state  The current state of the recipe tree.
+ * @param nodeId The ID of the node for which to compute demand.
+ *
+ * @returns The required production rate of the node’s item.
+ *
+ * @throws If the root node has no selected recipe or produces zero quantity.
  */
-export function getNodeDemand(state: RecipeTreeState, nodeId: RecipeTreeNode['id'], unit: TimeUnit = 'second'): ProductionRate
+export function getNodeDemand(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): ProductionRate
 {
 	const root = ensureNode(state, state.rootNodeId);
 	const rootRecipe = findSelectedRecipe(root);
@@ -218,10 +242,29 @@ export function getNodeDemand(state: RecipeTreeState, nodeId: RecipeTreeNode['id
 	const requiredCount = getResolvedQuantity(state, nodeId);
 	const ratio = requiredCount / rootRecipe.quantity;
 
-	return convertProductionRate({ amount: state.rate.amount * ratio, per: state.rate.per }, unit);
+	return { amount: state.rate.amount * ratio, per: state.rate.per };
 }
 
-export function getRequiredFactories(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): number
+/**
+ * Computes how many producer instances are required to satisfy the output
+ * demand of a given node.
+ *
+ * A producer represents a single machine (or equivalent unit) executing the
+ * node’s selected recipe continuously. The calculation is performed by:
+ *
+ *   demand rate ÷ single-producer throughput
+ *
+ * Demand is derived from the recipe tree and expressed relative to the
+ * global target rate. Throughput is derived from the selected recipe.
+ *
+ * @param state  The current state of the recipe tree.
+ * @param nodeId The ID of the node for which to calculate required producers.
+ *
+ * @returns The number of producers required to meet the node’s demand.
+ *
+ * @throws If the node has no selected recipe (i.e. it cannot be produced).
+ */
+export function getRequiredProducers(state: RecipeTreeState, nodeId: RecipeTreeNode['id']): number
 {
 	const recipe = findSelectedRecipe(ensureNode(state, nodeId));
 
@@ -230,8 +273,10 @@ export function getRequiredFactories(state: RecipeTreeState, nodeId: RecipeTreeN
 		throw new Error(`Node with id "${nodeId}" has no selected recipe.`);
 	}
 
-	const demand = getNodeDemand(state, nodeId, 'second').amount;
+	const demand = getNodeDemand(state, nodeId);
+
+	const demandPerSecond = convertProductionRate(demand, 'second').amount;
 	const recipeThroughput = getRecipeThroughput(recipe, 'second').amount;
 
-	return demand / recipeThroughput;
+	return demandPerSecond / recipeThroughput;
 }
