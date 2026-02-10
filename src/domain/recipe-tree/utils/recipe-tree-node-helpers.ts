@@ -1,6 +1,10 @@
 import { RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
 import { Recipe } from '@/domain/recipe/types';
 
+// TODO: Calculate the Bill Of Materials (BOM) for a given node,
+// which is the flattened list of all ingredients required to produce
+// the node's item, taking into account the selected recipes at each level of the tree.
+
 /**
  * Ensures that a node with the given ID exists in the tree state and returns it.
  * Throws an error if the node is not found.

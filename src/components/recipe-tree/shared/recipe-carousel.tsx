@@ -33,13 +33,13 @@ export function RecipeCarousel({ nodeId, recipes, selectedRecipeIndex }: RecipeC
 
 	return (
 		<div className="flex w-full items-center justify-between">
-			<Button variant="ghost" onClick={previousRecipe} size="icon">
+			<Button variant="ghost" onClick={previousRecipe} size="icon" className="nopan">
 				<ArrowLeftIcon />
 			</Button>
 			<span className="text-xs text-muted-foreground">
 				{selectedRecipeIndex + 1} / {recipes.length}
 			</span>
-			<Button variant="ghost" onClick={nextRecipe} size="icon">
+			<Button variant="ghost" onClick={nextRecipe} size="icon" className="nopan">
 				<ArrowRightIcon />
 			</Button>
 		</div>

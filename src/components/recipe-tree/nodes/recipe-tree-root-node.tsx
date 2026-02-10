@@ -1,7 +1,7 @@
-import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, NodeStats } from '@/components/recipe-tree';
+import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, NodeStats, ProductionRateControl } from '@/components/recipe-tree';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Handle, Position } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree';
+import { useRecipeTree, useProductionRate } from '@/domain/recipe-tree';
 import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helpers';
 
 interface RecipeTreeRootNodeProps
@@ -13,6 +13,8 @@ interface RecipeTreeRootNodeProps
 export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeRootNodeProps)
 {
 	const { recipeTree } = useRecipeTree();
+
+	const { rate, setRate } = useProductionRate({ amount: 1, per: 'second' });
 
 	if (!recipeTree)
 	{
@@ -36,9 +38,12 @@ export function RecipeTreeRootNode({ id, data: { item } }: RecipeTreeRootNodePro
 						<p className="truncate text-xs text-muted-foreground">{selectedRecipe.name}</p>
 					</div>
 				</CardHeader>
-				<CardContent className="flex gap-2 text-xs text-muted-foreground">
-					<NodeStats title="Recipe" quantity={selectedRecipe.quantity} time={selectedRecipe.time} />
-					<NodeStats title="Total" quantity={resolvedQuantity} time={nodeTime} />
+				<CardContent className="space-y-2 text-xs text-muted-foreground">
+					<div className="flex gap-2">
+						<NodeStats title="Recipe" quantity={selectedRecipe.quantity} time={selectedRecipe.time} />
+						<NodeStats title="Total" quantity={resolvedQuantity} time={nodeTime} />
+					</div>
+					<ProductionRateControl rate={rate} onChange={setRate} className="nopan" />
 				</CardContent>
 				<CardFooter>
 					<RecipeCarousel nodeId={id} recipes={node.recipes} selectedRecipeIndex={NodeHelpers.findSelectedRecipeIndex(node)} />
