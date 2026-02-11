@@ -6,6 +6,10 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/
 import { ButtonGroup } from '@/components/ui/button-group';
 import { useCallback } from 'react';
 
+// TODO: add preference buttons (“fastest”, “cheapest”, etc.)
+// that will automatically pick recipes in the recipe tree,
+// optimizing according to a criterion.
+
 const UNIT_OPTIONS: { value: TimeUnit; label: string }[] = [
 	{ value: 'second', label: 'Sec' },
 	{ value: 'minute', label: 'Min' },
