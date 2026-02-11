@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { useInventory } from '@/domain/inventory';
-import { ItemView } from '@/components';
+import { ItemView } from '@/components/item';
+import { RecipeView, RecipeViewV2 } from '@/components/recipe';
 
 //TODO: Fix this logic
 
@@ -34,10 +35,10 @@ export default function Page()
 		{
 			return <ItemView itemId={node.id} />;
 		}
-		// case 'recipe':
-		// {
-		// 	return <RecipeView itemId={node.id} />;
-		// }
+		case 'recipe':
+		{
+			return <RecipeViewV2 recipeId={node.id} />;
+		}
 		default:
 			return <pre>{JSON.stringify(node, null, 2)}</pre>;
 	}

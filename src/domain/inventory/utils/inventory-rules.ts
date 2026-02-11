@@ -1,4 +1,4 @@
-import { InventoryTreeNode, InventoryTreeState } from '@/domain/inventory';
+import { InventoryTreeNode } from '@/domain/inventory';
 
 interface CanAddChildArgs
 {
