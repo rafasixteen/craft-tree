@@ -3,7 +3,8 @@ import { Recipe } from '@/domain/recipe';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Field, FieldLabel } from '@/components/ui/field';
-import { IngredientsTable } from './ingredients-table';
+import { IngredientsTable } from '@/components/recipe';
+import { useCallback } from 'react';
 
 interface RecipeEditProps
 {
@@ -15,20 +16,29 @@ interface RecipeEditProps
 
 export function RecipeEdit({ recipe, ingredients, onRecipeChange, onIngredientsChange }: RecipeEditProps)
 {
-	const onRecipeNameChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-	{
-		onRecipeChange({ ...recipe, name: e.target.value });
-	};
+	const onRecipeNameChange = useCallback(
+		function onRecipeNameChange(e: React.ChangeEvent<HTMLInputElement>)
+		{
+			onRecipeChange({ ...recipe, name: e.target.value });
+		},
+		[recipe, onRecipeChange],
+	);
 
-	const onRecipeQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-	{
-		onRecipeChange({ ...recipe, quantity: Number(e.target.value) });
-	};
+	const onRecipeQuantityChange = useCallback(
+		function onRecipeQuantityChange(e: React.ChangeEvent<HTMLInputElement>)
+		{
+			onRecipeChange({ ...recipe, quantity: Number(e.target.value) });
+		},
+		[recipe, onRecipeChange],
+	);
 
-	const onRecipeTimeChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-	{
-		onRecipeChange({ ...recipe, time: Number(e.target.value) });
-	};
+	const onRecipeTimeChange = useCallback(
+		function onRecipeTimeChange(e: React.ChangeEvent<HTMLInputElement>)
+		{
+			onRecipeChange({ ...recipe, time: Number(e.target.value) });
+		},
+		[recipe, onRecipeChange],
+	);
 
 	return (
 		<div className="flex h-full min-h-0 flex-col">

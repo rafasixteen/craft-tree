@@ -2,5 +2,4 @@ export * from './hooks';
 export * from './ingredients-table';
 export * from './recipe-edit';
 export * from './recipe-info';
-export * from './recipe-view-v2';
 export * from './recipe-view';
