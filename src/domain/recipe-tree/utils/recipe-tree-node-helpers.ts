@@ -330,5 +330,5 @@ export function calculateBillOfMaterials(state: RecipeTreeState): BillOfMaterial
 		}
 	}
 
-	return Array.from(bomMap.values());
+	return Array.from(bomMap.values()).sort((a, b) => a.item.name.localeCompare(b.item.name));
 }
