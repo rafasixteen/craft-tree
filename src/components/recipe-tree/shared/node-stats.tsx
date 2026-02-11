@@ -2,6 +2,7 @@ import { RecipeTreeNode, useNodeStats, useSelectedRecipe } from '@/domain/recipe
 import { PackageIcon, ClockIcon, FactoryIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { pluralize } from '@/lib/pluralizer';
 
 interface NodeStatsProps
 {
@@ -43,7 +44,7 @@ export function NodeStats({ nodeId }: NodeStatsProps)
 						<div className="flex items-center gap-2">
 							<FactoryIcon className="size-4 text-primary" />
 							<span className="text-xs">
-								{ceilProducerCount}x {pluralizeLocal(selectedRecipe!.name, ceilProducerCount!)}
+								{ceilProducerCount}x {pluralize(selectedRecipe!.name, ceilProducerCount!)}
 							</span>
 						</div>
 					</>
@@ -56,35 +57,4 @@ export function NodeStats({ nodeId }: NodeStatsProps)
 function formatAmount(amount: number)
 {
 	return Number.isInteger(amount) ? amount.toString() : amount.toFixed(2);
-}
-
-function pluralizeLocal(word: string, count: number): string
-{
-	// Rule: "Word (Something)" → "Words (Something)"
-	const match = word.match(/^([A-Za-z]+)(\s*\(.*\))$/);
-
-	if (count === 1)
-	{
-		return word;
-	}
-
-	if (match)
-	{
-		return match[1] + 's' + match[2];
-	}
-
-	// Rule: ends with 'y' but not 'ay', 'ey', 'iy', 'oy', 'uy' → 'ies'
-	if (/[^aeiou]y$/i.test(word))
-	{
-		return word.replace(/y$/, 'ies');
-	}
-
-	// Rule: ends with 's', 'x', 'z', 'ch', 'sh' → add 'es'
-	if (/(s|x|z|ch|sh)$/i.test(word))
-	{
-		return word + 'es';
-	}
-
-	// Default: add 's'
-	return word + 's';
 }

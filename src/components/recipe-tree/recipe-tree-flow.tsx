@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position, useNodesInitialized, useReactFlow } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, DefaultEdgeOptions } from '@xyflow/react';
-import { RecipeTreeInternalNode, RecipeTreeLeafNode, RecipeTreeNodeData, RateControlNode } from '@/components/recipe-tree';
+import { RecipeTreeInternalNode, RecipeTreeLeafNode, RecipeTreeNodeData, RateControlNode, BillOfMaterialsOverlay } from '@/components/recipe-tree';
 import { useRecipeTree, RecipeTreeNode } from '@/domain/recipe-tree';
 import ELK from 'elkjs/lib/elk.bundled.js';
 
@@ -140,7 +140,9 @@ export function RecipeTreeFlow()
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
 	const { getNodes, getEdges } = useReactFlow<Node<RecipeTreeNodeData>, Edge>();
+
 	const nodesInitialized = useNodesInitialized();
+
 	const { recipeTree, dfs } = useRecipeTree();
 
 	useEffect(() =>
@@ -165,11 +167,11 @@ export function RecipeTreeFlow()
 		const newNodes: Node<RecipeTreeNodeData>[] = [];
 		const newEdges: Edge[] = [];
 
-		// Add all recipe tree nodes as before
 		function callback(node: RecipeTreeNode): void
 		{
-			const type: NodeType = node.parentId === null ? 'internal-node' : node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
+			const type: NodeType = node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
 			newNodes.push(buildNode(node, type));
+
 			if (node.parentId)
 			{
 				newEdges.push(buildEdge(node.parentId, node.id));
@@ -196,6 +198,7 @@ export function RecipeTreeFlow()
 
 		setNodes((prev) =>
 		{
+			// TODO: Maybe use a more robust way to check if nodes have not changed.
 			if (prev.length === newNodes.length && prev.every((prevNode, index) => prevNode.id === newNodes[index].id))
 			{
 				return prev;
@@ -216,7 +219,7 @@ export function RecipeTreeFlow()
 	}
 
 	return (
-		<div style={{ width: '100%', height: '100%' }}>
+		<div className="size-full">
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
@@ -230,6 +233,7 @@ export function RecipeTreeFlow()
 				nodesDraggable={false}
 				deleteKeyCode={null}
 			>
+				<BillOfMaterialsOverlay />
 				<Controls />
 				<Background gap={12} size={1} />
 			</ReactFlow>

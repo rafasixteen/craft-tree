@@ -1,9 +1,7 @@
-import { ProductionRate, RecipeTreeNode, RecipeTreeState, TimeUnit, convertProductionRate } from '@/domain/recipe-tree';
-import { Recipe } from '@/domain/recipe/types';
-
-// TODO: Calculate the Bill Of Materials (BOM) for a given node,
-// which is the flattened list of all ingredients required to produce
-// the node's item, taking into account the selected recipes at each level of the tree.
+import { ProductionRate, RecipeTreeNode, RecipeTreeState, TimeUnit, convertProductionRate, BillOfMaterials, BillOfMaterialsEntry } from '@/domain/recipe-tree';
+import { Item } from '@/domain/item';
+import { dfs } from '@/domain/recipe-tree';
+import { Recipe } from '@/domain/recipe';
 
 /**
  * Ensures that a node with the given ID exists in the tree state and returns it.
@@ -279,4 +277,58 @@ export function getRequiredProducers(state: RecipeTreeState, nodeId: RecipeTreeN
 	const recipeThroughput = getRecipeThroughput(recipe, 'second').amount;
 
 	return demandPerSecond / recipeThroughput;
+}
+
+/**
+ * Calculates the Bill Of Materials (BOM) for a recipe tree.
+ * Traverses the tree, collects all leaf nodes (raw materials),
+ * and sums their demand by item type.
+ *
+ * @param state The recipe tree state.
+ * @returns Array of { item, demand } for each leaf item.
+ */
+export function calculateBillOfMaterials(state: RecipeTreeState): BillOfMaterials
+{
+	const leafNodes: RecipeTreeNode[] = [];
+
+	function getSelectedRecipeChildren(node: RecipeTreeNode): RecipeTreeNode['id'][]
+	{
+		if (node.selectedRecipeId === null)
+		{
+			return [];
+		}
+		else
+		{
+			return node.children[node.selectedRecipeId];
+		}
+	}
+
+	function collectLeaf(node: RecipeTreeNode)
+	{
+		if (getSelectedRecipeChildren(node).length === 0)
+		{
+			leafNodes.push(node);
+		}
+	}
+
+	dfs(state, state.rootNodeId, collectLeaf, getSelectedRecipeChildren, 'pre');
+
+	const bomMap = new Map<Item['id'], BillOfMaterialsEntry>();
+
+	for (const node of leafNodes)
+	{
+		const demand = getNodeDemand(state, node.id);
+
+		if (bomMap.has(node.item.id))
+		{
+			const entry = bomMap.get(node.item.id)!;
+			entry.demand.amount += demand.amount;
+		}
+		else
+		{
+			bomMap.set(node.item.id, { item: node.item, demand: demand });
+		}
+	}
+
+	return Array.from(bomMap.values());
 }
