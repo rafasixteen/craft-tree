@@ -317,6 +317,12 @@ export function calculateBillOfMaterials(state: RecipeTreeState): BillOfMaterial
 
 	for (const node of leafNodes)
 	{
+		// Skip root node if it's a leaf. This can happen if the node we are visualizing is a raw material.
+		if (node.id === state.rootNodeId)
+		{
+			continue;
+		}
+
 		const demand = getNodeDemand(state, node.id);
 
 		if (bomMap.has(node.item.id))

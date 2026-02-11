@@ -1,4 +1,4 @@
-import { RecipeTreeNodeData, RecipeCarousel, NodeIcon, NodeStats } from '@/components/recipe-tree';
+import { ProcessedMaterialNodeData, RecipeCarousel, NodeIcon, NodeStats } from '@/components/recipe-tree';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { useRecipeTree } from '@/domain/recipe-tree';
 import { PackageIcon, ClockIcon } from 'lucide-react';
@@ -8,10 +8,10 @@ import * as NodeHelpers from '@/domain/recipe-tree/utils/recipe-tree-node-helper
 interface RecipeTreeNodeProps
 {
 	id: string;
-	data: RecipeTreeNodeData;
+	data: ProcessedMaterialNodeData;
 }
 
-export function RecipeTreeInternalNode({ id, data: { item } }: RecipeTreeNodeProps)
+export function ProcessedMaterialNode({ id, data: { item } }: RecipeTreeNodeProps)
 {
 	const { recipeTree } = useRecipeTree();
 

@@ -1,14 +1,14 @@
-import { NodeIcon, NodeStats, RecipeTreeNodeData } from '@/components/recipe-tree';
+import { NodeIcon, NodeStats, RawMaterialNodeData } from '@/components/recipe-tree';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Handle, Position } from '@xyflow/react';
 
-interface RecipeTreeLeafNodeProps
+interface RawMaterialNodeProps
 {
 	id: string;
-	data: RecipeTreeNodeData;
+	data: RawMaterialNodeData;
 }
 
-export function RecipeTreeLeafNode({ id, data: { item } }: RecipeTreeLeafNodeProps)
+export function RawMaterialNode({ id, data: { item } }: RawMaterialNodeProps)
 {
 	return (
 		<Card className="max-w-80 min-w-50">

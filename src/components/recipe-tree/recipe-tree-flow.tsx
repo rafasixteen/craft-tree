@@ -4,122 +4,16 @@ import '@xyflow/react/dist/style.css';
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { ReactFlow, Controls, Background, useNodesState, useEdgesState, Position, useNodesInitialized, useReactFlow } from '@xyflow/react';
+import { ReactFlow, Controls, Background, useNodesState, useEdgesState, useNodesInitialized, useReactFlow } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, DefaultEdgeOptions } from '@xyflow/react';
-import { RecipeTreeInternalNode, RecipeTreeLeafNode, RecipeTreeNodeData, RateControlNode, BillOfMaterialsOverlay } from '@/components/recipe-tree';
-import { useRecipeTree, RecipeTreeNode } from '@/domain/recipe-tree';
-import ELK from 'elkjs/lib/elk.bundled.js';
-
-const elk = new ELK();
-
-// Reference: https://eclipse.dev/elk/reference/options.html
-
-const elkOptions = {
-	'elk.algorithm': 'layered',
-	'elk.direction': 'DOWN',
-	'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
-	'elk.layered.considerModelOrder': 'true',
-	'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
-	'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
-	'elk.layered.spacing.nodeNodeBetweenLayers': '60',
-	'elk.spacing.nodeNode': '50',
-};
-
-async function getLayoutedElements(nodes: Node<RecipeTreeNodeData>[], edges: Edge[])
-{
-	function getNodeWidth(node: Node<RecipeTreeNodeData>): number
-	{
-		if (!node.measured)
-		{
-			throw new Error(`Node ${node.id} is not measured yet.`);
-		}
-
-		if (!node.measured.width)
-		{
-			throw new Error(`Node ${node.id} has no measured width.`);
-		}
-
-		return node.measured.width;
-	}
-
-	function getNodeHeight(node: Node<RecipeTreeNodeData>): number
-	{
-		if (!node.measured)
-		{
-			throw new Error(`Node ${node.id} is not measured yet.`);
-		}
-
-		if (!node.measured.height)
-		{
-			throw new Error(`Node ${node.id} has no measured height.`);
-		}
-
-		return node.measured.height;
-	}
-
-	const graph = {
-		id: 'root',
-		layoutOptions: elkOptions,
-		children: nodes.map((node) => ({
-			...node,
-			targetPosition: Position.Top,
-			sourcePosition: Position.Bottom,
-			width: getNodeWidth(node),
-			height: getNodeHeight(node),
-		})),
-		edges: edges.map((edge) => ({
-			id: edge.id,
-			sources: [edge.source],
-			targets: [edge.target],
-		})),
-	};
-
-	try
-	{
-		const layoutedGraph = await elk.layout(graph);
-
-		const rootNode = layoutedGraph.children!.find((node) =>
-		{
-			const hasIncomingEdge = edges.some((edge) => edge.target === node.id);
-			return !hasIncomingEdge;
-		});
-
-		if (!rootNode)
-		{
-			throw new Error('Root node not found in layouted graph.');
-		}
-
-		if (rootNode.x === undefined || rootNode.y === undefined)
-		{
-			throw new Error('Root node has undefined position.');
-		}
-
-		const offsetX = rootNode.x;
-		const offsetY = rootNode.y;
-
-		const layoutedNodes = layoutedGraph.children!.map((node) => ({
-			...node,
-			position: {
-				x: node.x! - offsetX,
-				y: node.y! - offsetY,
-			},
-		}));
-
-		return { nodes: layoutedNodes, edges };
-	}
-	catch (error)
-	{
-		console.error('Layout error:', error);
-		return { nodes, edges };
-	}
-}
-
-type NodeType = 'root-node' | 'internal-node' | 'leaf-node';
+import type { NodeType, ProcessedMaterialNodeData } from '@/components/recipe-tree';
+import { ProcessedMaterialNode, RawMaterialNode, RateControlNode, BillOfMaterialsOverlay, getLayoutedElements } from '@/components/recipe-tree';
+import { useRecipeTree, RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
 
 const nodeTypes = {
-	'root-node': RateControlNode,
-	'internal-node': RecipeTreeInternalNode,
-	'leaf-node': RecipeTreeLeafNode,
+	'rate-control': RateControlNode,
+	'processed-material': ProcessedMaterialNode,
+	'raw-material': RawMaterialNode,
 } satisfies Record<NodeType, React.ComponentType<any>>;
 
 const fitViewOptions: FitViewOptions = {
@@ -136,10 +30,10 @@ export function RecipeTreeFlow()
 	const { theme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
-	const [nodes, setNodes, onNodesChange] = useNodesState<Node<RecipeTreeNodeData>>([]);
+	const [nodes, setNodes, onNodesChange] = useNodesState<Node<ProcessedMaterialNodeData>>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-	const { getNodes, getEdges } = useReactFlow<Node<RecipeTreeNodeData>, Edge>();
+	const { getNodes, getEdges } = useReactFlow<Node<ProcessedMaterialNodeData>, Edge>();
 
 	const nodesInitialized = useNodesInitialized();
 
@@ -151,7 +45,7 @@ export function RecipeTreeFlow()
 		{
 			getLayoutedElements(getNodes(), getEdges()).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
 			{
-				setNodes(layoutedNodes);
+				setNodes(layoutedNodes as Node<ProcessedMaterialNodeData>[]);
 				setEdges(layoutedEdges);
 			});
 		}
@@ -164,12 +58,13 @@ export function RecipeTreeFlow()
 			return;
 		}
 
-		const newNodes: Node<RecipeTreeNodeData>[] = [];
+		const newNodes: Node<ProcessedMaterialNodeData>[] = [];
 		const newEdges: Edge[] = [];
 
 		function callback(node: RecipeTreeNode): void
 		{
-			const type: NodeType = node.recipes.length > 0 ? 'internal-node' : 'leaf-node';
+			const type: NodeType = node.recipes.length > 0 ? 'processed-material' : 'raw-material';
+
 			newNodes.push(buildNode(node, type));
 
 			if (node.parentId)
@@ -191,7 +86,7 @@ export function RecipeTreeFlow()
 		}
 
 		const rateControlNodeId = 'rate-control-root';
-		newNodes.push(buildRateControlNode(rateControlNodeId) as Node<RecipeTreeNodeData>);
+		newNodes.push(buildRateControlNode(rateControlNodeId) as Node<ProcessedMaterialNodeData>);
 		newEdges.push(buildRateControlEdge(rateControlNodeId, recipeTree.rootNodeId));
 
 		dfs(recipeTree.rootNodeId, callback, getSelectedRecipeChildren, 'pre');
@@ -241,7 +136,7 @@ export function RecipeTreeFlow()
 	);
 }
 
-function buildNode(node: RecipeTreeNode, type: NodeType): Node<RecipeTreeNodeData>
+function buildNode(node: RecipeTreeNode, type: NodeType): Node<ProcessedMaterialNodeData>
 {
 	return {
 		id: node.id,
@@ -269,7 +164,7 @@ function buildRateControlNode(nodeId: string): Node
 {
 	return {
 		id: nodeId,
-		type: 'root-node',
+		type: 'rate-control',
 		position: { x: 0, y: 0 },
 		data: {},
 	};
