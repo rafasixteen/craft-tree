@@ -8,7 +8,6 @@ import useSWR from 'swr';
 interface RecipeTreeContext
 {
 	recipeTree: RecipeTreeState | null;
-	error: Error | null;
 	dfs: (startNodeId: RecipeTreeNode['id'], callback: DfsCallback, getChildren: DfsGetChildren, order?: DfsOrder) => void;
 	changeRecipe: (nodeId: RecipeTreeNode['id'], delta: number) => void;
 	setRate: (rate: ProductionRate) => void;
@@ -22,9 +21,9 @@ interface RecipeTreeProviderProps
 	children: React.ReactNode;
 }
 
-export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps)
+export function RecipeTreeProvider({ itemId, children }: RecipeTreeProviderProps)
 {
-	const { data: rawData, error } = useSWR(['recipe-tree', itemId], () => getRecipeTreeData(itemId), { revalidateOnFocus: false });
+	const { data: rawData } = useSWR(['recipe-tree', itemId], () => getRecipeTreeData(itemId), { revalidateOnFocus: false });
 
 	const [recipeTree, setRecipeTree] = useState<RecipeTreeState | null>(null);
 
@@ -78,7 +77,7 @@ export function RecipeTreeProvider({ children, itemId }: RecipeTreeProviderProps
 		});
 	}, []);
 
-	const value = useMemo(() => ({ recipeTree, error, dfs, changeRecipe, setRate }), [recipeTree, error, dfs, changeRecipe, setRate]);
+	const value = useMemo(() => ({ recipeTree, dfs, changeRecipe, setRate }), [recipeTree, dfs, changeRecipe, setRate]);
 
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }

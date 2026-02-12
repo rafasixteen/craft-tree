@@ -11,3 +11,8 @@ export function slugify(text: string): string
 {
 	return slugifyLib(text, { lower: true, strict: true });
 }
+
+export function formatNumber(num: number, decimals: number = 2): string
+{
+	return Number.isInteger(num) ? num.toString() : num.toFixed(decimals);
+}

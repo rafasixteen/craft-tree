@@ -51,7 +51,7 @@ export function RateControlNode({ id }: RateControlNodeProps)
 	}
 
 	return (
-		<Card className="max-w-80 min-w-50">
+		<Card>
 			<CardContent className="text-xs text-muted-foreground">
 				<div className="nopan space-y-1.5">
 					<InputGroup>
