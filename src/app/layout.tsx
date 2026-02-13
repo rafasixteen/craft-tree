@@ -1,9 +1,11 @@
 import './globals.css';
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
-import { Footer, Header, ThemeProvider } from '@/components/layout';
+import { ThemeProvider } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { SessionProvider } from 'next-auth/react';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -25,14 +27,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 {
 	return (
 		<html lang="en" className={inter.variable} suppressHydrationWarning>
-			<body className={cn(geistSans.variable, geistMono.variable, 'flex h-screen antialiased')}>
+			<body className={cn(geistSans.variable, geistMono.variable)}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<SessionProvider>
-						<div className="flex flex-1 flex-col">
-							<Header />
-							<main className="min-h-0 flex-1">{children}</main>
-							<Footer />
-						</div>
+						<TooltipProvider>{children}</TooltipProvider>
 					</SessionProvider>
 				</ThemeProvider>
 			</body>

@@ -7,7 +7,7 @@ export default async function Home()
 	const session = await auth();
 
 	return (
-		<div className="relative h-full overflow-hidden py-4">
+		<div className="relative min-h-screen flex items-center justify-center overflow-hidden py-4">
 			{/* Animated background elements */}
 			<div className="absolute inset-0 overflow-hidden">
 				<div className="absolute top-0 left-1/4 size-48 animate-pulse rounded-full bg-primary/10 opacity-20 mix-blend-multiply blur-3xl filter sm:size-96" />
@@ -22,9 +22,9 @@ export default async function Home()
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
+			<div className="relative z-10 flex flex-col items-center justify-center px-4 text-center w-full">
 				{/* Main heading with animation */}
-				<div className="max-w-3xl space-y-6">
+				<div className="max-w-3xl mx-auto space-y-6">
 					<div className="space-y-4">
 						<h1 className="animate-fade-in bg-linear-to-r from-primary via-primary/80 to-secondary bg-clip-text text-3xl font-bold text-transparent sm:text-5xl md:text-6xl lg:text-7xl">
 							Craft Your Tree
@@ -45,7 +45,7 @@ export default async function Home()
 					<div className="animate-fade-in flex flex-wrap justify-center gap-3 pt-8 sm:gap-4" style={{ animationDelay: '0.6s' }}>
 						{session ? (
 							<Button size="lg" className="text-sm sm:text-base">
-								<Link href="/collections">Collections</Link>
+								<Link href="/inventory">Inventories</Link>
 							</Button>
 						) : (
 							<Button size="lg" className="text-sm sm:text-base">
@@ -69,7 +69,7 @@ export default async function Home()
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:col-span-2 sm:p-6 lg:col-span-1">
 							<div className="mb-2 text-2xl sm:text-3xl">🎮</div>
 							<h3 className="mb-2 text-sm font-semibold sm:text-base">Multi-Game Support</h3>
-							<p className="text-xs text-muted-foreground sm:text-sm">Separate collections for each game</p>
+							<p className="text-xs text-muted-foreground sm:text-sm">Separate inventories for each game</p>
 						</div>
 					</div>
 				</div>

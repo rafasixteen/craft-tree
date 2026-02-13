@@ -1,2 +1,2 @@
-export * from './inventory-data';
-export * from './inventory-tree-state';
+export * from './inventory-state';
+export * from './inventory';

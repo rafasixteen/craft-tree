@@ -1,7 +1,7 @@
 {
 	"plugins": [
-		"prettier-plugin-brace-style",
-		"prettier-plugin-multiline-arrays"
+		"prettier-plugin-multiline-arrays",
+		"prettier-plugin-brace-style"
 	],
 	"braceStyle": "allman",
 	"useTabs": true,
