@@ -5,7 +5,7 @@ import { Item } from '@/domain/item';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-interface DeleteItemParams
+export interface DeleteItemParams
 {
 	itemId: Item['id'];
 }

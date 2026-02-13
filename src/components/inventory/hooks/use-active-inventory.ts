@@ -10,5 +10,14 @@ export function useActiveInventory(): Inventory | null
 	const params = useParams();
 	const inventoryId = params['inventory-id'];
 
-	return inventories.find((inv) => inv.id === inventoryId) || null;
+	const inventory = inventories.find((inventory) => inventory.id === inventoryId) || null;
+
+	if (inventory === null)
+	{
+		console.warn(`Active inventory with ID ${inventoryId} not found`);
+		console.warn('Available inventories:', inventories);
+		console.warn('URL params:', params);
+	}
+
+	return inventory;
 }

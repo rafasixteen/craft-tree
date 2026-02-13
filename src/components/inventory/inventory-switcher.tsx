@@ -17,6 +17,7 @@ export function InventorySwitcher()
 
 	if (!activeInventory)
 	{
+		console.warn('Active inventory not found in inventory switcher');
 		return notFound();
 	}
 

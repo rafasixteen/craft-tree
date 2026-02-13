@@ -6,6 +6,8 @@ import { ThemeProvider } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { SessionProvider } from 'next-auth/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/sonner';
+import { auth } from '@/auth';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -23,14 +25,17 @@ export const metadata: Metadata = {
 	title: 'Craft Tree',
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>)
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>)
 {
+	const session = await auth();
+
 	return (
 		<html lang="en" className={inter.variable} suppressHydrationWarning>
 			<body className={cn(geistSans.variable, geistMono.variable)}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-					<SessionProvider>
+					<SessionProvider session={session}>
 						<TooltipProvider>{children}</TooltipProvider>
+						<Toaster />
 					</SessionProvider>
 				</ThemeProvider>
 			</body>

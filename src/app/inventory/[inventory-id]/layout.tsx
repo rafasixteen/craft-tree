@@ -1,6 +1,9 @@
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { getInventoryItems } from '@/domain/inventory';
+import { getTags } from '@/domain/tag';
 import { cookies } from 'next/headers';
+import { SWRConfig, unstable_serialize } from 'swr';
 
 interface Params
 {
@@ -13,15 +16,26 @@ interface InventoryLayoutProps
 	children: React.ReactNode;
 }
 
-export default async function InventoryLayout({ children }: InventoryLayoutProps)
+export default async function InventoryLayout({ params, children }: InventoryLayoutProps)
 {
 	const cookieStore = await cookies();
 	const sidebarState = cookieStore.get('sidebar_state')?.value === 'true';
 
+	const inventoryId = (await params)['inventory-id'];
+
 	return (
-		<SidebarProvider defaultOpen={sidebarState}>
-			<AppSidebar />
-			<SidebarInset>{children}</SidebarInset>
-		</SidebarProvider>
+		<SWRConfig
+			value={{
+				fallback: {
+					[unstable_serialize(['inventory-items', inventoryId])]: getInventoryItems(inventoryId),
+					[unstable_serialize(['tags', inventoryId])]: getTags({ inventoryId }),
+				},
+			}}
+		>
+			<SidebarProvider defaultOpen={sidebarState}>
+				<AppSidebar />
+				<SidebarInset>{children}</SidebarInset>
+			</SidebarProvider>
+		</SWRConfig>
 	);
 }
