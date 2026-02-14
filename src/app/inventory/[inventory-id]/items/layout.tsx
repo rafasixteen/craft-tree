@@ -1,6 +1,6 @@
 'use client';
 
-import { ItemSelectionProvider } from '@/components/inventory';
+import { ItemSelectionProvider } from '@/components/item';
 
 interface ItemsLayoutProps
 {

@@ -40,7 +40,8 @@ export function InventorySwitcher()
 					<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" align="start" side={isMobile ? 'bottom' : 'right'} sideOffset={4}>
 						<DropdownMenuLabel className="text-xs text-muted-foreground">Inventories</DropdownMenuLabel>
 						{inventories.map((inventory) => (
-							<Link href={`/inventory/${inventory.id}`} key={inventory.id}>
+							// TODO: Redirect either to /items or /producers based on the last visited page for that inventory.
+							<Link href={`/inventory/${inventory.id}/items`} key={inventory.id}>
 								<DropdownMenuItem className="gap-2 p-2">
 									<div className="flex size-7 items-center justify-center rounded-md border">
 										<p>{activeInventory.name.substring(0, 2).toUpperCase()}</p>

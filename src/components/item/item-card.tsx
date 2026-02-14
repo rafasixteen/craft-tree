@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Item } from '@/domain/item';
 import { cva } from 'class-variance-authority';
-import { useItemSelection } from '@/components/inventory';
+import { useItemSelection } from '@/components/item';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface ItemCardProps extends React.ComponentProps<typeof Card>

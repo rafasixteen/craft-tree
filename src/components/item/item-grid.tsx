@@ -1,5 +1,6 @@
 import { useItems } from '@/domain/inventory';
-import { ItemCard, useActiveInventory, useItemSelection } from '@/components/inventory';
+import { useActiveInventory } from '@/components/inventory';
+import { useItemSelection, ItemCard } from '@/components/item';
 import { useEffect, useRef } from 'react';
 
 export function ItemGrid()

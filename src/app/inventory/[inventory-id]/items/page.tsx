@@ -1,13 +1,13 @@
 'use client';
 
 import { Header } from '@/components/header';
-import { ItemGrid } from '@/components/inventory/item-grid';
+import { ItemGrid, useItemSelection } from '@/components/item';
 import { Button } from '@/components/ui/button';
 import { AddItemDialog } from '@/components/item/add-item-dialog';
 import { Input } from '@/components/ui/input';
 import { TagsCombobox } from '@/components/tag/tags-combo-box';
 import { TagsDialog } from '@/components/tag';
-import { useItemSelection, useActiveInventory } from '@/components/inventory';
+import { useActiveInventory } from '@/components/inventory';
 import { useItems } from '@/domain/inventory';
 
 export default function ItemsPage()
