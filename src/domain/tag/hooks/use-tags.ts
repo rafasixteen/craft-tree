@@ -33,7 +33,7 @@ export function useTags(inventoryId: Inventory['id'])
 				{
 					optimisticData: (current: Tag[] = []) => [...current, optimistic],
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
@@ -52,7 +52,7 @@ export function useTags(inventoryId: Inventory['id'])
 				{
 					optimisticData: (current: Tag[] = []) => current.filter((inv) => inv.id !== id),
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
