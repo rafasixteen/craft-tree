@@ -34,7 +34,7 @@ export function useItems(inventoryId: Inventory['id'])
 				{
 					optimisticData: (current: Item[] = []) => [...current, optimistic],
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
@@ -53,7 +53,7 @@ export function useItems(inventoryId: Inventory['id'])
 				{
 					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== id),
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
