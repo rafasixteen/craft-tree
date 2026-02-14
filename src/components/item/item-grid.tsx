@@ -7,7 +7,7 @@ export function ItemGrid()
 {
 	const inventory = useActiveInventory()!;
 	const { items } = useItems(inventory.id);
-	const { selectRange, clearSelection } = useItemSelection();
+	const { selectRange, clearSelection, hasAnySelection } = useItemSelection();
 
 	const gridRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +41,10 @@ export function ItemGrid()
 
 	function onCardClick(e: React.MouseEvent, id: string, idx: number)
 	{
+		// TODO: FIX ME -> This prevents card Link component from redirecting.
+
+		if (!hasAnySelection) return;
+
 		e.preventDefault();
 		e.stopPropagation();
 
