@@ -1,13 +1,15 @@
-import { useState, useTransition, useRef } from 'react';
+import { useState, useTransition, useEffect, useCallback } from 'react';
 import { useItems } from '@/domain/inventory';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useActiveInventory } from '@/components/inventory';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { nameSchema } from '@/domain/shared';
 import { toast } from 'sonner';
 import { TagsCombobox } from '@/components/tags/tags-combo-box';
-import { Tag } from '@/domain/tag';
+import { useTags } from '@/domain/tag';
+import { useForm, Controller, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AddItemFormValues, addItemFormSchema } from '@/components/item';
 
 interface AddItemDialogProps
 {
@@ -18,94 +20,85 @@ export function AddItemDialog({ trigger }: AddItemDialogProps)
 {
 	const inventory = useActiveInventory()!;
 	const { createItem } = useItems(inventory.id);
+	const { tags } = useTags(inventory.id);
 
 	const [open, setOpen] = useState(false);
-	const [name, setName] = useState('');
-	const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-	const [validationError, setValidationError] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
-	const inputRef = useRef<HTMLInputElement>(null);
 
-	function handleCreate()
-	{
-		startTransition(async () =>
+	const { register, control, reset, handleSubmit, formState } = useForm({
+		resolver: zodResolver(addItemFormSchema),
+		defaultValues: {
+			name: '',
+			tagNames: [],
+		},
+	});
+
+	const watchedName = useWatch({
+		control,
+		name: 'name',
+	});
+
+	const onSubmit = useCallback(
+		async function onSubmit(values: AddItemFormValues): Promise<void>
 		{
-			setValidationError(null);
-
-			const parsed = nameSchema.safeParse(name);
-
-			if (!parsed.success)
+			startTransition(async () =>
 			{
-				setValidationError(parsed.error.issues[0]?.message);
-				return;
-			}
-
-			try
-			{
-				await createItem({
-					name: parsed.data,
-					icon: null,
-					tagIds: selectedTags.map((t) => t.id!),
-				});
-
-				setName('');
-				setSelectedTags([]);
-
-				// Refocus input after state update and re-render.
-				setTimeout(() =>
+				try
 				{
-					inputRef.current?.focus();
-				}, 100);
+					const { name, tagNames } = values;
 
-				toast.success(`Item '${parsed.data}' added`);
-			}
-			catch
-			{
-				toast.error('Failed to add item');
-			}
-		});
-	}
+					const selectedTags = tags.filter((t) => tagNames.includes(t.name));
 
-	function onInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>)
+					await createItem({
+						name,
+						icon: null,
+						tagIds: selectedTags.map((t) => t.id!),
+					});
+
+					reset({
+						name: '',
+						tagNames: values.tagNames,
+					});
+
+					toast.success(`Item '${name}' added`);
+				}
+				catch
+				{
+					toast.error('Failed to add item');
+				}
+			});
+		},
+		[createItem, tags, reset],
+	);
+
+	useEffect(() =>
 	{
-		if (e.key === 'Enter' && !isPending)
+		if (!open)
 		{
-			e.preventDefault();
-			handleCreate();
+			reset();
 		}
-	}
+	}, [open]);
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen} modal={false}>
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
-			<DialogContent className="p-6 rounded-lg bg-muted/70">
+			<DialogContent className="p-6 rounded-lg">
 				<DialogHeader>
-					<DialogTitle className="text-lg mb-2">Add New Item</DialogTitle>
+					<DialogTitle>Add New Item</DialogTitle>
 				</DialogHeader>
-				<div className="flex flex-col gap-2 mt-1">
-					<Input
-						ref={inputRef}
-						placeholder="New item name..."
-						value={name}
-						onChange={(e) => setName(e.target.value)}
-						onKeyDown={onInputKeyDown}
-						disabled={isPending}
-						autoFocus
-						aria-invalid={!!validationError}
-						className="h-10 px-3 text-base rounded border border-border bg-background/90 focus:ring-2 focus:ring-primary/30"
-					/>
-					{/* TODO: add controlled input here */}
-					<TagsCombobox />
-					<Button disabled={isPending || !name.trim()} onClick={handleCreate} className="h-10 text-base rounded">
+				<form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 mt-2">
+					{/* Name input */}
+					<Input {...register('name')} placeholder="New item name..." disabled={isPending} aria-invalid={!!formState.errors.name} />
+					{formState.errors.name && <p className="text-sm text-destructive">{formState.errors.name.message}</p>}
+
+					{/* TagsCombobox */}
+					<Controller name="tagNames" control={control} render={({ field }) => <TagsCombobox value={field.value} onValueChange={field.onChange} />} />
+
+					{/* Submit button */}
+					<Button type="submit" disabled={isPending || !watchedName?.trim()}>
 						{isPending ? 'Adding...' : 'Add Item'}
 					</Button>
-					<p
-						className={`min-h-5 text-sm px-1 py-0 rounded transition-all duration-200 ${validationError ? 'text-destructive bg-destructive/10 opacity-100' : 'opacity-0'}`}
-						aria-live="polite"
-					>
-						{validationError || ' '}
-					</p>
-				</div>
+				</form>
 			</DialogContent>
 		</Dialog>
 	);

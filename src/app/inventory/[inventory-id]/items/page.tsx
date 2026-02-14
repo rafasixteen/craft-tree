@@ -33,7 +33,7 @@ export default function ItemsPage()
 						{
 							e.preventDefault();
 							e.stopPropagation();
-							selectedIds.forEach(async (id) => await deleteItem(id));
+							selectedIds.forEach(async (id) => await deleteItem({ itemId: id }));
 						}}
 					>
 						Delete Selected

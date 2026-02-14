@@ -15,11 +15,12 @@ import {
 	useComboboxAnchor,
 } from '@/components/ui/combobox';
 
-type TagsComboboxProps = React.ComponentProps<typeof Combobox>;
+interface TagsComboboxProps extends React.ComponentProps<typeof Combobox>
+{
+	className?: string;
+}
 
-// TODO: add controlled input
-
-export function TagsCombobox({ ...props }: TagsComboboxProps)
+export function TagsCombobox({ className, ...props }: TagsComboboxProps)
 {
 	const anchor = useComboboxAnchor();
 
@@ -28,7 +29,7 @@ export function TagsCombobox({ ...props }: TagsComboboxProps)
 
 	return (
 		<Combobox multiple autoHighlight items={tags.map((t) => t.name)} {...props}>
-			<ComboboxChips ref={anchor} className="w-full max-w-xs">
+			<ComboboxChips ref={anchor} className={className}>
 				<ComboboxValue>
 					{(values) => (
 						<>
