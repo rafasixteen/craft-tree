@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { nameSchema } from '@/domain/shared';
 import { toast } from 'sonner';
 import { TagsCombobox } from '@/components/tags/tags-combo-box';
+import { Tag } from '@/domain/tag';
 
 interface AddItemDialogProps
 {
@@ -18,10 +19,9 @@ export function AddItemDialog({ trigger }: AddItemDialogProps)
 	const inventory = useActiveInventory()!;
 	const { createItem } = useItems(inventory.id);
 
-
 	const [open, setOpen] = useState(false);
 	const [name, setName] = useState('');
-	const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+	const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 	const [validationError, setValidationError] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -42,9 +42,14 @@ export function AddItemDialog({ trigger }: AddItemDialogProps)
 
 			try
 			{
-				await createItem(parsed.data, null, selectedTagIds.length > 0 ? selectedTagIds : undefined);
+				await createItem({
+					name: parsed.data,
+					icon: null,
+					tagIds: selectedTags.map((t) => t.id!),
+				});
+
 				setName('');
-				setSelectedTagIds([]);
+				setSelectedTags([]);
 
 				// Refocus input after state update and re-render.
 				setTimeout(() =>
@@ -71,7 +76,7 @@ export function AddItemDialog({ trigger }: AddItemDialogProps)
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={open} onOpenChange={setOpen} modal={false}>
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
 			<DialogContent className="p-6 rounded-lg bg-muted/70">
 				<DialogHeader>
@@ -89,18 +94,11 @@ export function AddItemDialog({ trigger }: AddItemDialogProps)
 						aria-invalid={!!validationError}
 						className="h-10 px-3 text-base rounded border border-border bg-background/90 focus:ring-2 focus:ring-primary/30"
 					/>
-
-					<TagsCombobox
-						value={selectedTagIds}
-						onChange={setSelectedTagIds}
-						disabled={isPending}
-						className="min-w-0"
-					/>
-
+					{/* TODO: add controlled input here */}
+					<TagsCombobox />
 					<Button disabled={isPending || !name.trim()} onClick={handleCreate} className="h-10 text-base rounded">
 						{isPending ? 'Adding...' : 'Add Item'}
 					</Button>
-
 					<p
 						className={`min-h-5 text-sm px-1 py-0 rounded transition-all duration-200 ${validationError ? 'text-destructive bg-destructive/10 opacity-100' : 'opacity-0'}`}
 						aria-live="polite"

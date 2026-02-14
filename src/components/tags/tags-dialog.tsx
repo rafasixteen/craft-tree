@@ -119,7 +119,7 @@ export function TagsDialog({ trigger }: TagsDialogProps)
 								</React.Fragment>
 							))
 						) : (
-							<p className="text-sm text-muted-foreground">No tags yet.</p>
+							<p className="text-center text-sm text-muted-foreground">No tags yet.</p>
 						)}
 					</div>
 				</ScrollArea>

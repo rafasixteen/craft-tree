@@ -1,6 +1,6 @@
 'use client';
 
-import { Tag, useTags } from '@/domain/tag';
+import { useTags } from '@/domain/tag';
 import { useActiveInventory } from '@/components/inventory';
 import {
 	Combobox,
@@ -15,13 +15,11 @@ import {
 	useComboboxAnchor,
 } from '@/components/ui/combobox';
 
-interface TagsComboboxProps extends React.Component<typeof Combobox>
-{
-	value: Tag[];
-	onChange: (tags: Tag[]) => void;
-}
+type TagsComboboxProps = React.ComponentProps<typeof Combobox>;
 
-export function TagsCombobox({ value, onChange, ...props }: TagsComboboxProps)
+// TODO: add controlled input
+
+export function TagsCombobox({ ...props }: TagsComboboxProps)
 {
 	const anchor = useComboboxAnchor();
 
