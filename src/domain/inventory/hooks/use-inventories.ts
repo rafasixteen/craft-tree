@@ -40,7 +40,7 @@ export function useInventories()
 				{
 					optimisticData: (current: Inventory[] = []) => [...current, optimistic],
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
@@ -68,7 +68,7 @@ export function useInventories()
 				{
 					optimisticData: (current: Inventory[] = []) => current.map((inv) => (inv.id === id ? { ...inv, name: newName } : inv)),
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
@@ -87,7 +87,7 @@ export function useInventories()
 				{
 					optimisticData: (current: Inventory[] = []) => current.filter((inv) => inv.id !== id),
 					rollbackOnError: true,
-					revalidate: false,
+					revalidate: true,
 				},
 			);
 		},
