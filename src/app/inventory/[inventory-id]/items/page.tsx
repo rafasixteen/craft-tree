@@ -5,8 +5,8 @@ import { ItemGrid } from '@/components/inventory/item-grid';
 import { Button } from '@/components/ui/button';
 import { AddItemDialog } from '@/components/item/add-item-dialog';
 import { Input } from '@/components/ui/input';
-import { TagsCombobox } from '@/components/tags/tags-combo-box';
-import { TagsDialog } from '@/components/tags';
+import { TagsCombobox } from '@/components/tag/tags-combo-box';
+import { TagsDialog } from '@/components/tag';
 import { useItemSelection, useActiveInventory } from '@/components/inventory';
 import { useItems } from '@/domain/inventory';
 

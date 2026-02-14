@@ -5,7 +5,7 @@ import { useActiveInventory } from '@/components/inventory';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { TagsCombobox } from '@/components/tags/tags-combo-box';
+import { TagsCombobox } from '@/components/tag/tags-combo-box';
 import { useTags } from '@/domain/tag';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
