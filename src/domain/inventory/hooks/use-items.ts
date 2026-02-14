@@ -2,9 +2,31 @@
 
 import { Inventory, getInventoryItems } from '@/domain/inventory';
 import { Item } from '@/domain/item';
-import * as ItemServerActions from '@/domain/item/server';
+import { Tag } from '@/domain/tag';
 import { useCallback } from 'react';
+import * as ItemServerActions from '@/domain/item/server';
+import * as TagServerActions from '@/domain/tag/server';
 import useSWR from 'swr';
+
+interface CreateItemParams
+{
+	name: Item['name'];
+	icon: Item['icon'];
+	tagIds?: Tag['id'][];
+}
+
+interface UpdateItemParams
+{
+	itemId: Item['id'];
+	name?: Item['name'];
+	icon?: Item['icon'];
+	tagIds?: Tag['id'][];
+}
+
+interface DeleteItemParams
+{
+	itemId: Item['id'];
+}
 
 export function useItems(inventoryId: Inventory['id'])
 {
@@ -16,7 +38,7 @@ export function useItems(inventoryId: Inventory['id'])
 	});
 
 	const createItem = useCallback(
-		async function createItem(name: string, icon: string | null)
+		async function createItem({ name, icon, tagIds }: CreateItemParams)
 		{
 			const optimistic: Item = {
 				id: crypto.randomUUID(),
@@ -29,6 +51,12 @@ export function useItems(inventoryId: Inventory['id'])
 				async (current = []) =>
 				{
 					const created = await ItemServerActions.createItem({ name, icon, inventoryId });
+
+					if (tagIds && tagIds.length > 0)
+					{
+						await TagServerActions.setTags({ itemId: created.id, tagIds: tagIds });
+					}
+
 					return [...current, created];
 				},
 				{
@@ -41,17 +69,43 @@ export function useItems(inventoryId: Inventory['id'])
 		[inventoryId, mutate],
 	);
 
-	const deleteItem = useCallback(
-		async function deleteItem(id: Item['id'])
+	const updateItem = useCallback(
+		async function updateItem({ itemId, name, icon, tagIds }: UpdateItemParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					await ItemServerActions.deleteItem({ itemId: id });
-					return current.filter((item) => item.id !== id);
+					const updated = await ItemServerActions.updateItem({ itemId, name, icon });
+
+					if (tagIds)
+					{
+						await TagServerActions.setTags({ itemId, tagIds });
+					}
+
+					return current.map((item) => (item.id === itemId ? { ...item, ...updated, ...(tagIds ? { tagIds } : {}) } : item));
 				},
 				{
-					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== id),
+					optimisticData: (current: Item[] = []) =>
+						current.map((item) => (item.id === itemId ? { ...item, ...(name ? { name } : {}), ...(icon ? { icon } : {}), ...(tagIds ? { tagIds } : {}) } : item)),
+					rollbackOnError: true,
+					revalidate: true,
+				},
+			);
+		},
+		[inventoryId, mutate],
+	);
+
+	const deleteItem = useCallback(
+		async function deleteItem({ itemId }: DeleteItemParams)
+		{
+			await mutate(
+				async (current = []) =>
+				{
+					await ItemServerActions.deleteItem({ itemId });
+					return current.filter((item) => item.id !== itemId);
+				},
+				{
+					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== itemId),
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -63,6 +117,7 @@ export function useItems(inventoryId: Inventory['id'])
 	return {
 		items: data ?? [],
 		createItem,
+		updateItem,
 		deleteItem,
 	};
 }

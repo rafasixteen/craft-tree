@@ -91,6 +91,11 @@ export function ItemSelectionProvider({ children }: ItemSelectionProviderProps)
 export function useItemSelection()
 {
 	const ctx = useContext(ItemSelectionContext);
-	if (!ctx) throw new Error('useItemSelection must be used within ItemSelectionProvider');
+
+	if (!ctx)
+	{
+		throw new Error('useItemSelection must be used within ItemSelectionProvider');
+	}
+
 	return ctx;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useTags } from '@/domain/tag';
+import { Tag, useTags } from '@/domain/tag';
 import { useActiveInventory } from '@/components/inventory';
 import {
 	Combobox,
@@ -15,7 +15,13 @@ import {
 	useComboboxAnchor,
 } from '@/components/ui/combobox';
 
-export function TagsCombobox()
+interface TagsComboboxProps extends React.Component<typeof Combobox>
+{
+	value: Tag[];
+	onChange: (tags: Tag[]) => void;
+}
+
+export function TagsCombobox({ value, onChange, ...props }: TagsComboboxProps)
 {
 	const anchor = useComboboxAnchor();
 
@@ -23,7 +29,7 @@ export function TagsCombobox()
 	const { tags } = useTags(inventory.id!);
 
 	return (
-		<Combobox multiple autoHighlight items={tags.map((t) => t.name)}>
+		<Combobox multiple autoHighlight items={tags.map((t) => t.name)} {...props}>
 			<ComboboxChips ref={anchor} className="w-full max-w-xs">
 				<ComboboxValue>
 					{(values) => (
