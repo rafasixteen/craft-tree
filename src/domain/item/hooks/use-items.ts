@@ -5,7 +5,6 @@ import { Item } from '@/domain/item';
 import { Tag } from '@/domain/tag';
 import { useCallback } from 'react';
 import * as ItemServerActions from '@/domain/item/server';
-import * as TagServerActions from '@/domain/tag/server';
 import useSWR from 'swr';
 
 interface CreateItemParams
@@ -30,7 +29,7 @@ interface DeleteItemParams
 
 export function useItems(inventoryId: Inventory['id'])
 {
-	const swrKey = inventoryId ? ['inventory-items', inventoryId] : null;
+	const swrKey = ['inventory-items', inventoryId];
 	const fetcher = () => getInventoryItems(inventoryId);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
@@ -54,7 +53,7 @@ export function useItems(inventoryId: Inventory['id'])
 
 					if (tagIds && tagIds.length > 0)
 					{
-						await TagServerActions.setTags({ itemId: created.id, tagIds: tagIds });
+						await ItemServerActions.setItemTags({ itemId: created.id, tagIds: tagIds });
 					}
 
 					return [...current, created];
@@ -79,7 +78,7 @@ export function useItems(inventoryId: Inventory['id'])
 
 					if (tagIds)
 					{
-						await TagServerActions.setTags({ itemId, tagIds });
+						await ItemServerActions.setItemTags({ itemId, tagIds });
 					}
 
 					return current.map((item) => (item.id === itemId ? { ...item, ...updated, ...(tagIds ? { tagIds } : {}) } : item));

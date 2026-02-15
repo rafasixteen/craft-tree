@@ -6,13 +6,13 @@ import { Tag } from '@/domain/tag';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export interface SetTagsParams
+export interface SetItemTagsParams
 {
 	itemId: Item['id'];
 	tagIds: Tag['id'][];
 }
 
-export async function setTags({ itemId, tagIds }: SetTagsParams): Promise<void>
+export async function setItemTags({ itemId, tagIds }: SetItemTagsParams): Promise<void>
 {
 	await db.delete(itemTags).where(eq(itemTags.itemId, itemId));
 	await db.insert(itemTags).values(tagIds.map((tagId) => ({ itemId, tagId })));

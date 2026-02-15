@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { Inventory, useInventories } from '@/domain/inventory';
 
-export function useActiveInventory(): Inventory | null
+export function useActiveInventory(): Inventory
 {
 	const { inventories } = useInventories();
 
@@ -14,9 +14,7 @@ export function useActiveInventory(): Inventory | null
 
 	if (inventory === null)
 	{
-		console.warn(`Active inventory with ID ${inventoryId} not found`);
-		console.warn('Available inventories:', inventories);
-		console.warn('URL params:', params);
+		throw new Error('Active inventory not found');
 	}
 
 	return inventory;

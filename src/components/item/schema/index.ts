@@ -1,1 +1,2 @@
-export * from './add-item-form-schema';
+export * from './create-item-form-schema';
+export * from './update-item-form-schema';

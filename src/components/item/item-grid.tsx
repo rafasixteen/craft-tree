@@ -1,6 +1,6 @@
 import { useItems } from '@/domain/item';
 import { useActiveInventory } from '@/components/inventory';
-import { ItemCard, useItemGrid } from '@/components/item';
+import { ItemCell, useItemGrid } from '@/components/item';
 
 export function ItemGrid()
 {
@@ -12,7 +12,7 @@ export function ItemGrid()
 	return (
 		<div className="grid auto-rows-min grid-cols-2 gap-4 md:grid-cols-6" {...getItemGridProps()}>
 			{items.map((item) => (
-				<ItemCard key={item.id} item={item} {...getItemCellProps(item.id, items.indexOf(item))} />
+				<ItemCell key={item.id} {...getItemCellProps(item.id, items.indexOf(item))} />
 			))}
 		</div>
 	);

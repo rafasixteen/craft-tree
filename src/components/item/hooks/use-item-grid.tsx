@@ -15,6 +15,7 @@ export interface ItemGridProps
 
 export interface ItemCellProps
 {
+	item: Item;
 	role: string;
 	tabIndex: number;
 	'data-selected': boolean;
@@ -23,6 +24,7 @@ export interface ItemCellProps
 	ref: (node: HTMLDivElement | null) => void;
 	onClick: (e: React.MouseEvent) => void;
 	onDoubleClick: (e: React.MouseEvent) => void;
+	onContextMenu: (e: React.MouseEvent) => void;
 	onMouseEnter: (e: React.MouseEvent) => void;
 	onMouseLeave: (e: React.MouseEvent) => void;
 }
@@ -31,6 +33,11 @@ interface ItemGridContext
 {
 	selectedItemIds: Set<Item['id']>;
 	clearSelection: () => void;
+
+	editingItem: Item | null;
+	startEditingItem: (item: Item) => void;
+	stopEditingItem: () => void;
+
 	getItemGridProps: () => ItemGridProps;
 	getItemCellProps: (id: Item['id'], index: number) => ItemCellProps;
 }
@@ -50,6 +57,7 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 	const [selectedItemIds, setSelectedItemIds] = useState<Set<Item['id']>>(new Set());
 	const [hoveredItemId, setHoveredItemId] = useState<Item['id'] | null>(null);
 	const [focusedItemId, setFocusedItemId] = useState<Item['id'] | null>(null);
+	const [editingItem, setEditingItem] = useState<Item | null>(null);
 
 	const gridRef = useRef<HTMLDivElement | null>(null);
 
@@ -130,6 +138,18 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 		},
 		[selectSingle, items],
 	);
+
+	// Editing
+
+	const startEditingItem = useCallback(function startEditingItem(item: Item)
+	{
+		setEditingItem(item);
+	}, []);
+
+	const stopEditingItem = useCallback(function stopEditingItem()
+	{
+		setEditingItem(null);
+	}, []);
 
 	// URL Navigation
 
@@ -327,6 +347,7 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 		function getItemCellProps(id: Item['id'], index: number): ItemCellProps
 		{
 			return {
+				item: items.find((item) => item.id === id)!,
 				role: 'gridcell',
 				tabIndex: focusedItemId === id ? 0 : -1,
 				'data-selected': selectedItemIds.has(id),
@@ -373,6 +394,10 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 						navigateToItem(id);
 					}
 				},
+				onContextMenu(e: React.MouseEvent)
+				{
+					selectSingle(id);
+				},
 				onMouseEnter: () =>
 				{
 					setHoveredItemId(id);
@@ -383,7 +408,7 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 				},
 			};
 		},
-		[selectedItemIds, hoveredItemId, focusedItemId, selectRange, selectSingle, toggleSelection, navigateToItem],
+		[items, selectedItemIds, hoveredItemId, focusedItemId, selectRange, selectSingle, toggleSelection, navigateToItem],
 	);
 
 	// Others
@@ -408,10 +433,15 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 		return {
 			selectedItemIds,
 			clearSelection,
+
+			editingItem,
+			startEditingItem,
+			stopEditingItem,
+
 			getItemGridProps,
 			getItemCellProps,
 		};
-	}, [selectedItemIds, clearSelection, getItemGridProps, getItemCellProps]);
+	}, [selectedItemIds, clearSelection, editingItem, startEditingItem, stopEditingItem, getItemGridProps, getItemCellProps]);
 
 	return <ItemGridContext.Provider value={value}>{children}</ItemGridContext.Provider>;
 }

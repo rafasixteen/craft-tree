@@ -1,49 +1,40 @@
 'use client';
 
 import { Header } from '@/components/header';
-import { ItemGrid, useItemGrid } from '@/components/item';
+import { CreateItemSheet, ItemGrid } from '@/components/item';
 import { Button } from '@/components/ui/button';
-import { AddItemDialog } from '@/components/item/add-item-dialog';
 import { Input } from '@/components/ui/input';
-import { TagsCombobox } from '@/components/tag/tags-combo-box';
+import { TagsCombobox } from '@/components/tag';
 import { TagsDialog } from '@/components/tag';
-import { useActiveInventory } from '@/components/inventory';
-import { useItems } from '@/domain/item';
+import { UpdateItemSheet, useItemGrid } from '@/components/item';
 
 export default function ItemsPage()
 {
-	// const { selectedIds, selectionMode: hasAnySelection } = useItemSelection();
-
-	const inventory = useActiveInventory()!;
-	const { deleteItem } = useItems(inventory.id);
+	const { editingItem, stopEditingItem } = useItemGrid();
 
 	return (
 		<>
 			<Header>
-				<AddItemDialog trigger={<Button variant="ghost">Add Item</Button>} />
+				<CreateItemSheet />
 				<Input placeholder="Search items..." type="search" className="max-w-52 min-w-32" />
 				<TagsCombobox />
 				<Button variant="secondary">Filter</Button>
 				<Button variant="secondary">Clear Tags</Button>
 				<TagsDialog trigger={<Button variant="ghost">Manage Tags</Button>} />
-				{/* {hasAnySelection && (
-					<Button
-						variant="destructive"
-						onClick={(e) =>
-						{
-							e.preventDefault();
-							e.stopPropagation();
-							selectedIds.forEach(async (id) => await deleteItem({ itemId: id }));
-						}}
-					>
-						Delete Selected
-					</Button>
-				)}
-				{hasAnySelection && <Button variant="outline">Edit Selected</Button>} */}
 			</Header>
 			<div className="flex flex-1 flex-col gap-4 p-4">
 				<ItemGrid />
 			</div>
+			{editingItem && (
+				<UpdateItemSheet
+					item={editingItem}
+					open={true}
+					onOpenChange={(open) =>
+					{
+						if (!open) stopEditingItem();
+					}}
+				/>
+			)}
 		</>
 	);
 }
