@@ -125,6 +125,8 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 				rangeIds.forEach((rangeId) => next.add(rangeId));
 				return next;
 			});
+
+			setFocusedItemId(id);
 		},
 		[selectSingle, items],
 	);
@@ -195,6 +197,61 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 		return cols;
 	}, []);
 
+	const navigateCell = useCallback(
+		function navigateCell(direction: 'up' | 'down' | 'left' | 'right', e: React.KeyboardEvent)
+		{
+			if (!focusedItemId)
+			{
+				return;
+			}
+
+			const currentIndex = itemIds.indexOf(focusedItemId);
+
+			if (currentIndex === -1)
+			{
+				return;
+			}
+
+			let nextIndex = currentIndex;
+			const columns = getColumnCount();
+
+			switch (direction)
+			{
+				case 'right':
+					nextIndex = currentIndex + 1;
+					break;
+				case 'left':
+					nextIndex = currentIndex - 1;
+					break;
+				case 'down':
+					nextIndex = currentIndex + columns;
+					break;
+				case 'up':
+					nextIndex = currentIndex - columns;
+					break;
+			}
+
+			if (nextIndex < 0 || nextIndex >= itemIds.length)
+			{
+				return;
+			}
+
+			const nextId = itemIds[nextIndex];
+
+			if (e.shiftKey)
+			{
+				selectRange(nextId, nextIndex);
+			}
+			else
+			{
+				selectSingle(nextId);
+			}
+
+			e.preventDefault();
+		},
+		[focusedItemId, itemIds, getColumnCount, selectRange, selectSingle],
+	);
+
 	// Context API
 
 	const getItemGridProps = useCallback(
@@ -216,74 +273,54 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 				},
 				onKeyDown: (e: React.KeyboardEvent) =>
 				{
-					if (!items.length || focusedItemId === null)
-					{
-						return;
-					}
-
-					const currentIndex = itemIds.indexOf(focusedItemId);
-
-					if (currentIndex === -1)
-					{
-						return;
-					}
-
-					let nextIndex = currentIndex;
-					const columns = getColumnCount();
-
 					switch (e.key)
 					{
 						case 'Escape':
+						{
 							clearSelection();
-							e.preventDefault();
-							return;
-
+							break;
+						}
 						case 'Enter':
 						{
-							if (e.ctrlKey || e.metaKey) navigateToItem(focusedItemId, 'newTab');
-							else if (e.shiftKey) navigateToItem(focusedItemId, 'popup');
-							else navigateToItem(focusedItemId);
-							e.preventDefault();
-							return;
-						}
+							if (!focusedItemId)
+							{
+								return;
+							}
 
+							if (e.ctrlKey || e.metaKey)
+							{
+								navigateToItem(focusedItemId, 'newTab');
+							}
+							else if (e.shiftKey)
+							{
+								navigateToItem(focusedItemId, 'popup');
+							}
+							else
+							{
+								navigateToItem(focusedItemId);
+							}
+
+							break;
+						}
 						case 'ArrowRight':
-							nextIndex = currentIndex + 1;
+							navigateCell('right', e);
 							break;
 						case 'ArrowLeft':
-							nextIndex = currentIndex - 1;
+							navigateCell('left', e);
 							break;
 						case 'ArrowDown':
-							nextIndex = currentIndex + columns;
+							navigateCell('down', e);
 							break;
 						case 'ArrowUp':
-							nextIndex = currentIndex - columns;
+							navigateCell('up', e);
 							break;
 						default:
 							return;
 					}
-
-					if (nextIndex < 0 || nextIndex >= itemIds.length)
-					{
-						return;
-					}
-
-					const nextId = itemIds[nextIndex];
-
-					if (e.shiftKey)
-					{
-						selectRange(nextId, nextIndex);
-					}
-					else
-					{
-						selectSingle(nextId);
-					}
-
-					e.preventDefault();
 				},
 			};
 		},
-		[items, focusedItemId, itemIds, getColumnCount, clearSelection, selectRange, selectSingle, navigateToItem],
+		[clearSelection, navigateToItem, navigateCell, focusedItemId],
 	);
 
 	const getItemCellProps = useCallback(
