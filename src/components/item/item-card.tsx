@@ -1,12 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Item } from '@/domain/item';
 import { cva } from 'class-variance-authority';
-import { useItemSelection } from '@/components/item';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useState } from 'react';
 import React from 'react';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
 
 interface ItemCardProps extends React.ComponentProps<typeof Card>
 {
@@ -30,28 +25,19 @@ const itemCardClass = cva('aspect-square rounded-xl', {
 
 export function ItemCard({ item, ...props }: ItemCardProps)
 {
-	const { isSelected, toggleSelection, hasAnySelection } = useItemSelection();
+	// TODO: Find a way to get item state from the UI context.
 
-	const [hovered, setHovered] = useState(false);
-	const selected = isSelected(item.id);
-
-	const itemCardClassName = itemCardClass({ selected, hovered });
-
-	const pathname = usePathname();
-
-	const href = `${pathname}/${item.id}`;
-	const wrapperProps = !hasAnySelection ? { href: href } : {};
-
-	const Wrapper: React.ElementType = hasAnySelection ? React.Fragment : Link;
+	// const itemCardClassName = itemCardClass({ selected, hovered });
+	const itemCardClassName = itemCardClass();
 
 	return (
-		<Wrapper {...wrapperProps}>
-			<Card {...props} className={itemCardClassName} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-				<div className="flex items-center gap-2">
-					{hasAnySelection && <Checkbox checked={selected} onCheckedChange={() => toggleSelection(item.id)} tabIndex={-1} onClick={(e) => e.stopPropagation()} />}
-					<p className="select-none">{item.name}</p>
+		<Card {...props} className={itemCardClassName}>
+			<div className="flex items-center gap-2">
+				<p className="select-none">{item.name}</p>
+				<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-primary-foreground">
+					<p>{item.name.substring(0, 2).toUpperCase()}</p>
 				</div>
-			</Card>
-		</Wrapper>
+			</div>
+		</Card>
 	);
 }

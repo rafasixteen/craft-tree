@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useItems } from '@/domain/inventory/hooks/use-items';
+import { useItems } from '@/domain/item/hooks/use-items';
 import { resetMockDb, mockGetInventoryItems, mockCreateItem, mockDeleteItem } from './mock-items-db';
 
 vi.mock('@/domain/item/server', () => ({

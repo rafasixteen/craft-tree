@@ -2,7 +2,7 @@ import { useState, useTransition } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useItems } from '@/domain/inventory';
+import { useItems } from '@/domain/item';
 import { useActiveInventory } from '@/components/inventory';
 import { toast } from 'sonner';
 

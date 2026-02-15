@@ -1,5 +1,5 @@
 import { useState, useTransition, useEffect, useCallback } from 'react';
-import { useItems } from '@/domain/inventory';
+import { useItems } from '@/domain/item';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useActiveInventory } from '@/components/inventory';
 import { Input } from '@/components/ui/input';

@@ -8,11 +8,11 @@ import { Input } from '@/components/ui/input';
 import { TagsCombobox } from '@/components/tag/tags-combo-box';
 import { TagsDialog } from '@/components/tag';
 import { useActiveInventory } from '@/components/inventory';
-import { useItems } from '@/domain/inventory';
+import { useItems } from '@/domain/item';
 
 export default function ItemsPage()
 {
-	const { selectedIds, hasAnySelection } = useItemSelection();
+	// const { selectedIds, selectionMode: hasAnySelection } = useItemSelection();
 
 	const inventory = useActiveInventory()!;
 	const { deleteItem } = useItems(inventory.id);
@@ -26,7 +26,7 @@ export default function ItemsPage()
 				<Button variant="secondary">Filter</Button>
 				<Button variant="secondary">Clear Tags</Button>
 				<TagsDialog trigger={<Button variant="ghost">Manage Tags</Button>} />
-				{hasAnySelection && (
+				{/* {hasAnySelection && (
 					<Button
 						variant="destructive"
 						onClick={(e) =>
@@ -39,7 +39,7 @@ export default function ItemsPage()
 						Delete Selected
 					</Button>
 				)}
-				{hasAnySelection && <Button variant="outline">Edit Selected</Button>}
+				{hasAnySelection && <Button variant="outline">Edit Selected</Button>} */}
 			</Header>
 			<div className="flex flex-1 flex-col gap-4 p-4">
 				<ItemGrid />

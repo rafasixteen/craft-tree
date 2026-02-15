@@ -1,17 +1,24 @@
-import { createContext, useContext, useState, ReactNode, useRef, useCallback, useMemo } from 'react';
+import { useActiveInventory } from '@/components/inventory';
+import { useItems } from '@/domain/item';
+import { Item } from '@/domain/item';
+import { useRouter } from 'next/navigation';
+import { createContext, useContext, useState, ReactNode, useRef, useMemo } from 'react';
 
-interface ItemSelectionContextProps
+interface ItemProps
 {
-	selectedIds: string[];
-	hasAnySelection: boolean;
-	setSelectedIds: (ids: string[]) => void;
-	clearSelection: () => void;
-	toggleSelection: (id: string) => void;
-	isSelected: (id: string) => boolean;
-	selectRange: (id: string, index: number, items: { id: string }[], multi?: boolean, range?: boolean) => void;
+	onClick: (e: React.MouseEvent) => void;
+	onDoubleClick: (e: React.MouseEvent) => void;
+	onMouseEnter: (e: React.MouseEvent) => void;
+	onMouseLeave: (e: React.MouseEvent) => void;
 }
 
-const ItemSelectionContext = createContext<ItemSelectionContextProps | undefined>(undefined);
+interface ItemSelectionContext
+{
+	selectedItemIds: Set<Item['id']>;
+	getItemProps: (id: Item['id'], index: number) => ItemProps;
+}
+
+const ItemSelectionContext = createContext<ItemSelectionContext | undefined>(undefined);
 
 interface ItemSelectionProviderProps
 {
@@ -20,70 +27,140 @@ interface ItemSelectionProviderProps
 
 export function ItemSelectionProvider({ children }: ItemSelectionProviderProps)
 {
-	const [selectedIds, setSelectedIds] = useState<string[]>([]);
-	const lastSelectedIndex = useRef<number | null>(null);
+	const inventory = useActiveInventory()!;
+	const { items } = useItems(inventory.id);
 
-	const clearSelection = useCallback(() =>
+	const [selectedItemIds, setSelectedItemIds] = useState<Set<Item['id']>>(new Set());
+
+	const itemIds = items.map((item) => item.id);
+
+	// This will be used to track the "anchor" item for shift-click range selection.
+	const anchorRef = useRef<Item['id'] | null>(null);
+
+	const router = useRouter();
+
+	function clearSelection()
 	{
-		setSelectedIds([]);
-		lastSelectedIndex.current = null;
-	}, []);
+		setSelectedItemIds(new Set());
+		anchorRef.current = null;
+	}
 
-	const toggleSelection = useCallback(function toggleSelection(id: string)
+	function selectSingle(id: Item['id'])
 	{
-		setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
-	}, []);
+		setSelectedItemIds(new Set([id]));
+		anchorRef.current = id;
+	}
 
-	const isSelected = useCallback(
-		function isSelected(id: string)
+	function toggleSelection(id: Item['id'])
+	{
+		setSelectedItemIds((prev) =>
 		{
-			return selectedIds.includes(id);
-		},
-		[selectedIds],
-	);
+			const next = new Set(prev);
 
-	const selectRange = useCallback(
-		function selectRange(id: string, index: number, items: { id: string }[], multi = false, range = false)
-		{
-			if (range && lastSelectedIndex.current !== null)
+			if (next.has(id))
 			{
-				// Shift selection range
-				const start = Math.min(lastSelectedIndex.current, index);
-				const end = Math.max(lastSelectedIndex.current, index);
-				const rangeIds = items.slice(start, end + 1).map((item) => item.id);
-				setSelectedIds((prev) => Array.from(new Set([...prev, ...rangeIds])));
+				next.delete(id);
 			}
-			else if (multi)
+			else
 			{
-				// Ctrl/Cmd toggle
-				toggleSelection(id);
-				lastSelectedIndex.current = index;
+				next.add(id);
 			}
-			else if (range && lastSelectedIndex.current === null)
-			{
-				// Shift pressed but no prior selection → select just this one
-				setSelectedIds([id]);
-				lastSelectedIndex.current = index;
-			}
-			else if (selectedIds.length > 0)
-			{
-				// Regular click
-				setSelectedIds([id]);
-				lastSelectedIndex.current = index;
-			}
-		},
-		[selectedIds, toggleSelection],
-	);
 
-	const hasAnySelection = useMemo(() =>
+			return next;
+		});
+	}
+
+	function selectRange(id: Item['id'], index: number)
 	{
-		return selectedIds.length > 0;
-	}, [selectedIds]);
+		if (!anchorRef.current)
+		{
+			selectSingle(id);
+			return;
+		}
 
-	const value = useMemo(
-		() => ({ selectedIds, setSelectedIds, clearSelection, toggleSelection, isSelected, selectRange, hasAnySelection }),
-		[selectedIds, toggleSelection, isSelected, selectRange, clearSelection, hasAnySelection],
-	);
+		const startIndex = itemIds.indexOf(anchorRef.current);
+		const endIndex = index;
+
+		if (startIndex === -1 || endIndex === -1)
+		{
+			selectSingle(id);
+			return;
+		}
+
+		const [min, max] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)];
+		const rangeIds = itemIds.slice(min, max + 1);
+
+		setSelectedItemIds((prev) =>
+		{
+			const next = new Set(prev);
+			rangeIds.forEach((rangeId) => next.add(rangeId));
+			return next;
+		});
+	}
+
+	function getItemProps(id: Item['id'], index: number): ItemProps
+	{
+		return {
+			onClick: (e: React.MouseEvent) =>
+			{
+				if (e.shiftKey)
+				{
+					selectRange(id, index);
+				}
+				else if (e.metaKey || e.ctrlKey)
+				{
+					toggleSelection(id);
+				}
+				else
+				{
+					selectSingle(id);
+				}
+			},
+
+			onDoubleClick: (e: React.MouseEvent) =>
+			{
+				const href = '/inventory/' + inventory.id + '/items/' + id;
+
+				if (e.ctrlKey || e.metaKey)
+				{
+					window.open(href, '_blank');
+				}
+				else if (e.shiftKey)
+				{
+					const aspectRatio = 16 / 9;
+					const height = 600;
+					const width = Math.round(height * aspectRatio);
+
+					const left = window.screen.width - width;
+					const top = 0;
+
+					window.open(href, '_blank', `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
+				}
+				else
+				{
+					router.push(href);
+				}
+			},
+
+			onMouseEnter: () =>
+			{
+				/* Optional: hover logic */
+			},
+
+			onMouseLeave: () =>
+			{
+				/* Optional: hover logic */
+			},
+		};
+	}
+
+	const value = useMemo(() =>
+	{
+		return {
+			selectedItemIds,
+			getItemProps,
+		};
+	}, [selectedItemIds, getItemProps]);
 
 	return <ItemSelectionContext.Provider value={value}>{children}</ItemSelectionContext.Provider>;
 }
