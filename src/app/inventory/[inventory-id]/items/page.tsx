@@ -1,7 +1,7 @@
 'use client';
 
 import { Header } from '@/components/header';
-import { ItemGrid, useItemSelection } from '@/components/item';
+import { ItemGrid, useItemGrid } from '@/components/item';
 import { Button } from '@/components/ui/button';
 import { AddItemDialog } from '@/components/item/add-item-dialog';
 import { Input } from '@/components/ui/input';

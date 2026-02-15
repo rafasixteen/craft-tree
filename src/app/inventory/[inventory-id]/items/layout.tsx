@@ -1,6 +1,6 @@
 'use client';
 
-import { ItemSelectionProvider } from '@/components/item';
+import { ItemGridProvider } from '@/components/item';
 
 interface ItemsLayoutProps
 {
@@ -9,5 +9,5 @@ interface ItemsLayoutProps
 
 export default function ItemsLayout({ children }: ItemsLayoutProps)
 {
-	return <ItemSelectionProvider>{children}</ItemSelectionProvider>;
+	return <ItemGridProvider>{children}</ItemGridProvider>;
 }
