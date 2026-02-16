@@ -2,7 +2,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, Con
 import { ClipboardPasteIcon, CopyIcon, PencilIcon, ScissorsIcon, TrashIcon } from 'lucide-react';
 import { useActiveInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
-import { useItemGrid } from '@/components/item';
+import { useItemGridGeneric } from '@/components/grid';
 import { useCallback } from 'react';
 
 interface ItemContextMenuProps
@@ -16,7 +16,7 @@ export function ItemContextMenu({ children, item }: ItemContextMenuProps)
 	const inventory = useActiveInventory();
 	const { deleteItem } = useItems(inventory.id);
 
-	const { startEditingItem } = useItemGrid();
+	const { startEditingItem } = useItemGridGeneric<Item>();
 
 	const onDelete = useCallback(
 		function onDelete()

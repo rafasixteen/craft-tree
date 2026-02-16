@@ -2,11 +2,13 @@
 
 import { Header } from '@/components/header';
 import { CreateItemSheet, ItemGrid } from '@/components/item';
-import { UpdateItemSheet, useItemGrid } from '@/components/item';
+import { UpdateItemSheet } from '@/components/item';
+import { useItemGridGeneric } from '@/components/grid';
+import { Item } from '@/domain/item';
 
 export default function ItemsPage()
 {
-	const { editingItem, stopEditingItem } = useItemGrid();
+	const { editingItem, stopEditingItem } = useItemGridGeneric<Item>();
 
 	return (
 		<>

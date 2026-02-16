@@ -1,9 +1,10 @@
 'use client';
 
 import { useActiveInventory } from '@/components/inventory/hooks/use-active-inventory';
-import { ItemGridProvider } from '@/components/item';
+import { ItemGridProviderGeneric } from '@/components/grid';
 import { useItems } from '@/domain/item/hooks/use-items';
 import { useCallback } from 'react';
+import { Item } from '@/domain/item';
 
 interface ItemsLayoutProps
 {
@@ -24,8 +25,8 @@ export default function ItemsLayout({ children }: ItemsLayoutProps)
 	);
 
 	return (
-		<ItemGridProvider items={items} getItemHref={getItemHref}>
+		<ItemGridProviderGeneric<Item> items={items} getItemHref={getItemHref}>
 			{children}
-		</ItemGridProvider>
+		</ItemGridProviderGeneric>
 	);
 }
