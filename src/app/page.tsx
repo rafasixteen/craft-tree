@@ -7,7 +7,7 @@ export default async function Home()
 	const session = await auth();
 
 	return (
-		<div className="relative min-h-screen flex items-center justify-center overflow-hidden py-4">
+		<div className="relative flex min-h-screen items-center justify-center overflow-hidden py-4">
 			{/* Animated background elements */}
 			<div className="absolute inset-0 overflow-hidden">
 				<div className="absolute top-0 left-1/4 size-48 animate-pulse rounded-full bg-primary/10 opacity-20 mix-blend-multiply blur-3xl filter sm:size-96" />
@@ -22,9 +22,9 @@ export default async function Home()
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 flex flex-col items-center justify-center px-4 text-center w-full">
+			<div className="relative z-10 flex w-full flex-col items-center justify-center px-4 text-center">
 				{/* Main heading with animation */}
-				<div className="max-w-3xl mx-auto space-y-6">
+				<div className="mx-auto max-w-3xl space-y-6">
 					<div className="space-y-4">
 						<h1 className="animate-fade-in bg-linear-to-r from-primary via-primary/80 to-secondary bg-clip-text text-3xl font-bold text-transparent sm:text-5xl md:text-6xl lg:text-7xl">
 							Craft Your Tree

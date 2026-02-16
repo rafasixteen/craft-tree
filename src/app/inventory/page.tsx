@@ -13,7 +13,7 @@ export default function InventoryRootPage()
 			<div key={inventory.id} className="flex flex-1 flex-col gap-4 p-4">
 				<Link
 					href={`/inventory/${inventory.id}`}
-					className="inline-flex items-center rounded-md border border-input bg-background px-4 py-2 text-base font-medium shadow-sm transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+					className="inline-flex items-center rounded-md border border-input bg-background px-4 py-2 text-base font-medium shadow-sm transition-colors hover:bg-accent focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
 				>
 					{inventory.name}
 				</Link>

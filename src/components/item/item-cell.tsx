@@ -2,13 +2,13 @@ import { Card } from '@/components/ui/card';
 import { cva } from 'class-variance-authority';
 import { ItemCellProps, ItemContextMenu } from '@/components/item';
 
-const itemCardClass = cva('group relative aspect-square rounded-2xl border bg-card transition-all duration-200 ease-out cursor-pointer select-none overflow-hidden', {
+const itemCardClass = cva('group relative aspect-square cursor-pointer overflow-hidden rounded-2xl border bg-card transition-all duration-200 ease-out select-none', {
 	variants: {
 		selected: {
-			true: 'ring-2 ring-primary shadow-md',
+			true: 'shadow-md ring-2 ring-primary',
 		},
 		hovered: {
-			true: 'border-primary/40 shadow-sm scale-[1.02]',
+			true: 'scale-[1.02] border-primary/40 shadow-sm',
 		},
 	},
 	defaultVariants: {
@@ -26,8 +26,8 @@ export function ItemCell({ item, ...props }: ItemCellProps)
 			<Card {...props} className={itemCardClass({ selected, hovered })}>
 				<div className="flex h-full flex-col justify-between p-4">
 					{/* Top Section (Icon) */}
-					<div className="flex justify-between items-start">
-						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary font-semibold text-sm transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+					<div className="flex items-start justify-between">
+						<div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-sm font-semibold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
 							{item.name.substring(0, 2).toUpperCase()}
 						</div>
 					</div>
@@ -39,7 +39,7 @@ export function ItemCell({ item, ...props }: ItemCellProps)
 				</div>
 
 				{/* Subtle hover overlay */}
-				<div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 bg-primary/5 transition-opacity" />
+				<div className="pointer-events-none absolute inset-0 bg-primary/5 opacity-0 transition-opacity group-hover:opacity-100" />
 			</Card>
 		</ItemContextMenu>
 	);

@@ -56,12 +56,12 @@ export function TagsSelect({ value = [], onChange, className, maxSelected = 10 }
 	// Layout: Selected tags in a row, available tags below, both scrollable if needed
 	return (
 		<div className={`flex flex-col gap-2 ${className ?? ''}`}>
-			<div className="flex flex-wrap gap-2 min-h-8">
-				{selectedTags.length === 0 && <span className="text-muted-foreground text-sm opacity-70">No tags selected</span>}
+			<div className="flex min-h-8 flex-wrap gap-2">
+				{selectedTags.length === 0 && <span className="text-sm text-muted-foreground opacity-70">No tags selected</span>}
 				{selectedTags.map((tag) => (
 					<span
 						key={tag}
-						className="inline-flex items-center gap-1 px-2 py-1 rounded-full border bg-primary/80 text-primary-foreground border-primary text-xs cursor-pointer transition-colors hover:bg-primary/60"
+						className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-primary bg-primary/80 px-2 py-1 text-xs text-primary-foreground transition-colors hover:bg-primary/60"
 						onClick={() => toggleTag(tag)}
 						title="Remove tag"
 					>
@@ -70,21 +70,21 @@ export function TagsSelect({ value = [], onChange, className, maxSelected = 10 }
 					</span>
 				))}
 			</div>
-			<div className="flex flex-wrap gap-2 border rounded-md p-2 bg-background/80 max-h-32 overflow-y-auto">
+			<div className="flex max-h-32 flex-wrap gap-2 overflow-y-auto rounded-md border bg-background/80 p-2">
 				{tags
 					.filter((tag) => !selectedTags.includes(tag.name))
 					.map((tag) => (
 						<button
 							key={tag.name}
 							type="button"
-							className="px-2 py-1 rounded-full border bg-muted text-muted-foreground border-muted-foreground text-xs cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+							className="cursor-pointer rounded-full border border-muted-foreground bg-muted px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
 							onClick={() => toggleTag(tag.name)}
 							disabled={selectedTags.length >= maxSelected}
 						>
 							{tag.name}
 						</button>
 					))}
-				{tags.filter((tag) => !selectedTags.includes(tag.name)).length === 0 && <span className="text-muted-foreground text-xs opacity-60">No more tags available</span>}
+				{tags.filter((tag) => !selectedTags.includes(tag.name)).length === 0 && <span className="text-xs text-muted-foreground opacity-60">No more tags available</span>}
 			</div>
 		</div>
 	);
