@@ -1,5 +1,3 @@
-import { useActiveInventory } from '@/components/inventory';
-import { useItems } from '@/domain/item';
 import { Item } from '@/domain/item';
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useState, ReactNode, useRef, useMemo, useCallback, useEffect } from 'react';
@@ -31,6 +29,8 @@ export interface ItemCellProps
 
 interface ItemGridContext
 {
+	items: Item[];
+
 	selectedItemIds: Set<Item['id']>;
 	clearSelection: () => void;
 
@@ -46,14 +46,13 @@ const ItemGridContext = createContext<ItemGridContext | undefined>(undefined);
 
 interface ItemGridProviderProps
 {
+	items: Item[];
+	getItemHref: (id: Item['id']) => string;
 	children: ReactNode;
 }
 
-export function ItemGridProvider({ children }: ItemGridProviderProps)
+export function ItemGridProvider({ items, getItemHref, children }: ItemGridProviderProps)
 {
-	const inventory = useActiveInventory()!;
-	const { items } = useItems(inventory.id);
-
 	const [selectedItemIds, setSelectedItemIds] = useState<Set<Item['id']>>(new Set());
 	const [hoveredItemId, setHoveredItemId] = useState<Item['id'] | null>(null);
 	const [focusedItemId, setFocusedItemId] = useState<Item['id'] | null>(null);
@@ -156,7 +155,7 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 	const navigateToItem = useCallback(
 		function navigateToItem(id: Item['id'], openType?: 'newTab' | 'popup')
 		{
-			const href = `/inventory/${inventory.id}/items/${id}`;
+			const href = getItemHref(id);
 
 			if (openType === 'newTab')
 			{
@@ -179,7 +178,7 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 				router.push(href);
 			}
 		},
-		[inventory.id, router],
+		[getItemHref, router],
 	);
 
 	// Helpers
@@ -431,6 +430,8 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 	const value = useMemo(() =>
 	{
 		return {
+			items,
+
 			selectedItemIds,
 			clearSelection,
 
@@ -441,7 +442,7 @@ export function ItemGridProvider({ children }: ItemGridProviderProps)
 			getItemGridProps,
 			getItemCellProps,
 		};
-	}, [selectedItemIds, clearSelection, editingItem, startEditingItem, stopEditingItem, getItemGridProps, getItemCellProps]);
+	}, [items, selectedItemIds, clearSelection, editingItem, startEditingItem, stopEditingItem, getItemGridProps, getItemCellProps]);
 
 	return <ItemGridContext.Provider value={value}>{children}</ItemGridContext.Provider>;
 }
