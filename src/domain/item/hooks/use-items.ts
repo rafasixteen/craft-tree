@@ -76,7 +76,7 @@ export function useItems(inventoryId: Inventory['id'])
 				{
 					const updated = await ItemServerActions.updateItem({ itemId, name, icon });
 
-					if (tagIds)
+					if (tagIds && tagIds.length > 0)
 					{
 						await ItemServerActions.setItemTags({ itemId, tagIds });
 					}
