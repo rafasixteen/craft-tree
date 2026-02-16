@@ -1,4 +1,4 @@
-import { Item } from '@/domain';
+import { Item } from '@/domain/item';
 import { Tag } from '@/domain/tag';
 
 export interface ItemTag

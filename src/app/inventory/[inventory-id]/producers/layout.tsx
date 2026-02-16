@@ -1,9 +1,9 @@
 'use client';
 
 import { useActiveInventory } from '@/components/inventory/hooks/use-active-inventory';
-import { ItemGridProviderGeneric, useItemGridGeneric } from '@/components/item';
-import { useItems } from '@/domain/item';
-import { Producer } from '@/domain/producer';
+import { ItemGridProviderGeneric } from '@/components/grid';
+import { Producer, useProducers } from '@/domain/producer';
+import {} from '@/domain/producer/hooks/use-producers';
 import { useCallback } from 'react';
 
 interface ProducersLayoutProps
@@ -14,18 +14,18 @@ interface ProducersLayoutProps
 export default function ProducersLayout({ children }: ProducersLayoutProps)
 {
 	const inventory = useActiveInventory();
-	const { items } = useItems(inventory.id);
+	const { producers } = useProducers(inventory.id);
 
 	const getItemHref = useCallback(
 		function getItemHref(id: string)
 		{
-			return `/inventory/${inventory.id}/items/${id}`;
+			return `/inventory/${inventory.id}/producers/${id}`;
 		},
 		[inventory.id],
 	);
 
 	return (
-		<ItemGridProviderGeneric<Producer> items={items} getItemHref={getItemHref}>
+		<ItemGridProviderGeneric<Producer> items={producers} getItemHref={getItemHref}>
 			{children}
 		</ItemGridProviderGeneric>
 	);

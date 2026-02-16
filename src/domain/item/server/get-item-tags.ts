@@ -2,8 +2,8 @@
 
 import { itemTags } from '@/db/schema';
 import { Item, ItemTag } from '@/domain/item';
-import db from '@/db/client';
 import { eq } from 'drizzle-orm';
+import db from '@/db/client';
 
 export interface GetItemTagsParams
 {

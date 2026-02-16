@@ -1,34 +1,20 @@
 'use client';
 
 import { Inventory, getInventoryProducers } from '@/domain/inventory';
-import { Producer } from '@/domain/producer';
+import { Producer, CreateProducerParams, UpdateProducerParams, DeleteProducerParams } from '@/domain/producer';
 import { Tag } from '@/domain/tag';
 import { useCallback } from 'react';
 import * as ProducerServerActions from '@/domain/producer/server';
 import useSWR from 'swr';
 
-interface CreateProducerParams
+interface CreateProducer extends Omit<CreateProducerParams, 'inventoryId'>
 {
-	name: Producer['name'];
-	time: Producer['time'];
-	inputs?: Producer['inputs'];
-	outputs?: Producer['outputs'];
 	tagIds?: Tag['id'][];
 }
 
-interface UpdateProducerParams
+interface UpdateProducer extends UpdateProducerParams
 {
-	producerId: Producer['id'];
-	name?: Producer['name'];
-	time?: Producer['time'];
-	inputs?: Producer['inputs'];
-	outputs?: Producer['outputs'];
 	tagIds?: Tag['id'][];
-}
-
-interface DeleteProducerParams
-{
-	producerId: Producer['id'];
 }
 
 export function useProducers(inventoryId: Inventory['id'])
@@ -41,19 +27,21 @@ export function useProducers(inventoryId: Inventory['id'])
 	});
 
 	const createProducer = useCallback(
-		async function createProducer({ name, icon, tagIds }: CreateProducerParams)
+		async function createProducer({ name, time, inputs, outputs, tagIds }: CreateProducer)
 		{
 			const optimistic: Producer = {
 				id: crypto.randomUUID(),
 				name,
-				icon,
-				inventoryId,
+				time,
+				inventoryId: inventoryId,
+				inputs: inputs ?? [],
+				outputs: outputs ?? [],
 			};
 
 			await mutate(
 				async (current = []) =>
 				{
-					const created = await ProducerServerActions.createProducer({ name, icon, inventoryId });
+					const created = await ProducerServerActions.createProducer({ name, time, inventoryId, inputs, outputs });
 
 					if (tagIds && tagIds.length > 0)
 					{
@@ -73,24 +61,33 @@ export function useProducers(inventoryId: Inventory['id'])
 	);
 
 	const updateProducer = useCallback(
-		async function updateProducer({ producerId, name, icon, tagIds }: UpdateProducerParams)
+		async function updateProducer({ id, name, time, inputs, outputs, tagIds }: UpdateProducer)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await ProducerServerActions.updateProducer({ producerId, name, icon });
+					const updated = await ProducerServerActions.updateProducer({ id, name, time, inputs, outputs });
 
 					if (tagIds)
 					{
-						await ProducerServerActions.setProducerTags({ producerId, tagIds });
+						await ProducerServerActions.setProducerTags({ producerId: id, tagIds });
 					}
 
-					return current.map((producer) => (producer.id === producerId ? { ...producer, ...updated, ...(tagIds ? { tagIds } : {}) } : producer));
+					return current.map((producer) => (producer.id === id ? { ...producer, ...updated, ...(tagIds ? { tagIds } : {}) } : producer));
 				},
 				{
 					optimisticData: (current: Producer[] = []) =>
 						current.map((producer) =>
-							producer.id === producerId ? { ...producer, ...(name ? { name } : {}), ...(icon ? { icon } : {}), ...(tagIds ? { tagIds } : {}) } : producer,
+							producer.id === id
+								? {
+										...producer,
+										...(name ? { name } : {}),
+										...(time ? { time } : {}),
+										...(inputs ? { inputs } : {}),
+										...(outputs ? { outputs } : {}),
+										...(tagIds ? { tagIds } : {}),
+									}
+								: producer,
 						),
 					rollbackOnError: true,
 					revalidate: true,
