@@ -19,7 +19,7 @@ const producerCardClass = cva('group relative aspect-square cursor-pointer overf
 	},
 });
 
-export function ProducerCell({ item: producer, ...props }: CellProps<Producer>)
+export function ProducerCell({ data: producer, ...props }: CellProps<Producer>)
 {
 	const { 'data-selected': selected, 'data-hovered': hovered } = props;
 

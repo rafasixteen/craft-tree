@@ -1,15 +1,15 @@
 import { ProducerCell } from '@/components/producer';
-import { useItemGridGeneric } from '@/components/grid';
+import { useGrid } from '@/components/grid';
 import { Producer } from '@/domain/producer';
 
 export function ProducerGrid()
 {
-	const { items: producers, getItemGridProps, getItemCellProps } = useItemGridGeneric<Producer>();
+	const { cells: producers, getGridProps, getCellProps } = useGrid<Producer>();
 
 	return (
-		<div className="grid auto-rows-min grid-cols-2 gap-4 md:grid-cols-6" {...getItemGridProps()}>
+		<div className="grid auto-rows-min grid-cols-2 gap-4 md:grid-cols-6" {...getGridProps()}>
 			{producers.map((producer) => (
-				<ProducerCell key={producer.id} {...getItemCellProps(producer.id, producers.indexOf(producer))} />
+				<ProducerCell key={producer.id} {...getCellProps(producer.id, producers.indexOf(producer))} />
 			))}
 		</div>
 	);

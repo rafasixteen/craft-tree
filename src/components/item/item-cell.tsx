@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { cva } from 'class-variance-authority';
-import { ItemCellProps, ItemContextMenu } from '@/components/item';
+import { ItemContextMenu } from '@/components/item';
+import { CellProps } from '@/components/grid';
+import { Item } from '@/domain/item';
 
 const itemCardClass = cva('group relative aspect-square cursor-pointer overflow-hidden rounded-2xl border bg-card transition-all duration-200 ease-out select-none', {
 	variants: {
@@ -17,7 +19,7 @@ const itemCardClass = cva('group relative aspect-square cursor-pointer overflow-
 	},
 });
 
-export function ItemCell({ item, ...props }: ItemCellProps)
+export function ItemCell({ data: item, ...props }: CellProps<Item>)
 {
 	const { 'data-selected': selected, 'data-hovered': hovered } = props;
 

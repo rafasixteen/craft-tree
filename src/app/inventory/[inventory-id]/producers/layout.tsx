@@ -1,7 +1,7 @@
 'use client';
 
 import { useActiveInventory } from '@/components/inventory/hooks/use-active-inventory';
-import { ItemGridProviderGeneric } from '@/components/grid';
+import { GridProvider } from '@/components/grid';
 import { Producer, useProducers } from '@/domain/producer';
 import {} from '@/domain/producer/hooks/use-producers';
 import { useCallback } from 'react';
@@ -25,8 +25,8 @@ export default function ProducersLayout({ children }: ProducersLayoutProps)
 	);
 
 	return (
-		<ItemGridProviderGeneric<Producer> items={producers} getItemHref={getItemHref}>
+		<GridProvider<Producer> cells={producers} getCellHref={getItemHref}>
 			{children}
-		</ItemGridProviderGeneric>
+		</GridProvider>
 	);
 }

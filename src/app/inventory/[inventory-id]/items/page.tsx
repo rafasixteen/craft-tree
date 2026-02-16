@@ -3,12 +3,12 @@
 import { Header } from '@/components/header';
 import { CreateItemSheet, ItemGrid } from '@/components/item';
 import { UpdateItemSheet } from '@/components/item';
-import { useItemGridGeneric } from '@/components/grid';
+import { useGrid } from '@/components/grid';
 import { Item } from '@/domain/item';
 
 export default function ItemsPage()
 {
-	const { editingItem, stopEditingItem } = useItemGridGeneric<Item>();
+	const { editingCell, stopEditingCell } = useGrid<Item>();
 
 	return (
 		<>
@@ -18,7 +18,7 @@ export default function ItemsPage()
 			<div className="flex flex-1 flex-col gap-4 p-4">
 				<ItemGrid />
 			</div>
-			{editingItem && <UpdateItemSheet item={editingItem} open={true} onOpenChange={(open) => !open && stopEditingItem()} />}
+			{editingCell && <UpdateItemSheet item={editingCell} open={true} onOpenChange={(open) => !open && stopEditingCell()} />}
 		</>
 	);
 }

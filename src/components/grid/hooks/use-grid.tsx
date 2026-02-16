@@ -17,7 +17,7 @@ export interface GridProps
 
 export interface CellProps<T extends Identifiable>
 {
-	item: T;
+	data: T;
 	role: string;
 	tabIndex: number;
 	'data-selected': boolean;
@@ -31,43 +31,43 @@ export interface CellProps<T extends Identifiable>
 	onMouseLeave: (e: React.MouseEvent) => void;
 }
 
-interface ItemGridContext<T extends Identifiable>
+interface GridContext<T extends Identifiable>
 {
-	items: T[];
+	cells: T[];
 
-	selectedItemIds: Set<T['id']>;
+	selectedCellIds: Set<T['id']>;
 	clearSelection: () => void;
 
-	editingItem: T | null;
-	startEditingItem: (item: T) => void;
-	stopEditingItem: () => void;
+	editingCell: T | null;
+	startEditingCell: (cell: T) => void;
+	stopEditingCell: () => void;
 
-	getItemGridProps: () => GridProps;
-	getItemCellProps: (id: T['id'], index: number) => CellProps<T>;
+	getGridProps: () => GridProps;
+	getCellProps: (id: T['id'], index: number) => CellProps<T>;
 }
 
-const ItemGridContext = createContext<ItemGridContext<any> | undefined>(undefined);
+const GridContext = createContext<GridContext<any> | undefined>(undefined);
 
-interface ItemGridProviderProps<T extends Identifiable>
+interface GridProviderProps<T extends Identifiable>
 {
-	items: T[];
-	getItemHref: (id: T['id']) => string;
+	cells: T[];
+	getCellHref: (id: T['id']) => string;
 	children: ReactNode;
 }
 
-export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItemHref, children }: ItemGridProviderProps<T>)
+export function GridProvider<T extends Identifiable>({ cells, getCellHref, children }: GridProviderProps<T>)
 {
-	const [selectedItemIds, setSelectedItemIds] = useState<Set<T['id']>>(new Set());
-	const [hoveredItemId, setHoveredItemId] = useState<T['id'] | null>(null);
-	const [focusedItemId, setFocusedItemId] = useState<T['id'] | null>(null);
-	const [editingItem, setEditingItem] = useState<T | null>(null);
+	const [selectedCellIds, setSelectedCellIds] = useState<Set<T['id']>>(new Set());
+	const [hoveredCellId, setHoveredCellId] = useState<T['id'] | null>(null);
+	const [focusedCellId, setFocusedCellId] = useState<T['id'] | null>(null);
+	const [editingCell, setEditingCell] = useState<T | null>(null);
 
 	const gridRef = useRef<HTMLDivElement | null>(null);
 
-	const itemRefs = useRef<Map<T['id'], HTMLDivElement>>(new Map());
+	const cellRefs = useRef<Map<T['id'], HTMLDivElement>>(new Map());
 	const anchorRef = useRef<T['id'] | null>(null);
 
-	const itemIds = items.map((item) => item.id);
+	const cellIds = cells.map((cell) => cell.id);
 
 	const router = useRouter();
 
@@ -75,20 +75,20 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 
 	const clearSelection = useCallback(function clearSelection()
 	{
-		setSelectedItemIds(new Set());
+		setSelectedCellIds(new Set());
 		anchorRef.current = null;
 	}, []);
 
 	const selectSingle = useCallback(function selectSingle(id: T['id'])
 	{
-		setSelectedItemIds(new Set([id]));
-		setFocusedItemId(id);
+		setSelectedCellIds(new Set([id]));
+		setFocusedCellId(id);
 		anchorRef.current = id;
 	}, []);
 
 	const toggleSelection = useCallback(function toggleSelection(id: T['id'])
 	{
-		setSelectedItemIds((prev) =>
+		setSelectedCellIds((prev) =>
 		{
 			const next = new Set(prev);
 
@@ -104,7 +104,7 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 			return next;
 		});
 
-		setFocusedItemId(id);
+		setFocusedCellId(id);
 	}, []);
 
 	const selectRange = useCallback(
@@ -116,9 +116,9 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 				return;
 			}
 
-			const itemIds = items.map((item) => item.id);
+			const cellIds = cells.map((cell) => cell.id);
 
-			const startIndex = itemIds.indexOf(anchorRef.current);
+			const startIndex = cellIds.indexOf(anchorRef.current);
 			const endIndex = index;
 
 			if (startIndex === -1 || endIndex === -1)
@@ -128,38 +128,38 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 			}
 
 			const [min, max] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)];
-			const rangeIds = itemIds.slice(min, max + 1);
+			const rangeIds = cellIds.slice(min, max + 1);
 
-			setSelectedItemIds((prev) =>
+			setSelectedCellIds((prev) =>
 			{
 				const next = new Set(prev);
 				rangeIds.forEach((rangeId) => next.add(rangeId));
 				return next;
 			});
 
-			setFocusedItemId(id);
+			setFocusedCellId(id);
 		},
-		[selectSingle, items],
+		[selectSingle, cells],
 	);
 
 	// Editing
 
-	const startEditingItem = useCallback(function startEditingItem(item: T)
+	const startEditingCell = useCallback(function startEditingCell(cell: T)
 	{
-		setEditingItem(item);
+		setEditingCell(cell);
 	}, []);
 
-	const stopEditingItem = useCallback(function stopEditingItem()
+	const stopEditingCell = useCallback(function stopEditingCell()
 	{
-		setEditingItem(null);
+		setEditingCell(null);
 	}, []);
 
 	// URL Navigation
 
-	const navigateToItem = useCallback(
-		function navigateToItem(id: T['id'], openType?: 'newTab' | 'popup')
+	const navigateToCell = useCallback(
+		function navigateToCell(id: T['id'], openType?: 'newTab' | 'popup')
 		{
-			const href = getItemHref(id);
+			const href = getCellHref(id);
 
 			if (openType === 'newTab')
 			{
@@ -182,7 +182,7 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 				router.push(href);
 			}
 		},
-		[getItemHref, router],
+		[getCellHref, router],
 	);
 
 	// Helpers
@@ -223,12 +223,12 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 	const navigateCell = useCallback(
 		function navigateCell(direction: 'up' | 'down' | 'left' | 'right', e: React.KeyboardEvent)
 		{
-			if (!focusedItemId)
+			if (!focusedCellId)
 			{
 				return;
 			}
 
-			const currentIndex = itemIds.indexOf(focusedItemId);
+			const currentIndex = cellIds.indexOf(focusedCellId);
 
 			if (currentIndex === -1)
 			{
@@ -254,12 +254,12 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 					break;
 			}
 
-			if (nextIndex < 0 || nextIndex >= itemIds.length)
+			if (nextIndex < 0 || nextIndex >= cellIds.length)
 			{
 				return;
 			}
 
-			const nextId = itemIds[nextIndex];
+			const nextId = cellIds[nextIndex];
 
 			if (e.shiftKey)
 			{
@@ -272,13 +272,13 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 
 			e.preventDefault();
 		},
-		[focusedItemId, itemIds, getColumnCount, selectRange, selectSingle],
+		[focusedCellId, cellIds, getColumnCount, selectRange, selectSingle],
 	);
 
 	// Context API
 
-	const getItemGridProps = useCallback(
-		function getItemGridProps(): GridProps
+	const getGridProps = useCallback(
+		function getGridProps(): GridProps
 		{
 			return {
 				role: 'grid',
@@ -305,22 +305,22 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 						}
 						case 'Enter':
 						{
-							if (!focusedItemId)
+							if (!focusedCellId)
 							{
 								return;
 							}
 
 							if (e.ctrlKey || e.metaKey)
 							{
-								navigateToItem(focusedItemId, 'newTab');
+								navigateToCell(focusedCellId, 'newTab');
 							}
 							else if (e.shiftKey)
 							{
-								navigateToItem(focusedItemId, 'popup');
+								navigateToCell(focusedCellId, 'popup');
 							}
 							else
 							{
-								navigateToItem(focusedItemId);
+								navigateToCell(focusedCellId);
 							}
 
 							break;
@@ -343,28 +343,28 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 				},
 			};
 		},
-		[clearSelection, navigateToItem, navigateCell, focusedItemId],
+		[clearSelection, navigateToCell, navigateCell, focusedCellId],
 	);
 
-	const getItemCellProps = useCallback(
-		function getItemCellProps(id: T['id'], index: number): CellProps<T>
+	const getCellProps = useCallback(
+		function getCellProps(id: T['id'], index: number): CellProps<T>
 		{
 			return {
-				item: items.find((item) => item.id === id)!,
+				data: cells.find((cell) => cell.id === id)!,
 				role: 'gridcell',
-				tabIndex: focusedItemId === id ? 0 : -1,
-				'data-selected': selectedItemIds.has(id),
-				'data-hovered': hoveredItemId === id,
-				'data-focused': focusedItemId === id,
+				tabIndex: focusedCellId === id ? 0 : -1,
+				'data-selected': selectedCellIds.has(id),
+				'data-hovered': hoveredCellId === id,
+				'data-focused': focusedCellId === id,
 				ref: (node: HTMLDivElement | null) =>
 				{
 					if (node)
 					{
-						itemRefs.current.set(id, node);
+						cellRefs.current.set(id, node);
 					}
 					else
 					{
-						itemRefs.current.delete(id);
+						cellRefs.current.delete(id);
 					}
 				},
 				onClick: (e: React.MouseEvent) =>
@@ -386,15 +386,15 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 				{
 					if (e.ctrlKey || e.metaKey)
 					{
-						navigateToItem(id, 'newTab');
+						navigateToCell(id, 'newTab');
 					}
 					else if (e.shiftKey)
 					{
-						navigateToItem(id, 'popup');
+						navigateToCell(id, 'popup');
 					}
 					else
 					{
-						navigateToItem(id);
+						navigateToCell(id);
 					}
 				},
 				onContextMenu(e: React.MouseEvent)
@@ -403,61 +403,61 @@ export function ItemGridProviderGeneric<T extends Identifiable>({ items, getItem
 				},
 				onMouseEnter: () =>
 				{
-					setHoveredItemId(id);
+					setHoveredCellId(id);
 				},
 				onMouseLeave: () =>
 				{
-					setHoveredItemId((current) => (current === id ? null : current));
+					setHoveredCellId((current) => (current === id ? null : current));
 				},
 			};
 		},
-		[items, selectedItemIds, hoveredItemId, focusedItemId, selectRange, selectSingle, toggleSelection, navigateToItem],
+		[cells, selectedCellIds, hoveredCellId, focusedCellId, selectRange, selectSingle, toggleSelection, navigateToCell],
 	);
 
 	// Others
 
 	useEffect(() =>
 	{
-		if (!focusedItemId)
+		if (!focusedCellId)
 		{
 			return;
 		}
 
-		const element = itemRefs.current.get(focusedItemId);
+		const element = cellRefs.current.get(focusedCellId);
 
 		if (element)
 		{
 			element.focus();
 		}
-	}, [focusedItemId]);
+	}, [focusedCellId]);
 
 	const value = useMemo(() =>
 	{
 		return {
-			items,
+			cells,
 
-			selectedItemIds,
+			selectedCellIds,
 			clearSelection,
 
-			editingItem,
-			startEditingItem,
-			stopEditingItem,
+			editingCell,
+			startEditingCell,
+			stopEditingCell,
 
-			getItemGridProps,
-			getItemCellProps,
+			getGridProps,
+			getCellProps,
 		};
-	}, [items, selectedItemIds, clearSelection, editingItem, startEditingItem, stopEditingItem, getItemGridProps, getItemCellProps]);
+	}, [cells, selectedCellIds, clearSelection, editingCell, startEditingCell, stopEditingCell, getGridProps, getCellProps]);
 
-	return <ItemGridContext.Provider value={value}>{children}</ItemGridContext.Provider>;
+	return <GridContext.Provider value={value}>{children}</GridContext.Provider>;
 }
 
-export function useItemGridGeneric<T extends Identifiable>()
+export function useGrid<T extends Identifiable>()
 {
-	const ctx = useContext(ItemGridContext as React.Context<ItemGridContext<T> | undefined>);
+	const ctx = useContext(GridContext as React.Context<GridContext<T> | undefined>);
 
 	if (!ctx)
 	{
-		throw new Error('useItemGridGeneric must be used within ItemGridProviderGeneric');
+		throw new Error('useGrid must be used within GridProvider');
 	}
 
 	return ctx;
