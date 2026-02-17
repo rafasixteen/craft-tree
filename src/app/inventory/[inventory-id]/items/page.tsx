@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/header';
+import { Header } from '@/components/craft-tree-sidebar/header';
 import { CreateItemSheet, ItemGrid } from '@/components/item';
 import { UpdateItemSheet } from '@/components/item';
 import { useGrid } from '@/components/grid';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/header';
+import { Header } from '@/components/craft-tree-sidebar/header';
 import { CreateProducerSheet, ProducerGrid } from '@/components/producer';
 import { UpdateProducerSheet } from '@/components/producer';
 import { useGrid } from '@/components/grid';
