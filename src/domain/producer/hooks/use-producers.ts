@@ -68,7 +68,7 @@ export function useProducers(inventoryId: Inventory['id'])
 				{
 					const updated = await ProducerServerActions.updateProducer({ id, name, time, inputs, outputs });
 
-					if (tagIds)
+					if (tagIds && tagIds.length > 0)
 					{
 						await ProducerServerActions.setProducerTags({ producerId: id, tagIds });
 					}

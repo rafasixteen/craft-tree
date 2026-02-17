@@ -52,7 +52,7 @@ export function UpdateProducerSheet({ producer, ...props }: UpdateProducerSheetP
 					await updateProducer({
 						id: producer.id,
 						name: name,
-						time: 0,
+						time: 1,
 						inputs: [],
 						outputs: [],
 						tagIds: selectedTags.map((tag) => tag.id!),
