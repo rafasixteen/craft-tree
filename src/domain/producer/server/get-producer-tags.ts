@@ -5,12 +5,7 @@ import { Producer, ProducerTag } from '@/domain/producer';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export interface GetProducerTagsParams
+export async function getProducerTags(id: Producer['id']): Promise<ProducerTag[]>
 {
-	producerId: Producer['id'];
-}
-
-export async function getProducerTags({ producerId }: GetProducerTagsParams): Promise<ProducerTag[]>
-{
-	return db.select().from(producerTags).where(eq(producerTags.producerId, producerId));
+	return db.select().from(producerTags).where(eq(producerTags.producerId, id));
 }

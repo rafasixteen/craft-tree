@@ -33,7 +33,7 @@ export function useItems(inventoryId: Inventory['id'])
 	const fetcher = () => getInventoryItems(inventoryId);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: false,
+		revalidateOnMount: true,
 	});
 
 	const createItem = useCallback(

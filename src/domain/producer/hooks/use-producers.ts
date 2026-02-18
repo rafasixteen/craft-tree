@@ -1,21 +1,16 @@
 'use client';
 
 import { Inventory, getInventoryProducers } from '@/domain/inventory';
-import { Producer, CreateProducerParams, UpdateProducerParams, DeleteProducerParams } from '@/domain/producer';
-import { Tag } from '@/domain/tag';
+import { Producer } from '@/domain/producer';
 import { useCallback } from 'react';
 import * as ProducerServerActions from '@/domain/producer/server';
 import useSWR from 'swr';
 
-interface CreateProducer extends Omit<CreateProducerParams, 'inventoryId'>
-{
-	tagIds?: Tag['id'][];
-}
+type CreateProducerParams = Omit<Parameters<typeof ProducerServerActions.createProducer>[0], 'inventoryId'>;
 
-interface UpdateProducer extends UpdateProducerParams
-{
-	tagIds?: Tag['id'][];
-}
+type UpdateProducerParams = Parameters<typeof ProducerServerActions.updateProducer>[0];
+
+type DeleteProducerParams = Parameters<typeof ProducerServerActions.deleteProducer>[0];
 
 export function useProducers(inventoryId: Inventory['id'])
 {
@@ -23,31 +18,23 @@ export function useProducers(inventoryId: Inventory['id'])
 	const fetcher = () => getInventoryProducers(inventoryId);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: false,
+		revalidateOnMount: true,
 	});
 
 	const createProducer = useCallback(
-		async function createProducer({ name, time, inputs, outputs, tagIds }: CreateProducer)
+		async function createProducer({ name, time }: CreateProducerParams)
 		{
 			const optimistic: Producer = {
 				id: crypto.randomUUID(),
 				name,
 				time,
 				inventoryId: inventoryId,
-				inputs: inputs ?? [],
-				outputs: outputs ?? [],
 			};
 
 			await mutate(
 				async (current = []) =>
 				{
-					const created = await ProducerServerActions.createProducer({ name, time, inventoryId, inputs, outputs });
-
-					if (tagIds && tagIds.length > 0)
-					{
-						await ProducerServerActions.setProducerTags({ producerId: created.id, tagIds: tagIds });
-					}
-
+					const created = await ProducerServerActions.createProducer({ name, time, inventoryId });
 					return [...current, created];
 				},
 				{
@@ -61,19 +48,13 @@ export function useProducers(inventoryId: Inventory['id'])
 	);
 
 	const updateProducer = useCallback(
-		async function updateProducer({ id, name, time, inputs, outputs, tagIds }: UpdateProducer)
+		async function updateProducer({ id, name, time }: UpdateProducerParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await ProducerServerActions.updateProducer({ id, name, time, inputs, outputs });
-
-					if (tagIds && tagIds.length > 0)
-					{
-						await ProducerServerActions.setProducerTags({ producerId: id, tagIds });
-					}
-
-					return current.map((producer) => (producer.id === id ? { ...producer, ...updated, ...(tagIds ? { tagIds } : {}) } : producer));
+					const updated = await ProducerServerActions.updateProducer({ id, name, time });
+					return current.map((producer) => (producer.id === id ? { ...producer, ...updated } : producer));
 				},
 				{
 					optimisticData: (current: Producer[] = []) =>
@@ -81,11 +62,8 @@ export function useProducers(inventoryId: Inventory['id'])
 							producer.id === id
 								? {
 										...producer,
-										...(name ? { name } : {}),
-										...(time ? { time } : {}),
-										...(inputs ? { inputs } : {}),
-										...(outputs ? { outputs } : {}),
-										...(tagIds ? { tagIds } : {}),
+										name: name ?? producer.name,
+										time: time ?? producer.time,
 									}
 								: producer,
 						),
@@ -98,16 +76,16 @@ export function useProducers(inventoryId: Inventory['id'])
 	);
 
 	const deleteProducer = useCallback(
-		async function deleteProducer({ producerId }: DeleteProducerParams)
+		async function deleteProducer(id: DeleteProducerParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					await ProducerServerActions.deleteProducer({ producerId });
-					return current.filter((producer) => producer.id !== producerId);
+					await ProducerServerActions.deleteProducer(id);
+					return current.filter((producer) => producer.id !== id);
 				},
 				{
-					optimisticData: (current: Producer[] = []) => current.filter((producer) => producer.id !== producerId),
+					optimisticData: (current: Producer[] = []) => current.filter((producer) => producer.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},

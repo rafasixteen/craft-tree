@@ -16,7 +16,7 @@ export function useItemTags(itemId: Item['id'])
 	const fetcher = () => getItemTags({ itemId });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: false,
+		revalidateOnMount: true,
 	});
 
 	const setTags = useCallback(

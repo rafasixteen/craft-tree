@@ -14,7 +14,7 @@ export function useInventories()
 	const fetcher = () => getInventories(userId!);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: false,
+		revalidateOnMount: true,
 	});
 
 	const createInventory = useCallback(

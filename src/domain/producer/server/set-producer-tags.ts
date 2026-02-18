@@ -1,19 +1,36 @@
 'use server';
 
 import { producerTags } from '@/db/schema';
-import { Producer } from '@/domain/producer';
+import { Producer, ProducerTag } from '@/domain/producer';
 import { Tag } from '@/domain/tag';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export interface SetProducerTagsParams
+interface SetProducerTagsParams
 {
 	producerId: Producer['id'];
 	tagIds: Tag['id'][];
 }
 
-export async function setProducerTags({ producerId, tagIds }: SetProducerTagsParams): Promise<void>
+export async function setProducerTags({ producerId, tagIds }: SetProducerTagsParams): Promise<ProducerTag[]>
 {
-	await db.delete(producerTags).where(eq(producerTags.producerId, producerId));
-	await db.insert(producerTags).values(tagIds.map((tagId) => ({ producerId, tagId })));
+	return db.transaction(async (tx) =>
+	{
+		await tx.delete(producerTags).where(eq(producerTags.producerId, producerId));
+
+		if (tagIds.length === 0)
+		{
+			return [];
+		}
+
+		return await tx
+			.insert(producerTags)
+			.values(
+				tagIds.map((tagId) => ({
+					producerId,
+					tagId,
+				})),
+			)
+			.returning();
+	});
 }

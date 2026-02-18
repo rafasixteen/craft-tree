@@ -12,7 +12,7 @@ export function useTags(inventoryId: Inventory['id'])
 	const fetcher = () => getTags({ inventoryId });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: false,
+		revalidateOnMount: true,
 	});
 
 	const createTag = useCallback(

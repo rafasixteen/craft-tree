@@ -2,8 +2,8 @@ import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, Con
 import { ClipboardPasteIcon, CopyIcon, PencilIcon, ScissorsIcon, TrashIcon } from 'lucide-react';
 import { useActiveInventory } from '@/components/inventory';
 import { Producer, useProducers } from '@/domain/producer';
-import { useGrid } from '@/components/grid';
 import { useCallback } from 'react';
+import Link from 'next/link';
 
 interface ProducerContextMenuProps
 {
@@ -16,22 +16,12 @@ export function ProducerContextMenu({ children, producer }: ProducerContextMenuP
 	const inventory = useActiveInventory();
 	const { deleteProducer } = useProducers(inventory.id);
 
-	const { startEditingCell } = useGrid<Producer>();
-
 	const onDelete = useCallback(
 		function onDelete()
 		{
-			deleteProducer({ producerId: producer.id });
+			deleteProducer(producer.id);
 		},
 		[deleteProducer, producer.id],
-	);
-
-	const onEdit = useCallback(
-		function onEdit()
-		{
-			startEditingCell(producer);
-		},
-		[startEditingCell, producer],
 	);
 
 	return (
@@ -52,9 +42,11 @@ export function ProducerContextMenu({ children, producer }: ProducerContextMenuP
 							<ClipboardPasteIcon />
 							Paste
 						</ContextMenuItem>
-						<ContextMenuItem onSelect={onEdit}>
-							<PencilIcon />
-							Edit
+						<ContextMenuItem asChild>
+							<Link href={`producers/${producer.id}/edit`}>
+								<PencilIcon />
+								Edit
+							</Link>
 						</ContextMenuItem>
 					</ContextMenuGroup>
 					<ContextMenuSeparator />

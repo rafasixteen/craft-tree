@@ -18,6 +18,7 @@ import {
 interface TagsComboboxProps extends React.ComponentProps<typeof Combobox>
 {
 	className?: string;
+	maxSelected?: number;
 }
 
 export function TagsCombobox({ className, ...props }: TagsComboboxProps)
@@ -36,7 +37,7 @@ export function TagsCombobox({ className, ...props }: TagsComboboxProps)
 							{values.map((value: string) => (
 								<ComboboxChip key={value}>{value}</ComboboxChip>
 							))}
-							<ComboboxChipsInput disabled={values.length >= 3} />
+							<ComboboxChipsInput disabled={values.length >= (props.maxSelected ?? Infinity)} />
 						</>
 					)}
 				</ComboboxValue>

@@ -5,12 +5,7 @@ import { Producer } from '@/domain/producer';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export interface DeleteProducerParams
+export async function deleteProducer(id: Producer['id']): Promise<void>
 {
-	producerId: Producer['id'];
-}
-
-export async function deleteProducer({ producerId }: DeleteProducerParams): Promise<void>
-{
-	await db.delete(producers).where(eq(producers.id, producerId)).returning();
+	await db.delete(producers).where(eq(producers.id, id)).returning();
 }

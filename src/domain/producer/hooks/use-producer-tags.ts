@@ -1,45 +1,50 @@
 'use client';
 
-import { Producer, ProducerTag, getProducerTags, setProducerTags } from '@/domain/producer';
-import { Tag } from '@/domain/tag';
+import { getProducerTags, Producer, setProducerTags } from '@/domain/producer';
 import { useCallback } from 'react';
 import useSWR from 'swr';
 
-interface SetTagParams
-{
-	tagIds: Tag['id'][];
-}
+type SetTagsParams = Omit<Parameters<typeof setProducerTags>[0], 'producerId'>;
 
 export function useProducerTags(producerId: Producer['id'])
 {
 	const swrKey = ['producer-tags', producerId];
-	const fetcher = () => getProducerTags({ producerId });
+	const fetcher = () => getProducerTags(producerId);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: false,
+		revalidateOnMount: true,
 	});
 
 	const setTags = useCallback(
-		function setTags({ tagIds }: SetTagParams)
+		async function setTags({ tagIds }: SetTagsParams)
 		{
+			const optimistic = tagIds.map((tagId) => ({
+				tagId,
+				producerId,
+			}));
+
 			mutate(
-				async (current = []) =>
+				async () =>
 				{
-					await setProducerTags({ producerId, tagIds });
-					return current.map((tag) => (tagIds.includes(tag.tagId) ? { ...tag, selected: true } : { ...tag, selected: false }));
+					return await setProducerTags({ producerId, tagIds });
 				},
 				{
-					optimisticData: (current: ProducerTag[] = []) => current.map((tag) => (tagIds.includes(tag.tagId) ? { ...tag, selected: true } : { ...tag, selected: false })),
+					optimisticData: optimistic,
 					rollbackOnError: true,
-					revalidate: false,
+					populateCache: true,
 				},
 			);
 		},
-		[setProducerTags, mutate, producerId],
+		[producerId, mutate],
 	);
 
+	if (!data)
+	{
+		throw new Error('Producer tags not found. This hook must be used within a component wrapped by a <ProducerLayout> that provides the producer tags data via SWR fallback.');
+	}
+
 	return {
-		tags: data ?? [],
+		tags: data,
 		setTags,
 	};
 }
