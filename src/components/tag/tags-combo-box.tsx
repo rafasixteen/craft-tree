@@ -1,6 +1,6 @@
 'use client';
 
-import { useTags } from '@/domain/tag';
+import { Tag, useTags } from '@/domain/tag';
 import { useActiveInventory } from '@/components/inventory';
 import {
 	Combobox,
@@ -15,39 +15,46 @@ import {
 	useComboboxAnchor,
 } from '@/components/ui/combobox';
 
-interface TagsComboboxProps extends React.ComponentProps<typeof Combobox>
+interface TagsComboboxProps extends Omit<React.ComponentPropsWithoutRef<typeof ComboboxChips>, 'children' | 'value' | 'onValueChange' | 'multiple' | 'autoHighlight'>
 {
 	className?: string;
-	maxSelected?: number;
+	value: Tag['id'][];
+	onIdsChange: (value: Tag['id'][]) => void;
 }
 
-export function TagsCombobox({ className, ...props }: TagsComboboxProps)
+export function TagsCombobox({ className, value, onIdsChange }: TagsComboboxProps)
 {
 	const anchor = useComboboxAnchor();
+	const inventory = useActiveInventory();
+	const { tags } = useTags(inventory.id);
 
-	const inventory = useActiveInventory()!;
-	const { tags } = useTags(inventory.id!);
+	// Maps for fast lookup
+	const idToTag = new Map(tags.map((t) => [t.id, t]));
+	const tagIdsSet = new Set(tags.map((t) => t.id));
+
+	// Convert external ID array -> internal Tag[] for Combobox
+	const selectedTags = value.map((id) => idToTag.get(id)).filter(Boolean) as Tag[];
+
+	// Handle selection change from Combobox
+	const handleValueChange = (newTags: Tag[]) =>
+	{
+		const newIds = newTags.map((t) => t.id).filter((id) => tagIdsSet.has(id)); // safety
+		onIdsChange(newIds);
+	};
 
 	return (
-		<Combobox multiple autoHighlight items={tags.map((t) => t.name)} {...props}>
+		<Combobox items={tags} itemToStringValue={(tag: Tag) => tag.name} value={selectedTags} onValueChange={handleValueChange} multiple autoHighlight>
 			<ComboboxChips ref={anchor} className={className}>
-				<ComboboxValue>
-					{(values) => (
-						<>
-							{values.map((value: string) => (
-								<ComboboxChip key={value}>{value}</ComboboxChip>
-							))}
-							<ComboboxChipsInput disabled={values.length >= (props.maxSelected ?? Infinity)} />
-						</>
-					)}
-				</ComboboxValue>
+				<ComboboxValue>{(selected: Tag[]) => selected.map((tag) => <ComboboxChip key={tag.id}>{tag.name}</ComboboxChip>)}</ComboboxValue>
+				<ComboboxChipsInput />
 			</ComboboxChips>
+
 			<ComboboxContent anchor={anchor}>
 				<ComboboxEmpty>No tags found.</ComboboxEmpty>
 				<ComboboxList>
-					{(item) => (
-						<ComboboxItem key={item} value={item}>
-							{item}
+					{(tag: Tag) => (
+						<ComboboxItem key={tag.id} value={tag}>
+							{tag.name}
 						</ComboboxItem>
 					)}
 				</ComboboxList>
