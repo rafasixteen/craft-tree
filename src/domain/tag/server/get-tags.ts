@@ -13,6 +13,5 @@ export interface GetTagsParams
 
 export async function getTags({ inventoryId }: GetTagsParams): Promise<Tag[]>
 {
-	const tagsList = await db.select().from(tags).where(eq(tags.inventoryId, inventoryId));
-	return tagsList;
+	return await db.select().from(tags).where(eq(tags.inventoryId, inventoryId));
 }

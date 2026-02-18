@@ -4,11 +4,7 @@ import { tags } from '@/db/schema';
 import { Tag } from '@/domain/tag';
 import db from '@/db/client';
 
-export interface CreateTagParams
-{
-	name: Tag['name'];
-	inventoryId: Tag['inventoryId'];
-}
+type CreateTagParams = Omit<Tag, 'id'>;
 
 export async function createTag({ name, inventoryId }: CreateTagParams): Promise<Tag>
 {

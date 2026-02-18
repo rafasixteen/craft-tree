@@ -2,16 +2,11 @@
 
 import { tags } from '@/db/schema';
 import { Tag } from '@/domain/tag';
-import db from '@/db/client';
 import { eq } from 'drizzle-orm';
+import db from '@/db/client';
 
-export interface DeleteTagParams
+export async function deleteTag(id: Tag['id']): Promise<Tag>
 {
-	tagId: Tag['id'];
-}
-
-export async function deleteTag({ tagId }: DeleteTagParams): Promise<Tag>
-{
-	const [tag] = await db.delete(tags).where(eq(tags.id, tagId)).returning();
+	const [tag] = await db.delete(tags).where(eq(tags.id, id)).returning();
 	return tag;
 }
