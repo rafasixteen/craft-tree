@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeftFromLineIcon, ArrowRightFromLineIcon, FactoryIcon, PackageIcon, TagsIcon } from 'lucide-react';
 import { NavUser } from '@/components/user';
-import { InventorySwitcher } from '@/components/inventory';
+import { InventorySwitcher, useActiveInventory } from '@/components/inventory';
 import {
 	Sidebar,
 	SidebarContent,
@@ -16,6 +16,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { use } from 'react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {
@@ -38,13 +39,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 
 function InventoryGroup()
 {
+	const inventory = useActiveInventory();
+
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Inventory</SidebarGroupLabel>
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Items" asChild>
-						<Link href="items">
+						<Link href={`/inventory/${inventory.id}/items`}>
 							<PackageIcon />
 							<span>Items</span>
 						</Link>
@@ -52,7 +55,7 @@ function InventoryGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Producers" asChild>
-						<Link href="producers">
+						<Link href={`/inventory/${inventory.id}/producers`}>
 							<FactoryIcon />
 							<span>Producers</span>
 						</Link>
@@ -60,7 +63,7 @@ function InventoryGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Tags" asChild>
-						<Link href="tags">
+						<Link href={`/inventory/${inventory.id}/tags`}>
 							<TagsIcon />
 							<span>Tags</span>
 						</Link>
