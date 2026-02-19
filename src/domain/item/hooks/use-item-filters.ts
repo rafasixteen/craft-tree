@@ -1,24 +1,25 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 
 export function useItemFilters()
 {
-	const searchParams = useSearchParams();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
-	const searchTerm = searchParams.get('search');
-	const tagParams = searchParams.get('tags');
+	const rawSearch = searchParams.get('search');
+	const rawTags = searchParams.get('tags');
 
-	const tags = tagParams ? tagParams.split(',') : null;
+	const searchTerm = rawSearch?.trim() || null;
+	const tags = rawTags?.split(',').filter(Boolean) || null;
 
 	const setSearchTerm = useCallback(
 		function setSearchTerm(term: string | null)
 		{
-			const params = new URLSearchParams(searchParams.toString());
+			const params = new URLSearchParams(window.location.search);
 
-			if (term === null)
+			if (term === null || term.trim() === '')
 			{
 				params.delete('search');
 			}
@@ -29,31 +30,31 @@ export function useItemFilters()
 
 			router.push(`?${params.toString()}`);
 		},
-		[router, searchParams],
+		[router],
 	);
 
 	const setTags = useCallback(
-		function setTags(tags: string[] | null)
+		function setTags(newTags: string[] | null)
 		{
-			const params = new URLSearchParams(searchParams.toString());
+			const params = new URLSearchParams(window.location.search);
 
-			if (tags === null || tags.length === 0)
+			if (!newTags || newTags.length === 0)
 			{
 				params.delete('tags');
 			}
 			else
 			{
-				params.set('tags', tags.join(','));
+				params.set('tags', newTags.join(','));
 			}
 
 			router.push(`?${params.toString()}`);
 		},
-		[router, searchParams],
+		[router],
 	);
 
 	return {
-		searchTerm: searchTerm ?? undefined,
-		tags: tags ?? undefined,
+		searchTerm,
+		tags,
 		setSearchTerm,
 		setTags,
 	};

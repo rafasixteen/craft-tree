@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar/header';
+import { Header } from '@/components/craft-tree-sidebar';
 import { useActiveInventory } from '@/components/inventory';
 import { Card } from '@/components/ui/card';
 import { useTags } from '@/domain/tag';

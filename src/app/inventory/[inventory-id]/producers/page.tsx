@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar/header';
+import { Header } from '@/components/craft-tree-sidebar';
 import { ProducerGrid } from '@/components/producer';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

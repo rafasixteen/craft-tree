@@ -8,8 +8,8 @@ export function ProducerGrid()
 
 	return (
 		<div className="grid auto-rows-min grid-cols-2 gap-4 md:grid-cols-6" {...getGridProps()}>
-			{producers.map((producer) => (
-				<ProducerCell key={producer.id} {...getCellProps(producer.id, producers.indexOf(producer))} />
+			{producers.map((producer, index) => (
+				<ProducerCell key={producer.id} {...getCellProps(producer.id, index)} />
 			))}
 		</div>
 	);

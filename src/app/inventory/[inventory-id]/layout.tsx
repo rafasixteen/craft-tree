@@ -1,4 +1,4 @@
-import { AppSidebar } from '@/components/craft-tree-sidebar/app-sidebar';
+import { AppSidebar } from '@/components/craft-tree-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { getInventoryItems, getInventoryProducers } from '@/domain/inventory';
 import { getTags } from '@/domain/tag';

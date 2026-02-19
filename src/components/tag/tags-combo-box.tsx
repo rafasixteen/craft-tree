@@ -2,6 +2,7 @@
 
 import { Tag, useTags } from '@/domain/tag';
 import { useActiveInventory } from '@/components/inventory';
+import { useState } from 'react';
 import {
 	Combobox,
 	ComboboxChip,
@@ -42,10 +43,33 @@ export function TagsCombobox({ className, value, onIdsChange }: TagsComboboxProp
 		onIdsChange(newIds);
 	};
 
+	const [expanded, setExpanded] = useState(false);
+	const maxChips = 3;
+
 	return (
 		<Combobox items={tags} itemToStringValue={(tag: Tag) => tag.name} value={selectedTags} onValueChange={handleValueChange} multiple autoHighlight>
 			<ComboboxChips ref={anchor} className={className}>
-				<ComboboxValue>{(selected: Tag[]) => selected.map((tag) => <ComboboxChip key={tag.id}>{tag.name}</ComboboxChip>)}</ComboboxValue>
+				<ComboboxValue>
+					{(selected: Tag[]) =>
+					{
+						const displayTags = expanded ? selected : selected.slice(0, maxChips);
+						const extraCount = selected.length - maxChips;
+
+						return (
+							<>
+								{displayTags.map((tag) => (
+									<ComboboxChip key={tag.id}>{tag.name}</ComboboxChip>
+								))}
+
+								{selected.length > maxChips && (
+									<ComboboxChip onClick={() => setExpanded((prev) => !prev)} style={{ cursor: 'pointer' }} showRemove={false}>
+										{expanded ? 'Show less' : `+${extraCount} more`}
+									</ComboboxChip>
+								)}
+							</>
+						);
+					}}
+				</ComboboxValue>
 				<ComboboxChipsInput />
 			</ComboboxChips>
 
