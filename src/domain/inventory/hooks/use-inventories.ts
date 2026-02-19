@@ -6,6 +6,12 @@ import { useCallback } from 'react';
 import * as InventoryServerActions from '@/domain/inventory/server';
 import useSWR from 'swr';
 
+type CreateInventoryParams = Omit<Parameters<typeof InventoryServerActions.createInventory>[0], 'userId'>;
+
+type UpdateInventoryParams = Parameters<typeof InventoryServerActions.updateInventory>[0];
+
+type DeleteInventoryParams = Parameters<typeof InventoryServerActions.deleteInventory>[0];
+
 export function useInventories()
 {
 	const { userId } = useUserId();
@@ -18,7 +24,7 @@ export function useInventories()
 	});
 
 	const createInventory = useCallback(
-		async function createInventory(name: string)
+		async function createInventory({ name }: CreateInventoryParams)
 		{
 			if (!userId)
 			{
@@ -48,7 +54,7 @@ export function useInventories()
 	);
 
 	const updateInventory = useCallback(
-		async function updateInventory(id: Inventory['id'], newName: string)
+		async function updateInventory({ id, name }: UpdateInventoryParams)
 		{
 			if (!userId)
 			{
@@ -59,14 +65,14 @@ export function useInventories()
 				async (current = []) =>
 				{
 					const updated = await InventoryServerActions.updateInventory({
-						inventoryId: id,
-						newName: newName,
+						id: id,
+						name: name,
 					});
 
 					return current.map((inventory) => (inventory.id === id ? updated : inventory));
 				},
 				{
-					optimisticData: (current: Inventory[] = []) => current.map((inv) => (inv.id === id ? { ...inv, name: newName } : inv)),
+					optimisticData: (current: Inventory[] = []) => current.map((inv) => (inv.id === id ? { ...inv, name } : inv)),
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -76,12 +82,12 @@ export function useInventories()
 	);
 
 	const deleteInventory = useCallback(
-		async function deleteInventory(id: Inventory['id'])
+		async function deleteInventory(id: DeleteInventoryParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					await InventoryServerActions.deleteInventory({ inventoryId: id });
+					await InventoryServerActions.deleteInventory(id);
 					return current.filter((inv) => inv.id !== id);
 				},
 				{

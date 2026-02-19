@@ -50,7 +50,9 @@ export default function ItemAddPage()
 
 					toast.success(`Item '${name}' created`);
 
-					form.reset();
+					form.reset({
+						tagIds: tagIds,
+					});
 				}
 				catch
 				{

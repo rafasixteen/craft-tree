@@ -14,7 +14,7 @@ interface ItemContextMenuProps
 export function ItemContextMenu({ children, item }: ItemContextMenuProps)
 {
 	const inventory = useActiveInventory();
-	const { deleteItem } = useItems(inventory.id);
+	const { deleteItem } = useItems({ inventoryId: inventory.id });
 
 	const onDelete = useCallback(
 		function onDelete()

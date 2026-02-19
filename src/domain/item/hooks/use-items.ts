@@ -1,10 +1,11 @@
 'use client';
 
-import { Inventory, getInventoryItems } from '@/domain/inventory';
 import { Item } from '@/domain/item';
 import { useCallback } from 'react';
 import * as ItemServerActions from '@/domain/item/server';
 import useSWR from 'swr';
+
+type UseItemsParams = Parameters<typeof ItemServerActions.getItems>[0];
 
 type CreateItemParams = Omit<Parameters<typeof ItemServerActions.createItem>[0], 'inventoryId'>;
 
@@ -12,10 +13,10 @@ type UpdateItemParams = Parameters<typeof ItemServerActions.updateItem>[0];
 
 type DeleteItemParams = Parameters<typeof ItemServerActions.deleteItem>[0];
 
-export function useItems(inventoryId: Inventory['id'])
+export function useItems({ inventoryId, options }: UseItemsParams)
 {
-	const swrKey = ['inventory-items', inventoryId];
-	const fetcher = () => getInventoryItems(inventoryId);
+	const swrKey = ['inventory-items', inventoryId, options];
+	const fetcher = () => ItemServerActions.getItems({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,

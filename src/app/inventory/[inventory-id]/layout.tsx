@@ -1,6 +1,7 @@
 import { AppSidebar } from '@/components/craft-tree-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { getInventoryItems, getInventoryProducers } from '@/domain/inventory';
+import { getItems } from '@/domain/item';
+import { getInventoryProducers } from '@/domain/inventory';
 import { getTags } from '@/domain/tag';
 import { cookies } from 'next/headers';
 import { SWRConfig, unstable_serialize } from 'swr';
@@ -27,7 +28,7 @@ export default async function InventoryLayout({ params, children }: InventoryLay
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['inventory-items', inventoryId])]: getInventoryItems(inventoryId),
+					[unstable_serialize(['inventory-items', inventoryId, {}])]: getItems({ inventoryId }),
 					[unstable_serialize(['inventory-producers', inventoryId])]: getInventoryProducers(inventoryId),
 					[unstable_serialize(['tags', inventoryId])]: getTags({ inventoryId }),
 				},

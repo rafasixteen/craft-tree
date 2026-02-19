@@ -130,7 +130,7 @@ function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayPro
 	});
 
 	const inventory = useActiveInventory();
-	const { items } = useItems(inventory.id);
+	const { items } = useItems({ inventoryId: inventory.id });
 
 	const legend = name === 'inputs' ? 'Inputs' : 'Outputs';
 

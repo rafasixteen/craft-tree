@@ -65,7 +65,9 @@ export default function ProducerAddPage()
 
 					toast.success(`Producer '${name}' created`);
 
-					form.reset();
+					form.reset({
+						tagIds: tagIds,
+					});
 				}
 				catch
 				{

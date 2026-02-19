@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { getInventoriesByUserId } from '@/domain/inventory';
-import { getUserIdByEmail } from '@/domain/user';
+import { findUserIdByEmail } from '@/domain/user';
 import { SWRConfig, unstable_serialize } from 'swr';
 
 interface InventoryRootLayoutProps
@@ -19,13 +19,18 @@ export default async function InventoryRootLayout({ children }: InventoryRootLay
 	}
 
 	const email = session.user!.email!;
-	const userId = await getUserIdByEmail(email);
+	const userId = await findUserIdByEmail(email);
+
+	if (!userId)
+	{
+		return redirect('/sign-in');
+	}
 
 	return (
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['userId', email])]: getUserIdByEmail(email),
+					[unstable_serialize(['userId', email])]: findUserIdByEmail(email),
 					[unstable_serialize(['inventories', userId])]: getInventoriesByUserId(userId),
 				},
 			}}
