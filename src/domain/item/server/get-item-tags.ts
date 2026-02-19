@@ -5,12 +5,7 @@ import { Item, ItemTag } from '@/domain/item';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export interface GetItemTagsParams
+export async function getItemTags(id: Item['id']): Promise<ItemTag[]>
 {
-	itemId: Item['id'];
-}
-
-export async function getItemTags({ itemId }: GetItemTagsParams): Promise<ItemTag[]>
-{
-	return db.select().from(itemTags).where(eq(itemTags.itemId, itemId));
+	return db.select().from(itemTags).where(eq(itemTags.itemId, id));
 }

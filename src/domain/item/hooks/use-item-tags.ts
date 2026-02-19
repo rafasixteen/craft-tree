@@ -1,45 +1,50 @@
 'use client';
 
-import { Item, ItemTag, getItemTags, setItemTags } from '@/domain/item';
-import { Tag } from '@/domain/tag';
+import { getItemTags, Item, setItemTags } from '@/domain/item';
 import { useCallback } from 'react';
 import useSWR from 'swr';
 
-interface SetTagParams
-{
-	tagIds: Tag['id'][];
-}
+type SetTagsParams = Omit<Parameters<typeof setItemTags>[0], 'itemId'>;
 
 export function useItemTags(itemId: Item['id'])
 {
 	const swrKey = ['item-tags', itemId];
-	const fetcher = () => getItemTags({ itemId });
+	const fetcher = () => getItemTags(itemId);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,
 	});
 
 	const setTags = useCallback(
-		function setTags({ tagIds }: SetTagParams)
+		async function setTags({ tagIds }: SetTagsParams)
 		{
+			const optimistic = tagIds.map((tagId) => ({
+				tagId,
+				itemId,
+			}));
+
 			mutate(
-				async (current = []) =>
+				async () =>
 				{
-					await setItemTags({ itemId, tagIds });
-					return current.map((tag) => (tagIds.includes(tag.tagId) ? { ...tag, selected: true } : { ...tag, selected: false }));
+					return await setItemTags({ itemId, tagIds });
 				},
 				{
-					optimisticData: (current: ItemTag[] = []) => current.map((tag) => (tagIds.includes(tag.tagId) ? { ...tag, selected: true } : { ...tag, selected: false })),
+					optimisticData: optimistic,
 					rollbackOnError: true,
-					revalidate: false,
+					populateCache: true,
 				},
 			);
 		},
-		[setItemTags, mutate, itemId],
+		[itemId, mutate],
 	);
 
+	if (!data)
+	{
+		throw new Error('Item tags not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item tags data via SWR fallback.');
+	}
+
 	return {
-		tags: data ?? [],
+		tags: data,
 		setTags,
 	};
 }

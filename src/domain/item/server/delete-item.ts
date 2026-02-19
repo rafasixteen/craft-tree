@@ -5,12 +5,7 @@ import { Item } from '@/domain/item';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-export interface DeleteItemParams
+export async function deleteItem(id: Item['id']): Promise<void>
 {
-	itemId: Item['id'];
-}
-
-export async function deleteItem({ itemId }: DeleteItemParams): Promise<void>
-{
-	await db.delete(items).where(eq(items.id, itemId));
+	await db.delete(items).where(eq(items.id, id));
 }

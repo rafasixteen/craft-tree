@@ -1,8 +1,3 @@
-import { Producer } from '@/domain/producer';
-import { Tag } from '@/domain/tag';
+import { producerTags } from '@/db/schema';
 
-export interface ProducerTag
-{
-	producerId: Producer['id'];
-	tagId: Tag['id'];
-}
+export type ProducerTag = typeof producerTags.$inferSelect;

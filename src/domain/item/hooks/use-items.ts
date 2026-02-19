@@ -2,30 +2,15 @@
 
 import { Inventory, getInventoryItems } from '@/domain/inventory';
 import { Item } from '@/domain/item';
-import { Tag } from '@/domain/tag';
 import { useCallback } from 'react';
 import * as ItemServerActions from '@/domain/item/server';
 import useSWR from 'swr';
 
-interface CreateItemParams
-{
-	name: Item['name'];
-	icon: Item['icon'];
-	tagIds?: Tag['id'][];
-}
+type CreateItemParams = Omit<Parameters<typeof ItemServerActions.createItem>[0], 'inventoryId'>;
 
-interface UpdateItemParams
-{
-	itemId: Item['id'];
-	name?: Item['name'];
-	icon?: Item['icon'];
-	tagIds?: Tag['id'][];
-}
+type UpdateItemParams = Parameters<typeof ItemServerActions.updateItem>[0];
 
-interface DeleteItemParams
-{
-	itemId: Item['id'];
-}
+type DeleteItemParams = Parameters<typeof ItemServerActions.deleteItem>[0];
 
 export function useItems(inventoryId: Inventory['id'])
 {
@@ -37,25 +22,19 @@ export function useItems(inventoryId: Inventory['id'])
 	});
 
 	const createItem = useCallback(
-		async function createItem({ name, icon, tagIds }: CreateItemParams)
+		async function createItem({ name, icon }: CreateItemParams)
 		{
 			const optimistic: Item = {
 				id: crypto.randomUUID(),
 				name,
 				icon,
-				inventoryId,
+				inventoryId: inventoryId,
 			};
 
 			await mutate(
 				async (current = []) =>
 				{
 					const created = await ItemServerActions.createItem({ name, icon, inventoryId });
-
-					if (tagIds && tagIds.length > 0)
-					{
-						await ItemServerActions.setItemTags({ itemId: created.id, tagIds: tagIds });
-					}
-
 					return [...current, created];
 				},
 				{
@@ -69,23 +48,25 @@ export function useItems(inventoryId: Inventory['id'])
 	);
 
 	const updateItem = useCallback(
-		async function updateItem({ itemId, name, icon, tagIds }: UpdateItemParams)
+		async function updateItem({ id, name, icon }: UpdateItemParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await ItemServerActions.updateItem({ itemId, name, icon });
-
-					if (tagIds && tagIds.length > 0)
-					{
-						await ItemServerActions.setItemTags({ itemId, tagIds });
-					}
-
-					return current.map((item) => (item.id === itemId ? { ...item, ...updated, ...(tagIds ? { tagIds } : {}) } : item));
+					const updated = await ItemServerActions.updateItem({ id, name, icon });
+					return current.map((item) => (item.id === id ? { ...item, ...updated } : item));
 				},
 				{
 					optimisticData: (current: Item[] = []) =>
-						current.map((item) => (item.id === itemId ? { ...item, ...(name ? { name } : {}), ...(icon ? { icon } : {}), ...(tagIds ? { tagIds } : {}) } : item)),
+						current.map((item) =>
+							item.id === id
+								? {
+										...item,
+										name: name ?? item.name,
+										icon: icon ?? item.icon,
+									}
+								: item,
+						),
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -95,16 +76,16 @@ export function useItems(inventoryId: Inventory['id'])
 	);
 
 	const deleteItem = useCallback(
-		async function deleteItem({ itemId }: DeleteItemParams)
+		async function deleteItem(id: DeleteItemParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					await ItemServerActions.deleteItem({ itemId });
-					return current.filter((item) => item.id !== itemId);
+					await ItemServerActions.deleteItem(id);
+					return current.filter((item) => item.id !== id);
 				},
 				{
-					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== itemId),
+					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},
