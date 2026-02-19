@@ -1,24 +1,22 @@
 'use client';
 
 import { Header } from '@/components/craft-tree-sidebar/header';
-import { CreateItemSheet, ItemGrid } from '@/components/item';
-import { UpdateItemSheet } from '@/components/item';
-import { useGrid } from '@/components/grid';
-import { Item } from '@/domain/item';
+import { ItemGrid } from '@/components/item';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function ItemsPage()
 {
-	const { editingCell, stopEditingCell } = useGrid<Item>();
-
 	return (
 		<>
 			<Header>
-				<CreateItemSheet />
+				<Button asChild variant="default">
+					<Link href="items/add">Add Item</Link>
+				</Button>
 			</Header>
 			<div className="flex flex-1 flex-col gap-4 p-4">
 				<ItemGrid />
 			</div>
-			{editingCell && <UpdateItemSheet item={editingCell} open={true} onOpenChange={(open) => !open && stopEditingCell()} />}
 		</>
 	);
 }
