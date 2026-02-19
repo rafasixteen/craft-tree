@@ -106,13 +106,14 @@ export default function ProducersPage()
 	return (
 		<GridProvider<Producer> cells={producers} getCellHref={getProducerHref}>
 			<Header>
-				<Button asChild variant="default">
-					<Link href="producers/add">Add Producer</Link>
-				</Button>
+				<div className="flex items-center gap-2">
+					<Button asChild variant="default" size="sm">
+						<Link href="items/add">Add Item</Link>
+					</Button>
 
-				<Input type="text" placeholder="Search producers..." value={localSearch} onChange={onSearchBarChange} />
-
-				<TagsCombobox value={localTagIds} onIdsChange={onTagsComboBoxChange} className="w-full" maxChips={3} />
+					<Input type="text" placeholder="Search items..." value={localSearch} onChange={onSearchBarChange} className="w-48 md:w-64" />
+				</div>
+				<TagsCombobox value={localTagIds} onIdsChange={onTagsComboBoxChange} className="w-48 md:w-64" maxChips={2} />
 			</Header>
 
 			<div className="flex flex-1 flex-col gap-4 p-4">
