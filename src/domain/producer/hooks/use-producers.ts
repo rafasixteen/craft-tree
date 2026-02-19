@@ -1,10 +1,11 @@
 'use client';
 
-import { Inventory, getInventoryProducers } from '@/domain/inventory';
 import { Producer } from '@/domain/producer';
 import { useCallback } from 'react';
 import * as ProducerServerActions from '@/domain/producer/server';
 import useSWR from 'swr';
+
+type UseProducersParams = Parameters<typeof ProducerServerActions.getProducers>[0];
 
 type CreateProducerParams = Omit<Parameters<typeof ProducerServerActions.createProducer>[0], 'inventoryId'>;
 
@@ -12,10 +13,10 @@ type UpdateProducerParams = Parameters<typeof ProducerServerActions.updateProduc
 
 type DeleteProducerParams = Parameters<typeof ProducerServerActions.deleteProducer>[0];
 
-export function useProducers(inventoryId: Inventory['id'])
+export function useProducers({ inventoryId, options }: UseProducersParams)
 {
-	const swrKey = ['inventory-producers', inventoryId];
-	const fetcher = () => getInventoryProducers(inventoryId);
+	const swrKey = ['inventory-producers', inventoryId, options];
+	const fetcher = () => ProducerServerActions.getProducers({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,
