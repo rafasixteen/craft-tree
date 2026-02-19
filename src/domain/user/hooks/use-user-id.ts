@@ -1,6 +1,6 @@
 'use client';
 
-import { getUserIdByEmail } from '@/domain/user';
+import { findUserIdByEmail } from '@/domain/user';
 import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 
@@ -22,7 +22,7 @@ export function useUserId()
 
 	const swrKey = ['userId', email];
 
-	const { data: userId, isLoading } = useSWR(swrKey, () => getUserIdByEmail({ email: email }), {
+	const { data: userId, isLoading } = useSWR(swrKey, () => findUserIdByEmail(email), {
 		revalidateOnMount: true,
 	});
 

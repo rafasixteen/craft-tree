@@ -1,1 +1,1 @@
-export * from './get-user-id-by-email';
+export * from './find-user-id-by-email';

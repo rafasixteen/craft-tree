@@ -7,8 +7,8 @@ import db from '@/db/client';
 
 type FindUserIdByEmailParams = Exclude<User['email'], null>;
 
-export async function getUserIdByEmail(email: FindUserIdByEmailParams): Promise<User['id']>
+export async function findUserIdByEmail(email: FindUserIdByEmailParams): Promise<User['id'] | null>
 {
-	const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
-	return user.id;
+	const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email)).limit(1);
+	return user?.id ?? null;
 }
