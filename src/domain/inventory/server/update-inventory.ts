@@ -5,14 +5,10 @@ import { Inventory } from '@/domain/inventory';
 import { eq } from 'drizzle-orm';
 import db from '@/db/client';
 
-interface UpdateInventoryParams
-{
-	inventoryId: Inventory['id'];
-	newName: string;
-}
+type UpdateInventoryParams = Pick<Inventory, 'id' | 'name'>;
 
-export async function updateInventory({ inventoryId, newName }: UpdateInventoryParams): Promise<Inventory>
+export async function updateInventory({ id, name }: UpdateInventoryParams): Promise<Inventory>
 {
-	const [inventory] = await db.update(inventories).set({ name: newName }).where(eq(inventories.id, inventoryId)).returning();
+	const [inventory] = await db.update(inventories).set({ name }).where(eq(inventories.id, id)).returning();
 	return inventory;
 }

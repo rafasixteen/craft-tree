@@ -1,7 +1,7 @@
 'use client';
 
 import { useUserId } from '@/domain/user';
-import { getInventories, Inventory } from '@/domain/inventory';
+import { getInventoriesByUserId, Inventory } from '@/domain/inventory';
 import { useCallback } from 'react';
 import * as InventoryServerActions from '@/domain/inventory/server';
 import useSWR from 'swr';
@@ -11,7 +11,7 @@ export function useInventories()
 	const { userId } = useUserId();
 
 	const swrKey = userId ? ['inventories', userId] : null;
-	const fetcher = () => getInventories(userId!);
+	const fetcher = () => getInventoriesByUserId(userId!);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,

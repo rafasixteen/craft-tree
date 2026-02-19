@@ -32,7 +32,7 @@ describe('useInventories integration', () =>
 		resetMockInventoriesDb();
 		InventoryServerActions = await import('@/domain/inventory/server');
 		InventoryDomain = await import('@/domain/inventory');
-		(InventoryDomain.getInventories as any).mockImplementation(mockGetInventories);
+		(InventoryDomain.getInventoriesByUserId as any).mockImplementation(mockGetInventories);
 		(InventoryServerActions.createInventory as any).mockImplementation(mockCreateInventory);
 		(InventoryServerActions.updateInventory as any).mockImplementation(mockUpdateInventory);
 		(InventoryServerActions.deleteInventory as any).mockImplementation(mockDeleteInventory);
