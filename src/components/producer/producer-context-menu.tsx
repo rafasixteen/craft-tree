@@ -14,7 +14,7 @@ interface ProducerContextMenuProps
 export function ProducerContextMenu({ children, producer }: ProducerContextMenuProps)
 {
 	const inventory = useActiveInventory();
-	const { deleteProducer } = useProducers(inventory.id);
+	const { deleteProducer } = useProducers({ inventoryId: inventory.id });
 
 	const onDelete = useCallback(
 		function onDelete()
