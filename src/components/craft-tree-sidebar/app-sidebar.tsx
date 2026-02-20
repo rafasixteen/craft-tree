@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeftFromLineIcon, ArrowRightFromLineIcon, FactoryIcon, PackageIcon, TagsIcon } from 'lucide-react';
+import { ArrowLeftFromLineIcon, ArrowRightFromLineIcon, FactoryIcon, PackageIcon, TagsIcon, WaypointsIcon } from 'lucide-react';
 import { NavUser } from '@/components/user';
 import { InventorySwitcher, useActiveInventory } from '@/components/inventory';
 import {
@@ -16,7 +16,6 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { use } from 'react';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 {
@@ -27,6 +26,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 			</SidebarHeader>
 			<SidebarContent>
 				<InventoryGroup />
+				<ProductionGraphGroup />
 				<DocumentsGroup />
 			</SidebarContent>
 			<SidebarFooter>
@@ -66,6 +66,27 @@ function InventoryGroup()
 						<Link href={`/inventory/${inventory.id}/tags`}>
 							<TagsIcon />
 							<span>Tags</span>
+						</Link>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
+			</SidebarMenu>
+		</SidebarGroup>
+	);
+}
+
+function ProductionGraphGroup()
+{
+	const inventory = useActiveInventory();
+
+	return (
+		<SidebarGroup>
+			<SidebarGroupLabel>Production Graph</SidebarGroupLabel>
+			<SidebarMenu>
+				<SidebarMenuItem>
+					<SidebarMenuButton tooltip="Import" asChild>
+						<Link href={`/inventory/${inventory.id}/production-graph`}>
+							<WaypointsIcon />
+							<span>Production Graph</span>
 						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>
