@@ -1,13 +1,15 @@
 'use client';
 
-import { ProducerNodeData } from '@/components/production-graph';
-import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals } from '@xyflow/react';
+import { ItemNodeData, ProducerNodeData } from '@/components/production-graph';
+import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, useNodeConnections, useNodesData } from '@xyflow/react';
 import { getProducerInputs, getProducerOutputs, useProducers } from '@/domain/producer';
 import { useActiveInventory } from '@/components/inventory';
 import { ProducerCombobox } from '@/components/producer';
 import { useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
+import { ItemRate, ProductionRate } from '@/domain/production-graph';
+import { useEffect } from 'react';
 
 interface ProducerNodeProps
 {
@@ -26,11 +28,17 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 
 	const { producer, inputs, outputs } = data;
 
-	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
+	const { updateNodeData, getEdges, setEdges } = useReactFlow<Node<ProducerNodeData>, Edge>();
 
 	function onComboboxChange(producerId: string | null)
 	{
 		const selectedProducer = producers.find((p) => p.id === producerId) ?? null;
+
+		// Remove edges connected to this node
+		const edges = getEdges();
+		const filtered = edges.filter((e) => e.source !== id && e.target !== id);
+
+		setEdges(filtered);
 
 		if (!selectedProducer)
 		{
@@ -101,4 +109,60 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 			</BaseNodeContent>
 		</BaseNode>
 	);
+}
+
+interface InputHandleProps
+{
+	onChange: (rate: ItemRate | null) => void;
+}
+
+function InputHandle({ onChange }: InputHandleProps)
+{
+	const connections = useNodeConnections({
+		handleType: 'target',
+	});
+
+	const node = useNodesData<Node<ProducerNodeData> | Node<ItemNodeData>>(connections?.[0]?.source);
+	const nodeData = node?.data;
+
+	let itemRate: ItemRate | null = null;
+
+	if (nodeData && 'outputs' in nodeData)
+	{
+	}
+	else if (nodeData && 'item' in nodeData && 'rate' in nodeData)
+	{
+	}
+
+	const producer = nodeData?.producer;
+	const outputs = nodeData?.outputs;
+
+	const output = outputs?.find((o) => o.id === connections?.[0]?.sourceHandle);
+
+	let troughput: number = 1;
+
+	if (output && producer)
+	{
+		troughput = output.quantity / producer.time;
+	}
+
+	const rate: ProductionRate = {
+		amount: troughput,
+		per: 'second',
+	};
+
+	if (output)
+	{
+		itemRate = {
+			itemId: output.itemId,
+			rate: rate,
+		};
+	}
+
+	useEffect(() =>
+	{
+		onChange(itemRate);
+	}, [nodeData]);
+
+	return <LabeledHandle type="target" position={Position.Left} title="" />;
 }

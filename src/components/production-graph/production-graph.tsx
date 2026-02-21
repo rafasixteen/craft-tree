@@ -5,13 +5,12 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, OnConnect, OnNodesChange, OnEdgesChange, DefaultEdgeOptions, ReactFlowInstance, Connection } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { NodeType, ProducerNode, ItemFlowEdge, PaneContextMenu, NodeContextMenu, EdgeType, ItemNode, ProductionRateNode, ProducerNodeData } from '@/components/production-graph';
+import { NodeType, ProducerNode, ItemFlowEdge, PaneContextMenu, NodeContextMenu, EdgeType, ItemNode } from '@/components/production-graph';
 import { Button } from '@/components/ui/button';
 
 const nodeTypes: Record<NodeType, React.ComponentType<any>> = {
 	producer: ProducerNode,
 	item: ItemNode,
-	'production-rate': ProductionRateNode,
 };
 
 const edgeTypes: Record<EdgeType, React.ComponentType<any>> = {
@@ -198,17 +197,7 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 		const sourceType = sourceNode.type as NodeType;
 		const targetType = targetNode.type as NodeType;
 
-		switch (sourceType)
-		{
-			case 'item':
-				return targetType === 'production-rate';
-			case 'producer':
-				return targetType === 'production-rate' || targetType === 'producer';
-			case 'production-rate':
-				return targetType === 'producer';
-			default:
-				throw new Error(`Unknown source node type: ${sourceType}`);
-		}
+		return true;
 	}
 
 	useEffect(() =>

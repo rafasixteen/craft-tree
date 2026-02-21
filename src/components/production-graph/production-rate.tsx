@@ -1,9 +1,3 @@
-'use client';
-
-import { ProductionRateNodeData } from '@/components/production-graph';
-import { Edge, useReactFlow, Node, Position } from '@xyflow/react';
-import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
-import { LabeledHandle } from '@/components/labeled-handle';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from '@/components/ui/input-group';
@@ -17,42 +11,6 @@ const UNIT_OPTIONS: { value: TimeUnit; label: string }[] = [
 	{ value: 'hour', label: 'Hour' },
 ];
 
-interface ProductionRateNodeProps
-{
-	id: string;
-	data: ProductionRateNodeData;
-}
-
-export function ProductionRateNode({ id, data }: ProductionRateNodeProps)
-{
-	const { rate, readonly } = data;
-
-	const { updateNodeData } = useReactFlow<Node<ProductionRateNodeData>, Edge>();
-
-	const onRateChange = useCallback(
-		function onRateChange(value: ProductionRate)
-		{
-			updateNodeData(id, {
-				rate: value,
-			});
-		},
-		[updateNodeData, id],
-	);
-
-	return (
-		<BaseNode className="p-0">
-			<BaseNodeHeader className="m-0 border-b">
-				<ProductionRateComponent value={rate} onChange={onRateChange} className="nodrag m-0" readonly={readonly} />
-			</BaseNodeHeader>
-			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
-				<LabeledHandle type="target" position={Position.Left} title="" />
-				<p className="text-xs">Iron Worker</p>
-				<LabeledHandle type="source" position={Position.Right} title="" />
-			</BaseNodeContent>
-		</BaseNode>
-	);
-}
-
 interface ProductionRateComponentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>
 {
 	value: ProductionRate;
@@ -60,7 +18,7 @@ interface ProductionRateComponentProps extends Omit<React.HTMLAttributes<HTMLDiv
 	readonly?: boolean;
 }
 
-function ProductionRateComponent({ value, onChange, readonly, className, ...props }: ProductionRateComponentProps)
+export function ProductionRateComponent({ value, onChange, readonly, className, ...props }: ProductionRateComponentProps)
 {
 	const onAmountChange = useCallback(
 		function handleAmountChange(amount: number)
@@ -89,7 +47,7 @@ function ProductionRateComponent({ value, onChange, readonly, className, ...prop
 			<InputGroup>
 				<InputGroupInput
 					type="number"
-					min={1}
+					min={0}
 					step={1}
 					value={value.amount}
 					onChange={(e) => onAmountChange(Number(e.target.value))}

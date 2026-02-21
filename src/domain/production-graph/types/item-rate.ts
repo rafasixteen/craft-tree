@@ -1,9 +1,8 @@
 import { Item } from '@/domain/item';
 import { ProductionRate } from '@/domain/production-graph';
 
-export interface ItemNodeData extends Record<string, unknown>
+export interface ItemRate
 {
-	item: Item | null;
+	itemId: Item['id'];
 	rate: ProductionRate;
-	readonly?: boolean;
 }

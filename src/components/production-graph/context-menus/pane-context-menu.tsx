@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useReactFlow } from '@xyflow/react';
-import { ItemNodeData, ProducerNodeData, ProductionRateNodeData } from '@/components/production-graph';
+import { ItemNodeData, ProducerNodeData } from '@/components/production-graph';
 import React, { useCallback } from 'react';
 
 interface PaneContextMenuProps extends React.HTMLAttributes<HTMLDivElement>
@@ -30,6 +30,10 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 		{
 			const data: ItemNodeData = {
 				item: null,
+				rate: {
+					amount: 1,
+					per: 'second',
+				},
 			};
 
 			addNodes({
@@ -61,26 +65,6 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 		[addNodes, screenToFlowPosition],
 	);
 
-	const addProductionRate = useCallback(
-		function addProductionRate(e: React.MouseEvent)
-		{
-			const data: ProductionRateNodeData = {
-				rate: {
-					amount: 1,
-					per: 'second',
-				},
-			};
-
-			addNodes({
-				id: `production-rate-${crypto.randomUUID()}`,
-				type: 'production-rate',
-				position: screenToFlowPosition({ x: e.clientX, y: e.clientY }),
-				data: data,
-			});
-		},
-		[addNodes, screenToFlowPosition],
-	);
-
 	return (
 		<Card style={style} {...props} className="gap-0 p-1">
 			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addItem}>
@@ -88,9 +72,6 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 			</Button>
 			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addProducer}>
 				Add Producer
-			</Button>
-			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addProductionRate}>
-				Add Production Rate
 			</Button>
 		</Card>
 	);

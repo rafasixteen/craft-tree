@@ -2,5 +2,6 @@ export * from './context-menus';
 export * from './edges';
 export * from './nodes';
 export * from './production-graph';
+export * from './production-rate';
 export * from './types';
 export * from './utils';

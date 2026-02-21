@@ -15,7 +15,7 @@ export function ItemCombobox({ items, value, onChange, ...props }: ItemComboboxP
 {
 	const selectedItem = items.find((item) => item.id === value) ?? null;
 
-	const { 'aria-invalid': ariaInvalid, className, ...restProps } = props;
+	const { 'aria-invalid': ariaInvalid, disabled, className, ...restProps } = props;
 
 	const onValueChange = useCallback(
 		function onValueChange(item: Item | null)
@@ -34,7 +34,7 @@ export function ItemCombobox({ items, value, onChange, ...props }: ItemComboboxP
 			itemToStringLabel={(item) => item.name}
 			{...restProps}
 		>
-			<ComboboxInput placeholder="Search item..." className={className} aria-invalid={ariaInvalid} />
+			<ComboboxInput placeholder="Search item..." className={className} aria-invalid={ariaInvalid} disabled={disabled} />
 			<ComboboxContent>
 				<ComboboxEmpty>No items found.</ComboboxEmpty>
 				<ComboboxList>
