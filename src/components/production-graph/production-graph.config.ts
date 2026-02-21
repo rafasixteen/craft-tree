@@ -17,7 +17,7 @@ const fitViewOptions: FitViewOptions = {
 };
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
-	animated: false,
+	animated: true,
 	type: 'item-flow',
 };
 

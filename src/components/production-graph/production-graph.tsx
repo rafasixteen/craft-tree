@@ -6,7 +6,6 @@ import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Backg
 import type { ReactFlowInstance, Connection, NodeChange, EdgeChange } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { getSourceItemId, getTargetItemId } from '@/components/production-graph/utils';
 import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/context-menus';
 import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/types';
 import { graphConfig } from '@/components/production-graph/production-graph.config';
@@ -67,38 +66,9 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 	const onConnect = useCallback(
 		function onConnect(connection: Connection)
 		{
-			setEdges((eds) =>
-			{
-				const newEdges = addEdge({ ...connection, data: { rate: 0 } }, eds);
-				return validateEdges(newEdges);
-			});
+			setEdges((eds) => addEdge(connection, eds));
 		},
 		[setEdges],
-	);
-
-	const validateEdges = useCallback(
-		function validateEdges(edges: ProductionGraphEdge[]): ProductionGraphEdge[]
-		{
-			return edges.map((edge) =>
-			{
-				const sourceNode = nodes.find((n) => n.id === edge.source);
-				const targetNode = nodes.find((n) => n.id === edge.target);
-
-				const sourceItemId = getSourceItemId(sourceNode, edge.sourceHandle);
-				const targetItemId = getTargetItemId(targetNode, edge.targetHandle);
-
-				const invalid = !sourceItemId || !targetItemId || sourceItemId !== targetItemId;
-
-				return {
-					...edge,
-					data: {
-						...edge.data,
-						invalid,
-					},
-				};
-			});
-		},
-		[nodes],
 	);
 
 	const onPaneContextMenu = useCallback(
@@ -262,11 +232,6 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 	{
 		loadGraph();
 	}, []);
-
-	useEffect(() =>
-	{
-		setEdges((eds) => validateEdges(eds));
-	}, [nodes]);
 
 	return (
 		<div className="size-full">

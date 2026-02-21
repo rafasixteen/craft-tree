@@ -2,11 +2,12 @@ import { useNodeConnections, useNodes } from '@xyflow/react';
 import { ProductionGraphNode } from '@/components/production-graph/types';
 import { getSourceItemRate } from '@/components/production-graph/utils';
 
-export function useIncomingItemRate(handleId?: string)
+export function useIncomingItemRate(nodeId?: string, handleId?: string | null)
 {
 	const connections = useNodeConnections({
+		id: nodeId,
 		handleType: 'target',
-		handleId,
+		handleId: handleId ?? undefined,
 	});
 
 	const sourceId = connections?.[0]?.source;
