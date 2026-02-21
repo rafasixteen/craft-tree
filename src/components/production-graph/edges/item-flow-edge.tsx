@@ -27,6 +27,10 @@ export function ItemFlowEdge({ id, data, ...otherProps }: ItemFlowEdgeProps)
 		transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
 	};
 
+	const color = data?.invalid ? 'red' : 'currentColor';
+
+	console.log('Rendering edge', { id, source, target, data });
+
 	return (
 		<>
 			<BaseEdge id={id} path={edgePath} />

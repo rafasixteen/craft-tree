@@ -5,7 +5,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel } from '@xyflow/react';
 import type { Node, Edge, FitViewOptions, OnConnect, OnNodesChange, OnEdgesChange, DefaultEdgeOptions, ReactFlowInstance, Connection } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { NodeType, ProducerNode, ItemFlowEdge, PaneContextMenu, NodeContextMenu, EdgeType, ItemNode } from '@/components/production-graph';
+import { NodeType, ProducerNode, ItemFlowEdge, PaneContextMenu, NodeContextMenu, EdgeType, ItemNode, ItemFlowEdgeData } from '@/components/production-graph';
 import { Button } from '@/components/ui/button';
 
 const nodeTypes: Record<NodeType, React.ComponentType<any>> = {
@@ -68,7 +68,44 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 
 	const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
 	const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
-	const onConnect: OnConnect = useCallback((connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
+	// const onConnect: OnConnect = useCallback((connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
+
+	const onConnect: OnConnect = useCallback(
+		(connection) =>
+		{
+			// ...existing code to get nodes...
+			const sourceNode = nodes.find((n) => n.id === connection.source);
+			const targetNode = nodes.find((n) => n.id === connection.target);
+
+			let sourceItemId, targetItemId;
+			if (sourceNode?.type === 'producer')
+			{
+				sourceItemId = sourceNode.data.outputs?.find((o) => o.id === connection.sourceHandle)?.itemId;
+			}
+			else if (sourceNode?.type === 'item')
+			{
+				sourceItemId = sourceNode.data.item?.id;
+			}
+			if (targetNode?.type === 'producer')
+			{
+				targetItemId = targetNode.data.inputs?.find((i) => i.id === connection.targetHandle)?.itemId;
+			}
+			else if (targetNode?.type === 'item')
+			{
+				targetItemId = targetNode.data.item?.id;
+			}
+
+			const invalid = !sourceItemId || !targetItemId || sourceItemId !== targetItemId;
+
+			const data: ItemFlowEdgeData = {
+				rate: 0,
+				invalid,
+			};
+
+			setEdges((eds) => addEdge({ ...connection, data }, eds));
+		},
+		[nodes, setEdges],
+	);
 
 	const onPaneContextMenu = useCallback(
 		function onPaneContextMenu(event: React.MouseEvent)
@@ -186,18 +223,39 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 
 	function isValidConnection(connection: Edge | Connection): boolean
 	{
+		return true;
+
 		const sourceNode = nodes.find((n) => n.id === connection.source);
 		const targetNode = nodes.find((n) => n.id === connection.target);
 
-		if (!sourceNode || !targetNode)
+		if (!sourceNode || !targetNode) return false;
+
+		// Get itemId from source handle
+		let sourceItemId: string | undefined;
+		if (sourceNode.type === 'producer')
 		{
-			throw new Error('Source or target node not found');
+			const output = sourceNode.data.outputs?.find((o) => o.id === connection.sourceHandle);
+			sourceItemId = output?.itemId;
+		}
+		else if (sourceNode.type === 'item')
+		{
+			sourceItemId = sourceNode.data.item?.id;
 		}
 
-		const sourceType = sourceNode.type as NodeType;
-		const targetType = targetNode.type as NodeType;
+		// Get itemId from target handle
+		let targetItemId: string | undefined;
+		if (targetNode.type === 'producer')
+		{
+			const input = targetNode.data.inputs?.find((i) => i.id === connection.targetHandle);
+			targetItemId = input?.itemId;
+		}
+		else if (targetNode.type === 'item')
+		{
+			targetItemId = targetNode.data.item?.id;
+		}
 
-		return true;
+		// Only allow if both itemIds exist and match
+		return !!sourceItemId && !!targetItemId && sourceItemId === targetItemId;
 	}
 
 	useEffect(() =>
