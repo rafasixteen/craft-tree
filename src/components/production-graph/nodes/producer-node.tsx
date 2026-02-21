@@ -1,6 +1,6 @@
 'use client';
 
-import { ItemNodeData, ProducerNodeData } from '@/components/production-graph';
+import { ItemNodeData, ProducerNodeData } from '@/components/production-graph/types';
 import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, useNodeConnections, useNodesData } from '@xyflow/react';
 import { getProducerInputs, getProducerOutputs, ProducerInput, useProducers } from '@/domain/producer';
 import { useActiveInventory } from '@/components/inventory';
@@ -8,7 +8,7 @@ import { ProducerCombobox } from '@/components/producer';
 import { useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
-import { ItemRate, ProductionRate } from '@/domain/production-graph';
+import { ItemRate } from '@/domain/production-graph';
 import { useEffect } from 'react';
 
 interface ProducerNodeProps
@@ -154,11 +154,14 @@ function InputHandle({ input, itemName, onChange }: InputHandleProps)
 		}
 		else if ('item' in nodeData && 'rate' in nodeData)
 		{
-			// Item node: use its rate
-			itemRate = {
-				itemId: nodeData.item.id,
-				rate: nodeData.rate,
-			};
+			if (nodeData.item)
+			{
+				// Item node: use its rate
+				itemRate = {
+					itemId: nodeData.item.id,
+					rate: nodeData.rate,
+				};
+			}
 		}
 	}
 

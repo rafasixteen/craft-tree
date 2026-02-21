@@ -2,29 +2,14 @@
 
 import '@xyflow/react/dist/style.css';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel } from '@xyflow/react';
-import type { Node, Edge, FitViewOptions, OnConnect, OnNodesChange, OnEdgesChange, DefaultEdgeOptions, ReactFlowInstance, Connection } from '@xyflow/react';
+import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel, getOutgoers } from '@xyflow/react';
+import type { ReactFlowInstance, Connection, NodeChange, EdgeChange } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { NodeType, ProducerNode, ItemFlowEdge, PaneContextMenu, NodeContextMenu, EdgeType, ItemNode, ItemFlowEdgeData } from '@/components/production-graph';
 import { Button } from '@/components/ui/button';
-
-const nodeTypes: Record<NodeType, React.ComponentType<any>> = {
-	producer: ProducerNode,
-	item: ItemNode,
-};
-
-const edgeTypes: Record<EdgeType, React.ComponentType<any>> = {
-	'item-flow': ItemFlowEdge,
-};
-
-const fitViewOptions: FitViewOptions = {
-	padding: 0.2,
-};
-
-const defaultEdgeOptions: DefaultEdgeOptions = {
-	animated: false,
-	type: 'item-flow',
-};
+import { getSourceItemId, getTargetItemId } from '@/components/production-graph/utils';
+import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/context-menus';
+import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/types';
+import { graphConfig } from '@/components/production-graph/production-graph.config';
 
 interface ProductionGraphProps
 {
@@ -46,65 +31,74 @@ type NodeMenu = {
 	right?: number;
 } | null;
 
-// TODO: Use custom handles to facilitate getting production rate data without having to search through the node's inputs/outputs for the correct handle id.
-// https://reactflow.dev/learn/advanced-use/computing-flows
-
 export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 {
 	const { resolvedTheme } = useTheme();
 
 	const theme = resolvedTheme ?? initialTheme;
 
-	const [nodes, setNodes] = useState<Node[]>([]);
-	const [edges, setEdges] = useState<Edge[]>([]);
+	const [nodes, setNodes] = useState<ProductionGraphNode[]>([]);
+	const [edges, setEdges] = useState<ProductionGraphEdge[]>([]);
 
-	const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
-	const { setViewport } = useReactFlow();
+	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<ProductionGraphNode, ProductionGraphEdge> | null>(null);
+	const { setViewport, getNodes, getEdges } = useReactFlow<ProductionGraphNode, ProductionGraphEdge>();
 
 	const [paneMenu, setPaneMenu] = useState<PaneMenu>(null);
 	const [nodeMenu, setNodeMenu] = useState<NodeMenu>(null);
 
 	const ref = useRef<HTMLDivElement>(null);
 
-	const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [setNodes]);
-	const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), [setEdges]);
-	// const onConnect: OnConnect = useCallback((connection) => setEdges((eds) => addEdge(connection, eds)), [setEdges]);
-
-	const onConnect: OnConnect = useCallback(
-		(connection) =>
+	const onNodesChange = useCallback(
+		function onNodesChange(changes: NodeChange<ProductionGraphNode>[])
 		{
-			// ...existing code to get nodes...
-			const sourceNode = nodes.find((n) => n.id === connection.source);
-			const targetNode = nodes.find((n) => n.id === connection.target);
-
-			let sourceItemId, targetItemId;
-			if (sourceNode?.type === 'producer')
-			{
-				sourceItemId = sourceNode.data.outputs?.find((o) => o.id === connection.sourceHandle)?.itemId;
-			}
-			else if (sourceNode?.type === 'item')
-			{
-				sourceItemId = sourceNode.data.item?.id;
-			}
-			if (targetNode?.type === 'producer')
-			{
-				targetItemId = targetNode.data.inputs?.find((i) => i.id === connection.targetHandle)?.itemId;
-			}
-			else if (targetNode?.type === 'item')
-			{
-				targetItemId = targetNode.data.item?.id;
-			}
-
-			const invalid = !sourceItemId || !targetItemId || sourceItemId !== targetItemId;
-
-			const data: ItemFlowEdgeData = {
-				rate: 0,
-				invalid,
-			};
-
-			setEdges((eds) => addEdge({ ...connection, data }, eds));
+			setNodes((nds) => applyNodeChanges(changes, nds));
 		},
-		[nodes, setEdges],
+		[setNodes],
+	);
+
+	const onEdgesChange = useCallback(
+		function onEdgesChange(changes: EdgeChange<ProductionGraphEdge>[])
+		{
+			setEdges((eds) => applyEdgeChanges(changes, eds));
+		},
+		[setEdges],
+	);
+
+	const onConnect = useCallback(
+		function onConnect(connection: Connection)
+		{
+			setEdges((eds) =>
+			{
+				const newEdges = addEdge({ ...connection, data: { rate: 0 } }, eds);
+				return validateEdges(newEdges);
+			});
+		},
+		[setEdges],
+	);
+
+	const validateEdges = useCallback(
+		function validateEdges(edges: ProductionGraphEdge[]): ProductionGraphEdge[]
+		{
+			return edges.map((edge) =>
+			{
+				const sourceNode = nodes.find((n) => n.id === edge.source);
+				const targetNode = nodes.find((n) => n.id === edge.target);
+
+				const sourceItemId = getSourceItemId(sourceNode, edge.sourceHandle);
+				const targetItemId = getTargetItemId(targetNode, edge.targetHandle);
+
+				const invalid = !sourceItemId || !targetItemId || sourceItemId !== targetItemId;
+
+				return {
+					...edge,
+					data: {
+						...edge.data,
+						invalid,
+					},
+				};
+			});
+		},
+		[nodes],
 	);
 
 	const onPaneContextMenu = useCallback(
@@ -143,7 +137,7 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 	);
 
 	const onNodeContextMenu = useCallback(
-		function onNodeContextMenu(event: React.MouseEvent, node: Node)
+		function onNodeContextMenu(event: React.MouseEvent, node: ProductionGraphNode)
 		{
 			// Prevent native context menu from showing.
 			event.preventDefault();
@@ -190,18 +184,21 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 		[setPaneMenu, setNodeMenu],
 	);
 
-	function saveGraph()
-	{
-		if (!rfInstance)
+	const saveGraph = useCallback(
+		function saveGraph()
 		{
-			return;
-		}
+			if (!rfInstance)
+			{
+				return;
+			}
 
-		const flow = rfInstance.toObject();
-		localStorage.setItem('production-graph', JSON.stringify(flow));
-	}
+			const flow = rfInstance.toObject();
+			localStorage.setItem('production-graph', JSON.stringify(flow));
+		},
+		[rfInstance],
+	);
 
-	function loadGraph()
+	const loadGraph = useCallback(function loadGraph()
 	{
 		const saved = localStorage.getItem('production-graph');
 
@@ -219,70 +216,73 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 			setEdges(flow.edges || []);
 			setViewport({ x, y, zoom });
 		}
-	}
+	}, []);
 
-	function isValidConnection(connection: Edge | Connection): boolean
+	const isValidConnection = useCallback(function isValidConnection(connection: ProductionGraphEdge | Connection): boolean
 	{
-		return true;
+		const nodes = getNodes();
+		const edges = getEdges();
 
-		const sourceNode = nodes.find((n) => n.id === connection.source);
-		const targetNode = nodes.find((n) => n.id === connection.target);
+		const target = nodes.find((node) => node.id === connection.target);
 
-		if (!sourceNode || !targetNode) return false;
-
-		// Get itemId from source handle
-		let sourceItemId: string | undefined;
-		if (sourceNode.type === 'producer')
+		function hasCycle(node: ProductionGraphNode, visited = new Set()): boolean
 		{
-			const output = sourceNode.data.outputs?.find((o) => o.id === connection.sourceHandle);
-			sourceItemId = output?.itemId;
-		}
-		else if (sourceNode.type === 'item')
-		{
-			sourceItemId = sourceNode.data.item?.id;
+			if (visited.has(node.id))
+			{
+				return false;
+			}
+
+			visited.add(node.id);
+
+			for (const outgoer of getOutgoers(node, nodes, edges))
+			{
+				if (outgoer.id === connection.source)
+				{
+					return true;
+				}
+
+				if (hasCycle(outgoer, visited))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
-		// Get itemId from target handle
-		let targetItemId: string | undefined;
-		if (targetNode.type === 'producer')
+		if (!target || target.id === connection.source)
 		{
-			const input = targetNode.data.inputs?.find((i) => i.id === connection.targetHandle);
-			targetItemId = input?.itemId;
-		}
-		else if (targetNode.type === 'item')
-		{
-			targetItemId = targetNode.data.item?.id;
+			return false;
 		}
 
-		// Only allow if both itemIds exist and match
-		return !!sourceItemId && !!targetItemId && sourceItemId === targetItemId;
-	}
+		return !hasCycle(target);
+	}, []);
 
 	useEffect(() =>
 	{
 		loadGraph();
 	}, []);
 
+	useEffect(() =>
+	{
+		setEdges((eds) => validateEdges(eds));
+	}, [nodes]);
+
 	return (
 		<div className="size-full">
-			<ReactFlow
+			<ReactFlow<ProductionGraphNode, ProductionGraphEdge>
+				{...graphConfig}
 				ref={ref}
 				nodes={nodes}
 				edges={edges}
-				nodeTypes={nodeTypes}
-				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
+				isValidConnection={isValidConnection}
+				onInit={setRfInstance}
 				onNodeContextMenu={onNodeContextMenu}
 				onContextMenu={onPaneContextMenu}
 				onPaneClick={onPaneClick}
-				isValidConnection={isValidConnection}
-				onInit={setRfInstance}
-				fitView
-				snapToGrid
-				fitViewOptions={fitViewOptions}
-				defaultEdgeOptions={defaultEdgeOptions}
 				colorMode={theme === 'dark' ? 'dark' : 'light'}
 			>
 				{paneMenu && <PaneContextMenu {...paneMenu} onClick={onPaneClick} />}

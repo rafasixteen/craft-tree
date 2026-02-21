@@ -1,6 +1,7 @@
 'use client';
 
-import { ItemNodeData, ProducerNodeData, ProductionRateComponent } from '@/components/production-graph';
+import { ItemNodeData, ProducerNodeData } from '@/components/production-graph/types';
+import { ProductionRateComponent } from '@/components/production-graph/production-rate';
 import { Edge, useReactFlow, Node, Position, useNodeConnections, useNodesData } from '@xyflow/react';
 import { useActiveInventory } from '@/components/inventory';
 import { useItems } from '@/domain/item';
@@ -9,6 +10,7 @@ import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-nod
 import { LabeledHandle } from '@/components/labeled-handle';
 import { ItemRate, ProductionRate } from '@/domain/production-graph';
 import { useEffect } from 'react';
+import { useIncomingItemRate } from '@/components/production-graph/hooks';
 
 interface ItemNodeProps
 {
@@ -24,6 +26,8 @@ export function ItemNode({ id, data }: ItemNodeProps)
 	const { item, rate, readonly } = data;
 
 	const { updateNodeData } = useReactFlow<Node<ItemNodeData>, Edge>();
+
+	const itemRate = useIncomingItemRate();
 
 	function onComboboxChange(itemId: string | null)
 	{

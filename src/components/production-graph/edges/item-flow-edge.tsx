@@ -1,5 +1,6 @@
-import { BaseEdge, EdgeProps, getSmoothStepPath, Node, Edge, useReactFlow, EdgeLabelRenderer } from '@xyflow/react';
-import { ItemFlowEdgeData } from '@/components/production-graph';
+import { BaseEdge, EdgeProps, getSmoothStepPath, EdgeLabelRenderer } from '@xyflow/react';
+import { ItemFlowEdgeData } from '@/components/production-graph/types';
+import { cn } from '@/lib/utils';
 
 interface ItemFlowEdgeProps extends EdgeProps
 {
@@ -8,11 +9,7 @@ interface ItemFlowEdgeProps extends EdgeProps
 
 export function ItemFlowEdge({ id, data, ...otherProps }: ItemFlowEdgeProps)
 {
-	const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, ...rest } = otherProps;
-
-	const { source, target } = rest;
-
-	const { updateEdgeData } = useReactFlow<Node, Edge<ItemFlowEdgeData>>();
+	const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = otherProps;
 
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
@@ -27,15 +24,13 @@ export function ItemFlowEdge({ id, data, ...otherProps }: ItemFlowEdgeProps)
 		transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
 	};
 
-	const color = data?.invalid ? 'red' : 'currentColor';
-
-	console.log('Rendering edge', { id, source, target, data });
+	const invalid = data.invalid ?? false;
 
 	return (
 		<>
 			<BaseEdge id={id} path={edgePath} />
 			<EdgeLabelRenderer>
-				<div style={style} className="nodrag nopan absolute">
+				<div style={style} className={cn('nodrag nopan absolute', invalid && 'text-destructive')}>
 					Test
 				</div>
 			</EdgeLabelRenderer>
