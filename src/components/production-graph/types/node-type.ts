@@ -1,1 +1,1 @@
-export type NodeType = 'producer';
+export type NodeType = 'item' | 'producer' | 'production-rate';

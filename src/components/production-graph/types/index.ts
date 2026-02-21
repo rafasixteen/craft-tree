@@ -1,2 +1,4 @@
+export * from './edge-data';
+export * from './edge-type';
+export * from './node-data';
 export * from './node-type';
-export * from './producer-node-data';

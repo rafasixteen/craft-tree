@@ -108,7 +108,7 @@ export default function ProducersPage()
 			<Header>
 				<div className="flex items-center gap-2">
 					<Button asChild variant="default" size="sm">
-						<Link href="items/add">Add Item</Link>
+						<Link href="producers/add">Add Producer</Link>
 					</Button>
 
 					<Input type="text" placeholder="Search items..." value={localSearch} onChange={onSearchBarChange} className="w-48 md:w-64" />

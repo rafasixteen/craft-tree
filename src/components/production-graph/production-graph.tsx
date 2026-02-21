@@ -1,21 +1,21 @@
 'use client';
 
 import '@xyflow/react/dist/style.css';
-import { useState, useCallback, useRef } from 'react';
-import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background } from '@xyflow/react';
-import type { Node, Edge, FitViewOptions, OnConnect, OnNodesChange, OnEdgesChange, OnNodeDrag, DefaultEdgeOptions } from '@xyflow/react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel } from '@xyflow/react';
+import type { Node, Edge, FitViewOptions, OnConnect, OnNodesChange, OnEdgesChange, DefaultEdgeOptions, ReactFlowInstance, Connection } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { NodeType, ProducerNode, PaneContextMenu, NodeContextMenu } from '@/components/production-graph';
-
-const initialNodes: Node[] = [
-	{ id: '1', data: { label: 'Node 1' }, position: { x: 5, y: 5 } },
-	{ id: '2', data: { label: 'Node 2' }, position: { x: 5, y: 100 } },
-];
-
-const initialEdges: Edge[] = [{ id: 'e1-2', source: '1', target: '2' }];
+import { NodeType, ProducerNode, ItemFlowEdge, PaneContextMenu, NodeContextMenu, EdgeType, ItemNode, ProductionRateNode, ProducerNodeData } from '@/components/production-graph';
+import { Button } from '@/components/ui/button';
 
 const nodeTypes: Record<NodeType, React.ComponentType<any>> = {
 	producer: ProducerNode,
+	item: ItemNode,
+	'production-rate': ProductionRateNode,
+};
+
+const edgeTypes: Record<EdgeType, React.ComponentType<any>> = {
+	'item-flow': ItemFlowEdge,
 };
 
 const fitViewOptions: FitViewOptions = {
@@ -24,11 +24,7 @@ const fitViewOptions: FitViewOptions = {
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
 	animated: false,
-};
-
-const onNodeDrag: OnNodeDrag = (_, node) =>
-{
-	console.log('drag event', node.data);
+	type: 'item-flow',
 };
 
 interface ProductionGraphProps
@@ -51,14 +47,20 @@ type NodeMenu = {
 	right?: number;
 } | null;
 
+// TODO: Use custom handles to facilitate getting production rate data without having to search through the node's inputs/outputs for the correct handle id.
+// https://reactflow.dev/learn/advanced-use/computing-flows
+
 export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 {
 	const { resolvedTheme } = useTheme();
 
 	const theme = resolvedTheme ?? initialTheme;
 
-	const [nodes, setNodes] = useState<Node[]>(initialNodes);
-	const [edges, setEdges] = useState<Edge[]>(initialEdges);
+	const [nodes, setNodes] = useState<Node[]>([]);
+	const [edges, setEdges] = useState<Edge[]>([]);
+
+	const [rfInstance, setRfInstance] = useState<ReactFlowInstance | null>(null);
+	const { setViewport } = useReactFlow();
 
 	const [paneMenu, setPaneMenu] = useState<PaneMenu>(null);
 	const [nodeMenu, setNodeMenu] = useState<NodeMenu>(null);
@@ -152,6 +154,68 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 		[setPaneMenu, setNodeMenu],
 	);
 
+	function saveGraph()
+	{
+		if (!rfInstance)
+		{
+			return;
+		}
+
+		const flow = rfInstance.toObject();
+		localStorage.setItem('production-graph', JSON.stringify(flow));
+	}
+
+	function loadGraph()
+	{
+		const saved = localStorage.getItem('production-graph');
+
+		if (!saved)
+		{
+			return;
+		}
+
+		const flow = JSON.parse(saved);
+
+		if (flow)
+		{
+			const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+			setNodes(flow.nodes || []);
+			setEdges(flow.edges || []);
+			setViewport({ x, y, zoom });
+		}
+	}
+
+	function isValidConnection(connection: Edge | Connection): boolean
+	{
+		const sourceNode = nodes.find((n) => n.id === connection.source);
+		const targetNode = nodes.find((n) => n.id === connection.target);
+
+		if (!sourceNode || !targetNode)
+		{
+			throw new Error('Source or target node not found');
+		}
+
+		const sourceType = sourceNode.type as NodeType;
+		const targetType = targetNode.type as NodeType;
+
+		switch (sourceType)
+		{
+			case 'item':
+				return targetType === 'production-rate';
+			case 'producer':
+				return targetType === 'production-rate' || targetType === 'producer';
+			case 'production-rate':
+				return targetType === 'producer';
+			default:
+				throw new Error(`Unknown source node type: ${sourceType}`);
+		}
+	}
+
+	useEffect(() =>
+	{
+		loadGraph();
+	}, []);
+
 	return (
 		<div className="size-full">
 			<ReactFlow
@@ -159,13 +223,15 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 				nodes={nodes}
 				edges={edges}
 				nodeTypes={nodeTypes}
+				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
-				onNodeDrag={onNodeDrag}
 				onNodeContextMenu={onNodeContextMenu}
 				onContextMenu={onPaneContextMenu}
 				onPaneClick={onPaneClick}
+				isValidConnection={isValidConnection}
+				onInit={setRfInstance}
 				fitView
 				snapToGrid
 				fitViewOptions={fitViewOptions}
@@ -176,6 +242,10 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 				{nodeMenu && <NodeContextMenu {...nodeMenu} onClick={onPaneClick} />}
 				<Controls />
 				<Background gap={20} size={1} />
+				<Panel position="top-right">
+					<Button onClick={saveGraph}>save</Button>
+					<Button onClick={loadGraph}>restore</Button>
+				</Panel>
 			</ReactFlow>
 		</div>
 	);

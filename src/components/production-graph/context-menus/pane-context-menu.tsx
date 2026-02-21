@@ -1,8 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useReactFlow } from '@xyflow/react';
-import { ProducerNodeData } from '@/components/production-graph';
-import React from 'react';
+import { ItemNodeData, ProducerNodeData, ProductionRateNodeData } from '@/components/production-graph';
+import React, { useCallback } from 'react';
 
 interface PaneContextMenuProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -25,24 +25,72 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 		zIndex: 10,
 	};
 
-	function addProducer(e: React.MouseEvent)
-	{
-		const data: ProducerNodeData = {
-			producer: null,
-		};
+	const addItem = useCallback(
+		function addItem(e: React.MouseEvent)
+		{
+			const data: ItemNodeData = {
+				item: null,
+			};
 
-		addNodes({
-			id: `producer-${Date.now()}`,
-			type: 'producer',
-			position: screenToFlowPosition({ x: e.clientX, y: e.clientY }),
-			data: data,
-		});
-	}
+			addNodes({
+				id: `item-${crypto.randomUUID()}`,
+				type: 'item',
+				position: screenToFlowPosition({ x: e.clientX, y: e.clientY }),
+				data: data,
+			});
+		},
+		[addNodes, screenToFlowPosition],
+	);
+
+	const addProducer = useCallback(
+		function addProducer(e: React.MouseEvent)
+		{
+			const data: ProducerNodeData = {
+				producer: null,
+				inputs: null,
+				outputs: null,
+			};
+
+			addNodes({
+				id: `producer-${crypto.randomUUID()}`,
+				type: 'producer',
+				position: screenToFlowPosition({ x: e.clientX, y: e.clientY }),
+				data: data,
+			});
+		},
+		[addNodes, screenToFlowPosition],
+	);
+
+	const addProductionRate = useCallback(
+		function addProductionRate(e: React.MouseEvent)
+		{
+			const data: ProductionRateNodeData = {
+				rate: {
+					amount: 1,
+					per: 'second',
+				},
+			};
+
+			addNodes({
+				id: `production-rate-${crypto.randomUUID()}`,
+				type: 'production-rate',
+				position: screenToFlowPosition({ x: e.clientX, y: e.clientY }),
+				data: data,
+			});
+		},
+		[addNodes, screenToFlowPosition],
+	);
 
 	return (
-		<Card style={style} {...props} className="gap-2 p-2">
-			<Button variant="ghost" size="sm" className="w-full" onClick={addProducer}>
+		<Card style={style} {...props} className="gap-0 p-1">
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addItem}>
+				Add Item
+			</Button>
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addProducer}>
 				Add Producer
+			</Button>
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addProductionRate}>
+				Add Production Rate
 			</Button>
 		</Card>
 	);

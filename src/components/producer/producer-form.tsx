@@ -184,7 +184,7 @@ function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayPro
 								render={({ field: controllerField, fieldState }) => (
 									<Field orientation="horizontal" data-invalid={fieldState.invalid}>
 										<FieldContent>
-											<ItemCombobox {...controllerField} availableItems={filteredItems} id={`${name}-item-${index}`} aria-invalid={fieldState.invalid} />
+											<ItemCombobox {...controllerField} items={filteredItems} id={`${name}-item-${index}`} aria-invalid={fieldState.invalid} />
 											{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 										</FieldContent>
 									</Field>

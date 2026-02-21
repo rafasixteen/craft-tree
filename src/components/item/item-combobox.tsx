@@ -1,20 +1,21 @@
 import { useCallback } from 'react';
-import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from '../ui/combobox';
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from '@/components/ui/combobox';
 import { Item } from '@/domain/item';
 
 interface ItemComboboxProps extends Omit<React.ComponentProps<typeof Combobox<Item>>, 'items' | 'value' | 'onValueChange' | 'itemToStringValue' | 'itemToStringLabel'>
 {
-	availableItems: Item[];
+	items: Item[];
 	value: Item['id'] | null;
 	onChange: (itemId: Item['id'] | null) => void;
+	className?: string;
 	'aria-invalid'?: boolean;
 }
 
-export function ItemCombobox({ availableItems, value, onChange, ...props }: ItemComboboxProps)
+export function ItemCombobox({ items, value, onChange, ...props }: ItemComboboxProps)
 {
-	const selectedItem = availableItems.find((item) => item.id === value) ?? null;
+	const selectedItem = items.find((item) => item.id === value) ?? null;
 
-	const { 'aria-invalid': ariaInvalid, ...restProps } = props;
+	const { 'aria-invalid': ariaInvalid, className, ...restProps } = props;
 
 	const onValueChange = useCallback(
 		function onValueChange(item: Item | null)
@@ -26,14 +27,14 @@ export function ItemCombobox({ availableItems, value, onChange, ...props }: Item
 
 	return (
 		<Combobox<Item>
-			items={availableItems}
+			items={items}
 			value={selectedItem}
 			onValueChange={onValueChange}
 			itemToStringValue={(item) => item.id}
 			itemToStringLabel={(item) => item.name}
 			{...restProps}
 		>
-			<ComboboxInput placeholder="Search item..." className="w-full" aria-invalid={ariaInvalid} />
+			<ComboboxInput placeholder="Search item..." className={className} aria-invalid={ariaInvalid} />
 			<ComboboxContent>
 				<ComboboxEmpty>No items found.</ComboboxEmpty>
 				<ComboboxList>
