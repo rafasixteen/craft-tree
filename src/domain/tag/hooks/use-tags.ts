@@ -2,9 +2,10 @@
 
 import { getTags, Tag } from '@/domain/tag';
 import { useCallback } from 'react';
-import { Inventory } from '@/domain/inventory';
 import * as TagServerActions from '@/domain/tag/server';
 import useSWR from 'swr';
+
+type UseTagsParams = Parameters<typeof TagServerActions.getTags>[0];
 
 type CreateTagParams = Omit<Parameters<typeof TagServerActions.createTag>[0], 'inventoryId'>;
 
@@ -12,10 +13,10 @@ type UpdateTagParams = Parameters<typeof TagServerActions.updateTag>[0];
 
 type DeleteTagParams = Parameters<typeof TagServerActions.deleteTag>[0];
 
-export function useTags(inventoryId: Inventory['id'])
+export function useTags({ inventoryId, options }: UseTagsParams)
 {
-	const swrKey = ['tags', inventoryId];
-	const fetcher = () => getTags({ inventoryId });
+	const swrKey = ['tags', inventoryId, options];
+	const fetcher = () => getTags({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,

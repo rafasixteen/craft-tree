@@ -22,7 +22,7 @@ export default function ProducersPage()
 	const searchParams = useSearchParams();
 
 	const inventory = useActiveInventory();
-	const { tags: inventoryTags } = useTags(inventory.id);
+	const { tags: inventoryTags } = useTags({ inventoryId: inventory.id });
 
 	const rawSearch = searchParams.get('search') ?? '';
 	const rawTags = searchParams.get('tags') ?? '';
@@ -111,7 +111,7 @@ export default function ProducersPage()
 						<Link href="producers/add">Add Producer</Link>
 					</Button>
 
-					<Input type="text" placeholder="Search items..." value={localSearch} onChange={onSearchBarChange} className="w-48 md:w-64" />
+					<Input type="text" placeholder="Search producers..." value={localSearch} onChange={onSearchBarChange} className="w-48 md:w-64" />
 				</div>
 				<TagsCombobox value={localTagIds} onIdsChange={onTagsComboBoxChange} className="w-48 md:w-64" maxChips={2} />
 			</Header>

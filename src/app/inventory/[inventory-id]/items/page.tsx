@@ -22,7 +22,7 @@ export default function ItemsPage()
 	const searchParams = useSearchParams();
 
 	const inventory = useActiveInventory();
-	const { tags: inventoryTags } = useTags(inventory.id);
+	const { tags: inventoryTags } = useTags({ inventoryId: inventory.id });
 
 	const rawSearch = searchParams.get('search') ?? '';
 	const rawTags = searchParams.get('tags') ?? '';

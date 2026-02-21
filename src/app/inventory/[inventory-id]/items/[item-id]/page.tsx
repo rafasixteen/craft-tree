@@ -13,7 +13,7 @@ export default function ItemPage()
 	const { item } = useItem(itemId);
 
 	const { tags: itemTags } = useItemTags(itemId);
-	const { tags: inventoryTags } = useTags(item.inventoryId);
+	const { tags: inventoryTags } = useTags({ inventoryId: item.inventoryId });
 
 	const tags = itemTags.map((tag) => inventoryTags.find((t) => t.id === tag.tagId));
 

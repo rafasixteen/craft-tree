@@ -15,7 +15,7 @@ export default function ProducerPage()
 	const { outputs } = useProducerOutputs(producerId);
 
 	const { tags: producerTags } = useProducerTags(producerId);
-	const { tags: inventoryTags } = useTags(producer.inventoryId);
+	const { tags: inventoryTags } = useTags({ inventoryId: producer.inventoryId });
 
 	const tags = producerTags.map((tag) => inventoryTags.find((t) => t.id === tag.tagId));
 
