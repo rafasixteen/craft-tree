@@ -2,7 +2,7 @@
 
 import { ItemNodeData, ProducerNodeData } from '@/components/production-graph';
 import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, useNodeConnections, useNodesData } from '@xyflow/react';
-import { getProducerInputs, getProducerOutputs, useProducers } from '@/domain/producer';
+import { getProducerInputs, getProducerOutputs, ProducerInput, useProducers } from '@/domain/producer';
 import { useActiveInventory } from '@/components/inventory';
 import { ProducerCombobox } from '@/components/producer';
 import { useItems } from '@/domain/item';
@@ -82,13 +82,14 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 				{/* Inputs */}
 				<div className="flex flex-col justify-center gap-3">
 					{inputs?.map((input) => (
-						<LabeledHandle
+						<InputHandle
 							key={input.id}
-							id={input.id}
-							type="target"
-							position={Position.Left}
-							title={`x${input.quantity} ${getItemName(input.itemId)}`}
-							labelClassName="text-xs"
+							itemName={getItemName(input.itemId)}
+							input={input}
+							onChange={(rate) =>
+							{
+								console.log('Input rate changed:', rate);
+							}}
 						/>
 					))}
 				</div>
@@ -113,13 +114,18 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 
 interface InputHandleProps
 {
+	input: ProducerInput;
+	itemName: string;
 	onChange: (rate: ItemRate | null) => void;
 }
 
-function InputHandle({ onChange }: InputHandleProps)
+function InputHandle({ input, itemName, onChange }: InputHandleProps)
 {
+	// TODO: Make this type safe.
+
 	const connections = useNodeConnections({
 		handleType: 'target',
+		handleId: input.id,
 	});
 
 	const node = useNodesData<Node<ProducerNodeData> | Node<ItemNodeData>>(connections?.[0]?.source);
@@ -127,36 +133,33 @@ function InputHandle({ onChange }: InputHandleProps)
 
 	let itemRate: ItemRate | null = null;
 
-	if (nodeData && 'outputs' in nodeData)
+	if (nodeData)
 	{
-	}
-	else if (nodeData && 'item' in nodeData && 'rate' in nodeData)
-	{
-	}
+		if ('outputs' in nodeData && nodeData.outputs)
+		{
+			// Producer node: find the output matching the handle
+			const connection = connections?.[0];
+			const output = nodeData.outputs.find((o) => o.id === connection?.sourceHandle);
 
-	const producer = nodeData?.producer;
-	const outputs = nodeData?.outputs;
-
-	const output = outputs?.find((o) => o.id === connections?.[0]?.sourceHandle);
-
-	let troughput: number = 1;
-
-	if (output && producer)
-	{
-		troughput = output.quantity / producer.time;
-	}
-
-	const rate: ProductionRate = {
-		amount: troughput,
-		per: 'second',
-	};
-
-	if (output)
-	{
-		itemRate = {
-			itemId: output.itemId,
-			rate: rate,
-		};
+			if (output && nodeData.producer)
+			{
+				itemRate = {
+					itemId: output.itemId,
+					rate: {
+						amount: output.quantity / nodeData.producer.time,
+						per: 'second',
+					},
+				};
+			}
+		}
+		else if ('item' in nodeData && 'rate' in nodeData)
+		{
+			// Item node: use its rate
+			itemRate = {
+				itemId: nodeData.item.id,
+				rate: nodeData.rate,
+			};
+		}
 	}
 
 	useEffect(() =>
@@ -164,5 +167,5 @@ function InputHandle({ onChange }: InputHandleProps)
 		onChange(itemRate);
 	}, [nodeData]);
 
-	return <LabeledHandle type="target" position={Position.Left} title="" />;
+	return <LabeledHandle key={input.id} id={input.id} type="target" position={Position.Left} title={`x${input.quantity} ${itemName}`} labelClassName="text-xs" />;
 }
