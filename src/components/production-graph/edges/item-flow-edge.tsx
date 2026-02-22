@@ -1,6 +1,6 @@
 import { BaseEdge, EdgeProps, getSmoothStepPath, EdgeLabelRenderer } from '@xyflow/react';
 import { ItemFlowEdgeData } from '@/components/production-graph/types';
-import { useEdgeStatus, useSourceItemRate } from '@/components/production-graph/hooks';
+import { useEdgeStatus, useSupply } from '@/components/production-graph/hooks';
 
 interface ItemFlowEdgeProps extends EdgeProps
 {
@@ -9,7 +9,8 @@ interface ItemFlowEdgeProps extends EdgeProps
 
 export function ItemFlowEdge({ id, ...otherProps }: ItemFlowEdgeProps)
 {
-	const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, source, target, targetHandleId } = otherProps;
+	const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = otherProps;
+	const { source, target, sourceHandleId, targetHandleId } = otherProps;
 
 	const [edgePath, labelX, labelY] = getSmoothStepPath({
 		sourceX,
@@ -24,9 +25,17 @@ export function ItemFlowEdge({ id, ...otherProps }: ItemFlowEdgeProps)
 		transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
 	};
 
-	// Get rate and status
-	const itemRate = useSourceItemRate(source);
-	const status = useEdgeStatus(source, target, targetHandleId);
+	const itemRate = useSupply({
+		sourceNodeId: source,
+		sourceHandleId: sourceHandleId,
+	});
+
+	const status = useEdgeStatus({
+		sourceNodeId: source,
+		targetNodeId: target,
+		sourceHandleId: sourceHandleId,
+		targetHandleId: targetHandleId,
+	});
 
 	let color = 'gray';
 	if (status === 'valid') color = 'green';
@@ -37,8 +46,8 @@ export function ItemFlowEdge({ id, ...otherProps }: ItemFlowEdgeProps)
 		<>
 			<BaseEdge id={id} path={edgePath} style={{ stroke: color, strokeWidth: 2 }} />
 			<EdgeLabelRenderer>
-				<div style={{ ...style, color }} className="nodrag nopan absolute font-bold">
-					{itemRate?.rate.amount ?? 0} {itemRate?.rate.per ?? 'second'}
+				<div style={{ ...style, color }} className="nodrag nopan absolute">
+					{itemRate && `${itemRate.rate.amount.toFixed(2)}/s`}
 				</div>
 			</EdgeLabelRenderer>
 		</>

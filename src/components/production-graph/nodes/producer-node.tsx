@@ -61,7 +61,8 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 
 	return (
 		<BaseNode className="flex flex-col p-0">
-			<BaseNodeHeader className="m-0 border-b">
+			<BaseNodeHeader className="m-0 flex-col border-b">
+				<p className="text-xs">{id}</p>
 				<ProducerCombobox producers={producers} value={producer?.id ?? null} onChange={onComboboxChange} className="nodrag w-full" />
 			</BaseNodeHeader>
 			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
