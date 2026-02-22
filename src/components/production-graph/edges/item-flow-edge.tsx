@@ -47,7 +47,7 @@ export function ItemFlowEdge({ id, ...otherProps }: ItemFlowEdgeProps)
 			<BaseEdge id={id} path={edgePath} style={{ stroke: color, strokeWidth: 2 }} />
 			<EdgeLabelRenderer>
 				<div style={{ ...style, color }} className="nodrag nopan absolute">
-					{itemRate && `${itemRate.rate.amount.toFixed(2)}/s`}
+					{itemRate && `${itemRate.rate.amount.toFixed(2)}/${itemRate.rate.per.charAt(0)}`}
 				</div>
 			</EdgeLabelRenderer>
 		</>
