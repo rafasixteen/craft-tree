@@ -48,7 +48,7 @@ export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): It
 			throw new Error('Producer node supply must have sourceHandleId');
 		}
 
-		const output = outputs.find((o: ProducerOutput) => o.id === sourceHandleId);
+		const output = outputs.find((o: ProducerOutput) => o.itemId === sourceHandleId);
 
 		if (!output)
 		{

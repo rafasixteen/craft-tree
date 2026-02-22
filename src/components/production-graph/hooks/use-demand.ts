@@ -23,7 +23,7 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 		return null;
 	}
 
-	const input = node.data.inputs.find((i) => i.id === targetHandleId);
+	const input = node.data.inputs.find((i) => i.itemId === targetHandleId);
 
 	if (!input)
 	{

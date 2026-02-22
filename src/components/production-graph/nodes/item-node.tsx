@@ -18,14 +18,18 @@ interface ItemNodeProps
 
 export function ItemNode({ id, data }: ItemNodeProps)
 {
-	const invetory = useActiveInventory();
-	const { items } = useItems({ inventoryId: invetory.id });
-	const { item, rate } = data;
 	const { updateNodeData } = useReactFlow<Node<ItemNodeData>, Edge>();
+
+	const invetory = useActiveInventory();
+
+	const { items } = useItems({ inventoryId: invetory.id });
+
+	const { item, rate } = data;
 
 	function onComboboxChange(itemId: string | null)
 	{
 		const selectedItem = items.find((p) => p.id === itemId) ?? null;
+
 		updateNodeData(id, {
 			item: selectedItem,
 		});

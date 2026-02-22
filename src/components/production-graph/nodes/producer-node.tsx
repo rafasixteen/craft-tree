@@ -17,38 +17,77 @@ interface ProducerNodeProps
 
 export function ProducerNode({ id, data }: ProducerNodeProps)
 {
+	const { updateNodeData, getEdges, setEdges } = useReactFlow<Node<ProducerNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
+
 	const invetory = useActiveInventory();
+
 	const { producers } = useProducers({ inventoryId: invetory.id });
 	const { items } = useItems({ inventoryId: invetory.id });
+
+	// TODO: Add a use producer inputs and outputs so we can rehydrate with db state.
+	// This is to prevent the stale data when the db changes, which currently arent reflected
+	// in node data.
+
 	const { producer, inputs, outputs } = data;
-	const { updateNodeData, getEdges, setEdges } = useReactFlow<Node<ProducerNodeData>, Edge>();
 
 	function onComboboxChange(producerId: string | null)
 	{
-		const selectedProducer = producers.find((p) => p.id === producerId) ?? null;
-		// Remove edges connected to this node
+		// Remove only edges whose handle id (itemId) is no longer present in the new producer's inputs/outputs.
 		const edges = getEdges();
-		const filtered = edges.filter((e) => e.source !== id && e.target !== id);
-		setEdges(filtered);
-		if (!selectedProducer)
+
+		// If no producer is selected, remove all edges connected to this node.
+		if (!producerId)
 		{
+			const filtered = edges.filter((e) => e.source !== id && e.target !== id);
+
+			setEdges(filtered);
+
 			updateNodeData(id, {
 				producer: null,
 				inputs: null,
 				outputs: null,
 			});
+
 			return;
 		}
-		const inputs = getProducerInputs(selectedProducer.id);
-		const outputs = getProducerOutputs(selectedProducer.id);
-		Promise.all([inputs, outputs]).then(([inputs, outputs]) =>
+
+		// Get new input/output itemIds for the selected producer
+		const inputsPromise = getProducerInputs(producerId);
+		const outputsPromise = getProducerOutputs(producerId);
+
+		Promise.all([inputsPromise, outputsPromise]).then(([inputs, outputs]) =>
 		{
+			const inputItemIds = new Set(inputs.map((input) => input.itemId));
+			const outputItemIds = new Set(outputs.map((output) => output.itemId));
+
+			// Only keep edges that refer to itemIds still present in the new producer's inputs/outputs
+			const filtered = edges.filter((e) =>
+			{
+				// If this node is the source, check if the sourceHandleId is still a valid output itemId
+				if (e.source === id && e.sourceHandle)
+				{
+					return outputItemIds.has(e.sourceHandle);
+				}
+
+				// If this node is the target, check if the targetHandleId is still a valid input itemId
+				if (e.target === id && e.targetHandle)
+				{
+					return inputItemIds.has(e.targetHandle);
+				}
+
+				// Otherwise, keep the edge
+				return true;
+			});
+
+			setEdges(filtered);
+
 			updateNodeData(id, {
-				producer: selectedProducer,
+				producer: producers.find((p) => p.id === producerId) ?? null,
 				inputs: inputs,
 				outputs: outputs,
 			});
+
 			updateNodeInternals(id);
 		});
 	}
@@ -61,17 +100,16 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 
 	return (
 		<BaseNode className="flex flex-col p-0">
-			<BaseNodeHeader className="m-0 flex-col border-b">
-				<p className="text-xs">{id}</p>
+			<BaseNodeHeader className="m-0 border-b">
 				<ProducerCombobox producers={producers} value={producer?.id ?? null} onChange={onComboboxChange} className="nodrag w-full" />
 			</BaseNodeHeader>
 			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
 				{/* Inputs */}
 				<div className="flex flex-col justify-center gap-3">
-					{inputs?.map((input) => (
+					{inputs?.map((input, index) => (
 						<LabeledHandle
-							key={input.id}
-							id={input.id}
+							key={index}
+							id={input.itemId}
 							type="target"
 							position={Position.Left}
 							title={`x${input.quantity} ${getItemName(input.itemId)}`}
@@ -79,12 +117,13 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 						/>
 					))}
 				</div>
+
 				{/* Outputs */}
 				<div className="flex flex-col justify-center gap-3">
-					{outputs?.map((output) => (
+					{outputs?.map((output, index) => (
 						<LabeledHandle
-							key={output.id}
-							id={output.id}
+							key={index}
+							id={output.itemId}
 							type="source"
 							position={Position.Right}
 							title={`x${output.quantity} ${getItemName(output.itemId)}`}
