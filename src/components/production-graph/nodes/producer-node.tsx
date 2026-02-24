@@ -1,21 +1,20 @@
 'use client';
 
-import { ProducerNodeData } from '@/components/production-graph/types';
-import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals } from '@xyflow/react';
+import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/types';
+import { useProducerInputs } from '@/components/production-graph/hooks';
+import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, NodeProps } from '@xyflow/react';
 import { getProducerInputs, getProducerOutputs, useProducers } from '@/domain/producer';
 import { useActiveInventory } from '@/components/inventory';
 import { ProducerCombobox } from '@/components/producer';
 import { useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
+import { convertProductionRate, ItemRate, ProductionRate, TimeUnit } from '@/domain/production-graph';
+import { NodeAppendix } from '@/components/node-appendix';
+import { Input } from '@/components/ui/input';
+import { useEffect } from 'react';
 
-interface ProducerNodeProps
-{
-	id: string;
-	data: ProducerNodeData;
-}
-
-export function ProducerNode({ id, data }: ProducerNodeProps)
+export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 {
 	const { updateNodeData, getEdges, setEdges } = useReactFlow<Node<ProducerNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -29,7 +28,7 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 	// This is to prevent the stale data when the db changes, which currently arent reflected
 	// in node data.
 
-	const { producer, inputs, outputs } = data;
+	const { producer, inputs, outputs, producerCount } = data;
 
 	function onComboboxChange(producerId: string | null)
 	{
@@ -98,10 +97,89 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 		return item ? item.name : 'Unknown Item';
 	}
 
+	function onChange(newRates: ItemRate[])
+	{
+		updateNodeData(id, {
+			inputRates: newRates,
+		});
+
+		if (!inputs || !outputs || !producer)
+		{
+			return;
+		}
+
+		// Build rate lookup
+		const rateMap = new Map<string, number>();
+
+		for (const r of newRates)
+		{
+			const converted = convertProductionRate(r.rate, 'second');
+			rateMap.set(r.itemId, converted.amount);
+		}
+
+		// ----------------------------
+		// 1️⃣ Calculate supply-limited cycles/sec
+		// ----------------------------
+		let supplyLimitedCycles = Infinity;
+
+		for (const input of inputs)
+		{
+			const suppliedPerSecond = rateMap.get(input.itemId);
+
+			if (!suppliedPerSecond)
+			{
+				supplyLimitedCycles = 0;
+				break;
+			}
+
+			const possibleCycles = suppliedPerSecond / input.quantity;
+
+			supplyLimitedCycles = Math.min(supplyLimitedCycles, possibleCycles);
+		}
+
+		// ----------------------------
+		// 2️⃣ Calculate machine-limited cycles/sec
+		// ----------------------------
+		const singleMachineMax = 1 / producer.time;
+		const machineLimitedCycles = producerCount * singleMachineMax;
+
+		// ----------------------------
+		// 3️⃣ Final production rate
+		// ----------------------------
+		const actualCycles = Math.min(supplyLimitedCycles, machineLimitedCycles);
+
+		if (actualCycles <= 0 || actualCycles === Infinity)
+		{
+			updateNodeData(id, { outputRates: null });
+			return;
+		}
+
+		// ----------------------------
+		// 4️⃣ Scale outputs
+		// ----------------------------
+		const outputRates = outputs.map((output) => ({
+			itemId: output.itemId,
+			rate: {
+				amount: output.quantity * actualCycles,
+				per: 'second' as TimeUnit,
+			},
+		}));
+
+		updateNodeData(id, { outputRates });
+	}
+
+	const inputRates = useProducerInputs();
+
+	useEffect(() =>
+	{
+		onChange(inputRates);
+	}, [inputRates, producerCount]);
+
 	return (
 		<BaseNode className="flex flex-col p-0">
-			<BaseNodeHeader className="m-0 border-b">
+			<BaseNodeHeader className="m-0 flex-col border-b">
 				<ProducerCombobox producers={producers} value={producer?.id ?? null} onChange={onComboboxChange} className="nodrag w-full" />
+				<Input type="number" min={1} value={producerCount} onChange={(e) => updateNodeData(id, { producerCount: Number(e.target.value) })} className="nodrag w-16" />
 			</BaseNodeHeader>
 			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
 				{/* Inputs */}
@@ -132,6 +210,41 @@ export function ProducerNode({ id, data }: ProducerNodeProps)
 					))}
 				</div>
 			</BaseNodeContent>
+			<NodeAppendix position="bottom" className="flex flex-row justify-between p-0 py-3 text-xs">
+				<div className="flex flex-col justify-center gap-3">
+					<p>Demand</p>
+					{inputs?.map((input) =>
+					{
+						const rate: ProductionRate = {
+							amount: (input.quantity / producer!.time) * producerCount,
+							per: 'second',
+						};
+
+						return (
+							<div key={input.itemId}>
+								{getItemName(input.itemId)}: {rate.amount.toFixed(2)}/{rate.per}
+							</div>
+						);
+					})}
+				</div>
+
+				<div className="flex flex-col justify-center gap-3">
+					<p>Supply</p>
+					{outputs?.map((output) =>
+					{
+						const rate: ProductionRate = {
+							amount: (output.quantity / producer!.time) * producerCount,
+							per: 'second',
+						};
+
+						return (
+							<div key={output.itemId}>
+								{getItemName(output.itemId)}: {rate.amount.toFixed(2)}/{rate.per}
+							</div>
+						);
+					})}
+				</div>
+			</NodeAppendix>
 		</BaseNode>
 	);
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import { ItemNodeData } from '@/components/production-graph/types';
+import { ItemGraphNode, ItemNodeData } from '@/components/production-graph/types';
 import { ProductionRateComponent } from '@/components/production-graph/production-rate';
-import { Edge, useReactFlow, Node, Position } from '@xyflow/react';
+import { Edge, useReactFlow, Node, Position, NodeProps } from '@xyflow/react';
 import { useActiveInventory } from '@/components/inventory';
 import { useItems } from '@/domain/item';
 import { ItemCombobox } from '@/components/item';
@@ -10,13 +10,7 @@ import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-nod
 import { LabeledHandle } from '@/components/labeled-handle';
 import { ProductionRate } from '@/domain/production-graph';
 
-interface ItemNodeProps
-{
-	id: string;
-	data: ItemNodeData;
-}
-
-export function ItemNode({ id, data }: ItemNodeProps)
+export function ItemNode({ id, data }: NodeProps<ItemGraphNode>)
 {
 	const { updateNodeData } = useReactFlow<Node<ItemNodeData>, Edge>();
 

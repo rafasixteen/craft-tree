@@ -1,4 +1,4 @@
-import { useNodes } from '@xyflow/react';
+import { useNodesData } from '@xyflow/react';
 import { ItemRate } from '@/domain/production-graph';
 import { ProductionGraphNode } from '@/components/production-graph/types';
 
@@ -10,8 +10,7 @@ interface UseSupplyParams
 
 export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): ItemRate | null
 {
-	const nodes = useNodes<ProductionGraphNode>();
-	const node = nodes.find((n) => n.id === sourceNodeId);
+	const node = useNodesData<ProductionGraphNode>(sourceNodeId ?? '');
 
 	if (!node)
 	{

@@ -1,31 +1,18 @@
-import { BaseEdge, EdgeProps, getSmoothStepPath, EdgeLabelRenderer } from '@xyflow/react';
-import { ItemFlowEdgeData } from '@/components/production-graph/types';
+import { BaseEdge, EdgeProps, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
+import { ItemFlowGraphEdge } from '@/components/production-graph/types';
 import { useEdgeStatus, useSupply } from '@/components/production-graph/hooks';
 
-interface ItemFlowEdgeProps extends EdgeProps
+export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>)
 {
-	data: ItemFlowEdgeData;
-}
-
-export function ItemFlowEdge({ id, ...otherProps }: ItemFlowEdgeProps)
-{
-	const { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition } = otherProps;
 	const { source, target, sourceHandleId, targetHandleId } = otherProps;
 
-	const [edgePath, labelX, labelY] = getSmoothStepPath({
-		sourceX,
-		sourceY,
-		targetX,
-		targetY,
-		sourcePosition,
-		targetPosition,
-	});
+	const [edgePath, labelX, labelY] = getBezierPath(otherProps);
 
 	const style: React.CSSProperties = {
 		transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
 	};
 
-	const itemRate = useSupply({
+	const supply = useSupply({
 		sourceNodeId: source,
 		sourceHandleId: sourceHandleId,
 	});
@@ -47,7 +34,7 @@ export function ItemFlowEdge({ id, ...otherProps }: ItemFlowEdgeProps)
 			<BaseEdge id={id} path={edgePath} style={{ stroke: color, strokeWidth: 2 }} />
 			<EdgeLabelRenderer>
 				<div style={{ ...style, color }} className="nodrag nopan absolute">
-					{itemRate && `${itemRate.rate.amount.toFixed(2)}/${itemRate.rate.per.charAt(0)}`}
+					{supply && `${supply.rate.amount.toFixed(2)}/${supply.rate.per.charAt(0)}`}
 				</div>
 			</EdgeLabelRenderer>
 		</>

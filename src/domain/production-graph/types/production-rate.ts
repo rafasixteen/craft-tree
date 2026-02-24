@@ -1,6 +1,7 @@
 export type TimeUnit = 'second' | 'minute' | 'hour';
 
-export type ProductionRate = {
+export interface ProductionRate
+{
 	amount: number;
 	per: TimeUnit;
-};
+}

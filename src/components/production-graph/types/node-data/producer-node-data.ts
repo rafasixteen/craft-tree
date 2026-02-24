@@ -6,5 +6,8 @@ export interface ProducerNodeData extends Record<string, unknown>
 	producer: Producer | null;
 	inputs: ProducerInput[] | null;
 	outputs: ProducerOutput[] | null;
+
+	producerCount: number;
+	inputRates: ItemRate[] | null;
 	outputRates: ItemRate[] | null;
 }
