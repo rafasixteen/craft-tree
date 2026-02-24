@@ -56,6 +56,7 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 				inputRates: null,
 				outputRates: null,
 				producerCount: 1,
+				extraInfo: false,
 			};
 
 			addNodes({

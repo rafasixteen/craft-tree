@@ -13,6 +13,7 @@ import { convertProductionRate, ItemRate, ProductionRate, TimeUnit } from '@/dom
 import { NodeAppendix } from '@/components/node-appendix';
 import { Input } from '@/components/ui/input';
 import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 {
@@ -28,7 +29,7 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 	// This is to prevent the stale data when the db changes, which currently arent reflected
 	// in node data.
 
-	const { producer, inputs, outputs, producerCount } = data;
+	const { producer, inputs, outputs, producerCount, extraInfo } = data;
 
 	function onComboboxChange(producerId: string | null)
 	{
@@ -168,6 +169,16 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 		updateNodeData(id, { outputRates });
 	}
 
+	function toggleExtraInfo()
+	{
+		updateNodeData(id, { extraInfo: !extraInfo });
+	}
+
+	function onProducerCountChange(newCount: number)
+	{
+		updateNodeData(id, { producerCount: newCount });
+	}
+
 	const inputRates = useProducerInputs();
 
 	useEffect(() =>
@@ -179,72 +190,65 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 		<BaseNode className="flex flex-col p-0">
 			<BaseNodeHeader className="m-0 flex-col border-b">
 				<ProducerCombobox producers={producers} value={producer?.id ?? null} onChange={onComboboxChange} className="nodrag w-full" />
-				<Input type="number" min={1} value={producerCount} onChange={(e) => updateNodeData(id, { producerCount: Number(e.target.value) })} className="nodrag w-16" />
+				<Input type="number" min={1} value={producerCount} onChange={(e) => onProducerCountChange(Number(e.target.value))} className="nodrag w-16" />
+				<Button variant="ghost" size="sm" className="nodrag w-full justify-start" onClick={toggleExtraInfo}>
+					{extraInfo ? 'Hide' : 'Show'} Extra Info
+				</Button>
 			</BaseNodeHeader>
 			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
 				{/* Inputs */}
 				<div className="flex flex-col justify-center gap-3">
-					{inputs?.map((input, index) => (
-						<LabeledHandle
-							key={index}
-							id={input.itemId}
-							type="target"
-							position={Position.Left}
-							title={`x${input.quantity} ${getItemName(input.itemId)}`}
-							labelClassName="text-xs"
-						/>
-					))}
+					{inputs?.map((input, index) =>
+					{
+						const title = `x${input.quantity} ${getItemName(input.itemId)}`;
+						return <LabeledHandle key={index} id={input.itemId} type="target" position={Position.Left} title={title} labelClassName="text-xs" />;
+					})}
 				</div>
 
 				{/* Outputs */}
 				<div className="flex flex-col justify-center gap-3">
-					{outputs?.map((output, index) => (
-						<LabeledHandle
-							key={index}
-							id={output.itemId}
-							type="source"
-							position={Position.Right}
-							title={`x${output.quantity} ${getItemName(output.itemId)}`}
-							labelClassName="text-xs"
-						/>
-					))}
+					{outputs?.map((output, index) =>
+					{
+						const title = `x${output.quantity} ${getItemName(output.itemId)}`;
+						return <LabeledHandle key={index} id={output.itemId} type="source" position={Position.Right} title={title} labelClassName="text-xs" />;
+					})}
 				</div>
 			</BaseNodeContent>
-			<NodeAppendix position="bottom" className="flex flex-row justify-between p-0 py-3 text-xs">
-				<div className="flex flex-col justify-center gap-3">
-					<p>Demand</p>
-					{inputs?.map((input) =>
-					{
-						const rate: ProductionRate = {
-							amount: (input.quantity / producer!.time) * producerCount,
-							per: 'second',
-						};
+			{extraInfo && (
+				<NodeAppendix position="bottom" className="flex flex-row p-0 py-3 text-xs">
+					<div className="flex flex-col gap-3">
+						{inputs?.map((input) =>
+						{
+							const rate: ProductionRate = {
+								amount: (input.quantity / producer!.time) * producerCount,
+								per: 'second',
+							};
 
-						return (
-							<div key={input.itemId}>
-								{getItemName(input.itemId)}: {rate.amount.toFixed(2)}/{rate.per}
-							</div>
-						);
-					})}
-				</div>
+							return (
+								<div key={input.itemId}>
+									{getItemName(input.itemId)}: {rate.amount.toFixed(2)}/{rate.per}
+								</div>
+							);
+						})}
+					</div>
 
-				<div className="flex flex-col justify-center gap-3">
-					<p>Supply</p>
-					{outputs?.map((output) =>
-					{
-						const rate: ProductionRate = {
-							amount: (output.quantity / producer!.time) * producerCount,
-							per: 'second',
-						};
+					<div className="flex flex-col gap-3">
+						{outputs?.map((output) =>
+						{
+							const rate: ProductionRate = {
+								amount: (output.quantity / producer!.time) * producerCount,
+								per: 'second',
+							};
 
-						return (
-							<div key={output.itemId}>
-								{getItemName(output.itemId)}: {rate.amount.toFixed(2)}/{rate.per}
-							</div>
-						);
-					})}
-				</div>
-			</NodeAppendix>
+							return (
+								<div key={output.itemId}>
+									{getItemName(output.itemId)}: {rate.amount.toFixed(2)}/{rate.per}
+								</div>
+							);
+						})}
+					</div>
+				</NodeAppendix>
+			)}
 		</BaseNode>
 	);
 }
