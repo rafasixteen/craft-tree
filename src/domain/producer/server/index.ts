@@ -4,6 +4,7 @@ export * from './get-producer-by-id';
 export * from './get-producer-inputs';
 export * from './get-producer-outputs';
 export * from './get-producer-tags';
+export * from './get-producers-by-output-item';
 export * from './get-producers';
 export * from './set-producer-inputs';
 export * from './set-producer-outputs';
