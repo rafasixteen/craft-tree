@@ -1,4 +1,4 @@
-import { useNodes, useNodesData } from '@xyflow/react';
+import { useNodesData } from '@xyflow/react';
 import { ProductionGraphNode } from '@/components/production-graph/types';
 import { ItemRate } from '@/domain/production-graph';
 
@@ -17,12 +17,14 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 		return null;
 	}
 
-	if (!node.data.producer || !node.data.inputs)
+	const { producer, producerCount, inputs } = node.data;
+
+	if (!producer || !inputs)
 	{
 		return null;
 	}
 
-	const input = node.data.inputs.find((i) => i.itemId === targetHandleId);
+	const input = inputs.find((i) => i.itemId === targetHandleId);
 
 	if (!input)
 	{
@@ -32,7 +34,7 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 	return {
 		itemId: input.itemId,
 		rate: {
-			amount: input.quantity / node.data.producer.time,
+			amount: (input.quantity / producer.time) * producerCount,
 			per: 'second',
 		},
 	};
