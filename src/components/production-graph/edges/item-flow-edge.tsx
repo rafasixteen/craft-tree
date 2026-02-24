@@ -1,5 +1,5 @@
 import { BaseEdge, EdgeProps, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
-import { ItemFlowGraphEdge } from '@/components/production-graph/types';
+import { EdgeStatus, ItemFlowGraphEdge } from '@/components/production-graph/types';
 import { useEdgeStatus, useSupply } from '@/components/production-graph/hooks';
 
 export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>)
@@ -24,10 +24,7 @@ export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>
 		targetHandleId: targetHandleId,
 	});
 
-	let color = 'gray';
-	if (status === 'valid') color = 'green';
-	else if (status === 'insufficient') color = 'yellow';
-	else if (status === 'invalid') color = 'red';
+	const color = getEdgeColor(status);
 
 	return (
 		<>
@@ -39,4 +36,19 @@ export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>
 			</EdgeLabelRenderer>
 		</>
 	);
+}
+
+function getEdgeColor(status: EdgeStatus): string
+{
+	switch (status)
+	{
+		case 'valid':
+			return 'green';
+		case 'insufficient':
+			return 'yellow';
+		case 'invalid':
+			return 'red';
+		default:
+			return 'gray';
+	}
 }

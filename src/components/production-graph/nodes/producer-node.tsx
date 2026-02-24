@@ -8,7 +8,7 @@ import { useActiveInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
-import { convertProductionRate, ItemRate, ProductionRate, TimeUnit } from '@/domain/production-graph';
+import { convertProductionRate, ProductionRate, TimeUnit } from '@/domain/production-graph';
 import { NodeAppendix } from '@/components/node-appendix';
 import { Input } from '@/components/ui/input';
 import { useCallback, useEffect } from 'react';
@@ -32,44 +32,68 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 	const { inputs } = useProducerInputsV2(producerId);
 	const { outputs } = useProducerOutputsV2(producerId);
 
-	function onItemComboboxChange(itemId: string | null)
-	{
-		if (!itemId)
+	const inputRates = useProducerInputs();
+
+	const onItemComboboxChange = useCallback(
+		function onItemComboboxChange(itemId: string | null)
 		{
-			updateNodeData(id, {
-				itemId: undefined,
-				producerId: undefined,
-				selectedProducerIndex: 0,
-			});
+			if (!itemId)
+			{
+				updateNodeData(id, {
+					itemId: undefined,
+					producerId: undefined,
+					selectedProducerIndex: 0,
+				});
 
-			updateNodeInternals(id);
+				updateNodeInternals(id);
+			}
+			else
+			{
+				getProducersByOutputItem({ itemId: itemId }).then((producers) =>
+				{
+					const index = 0;
+					const producerId = producers[index].id;
 
-			return;
-		}
+					updateNodeData(id, {
+						itemId: itemId,
+						producerId: producerId,
+						selectedProducerIndex: index,
+					});
+				});
+			}
+		},
+		[updateNodeData, updateNodeInternals, id],
+	);
 
-		getProducersByOutputItem({ itemId: itemId }).then((producers) =>
+	const onProducerCountChange = useCallback(
+		function onProducerCountChange(newCount: number)
 		{
-			const index = 0;
-			const producerId = producers[index].id;
+			updateNodeData(id, { producerCount: newCount });
+		},
+		[updateNodeData, id],
+	);
 
-			updateNodeData(id, {
-				itemId: itemId,
-				producerId: producerId,
-				selectedProducerIndex: index,
-			});
-		});
-	}
+	const getItemName = useCallback(
+		function getItemName(itemId: string)
+		{
+			const item = items.find((i) => i.id === itemId);
+			return item ? item.name : 'Unknown Item';
+		},
+		[items],
+	);
 
-	function getItemName(itemId: string)
-	{
-		const item = items.find((i) => i.id === itemId);
-		return item ? item.name : 'Unknown Item';
-	}
+	const toggleExtraInfo = useCallback(
+		function toggleExtraInfo()
+		{
+			updateNodeData(id, { extraInfo: !extraInfo });
+		},
+		[updateNodeData, id, extraInfo],
+	);
 
-	function onChange(newRates: ItemRate[])
+	useEffect(() =>
 	{
 		updateNodeData(id, {
-			inputRates: newRates,
+			inputRates: inputRates,
 		});
 
 		if (!inputs || !outputs || !producer)
@@ -80,7 +104,7 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 		// Build rate lookup
 		const rateMap = new Map<string, number>();
 
-		for (const r of newRates)
+		for (const r of inputRates)
 		{
 			const converted = convertProductionRate(r.rate, 'second');
 			rateMap.set(r.itemId, converted.amount);
@@ -135,23 +159,6 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 		}));
 
 		updateNodeData(id, { outputRates });
-	}
-
-	function toggleExtraInfo()
-	{
-		updateNodeData(id, { extraInfo: !extraInfo });
-	}
-
-	function onProducerCountChange(newCount: number)
-	{
-		updateNodeData(id, { producerCount: newCount });
-	}
-
-	const inputRates = useProducerInputs();
-
-	useEffect(() =>
-	{
-		onChange(inputRates);
 	}, [inputRates, producerCount]);
 
 	useEffect(() =>
@@ -194,7 +201,7 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 				</BaseNodeContent>
 			)}
 			{itemId && (
-				<BaseNodeFooter className="m-0 flex-col border-t">
+				<BaseNodeFooter className="m-0 flex-col border-t p-1">
 					<ProducerCarousel nodeId={id} itemId={itemId} producerId={producerId} producerIndex={selectedProducerIndex ?? 0}></ProducerCarousel>
 				</BaseNodeFooter>
 			)}
