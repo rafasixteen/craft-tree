@@ -9,4 +9,4 @@ export type ItemGraphNode = RFNode<ItemNodeData, 'item'>;
 
 export type SplitGraphNode = RFNode<SplitNodeData, 'split'>;
 
-export type ProductionGraphNode = ProducerGraphNode | ItemGraphNode;
+export type ProductionGraphNode = ProducerGraphNode | ItemGraphNode | SplitGraphNode;

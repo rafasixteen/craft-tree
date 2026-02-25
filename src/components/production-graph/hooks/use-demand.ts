@@ -36,9 +36,7 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 
 	return {
 		itemId: input.itemId,
-		rate: {
-			amount: (input.quantity / producer.time) * node.data.producerCount,
-			per: 'second',
-		},
+		amount: (input.quantity / producer.time) * node.data.producerCount,
+		per: 'second',
 	};
 }

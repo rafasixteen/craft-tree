@@ -1,8 +1,7 @@
 import { Item } from '@/domain/item';
 import { ProductionRate } from '@/domain/production-graph';
 
-export interface ItemRate
+export interface ItemRate extends ProductionRate
 {
 	itemId: Item['id'];
-	rate: ProductionRate;
 }

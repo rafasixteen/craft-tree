@@ -1,28 +1,38 @@
 import { EdgeStatus } from '@/components/production-graph/types';
-import { convertProductionRate } from '@/domain/production-graph';
+import { convertProductionRate, ProductionRate } from '@/domain/production-graph';
 import { useDemand, useSupply } from '@/components/production-graph/hooks';
 
 type UseEdgeStatusParams = Parameters<typeof useSupply>[0] & Parameters<typeof useDemand>[0];
 
 export function useEdgeStatus({ sourceNodeId, targetNodeId, sourceHandleId, targetHandleId }: UseEdgeStatusParams): EdgeStatus
 {
-	const source = useSupply({ sourceNodeId, sourceHandleId });
-	const required = useDemand({ targetNodeId, targetHandleId });
+	const supply = useSupply({ sourceNodeId, sourceHandleId });
+	const demand = useDemand({ targetNodeId, targetHandleId });
 
-	if (!source || !required)
+	if (!supply || !demand)
 	{
 		return 'invalid';
 	}
 
-	if (source.itemId !== required.itemId)
+	if (supply.itemId !== demand.itemId)
 	{
 		return 'invalid';
 	}
 
-	const supply = convertProductionRate(source.rate, 'second');
-	const demand = convertProductionRate(required.rate, 'second');
+	const supplyRate: ProductionRate = {
+		amount: supply.amount,
+		per: supply.per,
+	};
 
-	if (supply.amount < demand.amount)
+	const demandRate: ProductionRate = {
+		amount: demand.amount,
+		per: demand.per,
+	};
+
+	const supplyRateSec = convertProductionRate(supplyRate, 'second');
+	const demandRateSec = convertProductionRate(demandRate, 'second');
+
+	if (supplyRateSec.amount < demandRateSec.amount)
 	{
 		return 'insufficient';
 	}

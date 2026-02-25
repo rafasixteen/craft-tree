@@ -72,8 +72,9 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 	function addSplitNode(e: React.MouseEvent)
 	{
 		const data: SplitNodeData = {
-			outputs: [
+			rates: [
 				{
+					itemId: '',
 					amount: 1,
 					per: 'second',
 				},

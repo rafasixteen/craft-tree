@@ -45,7 +45,8 @@ export function useProducerInputs(): ItemRate[]
 			{
 				newRates.push({
 					itemId: item.id,
-					rate: rate,
+					amount: rate.amount,
+					per: rate.per,
 				});
 			}
 		}

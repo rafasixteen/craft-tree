@@ -104,10 +104,15 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 		// Build rate lookup
 		const rateMap = new Map<string, number>();
 
-		for (const r of inputRates)
+		for (const itemRate of inputRates)
 		{
-			const converted = convertProductionRate(r.rate, 'second');
-			rateMap.set(r.itemId, converted.amount);
+			const rate: ProductionRate = {
+				amount: itemRate.amount,
+				per: itemRate.per,
+			};
+
+			const converted = convertProductionRate(rate, 'second');
+			rateMap.set(itemRate.itemId, converted.amount);
 		}
 
 		// ----------------------------
@@ -152,10 +157,8 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 		// ----------------------------
 		const outputRates = outputs.map((output) => ({
 			itemId: output.itemId,
-			rate: {
-				amount: output.quantity * actualCycles,
-				per: 'second' as TimeUnit,
-			},
+			amount: output.quantity * actualCycles,
+			per: 'second' as TimeUnit,
 		}));
 
 		updateNodeData(id, { outputRates });
