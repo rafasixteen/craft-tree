@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 
 export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 {
-	const { updateNodeData } = useReactFlow<SplitGraphNode>();
+	const { updateNodeData, getEdges, deleteElements } = useReactFlow<SplitGraphNode>();
 	const updateNodeInternals = useUpdateNodeInternals();
 
 	// TODO: Can we make the useSupply hook use the useNodeConnections
@@ -36,8 +36,8 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 	function addOutput()
 	{
 		const newRate: ItemRate = {
-			itemId: inputRate?.itemId || '',
-			amount: 1,
+			itemId: supply?.itemId || '',
+			amount: 0,
 			per: 'second',
 		};
 
@@ -54,12 +54,21 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 			return;
 		}
 
-		// TODO: Limit the amount based on the supply and other output rates
+		// Limit the amount based on the supply and other output rates
 		// to ensure the total output does not exceed the input.
+		let maxAmount = value.amount;
+
+		if (supply)
+		{
+			// Calculate total output except this index.
+			const totalOtherOutput = rates.reduce((sum, r, i) => (i !== index ? sum + r.amount : sum), 0);
+			const available = supply.amount - totalOtherOutput;
+			maxAmount = Math.max(0, Math.min(value.amount, available));
+		}
 
 		const newRate: ItemRate = {
 			itemId: rates[index].itemId,
-			amount: value.amount,
+			amount: maxAmount,
 			per: value.per,
 		};
 
@@ -76,7 +85,17 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 			return;
 		}
 
-		// TODO: Delete the edge connected to this handle.
+		const edges = getEdges();
+		const handleId = String(index);
+
+		// Remove any edges connected to this output handle.
+		edges.forEach((edge) =>
+		{
+			if (edge.source === id && edge.sourceHandle === handleId)
+			{
+				deleteElements({ edges: [edge] });
+			}
+		});
 
 		const newRates = rates.filter((_, i) => i !== index);
 
@@ -91,6 +110,7 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 			return;
 		}
 
+		// If the supply item changes, update all output rates to match the new item.
 		const newRates = rates.map((rate) =>
 		{
 			if (rate.itemId === supply.itemId)
@@ -123,15 +143,22 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 					<LabeledHandle type="target" position={Position.Left} title="" />
 
 					<div className="flex flex-col justify-center gap-3">
-						{rates.map((rate, index) => (
-							<div key={index} className="flex items-center gap-2">
-								<Button variant="destructive" size="icon-xs" onClick={() => removeOutput(index)} className="nodrag" disabled={rates.length <= 1}>
-									<XIcon className="size-3" />
-								</Button>
-								<ProductionRateComponent value={rate} onChange={(newRate) => onProductionRateChange(index, newRate)} className="nodrag w-full" />
-								<LabeledHandle id={String(index)} type="source" position={Position.Right} title="" />
-							</div>
-						))}
+						{rates.map((rate, index) =>
+						{
+							const edges = getEdges();
+							const handleId = String(index);
+							const hasConnection = edges.some((edge) => edge.source === id && edge.sourceHandle === handleId);
+
+							return (
+								<div key={index} className="flex items-center gap-2">
+									<Button variant="destructive" size="icon-xs" onClick={() => removeOutput(index)} className="nodrag" disabled={rates.length <= 1}>
+										<XIcon className="size-3" />
+									</Button>
+									<ProductionRateComponent value={rate} onChange={(newRate) => onProductionRateChange(index, newRate)} className="nodrag w-full" />
+									<LabeledHandle id={handleId} type="source" position={Position.Right} title="" isConnectable={!hasConnection} />
+								</div>
+							);
+						})}
 					</div>
 				</BaseNodeContent>
 			)}
