@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useReactFlow } from '@xyflow/react';
-import { ItemNodeData, ProducerNodeData } from '@/components/production-graph';
+import { ItemNodeData, ProducerNodeData, SplitNodeData } from '@/components/production-graph';
 import React, { useCallback } from 'react';
 
 interface PaneContextMenuProps extends React.HTMLAttributes<HTMLDivElement>
@@ -69,13 +69,35 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 		[addNodes, screenToFlowPosition],
 	);
 
+	function addSplitNode(e: React.MouseEvent)
+	{
+		const data: SplitNodeData = {
+			outputs: [
+				{
+					amount: 1,
+					per: 'second',
+				},
+			],
+		};
+
+		addNodes({
+			id: `split-${crypto.randomUUID()}`,
+			type: 'split',
+			position: screenToFlowPosition({ x: e.clientX, y: e.clientY }),
+			data: data,
+		});
+	}
+
 	return (
 		<Card style={style} {...props} className="gap-0 p-1">
 			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addItem}>
-				Add Item
+				Add Item Node
 			</Button>
 			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addProducer}>
-				Add Producer
+				Add Producer Node
+			</Button>
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addSplitNode}>
+				Add Split Node
 			</Button>
 		</Card>
 	);

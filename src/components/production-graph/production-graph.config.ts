@@ -1,11 +1,12 @@
 import { DefaultEdgeOptions, FitViewOptions, ReactFlowProps } from '@xyflow/react';
-import { ItemNode, ProducerNode } from '@/components/production-graph/nodes';
+import { ItemNode, ProducerNode, SplitNode } from '@/components/production-graph/nodes';
 import { ItemFlowEdge } from '@/components/production-graph/edges';
 import { EdgeType, NodeType } from '@/components/production-graph/types';
 
 const nodeTypes: Record<NodeType, React.ComponentType<any>> = {
 	producer: ProducerNode,
 	item: ItemNode,
+	split: SplitNode,
 };
 
 const edgeTypes: Record<EdgeType, React.ComponentType<any>> = {

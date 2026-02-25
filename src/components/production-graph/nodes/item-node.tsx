@@ -39,10 +39,11 @@ export function ItemNode({ id, data }: NodeProps<ItemGraphNode>)
 	return (
 		<BaseNode className="p-0">
 			<BaseNodeHeader className="m-0 border-b">
-				<ItemCombobox items={items} value={item?.id ?? null} onChange={onComboboxChange} className="nodrag" />
+				<ItemCombobox items={items} value={item?.id ?? null} onChange={onComboboxChange} className="nodrag w-full" />
 			</BaseNodeHeader>
 			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
-				<ProductionRateComponent value={rate} onChange={onRateChange} readonly={false} className="nodrag w-full" />
+				<LabeledHandle type="target" position={Position.Left} title="" className="opacity-0" />
+				<ProductionRateComponent value={rate} onChange={onRateChange} className="nodrag w-full" />
 				<LabeledHandle type="source" position={Position.Right} title="" />
 			</BaseNodeContent>
 		</BaseNode>
