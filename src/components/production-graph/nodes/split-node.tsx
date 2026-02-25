@@ -105,28 +105,27 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 
 	useEffect(() =>
 	{
-		if (!supply || !rates?.length)
+		if (!rates?.length)
 		{
 			return;
 		}
 
-		// If the supply item changes, update all output rates to match the new item.
-		const newRates = rates.map((rate) =>
-		{
-			if (rate.itemId === supply.itemId)
-			{
-				return rate;
-			}
+		const targetItemId = supply?.itemId || '';
+		const needsUpdate = rates.some((rate) => rate.itemId !== targetItemId);
 
-			return {
-				...rate,
-				itemId: supply.itemId,
-			};
-		});
+		if (!needsUpdate)
+		{
+			return;
+		}
+
+		const newRates = rates.map((rate) => ({
+			...rate,
+			itemId: targetItemId,
+		}));
 
 		updateNodeData(id, { rates: newRates });
 		updateNodeInternals(id);
-	}, [supply?.itemId]);
+	}, [supply?.itemId, rates, id, updateNodeData, updateNodeInternals]);
 
 	return (
 		<BaseNode className="flex flex-col p-0">
