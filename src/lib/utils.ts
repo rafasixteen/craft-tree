@@ -14,5 +14,5 @@ export function slugify(text: string): string
 
 export function formatNumber(num: number, decimals: number = 2): string
 {
-	return Number.isInteger(num) ? num.toString() : num.toFixed(decimals);
+	return Number.isInteger(num) ? num.toString() : parseFloat(num.toFixed(decimals)).toString();
 }
