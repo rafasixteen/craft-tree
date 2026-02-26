@@ -6,4 +6,3 @@ export * from './production-graph.config';
 export * from './production-graph';
 export * from './production-rate';
 export * from './types';
-export * from './utils';
