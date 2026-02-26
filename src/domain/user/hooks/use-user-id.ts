@@ -23,7 +23,7 @@ export function useUserId()
 	const swrKey = ['userId', email];
 
 	const { data: userId, isLoading } = useSWR(swrKey, () => findUserIdByEmail(email), {
-		revalidateOnMount: true,
+		revalidateOnMount: false,
 	});
 
 	return {
