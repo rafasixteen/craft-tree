@@ -1,4 +1,3 @@
-import { ProcessedMaterialNode } from '@/components/recipe-tree-v2/types';
 import { NodeProps, Handle, Position, Node } from '@xyflow/react';
 import { useRecipeTree } from '@/domain/recipe-tree-v2/hooks/use-recipe-tree';
 import { useCallback } from 'react';
@@ -14,7 +13,7 @@ import { formatNumber } from '@/lib/utils';
 import { Producer } from '@/domain/producer';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
 
-export function ProcessedMaterialNodeComponent({ id }: NodeProps<ProcessedMaterialNode>)
+export function ProcessedMaterialNode({ id }: NodeProps)
 {
 	const { recipeTree } = useRecipeTree();
 

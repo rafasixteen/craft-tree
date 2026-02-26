@@ -1,10 +1,11 @@
 import { DefaultEdgeOptions, FitViewOptions, ReactFlowProps } from '@xyflow/react';
 import { RecipeTreeNodeType } from '@/components/recipe-tree-v2/types';
-import { ProcessedMaterialNodeComponent, RawMaterialNodeComponent } from '@/components/recipe-tree-v2/nodes';
+import { ProcessedMaterialNode, RateControlNode, RawMaterialNode } from '@/components/recipe-tree-v2/nodes';
 
 const nodeTypes: Record<RecipeTreeNodeType, React.ComponentType<any>> = {
-	'processed-material': ProcessedMaterialNodeComponent,
-	'raw-material': RawMaterialNodeComponent,
+	'processed-material': ProcessedMaterialNode,
+	'raw-material': RawMaterialNode,
+	'rate-control': RateControlNode,
 };
 
 const fitViewOptions: FitViewOptions = {

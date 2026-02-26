@@ -4,6 +4,7 @@ import '@xyflow/react/dist/style.css';
 import { ReactFlow, Controls, Background, useNodesState, Edge, Node, useEdgesState, useReactFlow, useNodesInitialized } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { config, getLayoutedElements } from '@/components/recipe-tree-v2';
+import { buildNode, buildEdge } from '@/components/recipe-tree-v2/utils';
 import { useRecipeTreeNodes } from '@/components/recipe-tree-v2/hooks';
 import { useEffect } from 'react';
 
@@ -24,13 +25,29 @@ export function RecipeTree({ initialTheme }: RecipeTreeProps)
 
 	useEffect(() =>
 	{
-		setNodes(baseNodes);
-	}, [baseNodes, setNodes]);
+		if (baseNodes.length === 0 || baseEdges.length === 0)
+		{
+			return;
+		}
 
-	useEffect(() =>
-	{
-		setEdges(baseEdges);
-	}, [baseEdges, setEdges]);
+		const rateControlNodeId = 'rate-control-node';
+		const rateControlNode = buildNode({ nodeId: rateControlNodeId, type: 'rate-control' });
+		const rateControlEdge = buildEdge({ parentId: rateControlNodeId, childId: baseNodes[0].id });
+
+		const mergedNodes = [
+			rateControlNode,
+			...baseNodes.map((newNode) =>
+			{
+				const existingNode = nodes.find((n) => n.id === newNode.id);
+				return existingNode ? { ...newNode, position: existingNode.position } : newNode;
+			}),
+		];
+
+		const mergedEdges = [...baseEdges, rateControlEdge];
+
+		setNodes(mergedNodes);
+		setEdges(mergedEdges);
+	}, [baseNodes, baseEdges]);
 
 	const { getNodes, getEdges } = useReactFlow<Node, Edge>();
 

@@ -1,4 +1,3 @@
-import { RawMaterialNode } from '@/components/recipe-tree-v2/types';
 import { NodeProps, Handle, Position } from '@xyflow/react';
 import { useRecipeTree } from '@/domain/recipe-tree-v2/hooks/use-recipe-tree';
 import { useNodeDemand } from '@/domain/recipe-tree-v2/hooks/use-node-demand';
@@ -7,7 +6,7 @@ import { PackageIcon } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
 
-export function RawMaterialNodeComponent({ id }: NodeProps<RawMaterialNode>)
+export function RawMaterialNode({ id }: NodeProps)
 {
 	const { recipeTree } = useRecipeTree();
 

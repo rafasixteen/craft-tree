@@ -32,7 +32,6 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 				buildNode({
 					nodeId: node.id,
 					type,
-					data: { itemId: node.item.id },
 				}),
 			);
 

@@ -1,20 +1,19 @@
 import type { Node } from '@xyflow/react';
-import type { RecipeTreeNodeType, RecipeTreeNodeTypeDataMap } from '@/components/recipe-tree-v2';
+import type { RecipeTreeNodeType } from '@/components/recipe-tree-v2';
 
-interface BuildNodeParams<T extends RecipeTreeNodeType>
+interface BuildNodeParams
 {
 	nodeId: Node['id'];
-	type: T;
-	data: RecipeTreeNodeTypeDataMap[T];
+	type: RecipeTreeNodeType;
 	position?: { x: number; y: number };
 }
 
-export function buildNode<T extends RecipeTreeNodeType>({ nodeId, type, data, position }: BuildNodeParams<T>): Node
+export function buildNode({ nodeId, type, position }: BuildNodeParams): Node
 {
 	return {
 		id: nodeId,
 		type: type,
-		data: data,
+		data: {},
 		position: position ?? { x: 0, y: 0 },
 	};
 }
