@@ -49,11 +49,33 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 
 	function onProductionRateChange(index: number, value: ProductionRate)
 	{
-		if (!rates || !supply) return;
+		if (!rates)
+		{
+			return;
+		}
 
-		const updatedRates = redistributeRatesWithPriority(rates, index, value.amount, supply);
+		// Limit the amount based on the supply and other output rates
+		// to ensure the total output does not exceed the input.
+		let maxAmount = value.amount;
 
-		updateNodeData(id, { rates: updatedRates });
+		if (supply)
+		{
+			// Calculate total output except this index.
+			const totalOtherOutput = rates.reduce((sum, r, i) => (i !== index ? sum + r.amount : sum), 0);
+			const available = supply.amount - totalOtherOutput;
+			maxAmount = Math.max(0, Math.min(value.amount, available));
+		}
+
+		const newRate: ItemRate = {
+			itemId: rates[index].itemId,
+			amount: Math.round(maxAmount * 100) / 100, // Round to 2 decimal places
+			per: value.per,
+		};
+
+		const newRates = [...rates];
+		newRates[index] = newRate;
+
+		updateNodeData(id, { rates: newRates });
 	}
 
 	function removeOutput(index: number)
@@ -83,41 +105,29 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 
 	useEffect(() =>
 	{
-		if (!rates?.length || !supply)
+		// TODO: When the supply changes, ensure the output rates don't exceed the new supply.
+
+		if (!rates?.length)
 		{
 			return;
 		}
 
-		let didChange = false;
+		const targetItemId = supply?.itemId || '';
+		const needsUpdate = rates.some((rate) => rate.itemId !== targetItemId);
 
-		// 1️⃣ First ensure itemIds match supply
-		const nextRates = rates.map((rate) =>
-		{
-			if (rate.itemId !== supply.itemId)
-			{
-				didChange = true;
-				return { ...rate, itemId: supply.itemId };
-			}
-			return rate;
-		});
-
-		// 2️⃣ Then cap amounts to supply
-		const cappedRates = capRatesToSupply(nextRates, supply);
-
-		// Detect amount changes
-		if (!didChange)
-		{
-			didChange = cappedRates.some((r, i) => r.amount !== rates[i].amount);
-		}
-
-		if (!didChange)
+		if (!needsUpdate)
 		{
 			return;
 		}
 
-		updateNodeData(id, { rates: cappedRates });
+		const newRates = rates.map((rate) => ({
+			...rate,
+			itemId: targetItemId,
+		}));
+
+		updateNodeData(id, { rates: newRates });
 		updateNodeInternals(id);
-	}, [supply?.itemId, supply?.amount]);
+	}, [supply?.itemId, rates, id, updateNodeData, updateNodeInternals]);
 
 	return (
 		<BaseNode className="flex flex-col p-0">
@@ -155,63 +165,4 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 			)}
 		</BaseNode>
 	);
-}
-
-function capRatesToSupply(rates: ItemRate[], supply: ItemRate | null): ItemRate[]
-{
-	if (!supply)
-	{
-		return rates;
-	}
-
-	let remaining = supply.amount;
-
-	return rates.map((rate) =>
-	{
-		const cappedAmount = Math.max(0, Math.min(rate.amount, remaining));
-		remaining -= cappedAmount;
-
-		return {
-			...rate,
-			amount: cappedAmount,
-		};
-	});
-}
-
-function redistributeRatesWithPriority(rates: ItemRate[], editedIndex: number, newAmount: number, supply?: { amount: number }): ItemRate[]
-{
-	if (!supply) return rates;
-
-	const totalSupply = supply.amount;
-
-	// Clamp edited amount first
-	const clampedEditedAmount = Math.max(0, Math.min(newAmount, totalSupply));
-
-	// Calculate total of other outputs
-	const otherTotal = rates.reduce((sum, r, i) => (i !== editedIndex ? sum + r.amount : sum), 0);
-
-	const remaining = totalSupply - clampedEditedAmount;
-
-	const nextRates = rates.map((rate, i) =>
-	{
-		if (i === editedIndex)
-		{
-			return { ...rate, amount: clampedEditedAmount };
-		}
-
-		if (otherTotal === 0)
-		{
-			return { ...rate, amount: 0 };
-		}
-
-		// Proportional redistribution
-		const proportionalAmount = (rate.amount / otherTotal) * remaining;
-
-		return {
-			...rate,
-			amount: Math.max(0, proportionalAmount),
-		};
-	});
-
-	return nextRates;
 }
