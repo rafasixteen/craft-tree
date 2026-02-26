@@ -8,7 +8,6 @@ import { useSelectedProducerThroughput } from '@/domain/recipe-tree/hooks/use-se
 import { Card, CardContent } from '@/components/ui/card';
 import { PackageIcon, ClockIcon, FactoryIcon, ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { pluralize } from '@/lib/pluralizer';
 import { formatNumber } from '@/lib/utils';
 import { Producer } from '@/domain/producer';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
@@ -78,9 +77,8 @@ export function ProcessedMaterialNode({ id }: NodeProps)
 						<Separator className="my-1" />
 						<div className="flex items-center gap-2">
 							<FactoryIcon className="size-4 text-primary" />
-							<span className="text-xs">
-								{formatNumber(producerCount)}x {selectedProducer ? pluralize(selectedProducer.name, producerCount) : 'Producer'}
-							</span>
+							<span className="font-medium">Producer Count</span>
+							<span className="ml-auto font-mono">{formatNumber(producerCount)}</span>
 						</div>
 					</CardContent>
 				</Card>
