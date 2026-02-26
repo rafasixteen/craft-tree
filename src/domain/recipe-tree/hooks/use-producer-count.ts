@@ -1,4 +1,4 @@
-import { useRecipeTree, getRequiredProducers } from '@/domain/recipe-tree-v2';
+import { useRecipeTree, getRequiredProducers } from '@/domain/recipe-tree';
 import { useMemo } from 'react';
 
 export function useProducerCount(nodeId: string)

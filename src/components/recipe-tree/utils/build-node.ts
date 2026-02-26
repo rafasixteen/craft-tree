@@ -1,5 +1,5 @@
 import type { Node } from '@xyflow/react';
-import type { RecipeTreeNodeType } from '@/components/recipe-tree-v2';
+import type { RecipeTreeNodeType } from '@/components/recipe-tree';
 
 interface BuildNodeParams
 {

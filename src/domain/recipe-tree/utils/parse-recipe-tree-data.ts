@@ -1,5 +1,5 @@
-import { RecipeTreeData } from '@/domain/recipe-tree-v2/types/recipe-tree-data';
-import { RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree-v2/types';
+import { RecipeTreeData } from '@/domain/recipe-tree/types/recipe-tree-data';
+import { RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree/types';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
 
 export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState

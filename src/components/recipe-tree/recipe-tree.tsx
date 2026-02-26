@@ -3,9 +3,9 @@
 import '@xyflow/react/dist/style.css';
 import { ReactFlow, Controls, Background, useNodesState, Edge, Node, useEdgesState, useReactFlow, useNodesInitialized } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { config, getLayoutedElements } from '@/components/recipe-tree-v2';
-import { buildNode, buildEdge } from '@/components/recipe-tree-v2/utils';
-import { useRecipeTreeNodes } from '@/components/recipe-tree-v2/hooks';
+import { config, getLayoutedElements } from '@/components/recipe-tree';
+import { buildNode, buildEdge } from '@/components/recipe-tree/utils';
+import { useRecipeTreeNodes } from '@/components/recipe-tree/hooks';
 import { useEffect } from 'react';
 
 interface RecipeTreeProps

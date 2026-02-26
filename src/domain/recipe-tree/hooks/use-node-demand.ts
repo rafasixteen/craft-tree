@@ -1,5 +1,5 @@
 import { ProductionRate } from '@/domain/production-graph';
-import { useRecipeTree, getNodeDemand } from '@/domain/recipe-tree-v2';
+import { useRecipeTree, getNodeDemand } from '@/domain/recipe-tree';
 import { useMemo } from 'react';
 
 export function useNodeDemand(nodeId: string): ProductionRate

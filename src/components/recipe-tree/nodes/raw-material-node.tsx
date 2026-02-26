@@ -1,6 +1,6 @@
 import { NodeProps, Handle, Position } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree-v2/hooks/use-recipe-tree';
-import { useNodeDemand } from '@/domain/recipe-tree-v2/hooks/use-node-demand';
+import { useRecipeTree } from '@/domain/recipe-tree/hooks/use-recipe-tree';
+import { useNodeDemand } from '@/domain/recipe-tree/hooks/use-node-demand';
 import { Card, CardContent } from '@/components/ui/card';
 import { PackageIcon } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';

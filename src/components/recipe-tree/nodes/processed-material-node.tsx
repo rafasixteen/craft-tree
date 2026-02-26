@@ -1,10 +1,10 @@
 import { NodeProps, Handle, Position, Node } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree-v2/hooks/use-recipe-tree';
+import { useRecipeTree } from '@/domain/recipe-tree/hooks/use-recipe-tree';
 import { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { useNodeDemand } from '@/domain/recipe-tree-v2/hooks/use-node-demand';
-import { useProducerCount } from '@/domain/recipe-tree-v2/hooks/use-producer-count';
-import { useSelectedProducerThroughput } from '@/domain/recipe-tree-v2/hooks/use-selected-producer-throughput';
+import { useNodeDemand } from '@/domain/recipe-tree/hooks/use-node-demand';
+import { useProducerCount } from '@/domain/recipe-tree/hooks/use-producer-count';
+import { useSelectedProducerThroughput } from '@/domain/recipe-tree/hooks/use-selected-producer-throughput';
 import { Card, CardContent } from '@/components/ui/card';
 import { PackageIcon, ClockIcon, FactoryIcon, ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';

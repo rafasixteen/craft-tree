@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import type { Node, Edge } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree-v2/hooks/use-recipe-tree';
-import { buildEdge, buildNode } from '@/components/recipe-tree-v2/utils';
-import type { RecipeTreeNodeType } from '@/components/recipe-tree-v2/types';
-import { RecipeTreeNode } from '@/domain/recipe-tree-v2';
+import { useRecipeTree } from '@/domain/recipe-tree/hooks/use-recipe-tree';
+import { buildEdge, buildNode } from '@/components/recipe-tree/utils';
+import type { RecipeTreeNodeType } from '@/components/recipe-tree/types';
+import { RecipeTreeNode } from '@/domain/recipe-tree';
 
 export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 {

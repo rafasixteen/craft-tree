@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, createContext, useContext, useCallback, useEffect, useState } from 'react';
-import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData } from '@/domain/recipe-tree-v2';
+import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData } from '@/domain/recipe-tree';
 import { ProductionRate } from '@/domain/production-graph/types';
 import { Item } from '@/domain/item';
 import useSWR from 'swr';
@@ -29,7 +29,7 @@ interface RecipeTreeProviderProps
 
 export function RecipeTreeProvider({ itemId, children }: RecipeTreeProviderProps)
 {
-	const { data: rawData } = useSWR(['recipe-tree-v2', itemId], () => getRecipeTreeData(itemId), { revalidateOnFocus: false });
+	const { data: rawData } = useSWR(['recipe-tree', itemId], () => getRecipeTreeData(itemId), { revalidateOnFocus: false });
 	const [recipeTree, setRecipeTree] = useState<RecipeTreeState | null>(null);
 
 	useEffect(() =>

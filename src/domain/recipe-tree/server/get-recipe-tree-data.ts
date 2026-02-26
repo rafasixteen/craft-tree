@@ -4,7 +4,7 @@ import { inArray } from 'drizzle-orm';
 import { items, producers, producerInputs, producerOutputs } from '@/db/schema';
 import { Item } from '@/domain/item';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
-import { RecipeTreeData } from '@/domain/recipe-tree-v2/types/recipe-tree-data';
+import { RecipeTreeData } from '@/domain/recipe-tree/types/recipe-tree-data';
 import db from '@/db/client';
 
 export async function getRecipeTreeData(itemId: string): Promise<RecipeTreeData>

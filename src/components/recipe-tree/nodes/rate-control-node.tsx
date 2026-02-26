@@ -1,5 +1,5 @@
 import { Handle, Position } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree-v2';
+import { useRecipeTree } from '@/domain/recipe-tree';
 import { ProductionRateComponent } from '@/components/production-graph';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
 

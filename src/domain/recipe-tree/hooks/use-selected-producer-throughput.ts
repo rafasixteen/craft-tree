@@ -1,6 +1,6 @@
 import { useRecipeTree } from './use-recipe-tree';
 import { useMemo } from 'react';
-import { getProducerThroughput } from '@/domain/recipe-tree-v2';
+import { getProducerThroughput } from '@/domain/recipe-tree';
 import { ProductionRate } from '@/domain/production-graph';
 
 export function useSelectedProducerThroughput(nodeId: string): ProductionRate
