@@ -1,9 +1,8 @@
 'use client';
 
-import { useItemTags } from '@/domain/item';
 import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/craft-tree-sidebar';
-import { useItem } from '@/domain/item';
+import { useTag } from '@/domain/tag';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -11,46 +10,43 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Field } from '@/components/ui/field';
 import { toast } from 'sonner';
 import { useCallback } from 'react';
-import { ItemForm, ItemFormValues, itemFormSchema } from '@/components/item';
+import { TagForm, TagFormValues, tagFormSchema } from '@/components/tag';
 
-export default function ItemEditPage()
+export default function TagEditPage()
 {
 	const router = useRouter();
 
 	const params = useParams();
-	const itemId = params['item-id'] as string;
+	const tagId = params['tag-id'] as string;
 
-	const { item, updateItem } = useItem(itemId);
-	const { tags, setTags } = useItemTags(itemId);
+	const { tag, updateTag } = useTag(tagId);
 
-	const form = useForm<ItemFormValues>({
-		resolver: zodResolver(itemFormSchema),
+	const form = useForm<TagFormValues>({
+		resolver: zodResolver(tagFormSchema),
 		defaultValues: {
-			name: item.name,
-			tagIds: tags.map((tag) => tag.tagId),
+			name: tag.name,
 		},
 	});
 
 	const onSubmit = useCallback(
-		async function onSubmit(values: ItemFormValues)
+		async function onSubmit(values: TagFormValues)
 		{
 			try
 			{
-				const { name, tagIds } = values;
+				const { name } = values;
 
-				updateItem({ name, icon: null });
-				setTags({ tagIds });
+				updateTag({ name });
 
-				toast.success(`Item '${name}' updated`);
+				toast.success(`Tag '${name}' updated`);
 
-				router.push(`/inventory/${item.inventoryId}/items`);
+				router.push(`/inventories/${tag.inventoryId}/tags`);
 			}
 			catch
 			{
-				toast.error('Failed to update item');
+				toast.error('Failed to update tag');
 			}
 		},
-		[updateItem, setTags, item.inventoryId, router],
+		[updateTag, tag.inventoryId, router],
 	);
 
 	return (
@@ -58,18 +54,18 @@ export default function ItemEditPage()
 			<Header />
 			<Card className="flex min-h-0 flex-1 flex-col bg-transparent ring-0">
 				<CardHeader>
-					<CardTitle>Edit Item</CardTitle>
-					<CardDescription>Edit an existing item.</CardDescription>
+					<CardTitle>Edit Tag</CardTitle>
+					<CardDescription>Edit an existing tag.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<ItemForm id="edit-item-form" form={form} onSubmit={onSubmit} />
+					<TagForm id="edit-tag-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
 					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
 						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
-						<Button type="submit" form="edit-item-form" disabled={!form.formState.isDirty} className="flex-1">
+						<Button type="submit" form="edit-tag-form" disabled={!form.formState.isDirty} className="flex-1">
 							Save Changes
 						</Button>
 					</Field>

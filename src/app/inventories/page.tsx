@@ -13,7 +13,7 @@ export default function InventoryRootPage()
 		return inventories.map((inventory) => (
 			<div key={inventory.id} className="flex flex-1 flex-col gap-4 p-4">
 				<Link
-					href={`/inventory/${inventory.id}/items`}
+					href={`/inventories/${inventory.id}/items`}
 					className="inline-flex items-center rounded-md border border-input bg-background px-4 py-2 text-base font-medium shadow-sm transition-colors hover:bg-accent focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
 				>
 					{inventory.name}

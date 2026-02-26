@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeftFromLineIcon, ArrowRightFromLineIcon, FactoryIcon, PackageIcon, TagsIcon, WaypointsIcon } from 'lucide-react';
 import { NavUser } from '@/components/user';
-import { InventorySwitcher, useActiveInventory } from '@/components/inventory';
+import { InventorySwitcher, useInventory } from '@/components/inventory';
 import {
 	Sidebar,
 	SidebarContent,
@@ -39,7 +39,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 
 function InventoryGroup()
 {
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 
 	return (
 		<SidebarGroup>
@@ -47,7 +47,7 @@ function InventoryGroup()
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Items" asChild>
-						<Link href={`/inventory/${inventory.id}/items`}>
+						<Link href={`/inventories/${inventory.id}/items`}>
 							<PackageIcon />
 							<span>Items</span>
 						</Link>
@@ -55,7 +55,7 @@ function InventoryGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Producers" asChild>
-						<Link href={`/inventory/${inventory.id}/producers`}>
+						<Link href={`/inventories/${inventory.id}/producers`}>
 							<FactoryIcon />
 							<span>Producers</span>
 						</Link>
@@ -63,7 +63,7 @@ function InventoryGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Tags" asChild>
-						<Link href={`/inventory/${inventory.id}/tags`}>
+						<Link href={`/inventories/${inventory.id}/tags`}>
 							<TagsIcon />
 							<span>Tags</span>
 						</Link>
@@ -76,7 +76,7 @@ function InventoryGroup()
 
 function ProductionGraphGroup()
 {
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 
 	return (
 		<SidebarGroup>
@@ -84,7 +84,7 @@ function ProductionGraphGroup()
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Import" asChild>
-						<Link href={`/inventory/${inventory.id}/production-graph`}>
+						<Link href={`/inventories/${inventory.id}/production-graph`}>
 							<WaypointsIcon />
 							<span>Production Graph</span>
 						</Link>
@@ -103,7 +103,7 @@ function DocumentsGroup()
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Import" asChild>
-						<Link href="/inventory/import">
+						<Link href="/inventories/import">
 							<ArrowRightFromLineIcon />
 							<span>Import</span>
 						</Link>
@@ -111,7 +111,7 @@ function DocumentsGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Export" asChild>
-						<Link href="/inventory/export">
+						<Link href="/inventories/export">
 							<ArrowLeftFromLineIcon />
 							<span>Export</span>
 						</Link>

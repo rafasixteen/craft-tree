@@ -4,7 +4,7 @@ import { ProducerGraphNode, ProducerNodeData } from '@/components/production-gra
 import { useProducerInputs } from '@/components/production-graph/hooks';
 import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, NodeProps } from '@xyflow/react';
 import { getProducersByOutputItem, Producer, ProducerInput, ProducerOutput, useProducerInputsV2, useProducerOutputsV2, useProducerV2 } from '@/domain/producer';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
@@ -23,7 +23,7 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 
-	const invetory = useActiveInventory();
+	const invetory = useInventory();
 
 	const { items } = useItems({ inventoryId: invetory.id });
 

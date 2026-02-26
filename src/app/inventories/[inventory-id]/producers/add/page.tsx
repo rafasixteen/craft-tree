@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { toast } from 'sonner';
 import { useCallback, useTransition } from 'react';
 import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/components/producer';
@@ -16,7 +16,7 @@ import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/componen
 export default function ProducerAddPage()
 {
 	const router = useRouter();
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 
 	const [isCreating, startTransition] = useTransition();
 

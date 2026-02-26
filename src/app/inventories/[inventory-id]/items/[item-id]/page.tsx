@@ -24,7 +24,7 @@ export default function ItemPage()
 			<Header />
 			<div className="mx-auto max-w-3xl px-6 py-8">
 				<Button className="mb-4" variant="outline" size="sm" asChild>
-					<Link href={`/inventory/${item.inventoryId}/items/${itemId}/recipe-tree`}>Recipe Tree</Link>
+					<Link href={`/inventories/${item.inventoryId}/items/${itemId}/recipe-tree`}>Recipe Tree</Link>
 				</Button>
 
 				<section className="mb-8">

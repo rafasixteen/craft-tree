@@ -4,8 +4,7 @@ import { ChevronsUpDown, Plus } from 'lucide-react';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { useInventories } from '@/domain/inventory';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { notFound } from 'next/navigation';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import Link from 'next/link';
 
 export function InventorySwitcher()
@@ -13,13 +12,7 @@ export function InventorySwitcher()
 	const { isMobile } = useSidebar();
 
 	const { inventories } = useInventories();
-	const activeInventory = useActiveInventory();
-
-	if (!activeInventory)
-	{
-		console.warn('Active inventory not found in inventory switcher');
-		return notFound();
-	}
+	const inventory = useInventory();
 
 	return (
 		<SidebarMenu>
@@ -28,11 +21,11 @@ export function InventorySwitcher()
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
 							<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-								<p>{activeInventory.name.substring(0, 2).toUpperCase()}</p>
+								<p>{inventory.name.substring(0, 2).toUpperCase()}</p>
 							</div>
 							<div className="grid flex-1 text-left text-sm/tight">
-								<span className="truncate font-medium">{activeInventory.name}</span>
-								<span className="truncate text-xs">{activeInventory.id}</span>
+								<span className="truncate font-medium">{inventory.name}</span>
+								<span className="truncate text-xs">{inventory.id}</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>
@@ -41,10 +34,10 @@ export function InventorySwitcher()
 						<DropdownMenuLabel className="text-xs text-muted-foreground">Inventories</DropdownMenuLabel>
 						{inventories.map((inventory) => (
 							// TODO: Redirect either to /items or /producers based on the last visited page for that inventory.
-							<Link href={`/inventory/${inventory.id}/items`} key={inventory.id}>
+							<Link href={`/inventories/${inventory.id}/items`} key={inventory.id}>
 								<DropdownMenuItem className="gap-2 p-2">
 									<div className="flex size-7 items-center justify-center rounded-md border">
-										<p>{activeInventory.name.substring(0, 2).toUpperCase()}</p>
+										<p>{inventory.name.substring(0, 2).toUpperCase()}</p>
 									</div>
 									{inventory.name}
 								</DropdownMenuItem>

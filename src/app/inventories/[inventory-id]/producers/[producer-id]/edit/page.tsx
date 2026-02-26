@@ -51,7 +51,7 @@ export default function ProducerEditPage()
 
 				toast.success(`Producer '${name}' updated`);
 
-				router.push(`/inventory/${producer.inventoryId}/producers`);
+				router.push(`/inventories/${producer.inventoryId}/producers`);
 			}
 			catch
 			{

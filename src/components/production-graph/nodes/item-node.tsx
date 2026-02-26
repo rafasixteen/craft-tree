@@ -3,7 +3,7 @@
 import { ItemGraphNode, ItemNodeData } from '@/components/production-graph/types';
 import { ProductionRateComponent } from '@/components/production-graph/production-rate';
 import { Edge, useReactFlow, Node, Position, NodeProps } from '@xyflow/react';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { useItems } from '@/domain/item';
 import { ItemCombobox } from '@/components/item';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
@@ -14,7 +14,7 @@ export function ItemNode({ id, data }: NodeProps<ItemGraphNode>)
 {
 	const { updateNodeData } = useReactFlow<Node<ItemNodeData>, Edge>();
 
-	const invetory = useActiveInventory();
+	const invetory = useInventory();
 
 	const { items } = useItems({ inventoryId: invetory.id });
 

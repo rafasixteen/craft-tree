@@ -1,6 +1,6 @@
 import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { ClipboardPasteIcon, CopyIcon, PencilIcon, ScissorsIcon, Trash2Icon, TrashIcon } from 'lucide-react';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { Tag, useTags, useTagUsage } from '@/domain/tag';
 import { useCallback } from 'react';
 import Link from 'next/link';
@@ -25,7 +25,7 @@ interface TagContextMenuProps
 
 export function TagContextMenu({ children, tag }: TagContextMenuProps)
 {
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 
 	const { deleteTag } = useTags({ inventoryId: inventory.id });
 	const usage = useTagUsage(tag.id);

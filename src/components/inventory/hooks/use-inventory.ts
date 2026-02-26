@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { Inventory, useInventories } from '@/domain/inventory';
 
-export function useActiveInventory(): Inventory
+export function useInventory(): Inventory
 {
 	const { inventories } = useInventories();
 
@@ -14,7 +14,7 @@ export function useActiveInventory(): Inventory
 
 	if (inventory === null)
 	{
-		throw new Error('Active inventory not found');
+		throw new Error(`Inventory with id "${inventoryId}" was not found. ` + `Make sure you are inside a valid /inventory/[inventory-id] route and that the inventory exists.`);
 	}
 
 	return inventory;

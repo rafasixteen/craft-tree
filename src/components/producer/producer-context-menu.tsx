@@ -1,6 +1,6 @@
 import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { ClipboardPasteIcon, CopyIcon, PencilIcon, ScissorsIcon, TrashIcon } from 'lucide-react';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { Producer, useProducers } from '@/domain/producer';
 import { useCallback } from 'react';
 import Link from 'next/link';
@@ -13,7 +13,7 @@ interface ProducerContextMenuProps
 
 export function ProducerContextMenu({ children, producer }: ProducerContextMenuProps)
 {
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 	const { deleteProducer } = useProducers({ inventoryId: inventory.id });
 
 	const onDelete = useCallback(

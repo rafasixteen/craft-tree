@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Producer, useProducers, ProducerQueryOptions } from '@/domain/producer';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { TagsCombobox } from '@/components/tag/tags-combo-box';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { Tag, useTags } from '@/domain/tag';
 import { GridProvider } from '@/components/grid';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,7 +21,7 @@ export default function ProducersPage()
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 	const { tags: inventoryTags } = useTags({ inventoryId: inventory.id });
 
 	const rawSearch = searchParams.get('search') ?? '';
@@ -98,7 +98,7 @@ export default function ProducersPage()
 	const getProducerHref = useCallback(
 		function getProducerHref(id: string)
 		{
-			return `/inventory/${inventory.id}/producers/${id}`;
+			return `/inventories/${inventory.id}/producers/${id}`;
 		},
 		[inventory.id],
 	);

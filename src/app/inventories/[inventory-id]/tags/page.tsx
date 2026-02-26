@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tag, useTags, TagQueryOptions } from '@/domain/tag';
 import { useCallback, useEffect, useState, useMemo } from 'react';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { GridProvider } from '@/components/grid';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -19,7 +19,7 @@ export default function TagsPage()
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 	const { tags: inventoryTags } = useTags({ inventoryId: inventory.id });
 
 	const rawSearch = searchParams.get('search') ?? '';
@@ -69,7 +69,7 @@ export default function TagsPage()
 	const getTagHref = useCallback(
 		function getTagHref(id: string)
 		{
-			return `/inventory/${inventory.id}/tags/${id}`;
+			return `/inventories/${inventory.id}/tags/${id}`;
 		},
 		[inventory.id],
 	);

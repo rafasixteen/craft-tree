@@ -1,6 +1,6 @@
 import { ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { ClipboardPasteIcon, CopyIcon, PencilIcon, ScissorsIcon, TrashIcon } from 'lucide-react';
-import { useActiveInventory } from '@/components/inventory';
+import { useInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
 import { useCallback } from 'react';
 import Link from 'next/link';
@@ -13,7 +13,7 @@ interface ItemContextMenuProps
 
 export function ItemContextMenu({ children, item }: ItemContextMenuProps)
 {
-	const inventory = useActiveInventory();
+	const inventory = useInventory();
 	const { deleteItem } = useItems({ inventoryId: inventory.id });
 
 	const onDelete = useCallback(
