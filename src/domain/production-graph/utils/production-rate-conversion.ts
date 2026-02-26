@@ -1,4 +1,4 @@
-import type { ProductionRate, TimeUnit } from '@/domain/recipe-tree';
+import { ProductionRate, TimeUnit } from '@/domain/production-graph';
 
 const SECONDS_PER_UNIT: Record<TimeUnit, number> = {
 	second: 1,
