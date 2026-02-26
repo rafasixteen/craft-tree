@@ -14,7 +14,7 @@ interface ItemLayoutProps
 
 export default async function ItemLayout({ params, children }: ItemLayoutProps)
 {
-	const itemId = (await params)['item-id'];
+	const { 'item-id': itemId } = await params;
 
 	return (
 		<SWRConfig

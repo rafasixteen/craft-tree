@@ -14,7 +14,7 @@ interface TagLayoutProps
 
 export default async function TagLayout({ params, children }: TagLayoutProps)
 {
-	const tagId = (await params)['tag-id'];
+	const { 'tag-id': tagId } = await params;
 
 	return (
 		<SWRConfig

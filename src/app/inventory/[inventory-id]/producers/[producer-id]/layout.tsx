@@ -14,7 +14,7 @@ interface ProducerLayoutProps
 
 export default async function ProducerLayout({ params, children }: ProducerLayoutProps)
 {
-	const producerId = (await params)['producer-id'];
+	const { 'producer-id': producerId } = await params;
 
 	return (
 		<SWRConfig

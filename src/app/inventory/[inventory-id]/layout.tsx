@@ -19,10 +19,10 @@ interface InventoryLayoutProps
 
 export default async function InventoryLayout({ params, children }: InventoryLayoutProps)
 {
+	const { 'inventory-id': inventoryId } = await params;
+
 	const cookieStore = await cookies();
 	const sidebarState = cookieStore.get('sidebar_state')?.value === 'true';
-
-	const inventoryId = (await params)['inventory-id'];
 
 	return (
 		<SWRConfig
