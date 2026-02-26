@@ -3,12 +3,12 @@
 import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/types';
 import { useProducerInputs } from '@/components/production-graph/hooks';
 import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, NodeProps } from '@xyflow/react';
-import { getProducersByOutputItem, Producer, useProducerInputsV2, useProducerOutputsV2, useProducerV2 } from '@/domain/producer';
+import { getProducersByOutputItem, Producer, ProducerInput, ProducerOutput, useProducerInputsV2, useProducerOutputsV2, useProducerV2 } from '@/domain/producer';
 import { useActiveInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
-import { convertProductionRate, ProductionRate, TimeUnit } from '@/domain/production-graph';
+import { convertProductionRate, ItemRate, ProductionRate, TimeUnit } from '@/domain/production-graph';
 import { NodeAppendix } from '@/components/node-appendix';
 import { Input } from '@/components/ui/input';
 import { useCallback, useEffect } from 'react';
@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, InfoIcon } from 'lucide-react';
 import { useProducersByOutputItem } from '@/domain/producer/hooks/use-producers-by-output-item';
 import { ItemCombobox } from '@/components/item';
+import { formatNumber } from '@/lib/utils';
 
 export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 {
@@ -209,40 +210,17 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 				</BaseNodeFooter>
 			)}
 			{extraInfo && producer && inputs && outputs && (
-				<NodeAppendix position="bottom" className="flex flex-row justify-between p-2 py-3 text-xs text-muted-foreground">
-					{/* Inputs */}
-					<div className="flex flex-col gap-1">
-						{inputs.map((input) =>
-						{
-							const rate: ProductionRate = {
-								amount: (input.quantity / producer.time) * producerCount,
-								per: 'second',
-							};
-
-							return (
-								<div key={input.itemId}>
-									{getItemName(input.itemId)}: {rate.amount.toFixed(2)}/{rate.per.charAt(0)}
-								</div>
-							);
-						})}
-					</div>
-
-					{/* Outputs */}
-					<div className="flex flex-col gap-1">
-						{outputs.map((output) =>
-						{
-							const rate: ProductionRate = {
-								amount: (output.quantity / producer.time) * producerCount,
-								per: 'second',
-							};
-
-							return (
-								<div key={output.itemId}>
-									{getItemName(output.itemId)}: {rate.amount.toFixed(2)}/{rate.per.charAt(0)}
-								</div>
-							);
-						})}
-					</div>
+				<NodeAppendix position="bottom" className="flex gap-5 p-2 py-3 text-xs text-muted-foreground">
+					<MaximumThroughputDisplay inputs={inputs} outputs={outputs} producer={producer} producerCount={producerCount} getItemName={getItemName} />
+					<ActualThroughputDisplay
+						inputs={inputs}
+						outputs={outputs}
+						producer={producer}
+						producerCount={producerCount}
+						inputRates={inputRates}
+						getItemName={getItemName}
+					/>
+					<InputOverflowDisplay inputs={inputs} outputs={outputs} producer={producer} producerCount={producerCount} inputRates={inputRates} getItemName={getItemName} />
 				</NodeAppendix>
 			)}
 		</BaseNode>
@@ -306,4 +284,219 @@ function ProducerCarousel({ nodeId, itemId, producerId, producerIndex }: Produce
 			</Button>
 		</div>
 	);
+}
+
+interface ActualThroughputDisplayProps
+{
+	inputs: ProducerInput[];
+	outputs: ProducerOutput[];
+	producer: Producer;
+	producerCount: number;
+	inputRates: ItemRate[];
+	getItemName: (itemId: string) => string;
+}
+
+function ActualThroughputDisplay({ inputs, outputs, producer, producerCount, inputRates, getItemName }: ActualThroughputDisplayProps)
+{
+	const { actualInputRates, actualOutputRates } = calculateActualThroughput({ inputs, outputs, producer, producerCount, inputRates });
+
+	return (
+		<>
+			<p className="mb-1 font-semibold">Actual Throughput</p>
+			<div className="flex flex-row gap-4">
+				<div className="flex flex-col gap-1 justify-center">
+					{actualInputRates.map((input: { itemId: string; amount: number }) => (
+						<div key={input.itemId}>
+							{getItemName(input.itemId)}: {formatNumber(input.amount, 3)}/s
+						</div>
+					))}
+				</div>
+				<div className="flex flex-col gap-1 justify-center">
+					{actualOutputRates.map((output: { itemId: string; amount: number }) => (
+						<div key={output.itemId}>
+							{getItemName(output.itemId)}: {formatNumber(output.amount, 3)}/s
+						</div>
+					))}
+				</div>
+			</div>
+		</>
+	);
+}
+
+interface MaximumThroughputDisplayProps
+{
+	inputs: { itemId: string; quantity: number }[];
+	outputs: { itemId: string; quantity: number }[];
+	producer: Producer;
+	producerCount: number;
+	getItemName: (itemId: string) => string;
+}
+
+function MaximumThroughputDisplay({ inputs, outputs, producer, producerCount, getItemName }: MaximumThroughputDisplayProps)
+{
+	const { maxInputRates, maxOutputRates } = calculateMaximumThroughput({ inputs, outputs, producer, producerCount });
+
+	return (
+		<>
+			<p className="font-semibold">Maximum Throughput</p>
+			<div className="flex flex-row gap-4">
+				<div className="flex flex-col gap-1 justify-center">
+					{maxInputRates.map((input: { itemId: string; amount: number }) => (
+						<div key={input.itemId}>
+							{getItemName(input.itemId)}: {formatNumber(input.amount, 3)}/s
+						</div>
+					))}
+				</div>
+				<div className="flex flex-col gap-1 justify-center">
+					{maxOutputRates.map((output: { itemId: string; amount: number }) => (
+						<div key={output.itemId}>
+							{getItemName(output.itemId)}: {formatNumber(output.amount, 3)}/s
+						</div>
+					))}
+				</div>
+			</div>
+		</>
+	);
+}
+
+interface MaximumThroughputParameters
+{
+	inputs: { itemId: string; quantity: number }[];
+	outputs: { itemId: string; quantity: number }[];
+	producer: Producer;
+	producerCount: number;
+}
+
+interface InputOverflowDisplayProps extends ActualThroughputParameters
+{
+	getItemName: (itemId: string) => string;
+}
+
+function InputOverflowDisplay({ inputs, outputs, producer, producerCount, inputRates, getItemName }: InputOverflowDisplayProps)
+{
+	const { actualInputRates } = calculateActualThroughput({ inputs, outputs, producer, producerCount, inputRates });
+	const inputOverflow = calculateInputOverflow({ inputRates, actualInputRates: actualInputRates as ItemRate[] });
+
+	return (
+		<>
+			<p className="font-semibold">Overflow</p>
+			<div className="flex flex-col gap-1">
+				{inputOverflow.map((overflow) => (
+					<div key={overflow.itemId}>
+						{getItemName(overflow.itemId)}: {formatNumber(overflow.amount, 3)}/s
+					</div>
+				))}
+			</div>
+		</>
+	);
+}
+
+function calculateMaximumThroughput({ inputs, outputs, producer, producerCount }: MaximumThroughputParameters)
+{
+	const maxInputRates = inputs.map((input) => ({
+		itemId: input.itemId,
+		amount: (input.quantity / producer.time) * producerCount,
+		per: 'second' as TimeUnit,
+	}));
+
+	const maxOutputRates = outputs.map((output) => ({
+		itemId: output.itemId,
+		amount: (output.quantity / producer.time) * producerCount,
+		per: 'second' as TimeUnit,
+	}));
+
+	return {
+		maxInputRates,
+		maxOutputRates,
+	};
+}
+
+interface ActualThroughputParameters
+{
+	inputs: ProducerInput[];
+	outputs: ProducerOutput[];
+	producer: Producer;
+	producerCount: number;
+	inputRates: ItemRate[];
+}
+
+function calculateActualThroughput({ inputs, outputs, producer, producerCount, inputRates }: ActualThroughputParameters)
+{
+	// Build rate lookup
+	const rateMap = new Map();
+	for (const itemRate of inputRates)
+	{
+		const rate = {
+			amount: itemRate.amount,
+			per: itemRate.per,
+		};
+		const converted = convertProductionRate(rate, 'second');
+		rateMap.set(itemRate.itemId, converted.amount);
+	}
+
+	// Calculate supply-limited cycles/sec
+	let supplyLimitedCycles = Infinity;
+	for (const input of inputs)
+	{
+		const suppliedPerSecond = rateMap.get(input.itemId);
+		if (!suppliedPerSecond)
+		{
+			supplyLimitedCycles = 0;
+			break;
+		}
+		const possibleCycles = suppliedPerSecond / input.quantity;
+		supplyLimitedCycles = Math.min(supplyLimitedCycles, possibleCycles);
+	}
+
+	// Calculate machine-limited cycles/sec
+	const singleMachineMax = 1 / producer.time;
+	const machineLimitedCycles = producerCount * singleMachineMax;
+	const actualCycles = Math.min(supplyLimitedCycles, machineLimitedCycles);
+
+	// Calculate actual input rates
+	const actualInputRates = inputs.map((input) => ({
+		itemId: input.itemId,
+		amount: input.quantity * actualCycles,
+		per: 'second',
+	}));
+
+	// Calculate actual output rates
+	const actualOutputRates = outputs.map((output) => ({
+		itemId: output.itemId,
+		amount: output.quantity * actualCycles,
+		per: 'second',
+	}));
+
+	return {
+		actualCycles,
+		actualInputRates,
+		actualOutputRates,
+	};
+}
+
+interface InputOverflowParameters
+{
+	inputRates: ItemRate[];
+	actualInputRates: ItemRate[];
+}
+
+function calculateInputOverflow({ inputRates, actualInputRates }: InputOverflowParameters): ItemRate[]
+{
+	return inputRates.map((rate) =>
+	{
+		const actualRate = actualInputRates.find((r) => r.itemId === rate.itemId);
+
+		if (!actualRate)
+		{
+			throw new Error(`Missing actual rate for itemId ${rate.itemId}`);
+		}
+
+		const overflowAmount = Math.max(0, rate.amount - actualRate.amount);
+
+		return {
+			itemId: rate.itemId,
+			amount: overflowAmount,
+			per: 'second' as TimeUnit,
+		};
+	});
 }
