@@ -6,8 +6,6 @@ export const items = pgTable('items', {
 
 	name: text('name').notNull(),
 
-	icon: text('icon'),
-
 	inventoryId: uuid('inventory_id')
 		.references(() => inventories.id, { onDelete: 'cascade' })
 		.notNull(),
