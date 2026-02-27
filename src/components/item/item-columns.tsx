@@ -15,9 +15,11 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
+			const name = row.original.name;
+
 			return (
 				<div className="flex space-x-2">
-					<span className="max-w-[500px] truncate font-medium">{row.getValue('name')}</span>
+					<span className="max-w-[500px] truncate font-medium">{name}</span>
 				</div>
 			);
 		},
@@ -27,7 +29,7 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Tags" />,
 		cell: ({ row }) =>
 		{
-			const tags = row.getValue('tags') as string[];
+			const tags = row.original.tags;
 
 			return (
 				<div className="flex flex-wrap gap-1">

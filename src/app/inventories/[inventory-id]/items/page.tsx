@@ -1,10 +1,10 @@
 'use client';
 
 import { Header } from '@/components/craft-tree-sidebar';
-import { itemColumnns } from '@/components/item';
+import { itemColumnns, ItemsTable } from '@/components/item';
 import { useItems } from '@/domain/item';
 import { useInventory } from '@/components/inventory';
-import { DataTable } from '@/components/table/components/data-table';
+import { useTable, DataTableToolbar, DataTablePagination } from '@/components/table';
 
 export default function ItemsPage()
 {
@@ -17,10 +17,16 @@ export default function ItemsPage()
 		tags: ['tag1', 'tag2'],
 	}));
 
+	const table = useTable({
+		columns: itemColumnns,
+		data: tableData,
+	});
+
 	return (
 		<>
-			<Header></Header>
-			<DataTable data={tableData} columns={itemColumnns} />
+			<Header>{/* <DataTableToolbar table={table} /> */}</Header>
+			<ItemsTable table={table} />
+			{/* <DataTablePagination table={table} /> */}
 		</>
 	);
 }
