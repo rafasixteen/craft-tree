@@ -1,7 +1,7 @@
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { X } from 'lucide-react';
+import { Settings2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,12 +23,12 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
 			<div className="flex flex-1 items-center space-x-2">
 				<Input
 					placeholder="Filter tasks..."
-					value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
-					onChange={(event) => table.getColumn('title')?.setFilterValue(event.target.value)}
+					value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+					onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
 					className="h-8 w-[150px] lg:w-[250px]"
 				/>
-				{table.getColumn('status') && <DataTableFacetedFilter column={table.getColumn('status')} title="Status" options={statuses} />}
-				{table.getColumn('priority') && <DataTableFacetedFilter column={table.getColumn('priority')} title="Priority" options={priorities} />}
+				{/* {table.getColumn('status') && <DataTableFacetedFilter column={table.getColumn('status')} title="Status" options={statuses} />}
+				{table.getColumn('priority') && <DataTableFacetedFilter column={table.getColumn('priority')} title="Priority" options={priorities} />} */}
 				{isFiltered && (
 					<Button variant="ghost" onClick={() => table.resetColumnFilters()} className="h-8 px-2 lg:px-3">
 						Reset
@@ -37,6 +37,9 @@ export function DataTableToolbar<TData>({ table }: DataTableToolbarProps<TData>)
 				)}
 			</div>
 			<DataTableViewOptions table={table} />
+			<Button variant="default" size="sm" className="ml-auto hidden h-8 lg:flex">
+				Add Task
+			</Button>
 		</div>
 	);
 }
