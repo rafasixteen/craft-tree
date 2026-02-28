@@ -34,7 +34,7 @@ export function useDataTable<TData, TValue>({ columns, data }: DataTableParams<T
 		pageSize: 16,
 	});
 
-	const table = useReactTable({
+	return useReactTable({
 		data,
 		columns,
 		state: {
@@ -57,6 +57,4 @@ export function useDataTable<TData, TValue>({ columns, data }: DataTableParams<T
 		getFacetedRowModel: getFacetedRowModel(),
 		getFacetedUniqueValues: getFacetedUniqueValues(),
 	});
-
-	return table;
 }
