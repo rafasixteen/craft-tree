@@ -1,32 +1,43 @@
 'use client';
 
-import Link from 'next/link';
 import { useInventories } from '@/domain/inventory';
+import { DataTable, DataTableFilter, useDataTable } from '@/components/data-table';
+import { inventoryColumnns } from '@/components/inventory';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { Header, InventoriesSidebar } from '@/components/craft-tree-sidebar';
+import Link from 'next/link';
 
-export default function InventoryRootPage()
+export default function InventoriesPage()
 {
 	const { inventories } = useInventories();
 
-	if (inventories.length > 0)
-	{
-		// TODO: Redirect either to /items or /producers based on the last visited page for that inventory.
-		return inventories.map((inventory) => (
-			<div key={inventory.id} className="flex flex-1 flex-col gap-4 p-4">
-				<Link
-					href={`/inventories/${inventory.id}/items`}
-					className="inline-flex items-center rounded-md border border-input bg-background px-4 py-2 text-base font-medium shadow-sm transition-colors hover:bg-accent focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none"
-				>
-					{inventory.name}
-				</Link>
-			</div>
-		));
-	}
-	else
-	{
-		return (
-			<div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
-				<p className="text-sm text-muted-foreground">No inventories found. Create one to get started!</p>
-			</div>
-		);
-	}
+	const table = useDataTable({
+		data: inventories,
+		columns: inventoryColumnns,
+	});
+
+	const sidebarState = document.cookie.includes('sidebar_state=true');
+
+	return (
+		<SidebarProvider defaultOpen={sidebarState}>
+			<InventoriesSidebar />
+			<SidebarInset>
+				<div className="flex h-full flex-col">
+					<Header>
+						<div className="flex items-center space-x-2">
+							<DataTableFilter table={table} filterKey="name" type="search" placeholder="Filter inventories..." className="h-8 w-64" />
+							<Button variant="default" size="sm" className="h-8">
+								<Link href="/inventories/create">Create Inventory</Link>
+							</Button>
+						</div>
+					</Header>
+					<Card className="m-2 flex-1 bg-transparent p-0">
+						<DataTable table={table} />
+					</Card>
+				</div>
+			</SidebarInset>
+		</SidebarProvider>
+	);
 }

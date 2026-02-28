@@ -33,7 +33,6 @@ export function InventorySwitcher()
 					<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" align="start" side={isMobile ? 'bottom' : 'right'} sideOffset={4}>
 						<DropdownMenuLabel className="text-xs text-muted-foreground">Inventories</DropdownMenuLabel>
 						{inventories.map((inventory) => (
-							// TODO: Redirect either to /items or /producers based on the last visited page for that inventory.
 							<Link href={`/inventories/${inventory.id}/items`} key={inventory.id}>
 								<DropdownMenuItem className="gap-2 p-2">
 									<div className="flex size-7 items-center justify-center rounded-md border">
@@ -45,10 +44,12 @@ export function InventorySwitcher()
 						))}
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className="gap-2 p-2">
-							<div className="flex size-7 items-center justify-center rounded-md border bg-transparent">
-								<Plus className="size-4" />
-							</div>
-							<div className="font-medium text-muted-foreground">Add inventory</div>
+							<Link href="/inventories/create" className="flex items-center gap-2">
+								<div className="flex size-7 items-center justify-center rounded-md border bg-transparent">
+									<Plus className="size-4" />
+								</div>
+								<div className="font-medium text-muted-foreground">Create inventory</div>
+							</Link>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

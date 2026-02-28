@@ -4,12 +4,12 @@ import { getInventoriesByUserId } from '@/domain/inventory';
 import { findUserIdByEmail } from '@/domain/user';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-interface InventoryRootLayoutProps
+interface InventoriesLayoutProps
 {
 	children: React.ReactNode;
 }
 
-export default async function InventoryRootLayout({ children }: InventoryRootLayoutProps)
+export default async function InventoriesLayout({ children }: InventoriesLayoutProps)
 {
 	const session = await auth();
 
@@ -18,7 +18,13 @@ export default async function InventoryRootLayout({ children }: InventoryRootLay
 		return redirect('/sign-in');
 	}
 
-	const email = session.user!.email!;
+	const email = session.user?.email;
+
+	if (!email)
+	{
+		redirect('/sign-in');
+	}
+
 	const userId = await findUserIdByEmail(email);
 
 	if (!userId)

@@ -1,9 +1,8 @@
-'use client';
-
 import Link from 'next/link';
 import { ArrowLeftFromLineIcon, ArrowRightFromLineIcon, FactoryIcon, PackageIcon, TagsIcon, WaypointsIcon } from 'lucide-react';
 import { NavUser } from '@/components/user';
-import { InventorySwitcher, useInventory } from '@/components/inventory';
+import { InventorySwitcher } from '@/components/inventory';
+import { Inventory } from '@/domain/inventory';
 import {
 	Sidebar,
 	SidebarContent,
@@ -17,7 +16,12 @@ import {
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
+interface InventorySidebarProps extends React.ComponentProps<typeof Sidebar>
+{
+	inventoryId: Inventory['id'];
+}
+
+export function InventorySidebar({ inventoryId, ...props }: InventorySidebarProps)
 {
 	return (
 		<Sidebar collapsible="icon" {...props}>
@@ -25,8 +29,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 				<InventorySwitcher />
 			</SidebarHeader>
 			<SidebarContent>
-				<InventoryGroup />
-				<ProductionGraphGroup />
+				<InventoryGroup inventoryId={inventoryId} />
+				<ProductionGraphGroup inventoryId={inventoryId} />
 				<DocumentsGroup />
 			</SidebarContent>
 			<SidebarFooter>
@@ -37,17 +41,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
 	);
 }
 
-function InventoryGroup()
+function InventoryGroup({ inventoryId }: { inventoryId: Inventory['id'] })
 {
-	const inventory = useInventory();
-
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Inventory</SidebarGroupLabel>
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Items" asChild>
-						<Link href={`/inventories/${inventory.id}/items`}>
+						<Link href={`/inventories/${inventoryId}/items`}>
 							<PackageIcon />
 							<span>Items</span>
 						</Link>
@@ -55,7 +57,7 @@ function InventoryGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Producers" asChild>
-						<Link href={`/inventories/${inventory.id}/producers`}>
+						<Link href={`/inventories/${inventoryId}/producers`}>
 							<FactoryIcon />
 							<span>Producers</span>
 						</Link>
@@ -63,7 +65,7 @@ function InventoryGroup()
 				</SidebarMenuItem>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Tags" asChild>
-						<Link href={`/inventories/${inventory.id}/tags`}>
+						<Link href={`/inventories/${inventoryId}/tags`}>
 							<TagsIcon />
 							<span>Tags</span>
 						</Link>
@@ -74,17 +76,15 @@ function InventoryGroup()
 	);
 }
 
-function ProductionGraphGroup()
+function ProductionGraphGroup({ inventoryId }: { inventoryId: Inventory['id'] })
 {
-	const inventory = useInventory();
-
 	return (
 		<SidebarGroup>
 			<SidebarGroupLabel>Production Graph</SidebarGroupLabel>
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<SidebarMenuButton tooltip="Import" asChild>
-						<Link href={`/inventories/${inventory.id}/production-graph`}>
+						<Link href={`/inventories/${inventoryId}/production-graph`}>
 							<WaypointsIcon />
 							<span>Production Graph</span>
 						</Link>

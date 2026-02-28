@@ -1,4 +1,4 @@
-import { AppSidebar } from '@/components/craft-tree-sidebar';
+import { InventorySidebar } from '@/components/craft-tree-sidebar/inventory-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { getItems } from '@/domain/item';
 import { getItemsTags, getProducersTags, getTags } from '@/domain/tag';
@@ -37,7 +37,7 @@ export default async function InventoryLayout({ params, children }: InventoryLay
 			}}
 		>
 			<SidebarProvider defaultOpen={sidebarState}>
-				<AppSidebar />
+				<InventorySidebar inventoryId={inventoryId} />
 				<SidebarInset>{children}</SidebarInset>
 			</SidebarProvider>
 		</SWRConfig>
