@@ -8,7 +8,7 @@ const appendixVariants = cva(
   {
     variants: {
       position: {
-        top: "-translate-y-full -my-1",
+        top: "-my-1 -translate-y-full",
         bottom: "top-full my-1",
         left: "-left-full -mx-1",
         right: "left-full mx-1",

@@ -1,11 +1,11 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { Item } from '@/domain/item';
-import { DataTableColumnHeader } from '../table/components/data-table-column-header';
+import { ColumnDef, Row } from '@tanstack/react-table';
+import { Item, useItems } from '@/domain/item';
+import { DataTableColumnHeader } from '@/components/data-table';
+import { Button } from '@/components/ui/button';
+import { PencilIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '../ui/button';
-import { PackageIcon, PencilIcon, TrashIcon } from 'lucide-react';
 
 export type ItemColumnData = Item & { tags: string[] };
 
@@ -16,11 +16,12 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 		cell: ({ row }) =>
 		{
 			const name = row.original.name;
+			const href = `/inventories/${row.original.inventoryId}/items/${row.original.id}`;
 
 			return (
-				<div className="flex space-x-2">
-					<span className="max-w-[500px] truncate font-medium">{name}</span>
-				</div>
+				<Link href={href} className="ml-3 truncate font-medium hover:underline">
+					{name}
+				</Link>
 			);
 		},
 	},
@@ -30,47 +31,60 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 		cell: ({ row }) =>
 		{
 			const tags = row.original.tags;
+			const sortedTags = [...tags].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
 			return (
 				<div className="flex flex-wrap gap-1">
-					{tags && tags.length > 0 ? (
-						tags.map((tag, idx) => (
-							<span key={idx} className="px-2 py-1 bg-muted rounded text-xs">
+					{sortedTags.length > 0 ? (
+						sortedTags.map((tag, index) => (
+							<span key={index} className="rounded-md bg-muted px-2 py-1 text-xs">
 								{tag}
 							</span>
 						))
 					) : (
-						<span className="text-gray-400">No tags</span>
+						<span className="text-xs text-muted-foreground">No tags</span>
 					)}
 				</div>
 			);
+		},
+		filterFn: (row, id, value: string[]) =>
+		{
+			// Every selected tag must exist in the row
+			return value.every((tag) => row.original.tags.includes(tag));
 		},
 		enableSorting: false,
 	},
 	{
 		id: 'actions',
-		cell: ({ row }) =>
-		{
-			const id = row.original.id;
-			const inventoryId = row.original.inventoryId;
-
-			return (
-				<div className="flex gap-2">
-					<Button variant="default" size="icon-sm" asChild>
-						<Link href={`/inventories/${inventoryId}/items/${id}`}>
-							<PackageIcon className="size-3" />
-						</Link>
-					</Button>
-					<Button variant="outline" size="icon-sm">
-						<PencilIcon className="size-3" />
-					</Button>
-					<Button variant="destructive" size="icon-sm">
-						<TrashIcon className="size-3" />
-					</Button>
-				</div>
-			);
-		},
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" className="text-center" />,
+		cell: ({ row }) => <Actions row={row} />,
 		enableSorting: false,
 		enableHiding: false,
 	},
 ];
+
+interface ActionsProps
+{
+	row: Row<ItemColumnData>;
+}
+
+function Actions({ row }: ActionsProps)
+{
+	const id = row.original.id;
+	const inventoryId = row.original.inventoryId;
+
+	const { deleteItem } = useItems({ inventoryId });
+
+	return (
+		<div className="flex justify-center gap-2">
+			<Button variant="outline" size="icon-sm">
+				<Link href={`/inventories/${inventoryId}/items/${id}/edit`}>
+					<PencilIcon className="size-3" />
+				</Link>
+			</Button>
+			<Button variant="destructive" size="icon-sm" onClick={() => deleteItem(id)}>
+				<TrashIcon className="size-3" />
+			</Button>
+		</div>
+	);
+}

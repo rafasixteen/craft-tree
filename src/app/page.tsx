@@ -7,7 +7,7 @@ export default async function Home()
 	const session = await auth();
 
 	return (
-		<div className="relative flex min-h-screen items-center justify-center overflow-hidden py-4">
+		<div className="flex flex-1 py-4">
 			{/* Animated background elements */}
 			<div className="absolute inset-0 overflow-hidden">
 				<div className="absolute top-0 left-1/4 size-48 animate-pulse rounded-full bg-primary/10 opacity-20 mix-blend-multiply blur-3xl filter sm:size-96" />
@@ -22,7 +22,7 @@ export default async function Home()
 			</div>
 
 			{/* Content */}
-			<div className="relative z-10 flex w-full flex-col items-center justify-center px-4 text-center">
+			<div className="relative z-10 flex w-full items-center justify-center px-4 text-center">
 				{/* Main heading with animation */}
 				<div className="mx-auto max-w-3xl space-y-6">
 					<div className="space-y-4">

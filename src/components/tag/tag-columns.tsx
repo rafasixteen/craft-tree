@@ -1,49 +1,61 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { Tag } from '@/domain/tag';
-import { DataTableColumnHeader } from '../table/components/data-table-column-header';
+import { ColumnDef, Row } from '@tanstack/react-table';
+import { Tag, useTags } from '@/domain/tag';
+import { DataTableColumnHeader } from '@/components/data-table';
+import { Button } from '@/components/ui/button';
+import { PencilIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '../ui/button';
-import { PackageIcon, PencilIcon, TrashIcon } from 'lucide-react';
 
-export const tagColumnns: ColumnDef<Tag>[] = [
+export type TagColumnData = Tag;
+
+export const tagColumnns: ColumnDef<TagColumnData>[] = [
 	{
 		accessorKey: 'name',
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
+			const name = row.original.name;
+			const href = `/inventories/${row.original.inventoryId}/tags/${row.original.id}`;
+
 			return (
-				<div className="flex space-x-2">
-					<span className="max-w-[500px] truncate font-medium">{row.getValue('name')}</span>
-				</div>
+				<Link href={href} className="ml-3 truncate font-medium hover:underline">
+					{name}
+				</Link>
 			);
 		},
 	},
 	{
 		id: 'actions',
-		cell: ({ row }) =>
-		{
-			const id = row.original.id;
-			const inventoryId = row.original.inventoryId;
-
-			return (
-				<div className="flex gap-2">
-					<Button variant="default" size="icon-sm" asChild>
-						<Link href={`/inventories/${inventoryId}/tags/${id}`}>
-							<PackageIcon className="size-3" />
-						</Link>
-					</Button>
-					<Button variant="outline" size="icon-sm">
-						<PencilIcon className="size-3" />
-					</Button>
-					<Button variant="destructive" size="icon-sm">
-						<TrashIcon className="size-3" />
-					</Button>
-				</div>
-			);
-		},
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" className="text-center" />,
+		cell: ({ row }) => <Actions row={row} />,
 		enableSorting: false,
 		enableHiding: false,
 	},
 ];
+
+interface ActionsProps
+{
+	row: Row<TagColumnData>;
+}
+
+function Actions({ row }: ActionsProps)
+{
+	const id = row.original.id;
+	const inventoryId = row.original.inventoryId;
+
+	const { deleteTag } = useTags({ inventoryId });
+
+	return (
+		<div className="flex justify-center gap-2">
+			<Button variant="outline" size="icon-sm">
+				<Link href={`/inventories/${inventoryId}/tags/${id}/edit`}>
+					<PencilIcon className="size-3" />
+				</Link>
+			</Button>
+			<Button variant="destructive" size="icon-sm" onClick={() => deleteTag(id)}>
+				<TrashIcon className="size-3" />
+			</Button>
+		</div>
+	);
+}

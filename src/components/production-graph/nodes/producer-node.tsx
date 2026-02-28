@@ -304,14 +304,14 @@ function ActualThroughputDisplay({ inputs, outputs, producer, producerCount, inp
 		<>
 			<p className="mb-1 font-semibold">Actual Throughput</p>
 			<div className="flex flex-row gap-4">
-				<div className="flex flex-col gap-1 justify-center">
+				<div className="flex flex-col justify-center gap-1">
 					{actualInputRates.map((input: { itemId: string; amount: number }) => (
 						<div key={input.itemId}>
 							{getItemName(input.itemId)}: {formatNumber(input.amount, 3)}/s
 						</div>
 					))}
 				</div>
-				<div className="flex flex-col gap-1 justify-center">
+				<div className="flex flex-col justify-center gap-1">
 					{actualOutputRates.map((output: { itemId: string; amount: number }) => (
 						<div key={output.itemId}>
 							{getItemName(output.itemId)}: {formatNumber(output.amount, 3)}/s
@@ -340,14 +340,14 @@ function MaximumThroughputDisplay({ inputs, outputs, producer, producerCount, ge
 		<>
 			<p className="font-semibold">Maximum Throughput</p>
 			<div className="flex flex-row gap-4">
-				<div className="flex flex-col gap-1 justify-center">
+				<div className="flex flex-col justify-center gap-1">
 					{maxInputRates.map((input: { itemId: string; amount: number }) => (
 						<div key={input.itemId}>
 							{getItemName(input.itemId)}: {formatNumber(input.amount, 3)}/s
 						</div>
 					))}
 				</div>
-				<div className="flex flex-col gap-1 justify-center">
+				<div className="flex flex-col justify-center gap-1">
 					{maxOutputRates.map((output: { itemId: string; amount: number }) => (
 						<div key={output.itemId}>
 							{getItemName(output.itemId)}: {formatNumber(output.amount, 3)}/s

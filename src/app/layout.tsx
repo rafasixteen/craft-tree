@@ -31,7 +31,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
 	return (
 		<html lang="en" className={inter.variable} suppressHydrationWarning>
-			<body className={cn(geistSans.variable, geistMono.variable)}>
+			<body className={cn(geistSans.variable, geistMono.variable, 'flex h-screen')}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<SessionProvider session={session}>
 						<TooltipProvider>{children}</TooltipProvider>
