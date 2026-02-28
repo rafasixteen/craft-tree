@@ -42,14 +42,13 @@ interface ActionsProps
 function Actions({ row }: ActionsProps)
 {
 	const id = row.original.id;
-	const inventoryId = row.original.id;
 
 	const { deleteInventory } = useInventories();
 
 	return (
 		<div className="flex justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${inventoryId}/inventorys/${id}/edit`}>
+				<Link href={`/inventories/${id}/edit`}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
