@@ -1,18 +1,7 @@
 import { getItemById, getItemTags } from '@/domain/item';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-interface Params
-{
-	'item-id': string;
-}
-
-interface ItemLayoutProps
-{
-	params: Promise<Params>;
-	children: React.ReactNode;
-}
-
-export default async function ItemLayout({ params, children }: ItemLayoutProps)
+export default async function ItemLayout({ params, children }: LayoutProps<'/inventories/[inventory-id]/items/[item-id]'>)
 {
 	const { 'item-id': itemId } = await params;
 

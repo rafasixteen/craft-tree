@@ -6,18 +6,7 @@ import { getProducers } from '@/domain/producer';
 import { cookies } from 'next/headers';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-interface Params
-{
-	'inventory-id': string;
-}
-
-interface InventoryLayoutProps
-{
-	params: Promise<Params>;
-	children: React.ReactNode;
-}
-
-export default async function InventoryLayout({ params, children }: InventoryLayoutProps)
+export default async function InventoryLayout({ params, children }: LayoutProps<'/inventories/[inventory-id]'>)
 {
 	const { 'inventory-id': inventoryId } = await params;
 

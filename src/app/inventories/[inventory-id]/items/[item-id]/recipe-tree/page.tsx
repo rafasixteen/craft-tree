@@ -1,23 +1,12 @@
 import { Header } from '@/components/craft-tree-sidebar';
 import { RecipeTree } from '@/components/recipe-tree';
 import { RecipeTreeProvider } from '@/domain/recipe-tree/hooks';
-import { Item } from '@/domain/item';
 import { ReactFlowProvider } from '@xyflow/react';
 import { cookies } from 'next/headers';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { getRecipeTreeData } from '@/domain/recipe-tree';
 
-interface Params
-{
-	'item-id': Item['id'];
-}
-
-interface RecipeTreePageProps
-{
-	params: Promise<Params>;
-}
-
-export default async function RecipeTreePage({ params }: RecipeTreePageProps)
+export default async function RecipeTreePage({ params }: PageProps<'/inventories/[inventory-id]/items/[item-id]/recipe-tree'>)
 {
 	const { 'item-id': itemId } = await params;
 

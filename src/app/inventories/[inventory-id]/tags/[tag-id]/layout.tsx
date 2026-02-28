@@ -1,18 +1,7 @@
 import { getTagById } from '@/domain/tag';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-interface Params
-{
-	'tag-id': string;
-}
-
-interface TagLayoutProps
-{
-	params: Promise<Params>;
-	children: React.ReactNode;
-}
-
-export default async function TagLayout({ params, children }: TagLayoutProps)
+export default async function TagLayout({ params, children }: LayoutProps<'/inventories/[inventory-id]/tags/[tag-id]'>)
 {
 	const { 'tag-id': tagId } = await params;
 

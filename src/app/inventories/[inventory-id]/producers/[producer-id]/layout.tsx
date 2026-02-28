@@ -1,18 +1,7 @@
 import { getProducerById, getProducerInputs, getProducerOutputs, getProducerTags } from '@/domain/producer';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-interface Params
-{
-	'producer-id': string;
-}
-
-interface ProducerLayoutProps
-{
-	params: Promise<Params>;
-	children: React.ReactNode;
-}
-
-export default async function ProducerLayout({ params, children }: ProducerLayoutProps)
+export default async function ProducerLayout({ params, children }: LayoutProps<'/inventories/[inventory-id]/producers/[producer-id]'>)
 {
 	const { 'producer-id': producerId } = await params;
 
