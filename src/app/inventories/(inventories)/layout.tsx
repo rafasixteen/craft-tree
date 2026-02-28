@@ -29,7 +29,7 @@ export default async function InventoriesLayout({ children }: LayoutProps<'/inve
 	}
 
 	const cookieStore = await cookies();
-	const sidebarState = cookieStore.get('sidebar_state')?.value === 'true';
+	const sidebarState = cookieStore.get('sidebar_state')?.value !== 'false';
 
 	return (
 		<SidebarProvider defaultOpen={sidebarState}>
