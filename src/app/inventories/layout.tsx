@@ -4,12 +4,7 @@ import { getInventoriesByUserId } from '@/domain/inventory';
 import { findUserIdByEmail } from '@/domain/user';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-interface InventoriesLayoutProps
-{
-	children: React.ReactNode;
-}
-
-export default async function InventoriesLayout({ children }: InventoriesLayoutProps)
+export default async function InventoriesRootLayout({ children }: LayoutProps<'/inventories'>)
 {
 	const session = await auth();
 

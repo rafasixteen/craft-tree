@@ -13,6 +13,8 @@ export default async function InventoryLayout({ params, children }: LayoutProps<
 	const cookieStore = await cookies();
 	const sidebarState = cookieStore.get('sidebar_state')?.value === 'true';
 
+	console.log('InventoryLayout: inventoryId =', inventoryId);
+
 	return (
 		<SWRConfig
 			value={{
