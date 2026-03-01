@@ -16,8 +16,8 @@ import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/componen
 export default function ProducerEditPage()
 {
 	const router = useRouter();
-
 	const params = useParams();
+
 	const producerId = params['producer-id'] as string;
 
 	const { producer, updateProducer } = useProducer(producerId);
@@ -28,6 +28,7 @@ export default function ProducerEditPage()
 
 	const form = useForm<ProducerFormValues>({
 		resolver: zodResolver(producerFormSchema),
+		mode: 'onChange',
 		defaultValues: {
 			name: producer.name,
 			time: producer.time,
@@ -50,7 +51,6 @@ export default function ProducerEditPage()
 				setTags({ tagIds });
 
 				toast.success(`Producer '${name}' updated`);
-
 				router.push(`/inventories/${producer.inventoryId}/producers`);
 			}
 			catch

@@ -4,7 +4,7 @@ import { Header } from '@/components/craft-tree-sidebar';
 import { itemColumnns } from '@/components/item';
 import { useMemo } from 'react';
 import { useItems } from '@/domain/item';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { useDataTable, DataTablePagination, DataTableFilter, DataTableFacetedFilter, DataTable } from '@/components/data-table';
 import { useItemsTags, useTags } from '@/domain/tag';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import Link from 'next/link';
 
 export default function ItemsPage()
 {
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 
 	const { items } = useItems({ inventoryId: inventory.id });
 

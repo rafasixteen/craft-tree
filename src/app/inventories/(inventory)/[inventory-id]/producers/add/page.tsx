@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { toast } from 'sonner';
 import { useCallback, useTransition } from 'react';
 import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/components/producer';
@@ -16,12 +16,13 @@ import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/componen
 export default function ProducerAddPage()
 {
 	const router = useRouter();
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 
 	const [isCreating, startTransition] = useTransition();
 
 	const form = useForm<ProducerFormValues>({
 		resolver: zodResolver(producerFormSchema),
+		mode: 'onChange',
 		defaultValues: {
 			name: '',
 			time: 10,

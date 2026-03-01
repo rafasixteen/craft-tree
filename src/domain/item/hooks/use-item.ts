@@ -22,25 +22,18 @@ export function useItem(itemId: Item['id'])
 	}
 
 	const updateItem = useCallback(
-		async function updateItem({ name, icon }: UpdateItemParams)
+		async function updateItem({ name }: UpdateItemParams)
 		{
 			await mutate(
 				async () =>
 				{
-					return await ItemServerActions.updateItem({ id: itemId, name, icon });
+					return await ItemServerActions.updateItem({ id: itemId, name });
 				},
 				{
-					optimisticData: (currentData, displayedData) =>
-					{
-						const current = currentData ?? displayedData;
-
-						if (!current)
-						{
-							return { id: itemId, name: name ?? '', icon: icon ?? '', inventoryId: '' };
-						}
-
-						return { ...current, name: name ?? current.name, icon: icon ?? current.icon };
-					},
+					optimisticData: (current) => ({
+						...current!,
+						name,
+					}),
 					rollbackOnError: true,
 					revalidate: true,
 				},

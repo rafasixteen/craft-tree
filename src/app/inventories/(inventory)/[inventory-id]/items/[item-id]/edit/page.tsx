@@ -16,8 +16,8 @@ import { ItemForm, ItemFormValues, itemFormSchema } from '@/components/item';
 export default function ItemEditPage()
 {
 	const router = useRouter();
-
 	const params = useParams();
+
 	const itemId = params['item-id'] as string;
 
 	const { item, updateItem } = useItem(itemId);
@@ -25,6 +25,7 @@ export default function ItemEditPage()
 
 	const form = useForm<ItemFormValues>({
 		resolver: zodResolver(itemFormSchema),
+		mode: 'onChange',
 		defaultValues: {
 			name: item.name,
 			tagIds: tags.map((tag) => tag.tagId),
@@ -38,11 +39,10 @@ export default function ItemEditPage()
 			{
 				const { name, tagIds } = values;
 
-				updateItem({ name, icon: null });
+				updateItem({ name });
 				setTags({ tagIds });
 
 				toast.success(`Item '${name}' updated`);
-
 				router.push(`/inventories/${item.inventoryId}/items`);
 			}
 			catch

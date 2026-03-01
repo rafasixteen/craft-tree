@@ -4,7 +4,7 @@ import { ChevronsUpDown, Plus } from 'lucide-react';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import { useInventories } from '@/domain/inventory';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import Link from 'next/link';
 
 export function InventorySwitcher()
@@ -12,7 +12,7 @@ export function InventorySwitcher()
 	const { isMobile } = useSidebar();
 
 	const { inventories } = useInventories();
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 
 	return (
 		<SidebarMenu>

@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { toast } from 'sonner';
 import { useCallback, useTransition } from 'react';
 import { ItemForm, ItemFormValues, itemFormSchema } from '@/components/item';
@@ -16,12 +16,13 @@ import { ItemForm, ItemFormValues, itemFormSchema } from '@/components/item';
 export default function ItemAddPage()
 {
 	const router = useRouter();
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 
 	const [isCreating, startTransition] = useTransition();
 
 	const form = useForm<ItemFormValues>({
 		resolver: zodResolver(itemFormSchema),
+		mode: 'onChange',
 		defaultValues: {
 			name: '',
 			tagIds: [],
@@ -39,7 +40,6 @@ export default function ItemAddPage()
 
 					const item = await createItem({
 						name: name,
-						icon: null,
 						inventoryId: inventory.id,
 					});
 

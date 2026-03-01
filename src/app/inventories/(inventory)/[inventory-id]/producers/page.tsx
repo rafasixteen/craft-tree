@@ -4,7 +4,7 @@ import { Header } from '@/components/craft-tree-sidebar';
 import { producerColumnns } from '@/components/producer';
 import { useMemo } from 'react';
 import { useProducers } from '@/domain/producer';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { useDataTable, DataTablePagination, DataTableFilter, DataTableFacetedFilter, DataTable } from '@/components/data-table';
 import { useProducersTags, useTags } from '@/domain/tag';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import Link from 'next/link';
 
 export default function ProducersPage()
 {
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 
 	const { producers } = useProducers({ inventoryId: inventory.id });
 

@@ -23,19 +23,18 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 	});
 
 	const createItem = useCallback(
-		async function createItem({ name, icon }: CreateItemParams)
+		async function createItem({ name }: CreateItemParams)
 		{
 			const optimistic: Item = {
 				id: crypto.randomUUID(),
 				name,
-				icon,
 				inventoryId: inventoryId,
 			};
 
 			await mutate(
 				async (current = []) =>
 				{
-					const created = await ItemServerActions.createItem({ name, icon, inventoryId });
+					const created = await ItemServerActions.createItem({ name, inventoryId });
 					return [...current, created];
 				},
 				{
@@ -49,12 +48,12 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 	);
 
 	const updateItem = useCallback(
-		async function updateItem({ id, name, icon }: UpdateItemParams)
+		async function updateItem({ id, name }: UpdateItemParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await ItemServerActions.updateItem({ id, name, icon });
+					const updated = await ItemServerActions.updateItem({ id, name });
 					return current.map((item) => (item.id === id ? { ...item, ...updated } : item));
 				},
 				{
@@ -64,7 +63,6 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 								? {
 										...item,
 										name: name ?? item.name,
-										icon: icon ?? item.icon,
 									}
 								: item,
 						),

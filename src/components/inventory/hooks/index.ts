@@ -1,1 +1,1 @@
-export * from './use-inventory';
+export * from './use-current-inventory';

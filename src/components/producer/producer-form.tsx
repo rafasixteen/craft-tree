@@ -8,7 +8,7 @@ import { TagsCombobox } from '@/components/tag/tags-combo-box';
 import { useItems } from '@/domain/item';
 import { XIcon } from 'lucide-react';
 import { ItemCombobox } from '@/components/item';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import z from 'zod';
@@ -129,7 +129,7 @@ function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayPro
 		name,
 	});
 
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 	const { items } = useItems({ inventoryId: inventory.id });
 
 	const legend = name === 'inputs' ? 'Inputs' : 'Outputs';

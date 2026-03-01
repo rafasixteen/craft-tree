@@ -23,6 +23,7 @@ export default function TagEditPage()
 
 	const form = useForm<TagFormValues>({
 		resolver: zodResolver(tagFormSchema),
+		mode: 'onChange',
 		defaultValues: {
 			name: tag.name,
 		},

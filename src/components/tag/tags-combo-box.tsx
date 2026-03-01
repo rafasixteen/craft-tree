@@ -1,7 +1,7 @@
 'use client';
 
 import { Tag, useTags } from '@/domain/tag';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { useEffect, useState } from 'react';
 import {
 	Combobox,
@@ -28,7 +28,7 @@ export function TagsCombobox({ className, value, onIdsChange, maxChips }: TagsCo
 {
 	const anchor = useComboboxAnchor();
 
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 	const { tags } = useTags({ inventoryId: inventory.id });
 
 	const [expanded, setExpanded] = useState(false);

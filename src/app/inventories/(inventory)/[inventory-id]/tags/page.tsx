@@ -4,7 +4,7 @@ import { Header } from '@/components/craft-tree-sidebar';
 import { tagColumnns } from '@/components/tag';
 import { useMemo } from 'react';
 import { useTags } from '@/domain/tag';
-import { useInventory } from '@/components/inventory';
+import { useCurrentInventory } from '@/components/inventory';
 import { useDataTable, DataTablePagination, DataTableFilter, DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 export default function TagsPage()
 {
-	const inventory = useInventory();
+	const inventory = useCurrentInventory();
 
 	const { tags } = useTags({ inventoryId: inventory.id });
 
