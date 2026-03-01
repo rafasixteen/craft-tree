@@ -3,7 +3,7 @@
 import '@xyflow/react/dist/style.css';
 import { ReactFlow, Controls, Background, useNodesState, Edge, Node, useEdgesState, useReactFlow, useNodesInitialized } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { config, getLayoutedElements, BillOfMaterialsOverlay } from '@/components/recipe-tree';
+import { config, getLayoutedElements, BillOfMaterialsOverlay, ProducersOverlay } from '@/components/recipe-tree';
 import { buildNode, buildEdge } from '@/components/recipe-tree/utils';
 import { useRecipeTreeNodes } from '@/components/recipe-tree/hooks';
 import { useEffect } from 'react';
@@ -70,7 +70,8 @@ export function RecipeTree({ initialTheme }: RecipeTreeProps)
 			<ReactFlow {...config} nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} colorMode={theme === 'dark' ? 'dark' : 'light'}>
 				<Controls />
 				<Background gap={20} size={1} />
-				<BillOfMaterialsOverlay />
+				<BillOfMaterialsOverlay position="top-right" />
+				<ProducersOverlay />
 			</ReactFlow>
 		</div>
 	);

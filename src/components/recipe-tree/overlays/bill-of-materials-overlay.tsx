@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getBillOfMaterials, useRecipeTree } from '@/domain/recipe-tree';
 import { Panel } from '@xyflow/react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { TimeUnit, convertProductionRate } from '@/domain/production-graph';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -13,7 +13,7 @@ const UNIT_OPTIONS: { value: TimeUnit; label: string }[] = [
 	{ value: 'hour', label: 'Hour' },
 ];
 
-export function BillOfMaterialsOverlay()
+export function BillOfMaterialsOverlay(props: React.ComponentProps<typeof Panel>)
 {
 	const { recipeTree } = useRecipeTree();
 	const [selectedUnit, setSelectedUnit] = useState<TimeUnit>('second');
@@ -26,7 +26,7 @@ export function BillOfMaterialsOverlay()
 	const bom = getBillOfMaterials(recipeTree);
 
 	return (
-		<Panel position="top-right">
+		<Panel {...props}>
 			<Card>
 				<CardHeader className="border-b">
 					<CardTitle>Bill of Materials</CardTitle>
