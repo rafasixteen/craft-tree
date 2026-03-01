@@ -1,5 +1,5 @@
 import { useNodesData } from '@xyflow/react';
-import { ProductionGraphNode } from '@/components/production-graph/types';
+import { ProductionGraphNode } from '@/components/production-graph/flow/types';
 import { ItemRate } from '@/domain/production-graph';
 import { useProducerInputsV2, useProducerV2 } from '@/domain/producer';
 

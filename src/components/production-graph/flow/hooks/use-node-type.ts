@@ -1,5 +1,5 @@
 import { useNodesData } from '@xyflow/react';
-import { ProductionGraphNode } from '@/components/production-graph/types';
+import { ProductionGraphNode } from '@/components/production-graph/flow/types';
 
 export function useNodeType(nodeId?: string | null): ProductionGraphNode['type'] | undefined
 {

@@ -6,9 +6,9 @@ import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Backg
 import type { ReactFlowInstance, Connection, NodeChange, EdgeChange } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/context-menus';
-import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/types';
-import { graphConfig } from '@/components/production-graph/production-graph.config';
+import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/flow/context-menus';
+import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/flow/types';
+import { graphConfig } from '@/components/production-graph/flow/production-graph.config';
 
 interface ProductionGraphProps
 {

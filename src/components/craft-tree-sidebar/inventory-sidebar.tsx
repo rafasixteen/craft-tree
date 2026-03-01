@@ -30,7 +30,6 @@ export function InventorySidebar({ inventoryId, ...props }: InventorySidebarProp
 			</SidebarHeader>
 			<SidebarContent>
 				<InventoryGroup inventoryId={inventoryId} />
-				<ProductionGraphGroup inventoryId={inventoryId} />
 				<DocumentsGroup />
 			</SidebarContent>
 			<SidebarFooter>
@@ -71,22 +70,11 @@ function InventoryGroup({ inventoryId }: { inventoryId: Inventory['id'] })
 						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>
-			</SidebarMenu>
-		</SidebarGroup>
-	);
-}
-
-function ProductionGraphGroup({ inventoryId }: { inventoryId: Inventory['id'] })
-{
-	return (
-		<SidebarGroup>
-			<SidebarGroupLabel>Production Graph</SidebarGroupLabel>
-			<SidebarMenu>
 				<SidebarMenuItem>
-					<SidebarMenuButton tooltip="Import" asChild>
-						<Link href={`/inventories/${inventoryId}/production-graph`}>
+					<SidebarMenuButton tooltip="Production Graphs" asChild>
+						<Link href={`/inventories/${inventoryId}/production-graphs`}>
 							<WaypointsIcon />
-							<span>Production Graph</span>
+							<span>Production Graphs</span>
 						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>

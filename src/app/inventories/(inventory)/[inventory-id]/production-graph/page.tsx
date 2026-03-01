@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { Header } from '@/components/craft-tree-sidebar';
-import { ProductionGraph } from '@/components/production-graph';
+import { ProductionGraph } from '@/components/production-graph/flow';
 import { ReactFlowProvider } from '@xyflow/react';
 
 export default async function ProductionGraphPage()

@@ -71,7 +71,7 @@ export default function TagAddPage()
 						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
-						<Button type="submit" form="add-tag-form" disabled={isCreating} className="flex-1">
+						<Button type="submit" form="add-tag-form" disabled={isCreating || !form.formState.isValid} className="flex-1">
 							{isCreating ? 'Creating...' : 'Create'}
 						</Button>
 					</Field>

@@ -1,6 +1,6 @@
 import { BaseEdge, EdgeProps, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
-import { EdgeStatus, ItemFlowGraphEdge } from '@/components/production-graph/types';
-import { useEdgeStatus, useSupply } from '@/components/production-graph/hooks';
+import { EdgeStatus, ItemFlowGraphEdge } from '@/components/production-graph/flow/types';
+import { useEdgeStatus, useSupply } from '@/components/production-graph/flow/hooks';
 import { formatNumber } from '@/lib/utils';
 
 export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>)

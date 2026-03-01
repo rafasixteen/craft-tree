@@ -1,5 +1,5 @@
 import type { Edge as RFEdge } from '@xyflow/react';
-import { ItemFlowEdgeData } from '@/components/production-graph/types';
+import { ItemFlowEdgeData } from '@/components/production-graph/flow/types';
 
 export type EdgeType = 'item-flow';
 

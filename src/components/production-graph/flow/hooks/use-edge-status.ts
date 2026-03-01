@@ -1,6 +1,6 @@
-import { EdgeStatus } from '@/components/production-graph/types';
+import { EdgeStatus } from '@/components/production-graph/flow/types';
 import { convertProductionRate, ProductionRate } from '@/domain/production-graph';
-import { useDemand, useSupply, useNodeType } from '@/components/production-graph/hooks';
+import { useDemand, useSupply, useNodeType } from '@/components/production-graph/flow/hooks';
 
 type UseEdgeStatusParams = Parameters<typeof useSupply>[0] & Parameters<typeof useDemand>[0];
 

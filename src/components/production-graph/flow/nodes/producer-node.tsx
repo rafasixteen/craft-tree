@@ -1,7 +1,7 @@
 'use client';
 
-import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/types';
-import { useProducerInputs } from '@/components/production-graph/hooks';
+import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/flow/types';
+import { useProducerInputs } from '@/components/production-graph/flow/hooks';
 import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, NodeProps } from '@xyflow/react';
 import { getProducersByOutputItem, Producer, ProducerInput, ProducerOutput, useProducerInputsV2, useProducerOutputsV2, useProducerV2 } from '@/domain/producer';
 import { useCurrentInventory } from '@/components/inventory';

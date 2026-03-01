@@ -65,7 +65,7 @@ export default function InventoryEditPage()
 						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
-						<Button type="submit" form="edit-inventory-form" disabled={!form.formState.isDirty} className="flex-1">
+						<Button type="submit" form="edit-inventory-form" disabled={!form.formState.isDirty || !form.formState.isValid} className="flex-1">
 							Save Changes
 						</Button>
 					</Field>

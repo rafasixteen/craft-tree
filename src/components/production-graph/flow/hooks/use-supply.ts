@@ -1,6 +1,6 @@
 import { useNodesData } from '@xyflow/react';
 import { ItemRate } from '@/domain/production-graph';
-import { ProductionGraphNode } from '@/components/production-graph/types';
+import { ProductionGraphNode } from '@/components/production-graph/flow/types';
 
 interface UseSupplyParams
 {

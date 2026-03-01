@@ -1,0 +1,36 @@
+'use client';
+
+import { Header } from '@/components/craft-tree-sidebar';
+import { useDataTable, DataTableFilter, DataTable, DataTablePagination } from '@/components/data-table';
+import { useCurrentInventory } from '@/components/inventory';
+import { productionGraphColumnns } from '@/components/production-graph';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import Link from 'next/link';
+
+export default function ProductionGraphsPage()
+{
+	const inventory = useCurrentInventory();
+
+	const table = useDataTable({
+		columns: productionGraphColumnns,
+		data: [],
+	});
+
+	return (
+		<>
+			<Header>
+				<div className="flex items-center space-x-2">
+					<DataTableFilter table={table} filterKey="name" type="search" placeholder="Filter production graphs..." className="h-8 w-64" />
+					<Button variant="default" size="sm" className="h-8">
+						<Link href={`/inventories/${inventory.id}/production-graphs/add`}>Add Production Graph</Link>
+					</Button>
+				</div>
+			</Header>
+			<Card className="m-2 flex-1 bg-transparent p-0">
+				<DataTable table={table} />
+			</Card>
+			<DataTablePagination table={table} />
+		</>
+	);
+}

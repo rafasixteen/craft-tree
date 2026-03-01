@@ -1,7 +1,7 @@
 'use client';
 
-import { ItemGraphNode, ItemNodeData } from '@/components/production-graph/types';
-import { ProductionRateComponent } from '@/components/production-graph/production-rate';
+import { ItemGraphNode, ItemNodeData } from '@/components/production-graph/flow/types';
+import { ProductionRateComponent } from '@/components/production-graph/flow/production-rate';
 import { Edge, useReactFlow, Node, Position, NodeProps } from '@xyflow/react';
 import { useCurrentInventory } from '@/components/inventory';
 import { useItems } from '@/domain/item';

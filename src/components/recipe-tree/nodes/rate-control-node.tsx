@@ -1,6 +1,6 @@
 import { Handle, Position } from '@xyflow/react';
 import { useRecipeTree } from '@/domain/recipe-tree';
-import { ProductionRateComponent } from '@/components/production-graph';
+import { ProductionRateComponent } from '@/components/production-graph/flow';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
 
 // TODO: add preference buttons (“fastest”, “cheapest”, etc.)

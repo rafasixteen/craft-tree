@@ -7,7 +7,7 @@ export * from './item';
 export * from './labeled-handle';
 export * from './node-appendix';
 export * from './producer';
-export * from './production-graph';
+export * from './production-graph/flow';
 export * from './recipe-tree';
 export * from './tag';
 export * from './theme-toggle';

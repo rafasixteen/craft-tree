@@ -4,11 +4,11 @@ import { BaseNode, BaseNodeHeader, BaseNodeContent } from '@/components/base-nod
 import { LabeledHandle } from '@/components/labeled-handle';
 import { Button } from '@/components/ui/button';
 import { NodeProps, Position, useNodeConnections, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
-import { SplitGraphNode } from '@/components/production-graph/types';
+import { SplitGraphNode } from '@/components/production-graph/flow/types';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { ItemRate, ProductionRate } from '@/domain/production-graph';
-import { ProductionRateComponent } from '@/components/production-graph/production-rate';
-import { useSupply } from '@/components/production-graph/hooks';
+import { ProductionRateComponent } from '@/components/production-graph/flow/production-rate';
+import { useSupply } from '@/components/production-graph/flow/hooks';
 import { useEffect } from 'react';
 
 export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)

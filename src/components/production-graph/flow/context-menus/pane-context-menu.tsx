@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useReactFlow } from '@xyflow/react';
-import { ItemNodeData, ProducerNodeData, SplitNodeData } from '@/components/production-graph';
+import { ItemNodeData, ProducerNodeData, SplitNodeData } from '@/components/production-graph/flow';
 import React, { useCallback } from 'react';
 
 interface PaneContextMenuProps extends React.HTMLAttributes<HTMLDivElement>

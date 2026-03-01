@@ -1,7 +1,7 @@
 'use client';
 
 import { useNodeConnections, useNodesData } from '@xyflow/react';
-import { ItemGraphNode, ProducerGraphNode, ProductionGraphNode, SplitGraphNode } from '@/components/production-graph/types';
+import { ItemGraphNode, ProducerGraphNode, ProductionGraphNode, SplitGraphNode } from '@/components/production-graph/flow/types';
 import { ItemRate } from '@/domain/production-graph';
 import { useMemo } from 'react';
 
