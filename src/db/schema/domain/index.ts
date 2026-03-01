@@ -5,4 +5,5 @@ export * from './producer-inputs';
 export * from './producer-outputs';
 export * from './producer-tags';
 export * from './producers';
+export * from './production-graphs';
 export * from './tags';

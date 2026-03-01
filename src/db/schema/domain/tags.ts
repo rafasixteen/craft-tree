@@ -12,5 +12,7 @@ export const tags = pgTable(
 			.notNull()
 			.references(() => inventories.id, { onDelete: 'cascade' }),
 	},
-	(table) => [unique().on(table.inventoryId, table.name)],
+	(table) => [
+		unique('unique_inventory_tag_name').on(table.inventoryId, table.name),
+	],
 );
