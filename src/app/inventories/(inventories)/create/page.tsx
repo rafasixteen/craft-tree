@@ -50,6 +50,7 @@ export default function InventoryAddPage()
 					});
 
 					toast.success(`Inventory '${name}' created`);
+					form.reset();
 				}
 				catch
 				{

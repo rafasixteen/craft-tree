@@ -21,7 +21,7 @@ export function InventoriesSidebar(props: React.ComponentProps<typeof Sidebar>)
 			<SidebarHeader>
 				<SidebarMenuButton>
 					<PackageIcon />
-					<span>Inventories</span>
+					<Link href="/inventories">Inventories</Link>
 				</SidebarMenuButton>
 			</SidebarHeader>
 			<SidebarContent>
