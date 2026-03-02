@@ -3,17 +3,14 @@
 import '@xyflow/react/dist/style.css';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel, getOutgoers } from '@xyflow/react';
-import type { ReactFlowInstance, Connection, NodeChange, EdgeChange } from '@xyflow/react';
+import type { ReactFlowInstance, Connection, NodeChange, EdgeChange, Viewport } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/flow/context-menus';
 import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/flow/types';
 import { graphConfig } from '@/components/production-graph/flow/production-graph.config';
-
-interface ProductionGraphProps
-{
-	initialTheme: 'light' | 'dark';
-}
+import { useProductionGraph } from '@/domain/production-graph';
+import { useParams } from 'next/navigation';
 
 type PaneMenu = {
 	top?: number;
@@ -30,17 +27,31 @@ type NodeMenu = {
 	right?: number;
 } | null;
 
-export function ProductionGraph({ initialTheme }: ProductionGraphProps)
+interface ProductionGraphProps
+{
+	initialNodes: ProductionGraphNode[];
+	initialEdges: ProductionGraphEdge[];
+	initialViewport?: Viewport;
+	initialTheme: 'light' | 'dark';
+}
+
+export function ProductionGraph({ initialNodes, initialEdges, initialViewport, initialTheme }: ProductionGraphProps)
 {
 	const { resolvedTheme } = useTheme();
 
 	const theme = resolvedTheme ?? initialTheme;
 
-	const [nodes, setNodes] = useState<ProductionGraphNode[]>([]);
-	const [edges, setEdges] = useState<ProductionGraphEdge[]>([]);
+	const [nodes, setNodes] = useState<ProductionGraphNode[]>(initialNodes);
+	const [edges, setEdges] = useState<ProductionGraphEdge[]>(initialEdges);
+	const [viewport, setViewport] = useState<Viewport>(initialViewport || { x: 0, y: 0, zoom: 1 });
 
 	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<ProductionGraphNode, ProductionGraphEdge> | null>(null);
-	const { setViewport, getNodes, getEdges } = useReactFlow<ProductionGraphNode, ProductionGraphEdge>();
+	const { getNodes, getEdges } = useReactFlow<ProductionGraphNode, ProductionGraphEdge>();
+
+	const params = useParams();
+	const graphId = params['production-graph-id'] as string;
+
+	const { updateProductionGraph } = useProductionGraph(graphId);
 
 	const [paneMenu, setPaneMenu] = useState<PaneMenu>(null);
 	const [nodeMenu, setNodeMenu] = useState<NodeMenu>(null);
@@ -157,36 +168,13 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 	const saveGraph = useCallback(
 		function saveGraph()
 		{
-			if (!rfInstance)
+			if (rfInstance)
 			{
-				return;
+				updateProductionGraph({ data: rfInstance.toObject() });
 			}
-
-			const flow = rfInstance.toObject();
-			localStorage.setItem('production-graph', JSON.stringify(flow));
 		},
 		[rfInstance],
 	);
-
-	const loadGraph = useCallback(function loadGraph()
-	{
-		const saved = localStorage.getItem('production-graph');
-
-		if (!saved)
-		{
-			return;
-		}
-
-		const flow = JSON.parse(saved);
-
-		if (flow)
-		{
-			const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-			setNodes(flow.nodes || []);
-			setEdges(flow.edges || []);
-			setViewport({ x, y, zoom });
-		}
-	}, []);
 
 	const isValidConnection = useCallback(function isValidConnection(connection: ProductionGraphEdge | Connection): boolean
 	{
@@ -228,11 +216,6 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 		return !hasCycle(target);
 	}, []);
 
-	useEffect(() =>
-	{
-		loadGraph();
-	}, []);
-
 	return (
 		<div className="size-full">
 			<ReactFlow<ProductionGraphNode, ProductionGraphEdge>
@@ -240,6 +223,8 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 				ref={ref}
 				nodes={nodes}
 				edges={edges}
+				viewport={viewport}
+				onViewportChange={setViewport}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
@@ -256,7 +241,6 @@ export function ProductionGraph({ initialTheme }: ProductionGraphProps)
 				<Background gap={20} size={1} />
 				<Panel position="top-right">
 					<Button onClick={saveGraph}>save</Button>
-					<Button onClick={loadGraph}>restore</Button>
 				</Panel>
 			</ReactFlow>
 		</div>

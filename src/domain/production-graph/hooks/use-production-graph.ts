@@ -24,12 +24,12 @@ export function useProductionGraph(productionGraphId: ProductionGraph['id'])
 	}
 
 	const updateProductionGraph = useCallback(
-		async function updateProductionGraph({ name }: UpdateProductionGraphParams)
+		async function updateProductionGraph({ name, data }: UpdateProductionGraphParams)
 		{
 			await mutate(
 				async () =>
 				{
-					return await ProductionGraphServerActions.updateProductionGraph({ id: productionGraph.id, name });
+					return await ProductionGraphServerActions.updateProductionGraph({ id: productionGraph.id, name, data });
 				},
 				{
 					optimisticData: (current) =>
@@ -41,7 +41,7 @@ export function useProductionGraph(productionGraphId: ProductionGraph['id'])
 
 						return {
 							id: current.id,
-							data: current.data,
+							data: data ?? current.data,
 							inventoryId: current.inventoryId,
 							name: name ?? current.name,
 						};
