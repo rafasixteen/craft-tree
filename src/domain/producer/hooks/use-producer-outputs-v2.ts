@@ -1,51 +1,16 @@
 'use client';
 
-import { getProducerOutputs, Producer, setProducerOutputs } from '@/domain/producer';
-import { useCallback } from 'react';
-import useSWR from 'swr';
+import { useCurrentInventory } from '@/components/inventory';
+import { getProducerOutputs, Producer, useProducersOutputs } from '@/domain/producer';
 
-type SetOutputsParams = Omit<Parameters<typeof setProducerOutputs>[0], 'producerId'>;
+type UseProducerOutputsReturn = Awaited<ReturnType<typeof getProducerOutputs>> | undefined;
 
-export function useProducerOutputsV2(producerId?: Producer['id'])
+export function useProducerOutputsV2(producerId?: Producer['id']): UseProducerOutputsReturn
 {
-	const swrKey = producerId ? ['producer-outputs', producerId] : null;
-	const fetcher = () => (producerId ? getProducerOutputs(producerId) : null);
+	const inventory = useCurrentInventory();
+	const outputs = useProducersOutputs({ inventoryId: inventory.id });
 
-	const { data: outputs, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
+	if (!outputs || !producerId) return undefined;
 
-	const setOutputs = useCallback(
-		async function setOutputs({ outputs }: SetOutputsParams)
-		{
-			if (!producerId)
-			{
-				throw new Error('Producer ID is required to set outputs');
-			}
-
-			const optimistic = outputs.map((output, index) => ({
-				id: `temp-${index}`,
-				...output,
-				producerId,
-			}));
-
-			await mutate(
-				async () =>
-				{
-					return await setProducerOutputs({ producerId, outputs });
-				},
-				{
-					optimisticData: optimistic,
-					rollbackOnError: true,
-					revalidate: false,
-				},
-			);
-		},
-		[producerId, mutate],
-	);
-
-	return {
-		outputs: outputs ?? [],
-		setOutputs,
-	};
+	return outputs.filter((output) => output.producerId === producerId);
 }

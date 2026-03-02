@@ -15,7 +15,7 @@ type DeleteProductionGraphsParams = Parameters<typeof ProductionGraphServerActio
 
 export function useProductionGraphs({ inventoryId }: UseProductionGraphsParams)
 {
-	const swrKey = ['production-graphs', inventoryId];
+	const swrKey = ['inventory-production-graphs', inventoryId];
 	const fetcher = () => getProductionGraphs({ inventoryId });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {

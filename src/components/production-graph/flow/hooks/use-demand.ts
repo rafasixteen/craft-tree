@@ -14,8 +14,8 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 	const node = useNodesData<ProductionGraphNode>(targetNodeId ?? '');
 	const producerId = node?.type === 'producer' ? (node.data.producerId ?? undefined) : undefined;
 
-	const { inputs } = useProducerInputsV2(producerId);
-	const { producer } = useProducerV2(producerId);
+	const inputs = useProducerInputsV2(producerId);
+	const producer = useProducerV2(producerId);
 
 	if (!node || node.type !== 'producer')
 	{

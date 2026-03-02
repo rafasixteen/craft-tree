@@ -15,8 +15,8 @@ type DeleteProducerParams = Parameters<typeof ProducerServerActions.deleteProduc
 
 export function useProducers({ inventoryId, options }: UseProducersParams)
 {
-	const swrKey = ['inventory-producers', inventoryId, options];
-	const fetcher = () => ProducerServerActions.getProducers({ inventoryId, options });
+	const swrKey = options ? ['inventory-producers', inventoryId, options] : ['inventory-producers', inventoryId];
+	const fetcher = () => ProducerServerActions.getProducers({ inventoryId });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,

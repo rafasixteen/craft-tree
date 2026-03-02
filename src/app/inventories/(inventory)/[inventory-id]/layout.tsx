@@ -2,7 +2,7 @@ import { InventorySidebar } from '@/components/craft-tree-sidebar/inventory-side
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { getItems } from '@/domain/item';
 import { getItemsTags, getProducersTags, getTags } from '@/domain/tag';
-import { getProducers } from '@/domain/producer';
+import { getProducers, getProducersInputs, getProducersOutputs } from '@/domain/producer';
 import { cookies } from 'next/headers';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { getInventoryById } from '@/domain/inventory';
@@ -20,12 +20,14 @@ export default async function InventoryLayout({ params, children }: LayoutProps<
 			value={{
 				fallback: {
 					[unstable_serialize(['inventory', inventoryId])]: getInventoryById(inventoryId),
-					[unstable_serialize(['inventory-items', inventoryId, {}])]: getItems({ inventoryId }),
-					[unstable_serialize(['inventory-producers', inventoryId, {}])]: getProducers({ inventoryId }),
-					[unstable_serialize(['inventory-tags', inventoryId, {}])]: getTags({ inventoryId }),
-					[unstable_serialize(['inventory-production-graphs', inventoryId])]: getProductionGraphs({ inventoryId }),
+					[unstable_serialize(['inventory-tags', inventoryId])]: getTags({ inventoryId }),
+					[unstable_serialize(['inventory-items', inventoryId])]: getItems({ inventoryId }),
 					[unstable_serialize(['inventory-items-tags', inventoryId])]: getItemsTags({ inventoryId }),
+					[unstable_serialize(['inventory-producers', inventoryId])]: getProducers({ inventoryId }),
+					[unstable_serialize(['inventory-producers-inputs', inventoryId])]: getProducersInputs({ inventoryId }),
+					[unstable_serialize(['inventory-producers-outputs', inventoryId])]: getProducersOutputs({ inventoryId }),
 					[unstable_serialize(['inventory-producers-tags', inventoryId])]: getProducersTags({ inventoryId }),
+					[unstable_serialize(['inventory-production-graphs', inventoryId])]: getProductionGraphs({ inventoryId }),
 				},
 			}}
 		>

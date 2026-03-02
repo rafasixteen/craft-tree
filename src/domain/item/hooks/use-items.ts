@@ -15,7 +15,7 @@ type DeleteItemParams = Parameters<typeof ItemServerActions.deleteItem>[0];
 
 export function useItems({ inventoryId, options }: UseItemsParams)
 {
-	const swrKey = ['inventory-items', inventoryId, options];
+	const swrKey = options ? ['inventory-items', inventoryId, options] : ['inventory-items', inventoryId];
 	const fetcher = () => ItemServerActions.getItems({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {

@@ -3,7 +3,6 @@
 import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/flow/types';
 import { useProducerInputs } from '@/components/production-graph/flow/hooks';
 import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, NodeProps } from '@xyflow/react';
-import { getProducersByOutputItem, Producer, ProducerInput, ProducerOutput, useProducerInputsV2, useProducerOutputsV2, useProducerV2 } from '@/domain/producer';
 import { useCurrentInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
@@ -14,9 +13,18 @@ import { Input } from '@/components/ui/input';
 import { useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, InfoIcon } from 'lucide-react';
-import { useProducersByOutputItem } from '@/domain/producer/hooks/use-producers-by-output-item';
 import { ItemCombobox } from '@/components/item';
 import { cn, formatNumber } from '@/lib/utils';
+import {
+	getProducersByOutputItem,
+	Producer,
+	ProducerInput,
+	ProducerOutput,
+	useProducersByOutputItem,
+	useProducerInputsV2,
+	useProducerOutputsV2,
+	useProducerV2,
+} from '@/domain/producer';
 
 export function ProducerNode({ id, data, selected }: NodeProps<ProducerGraphNode>)
 {
@@ -29,9 +37,9 @@ export function ProducerNode({ id, data, selected }: NodeProps<ProducerGraphNode
 
 	const { itemId, producerId, producerCount, extraInfo, selectedProducerIndex } = data;
 
-	const { producer } = useProducerV2(producerId);
-	const { inputs } = useProducerInputsV2(producerId);
-	const { outputs } = useProducerOutputsV2(producerId);
+	const producer = useProducerV2(producerId);
+	const inputs = useProducerInputsV2(producerId);
+	const outputs = useProducerOutputsV2(producerId);
 
 	const inputRates = useProducerInputs();
 
