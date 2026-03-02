@@ -45,6 +45,8 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 	const [edges, setEdges] = useState<ProductionGraphEdge[]>(initialEdges);
 	const [viewport, setViewport] = useState<Viewport>(initialViewport || { x: 0, y: 0, zoom: 1 });
 
+	const [isDirty, setIsDirty] = useState<boolean>(false);
+
 	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<ProductionGraphNode, ProductionGraphEdge> | null>(null);
 	const { getNodes, getEdges } = useReactFlow<ProductionGraphNode, ProductionGraphEdge>();
 
@@ -58,10 +60,14 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 	const ref = useRef<HTMLDivElement>(null);
 
+	const duplicate = useKeyPress(['Control+d', 'Meta+d']);
+	const save = useKeyPress(['Control+s', 'Meta+s']);
+
 	const onNodesChange = useCallback(
 		function onNodesChange(changes: NodeChange<ProductionGraphNode>[])
 		{
 			setNodes((nds) => applyNodeChanges(changes, nds));
+			setIsDirty(true);
 		},
 		[setNodes],
 	);
@@ -70,6 +76,7 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 		function onEdgesChange(changes: EdgeChange<ProductionGraphEdge>[])
 		{
 			setEdges((eds) => applyEdgeChanges(changes, eds));
+			setIsDirty(true);
 		},
 		[setEdges],
 	);
@@ -171,6 +178,7 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 			if (rfInstance)
 			{
 				updateProductionGraph({ data: rfInstance.toObject() });
+				setIsDirty(false);
 			}
 		},
 		[rfInstance],
@@ -215,8 +223,6 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 		return !hasCycle(target);
 	}, []);
-
-	const duplicate = useKeyPress(['Control+d', 'Meta+d']);
 
 	useEffect(() =>
 	{
@@ -286,6 +292,14 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 		);
 	}, [duplicate]);
 
+	useEffect(() =>
+	{
+		if (save)
+		{
+			saveGraph();
+		}
+	}, [save]);
+
 	return (
 		<div className="size-full">
 			<ReactFlow<ProductionGraphNode, ProductionGraphEdge>
@@ -310,7 +324,9 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 				<Controls />
 				<Background gap={20} size={1} />
 				<Panel position="top-right">
-					<Button onClick={saveGraph}>save</Button>
+					<Button onClick={saveGraph} disabled={!isDirty}>
+						save
+					</Button>
 				</Panel>
 			</ReactFlow>
 		</div>
