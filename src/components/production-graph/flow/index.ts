@@ -3,6 +3,7 @@ export * from './edges';
 export * from './hooks';
 export * from './nodes';
 export * from './production-graph.config';
+export * from './production-graph.layouting';
 export * from './production-graph';
 export * from './production-rate';
 export * from './types';

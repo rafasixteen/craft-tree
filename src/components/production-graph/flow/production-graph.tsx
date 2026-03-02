@@ -8,7 +8,7 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/flow/context-menus';
 import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/flow/types';
-import { graphConfig } from '@/components/production-graph/flow/production-graph.config';
+import { graphConfig, getLayoutedElements } from '@/components/production-graph';
 import { useProductionGraph } from '@/domain/production-graph';
 import { useParams } from 'next/navigation';
 
@@ -62,6 +62,7 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 	const duplicate = useKeyPress(['Control+d', 'Meta+d']);
 	const save = useKeyPress(['Control+s', 'Meta+s']);
+	const layout = useKeyPress(['Control+l', 'Meta+l']);
 
 	const onNodesChange = useCallback(
 		function onNodesChange(changes: NodeChange<ProductionGraphNode>[])
@@ -224,6 +225,16 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 		return !hasCycle(target);
 	}, []);
 
+	const layoutGraph = useCallback(async function layoutGraph()
+	{
+		const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(getNodes(), getEdges());
+
+		setNodes(layoutedNodes);
+		setEdges(layoutedEdges);
+
+		rfInstance?.fitView();
+	}, []);
+
 	useEffect(() =>
 	{
 		if (!duplicate) return;
@@ -300,6 +311,14 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 		}
 	}, [save]);
 
+	useEffect(() =>
+	{
+		if (layout)
+		{
+			layoutGraph();
+		}
+	}, [layout]);
+
 	return (
 		<div className="size-full">
 			<ReactFlow<ProductionGraphNode, ProductionGraphEdge>
@@ -327,6 +346,7 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 					<Button onClick={saveGraph} disabled={!isDirty}>
 						save
 					</Button>
+					<Button onClick={layoutGraph}>layout</Button>
 				</Panel>
 			</ReactFlow>
 		</div>
