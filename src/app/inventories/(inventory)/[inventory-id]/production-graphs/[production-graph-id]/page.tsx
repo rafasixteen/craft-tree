@@ -14,9 +14,6 @@ export default async function ProductionGraphPage({ params }: PageProps<'/invent
 	const { 'production-graph-id': productionGraphId } = await params;
 	const productionGraph = await getProductionGraphById(productionGraphId);
 
-	// TODO: Add production graph data schema.
-	// Use it to infer a type which will be used to define the database "data" column.
-	// I.e. data: jsonb('data').$type<ProductionGraphData>().notNull(),
 	const { nodes, edges, viewport } = productionGraph.data;
 
 	return (
