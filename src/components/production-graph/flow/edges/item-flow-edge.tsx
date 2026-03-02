@@ -3,7 +3,7 @@ import { EdgeStatus, ItemFlowGraphEdge } from '@/components/production-graph/flo
 import { useEdgeStatus, useSupply } from '@/components/production-graph/flow/hooks';
 import { formatNumber } from '@/lib/utils';
 
-export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>)
+export function ItemFlowEdge({ id, selected, ...otherProps }: EdgeProps<ItemFlowGraphEdge>)
 {
 	const { source, target, sourceHandleId, targetHandleId } = otherProps;
 
@@ -26,6 +26,8 @@ export function ItemFlowEdge({ id, ...otherProps }: EdgeProps<ItemFlowGraphEdge>
 	});
 
 	const color = getEdgeColor(status);
+
+	// TODO: Add an indicator when the edge is selected.
 
 	return (
 		<>

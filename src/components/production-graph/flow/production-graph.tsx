@@ -2,7 +2,7 @@
 
 import '@xyflow/react/dist/style.css';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel, getOutgoers } from '@xyflow/react';
+import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel, getOutgoers, useKeyPress } from '@xyflow/react';
 import type { ReactFlowInstance, Connection, NodeChange, EdgeChange, Viewport } from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -215,6 +215,76 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 		return !hasCycle(target);
 	}, []);
+
+	const duplicate = useKeyPress(['Control+d', 'Meta+d']);
+
+	useEffect(() =>
+	{
+		if (!duplicate) return;
+
+		const selectedNodes = nodes.filter((node) => node.selected);
+		const selectedEdges = edges.filter((edge) => edge.selected);
+
+		if (selectedNodes.length === 0) return;
+
+		// Create a mapping from old node IDs to new node IDs
+		const idMap = new Map<string, string>();
+
+		const newNodes = selectedNodes.map((node) =>
+		{
+			const newId = crypto.randomUUID();
+			idMap.set(node.id, newId);
+
+			return {
+				...node,
+				id: newId,
+				selected: true, // Select duplicated node
+				position: {
+					x: node.position.x + 20,
+					y: node.position.y + 20,
+				},
+			};
+		});
+
+		const newEdges = edges
+			.filter(
+				(edge) =>
+					selectedEdges.some((selectedEdge) => selectedEdge.id === edge.id) ||
+					(selectedNodes.some((node) => node.id === edge.source) && selectedNodes.some((node) => node.id === edge.target)),
+			)
+			.map((edge) =>
+			{
+				const newId = crypto.randomUUID();
+
+				return {
+					...edge,
+					id: newId,
+					source: idMap.get(edge.source) ?? edge.source,
+					target: idMap.get(edge.target) ?? edge.target,
+					selected: true, // Select duplicated edge
+				};
+			});
+
+		// Update nodes: unselect old ones, add new selected ones
+		setNodes((prevNodes) =>
+			prevNodes
+				.map((node) => ({
+					...node,
+					selected: false,
+				}))
+				.concat(newNodes),
+		);
+
+		// Update edges: unselect old ones, add new selected ones
+		setEdges((prevEdges) =>
+			prevEdges
+				.map((edge) => ({
+					...edge,
+					selected: false,
+				}))
+				.concat(newEdges),
+		);
+	}, [duplicate]);
 
 	return (
 		<div className="size-full">

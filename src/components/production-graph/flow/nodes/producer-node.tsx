@@ -16,9 +16,9 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, InfoIcon } from 'lucide-react';
 import { useProducersByOutputItem } from '@/domain/producer/hooks/use-producers-by-output-item';
 import { ItemCombobox } from '@/components/item';
-import { formatNumber } from '@/lib/utils';
+import { cn, formatNumber } from '@/lib/utils';
 
-export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
+export function ProducerNode({ id, data, selected }: NodeProps<ProducerGraphNode>)
 {
 	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -171,7 +171,7 @@ export function ProducerNode({ id, data }: NodeProps<ProducerGraphNode>)
 	}, [inputs, outputs, id]);
 
 	return (
-		<BaseNode className="flex flex-col p-0">
+		<BaseNode className={cn('flex flex-col p-0', selected && 'ring-2 ring-primary')}>
 			<BaseNodeHeader className="flex flex-col border-b">
 				<div className="flex w-full items-start justify-between gap-2">
 					<ItemCombobox items={items} value={itemId ?? null} onChange={onItemComboboxChange} className="nodrag flex-1" />

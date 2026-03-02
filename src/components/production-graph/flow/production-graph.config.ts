@@ -1,4 +1,4 @@
-import { DefaultEdgeOptions, FitViewOptions, ReactFlowProps } from '@xyflow/react';
+import { DefaultEdgeOptions, FitViewOptions, ReactFlowProps, SelectionMode } from '@xyflow/react';
 import { ItemNode, ProducerNode, SplitNode } from '@/components/production-graph/flow/nodes';
 import { ItemFlowEdge } from '@/components/production-graph/flow/edges';
 import { EdgeType, NodeType } from '@/components/production-graph/flow/types';
@@ -29,4 +29,8 @@ export const graphConfig = {
 	fitViewOptions,
 	snapToGrid: true,
 	defaultEdgeOptions,
+	deleteKeyCode: ['Delete', 'Backspace'],
+	selectionKeyCode: ['Shift'],
+	multiSelectionKeyCode: ['Control', 'Meta'],
+	selectionMode: SelectionMode.Partial,
 } satisfies Partial<ReactFlowProps>;

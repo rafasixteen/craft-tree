@@ -9,8 +9,9 @@ import { ItemCombobox } from '@/components/item';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { ProductionRate } from '@/domain/production-graph';
+import { cn } from '@/lib/utils';
 
-export function ItemNode({ id, data }: NodeProps<ItemGraphNode>)
+export function ItemNode({ id, data, selected }: NodeProps<ItemGraphNode>)
 {
 	const { updateNodeData } = useReactFlow<Node<ItemNodeData>, Edge>();
 
@@ -37,7 +38,7 @@ export function ItemNode({ id, data }: NodeProps<ItemGraphNode>)
 	}
 
 	return (
-		<BaseNode className="p-0">
+		<BaseNode className={cn('p-0', selected && 'ring-2 ring-primary')}>
 			<BaseNodeHeader className="m-0 border-b">
 				<ItemCombobox items={items} value={item?.id ?? null} onChange={onComboboxChange} className="nodrag w-full" />
 			</BaseNodeHeader>

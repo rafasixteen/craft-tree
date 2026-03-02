@@ -10,8 +10,9 @@ import { ItemRate, ProductionRate } from '@/domain/production-graph';
 import { ProductionRateComponent } from '@/components/production-graph/flow/production-rate';
 import { useSupply } from '@/components/production-graph/flow/hooks';
 import { useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
-export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
+export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 {
 	const { updateNodeData, getEdges, deleteElements } = useReactFlow<SplitGraphNode>();
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -130,7 +131,7 @@ export function SplitNode({ id, data }: NodeProps<SplitGraphNode>)
 	}, [supply?.itemId, rates, id, updateNodeData, updateNodeInternals]);
 
 	return (
-		<BaseNode className="flex flex-col p-0">
+		<BaseNode className={cn('flex flex-col p-0', selected && 'ring-2 ring-primary')}>
 			<BaseNodeHeader className="flex flex-col border-b">
 				<div className="flex w-full items-center justify-between gap-2">
 					<span>Split Node</span>
