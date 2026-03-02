@@ -6,15 +6,18 @@ import { useCurrentInventory } from '@/components/inventory';
 import { productionGraphColumnns } from '@/components/production-graph';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useProductionGraphs } from '@/domain/production-graph';
 import Link from 'next/link';
 
 export default function ProductionGraphsPage()
 {
 	const inventory = useCurrentInventory();
 
+	const { productionGraphs } = useProductionGraphs({ inventoryId: inventory.id });
+
 	const table = useDataTable({
 		columns: productionGraphColumnns,
-		data: [],
+		data: productionGraphs,
 	});
 
 	return (

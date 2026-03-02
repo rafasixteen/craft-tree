@@ -17,7 +17,7 @@ export default function ProductionGraphEditPage()
 	const router = useRouter();
 	const params = useParams();
 
-	const productionGraphId = params['productionGraph-id'] as string;
+	const productionGraphId = params['production-graph-id'] as string;
 
 	const { productionGraph, updateProductionGraph } = useProductionGraph(productionGraphId);
 
@@ -54,18 +54,18 @@ export default function ProductionGraphEditPage()
 			<Header />
 			<Card className="flex min-h-0 flex-1 flex-col bg-transparent ring-0">
 				<CardHeader>
-					<CardTitle>Edit ProductionGraph</CardTitle>
-					<CardDescription>Edit an existing productionGraph.</CardDescription>
+					<CardTitle>Edit Production Graph</CardTitle>
+					<CardDescription>Edit an existing production graph.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<ProductionGraphForm id="edit-productionGraph-form" form={form} onSubmit={onSubmit} />
+					<ProductionGraphForm id="edit-production-graph-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
 					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
 						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
-						<Button type="submit" form="edit-productionGraph-form" disabled={!form.formState.isDirty || !form.formState.isValid} className="flex-1">
+						<Button type="submit" form="edit-production-graph-form" disabled={!form.formState.isDirty || !form.formState.isValid} className="flex-1">
 							Save Changes
 						</Button>
 					</Field>

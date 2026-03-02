@@ -1,15 +1,15 @@
 'use client';
 
 import { ColumnDef, Row } from '@tanstack/react-table';
-import { Inventory } from '@/domain/inventory';
+import { ProductionGraph, useProductionGraphs } from '@/domain/production-graph';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import { PencilIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 
-export type InventoryColumnData = Inventory;
+export type ProductionGraphColumnData = ProductionGraph;
 
-export const productionGraphColumnns: ColumnDef<InventoryColumnData>[] = [
+export const productionGraphColumnns: ColumnDef<ProductionGraphColumnData>[] = [
 	{
 		accessorKey: 'name',
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
@@ -17,7 +17,9 @@ export const productionGraphColumnns: ColumnDef<InventoryColumnData>[] = [
 		{
 			const name = row.original.name;
 			const id = row.original.id;
-			const href = `/inventories/${row.original.id}/production-graphs/${id}`;
+			const inventoryId = row.original.inventoryId;
+
+			const href = `/inventories/${inventoryId}/production-graphs/${id}`;
 
 			return (
 				<Link href={href} className="ml-3 truncate font-medium hover:underline">
@@ -37,24 +39,24 @@ export const productionGraphColumnns: ColumnDef<InventoryColumnData>[] = [
 
 interface ActionsProps
 {
-	row: Row<InventoryColumnData>;
+	row: Row<ProductionGraphColumnData>;
 }
 
 function Actions({ row }: ActionsProps)
 {
 	const id = row.original.id;
+	const inventoryId = row.original.inventoryId;
 
-	// TODO: Add useProductionGraphs hook.
-	// const { deleteInventory } = useInventories();
+	const { deleteProductionGraph } = useProductionGraphs({ inventoryId });
 
 	return (
 		<div className="flex justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${id}/edit`}>
+				<Link href={`/inventories/${inventoryId}/production-graphs/${id}/edit`}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button variant="destructive" size="icon-sm">
+			<Button variant="destructive" size="icon-sm" onClick={() => deleteProductionGraph(id)}>
 				<TrashIcon className="size-3" />
 			</Button>
 		</div>

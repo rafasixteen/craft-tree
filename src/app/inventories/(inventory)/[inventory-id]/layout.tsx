@@ -6,6 +6,7 @@ import { getProducers } from '@/domain/producer';
 import { cookies } from 'next/headers';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { getInventoryById } from '@/domain/inventory';
+import { getProductionGraphs } from '@/domain/production-graph';
 
 export default async function InventoryLayout({ params, children }: LayoutProps<'/inventories/[inventory-id]'>)
 {
@@ -21,9 +22,10 @@ export default async function InventoryLayout({ params, children }: LayoutProps<
 					[unstable_serialize(['inventory', inventoryId])]: getInventoryById(inventoryId),
 					[unstable_serialize(['inventory-items', inventoryId, {}])]: getItems({ inventoryId }),
 					[unstable_serialize(['inventory-producers', inventoryId, {}])]: getProducers({ inventoryId }),
+					[unstable_serialize(['inventory-tags', inventoryId, {}])]: getTags({ inventoryId }),
+					[unstable_serialize(['inventory-production-graphs', inventoryId])]: getProductionGraphs({ inventoryId }),
 					[unstable_serialize(['inventory-items-tags', inventoryId])]: getItemsTags({ inventoryId }),
 					[unstable_serialize(['inventory-producers-tags', inventoryId])]: getProducersTags({ inventoryId }),
-					[unstable_serialize(['tags', inventoryId])]: getTags({ inventoryId }),
 				},
 			}}
 		>

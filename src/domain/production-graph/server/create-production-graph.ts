@@ -1,6 +1,13 @@
 'use server';
 
-export async function createProductionGraph(params: any): Promise<void>
+import { productionGraphs } from '@/db/schema';
+import { ProductionGraph } from '@/domain/production-graph';
+import db from '@/db/client';
+
+type CreateProductionGraphParams = Omit<ProductionGraph, 'id' | 'data'>;
+
+export async function createProductionGraph({ name, inventoryId }: CreateProductionGraphParams): Promise<ProductionGraph>
 {
-	throw new Error('Not implemented');
+	const [productionGraph] = await db.insert(productionGraphs).values({ name, inventoryId }).returning();
+	return productionGraph;
 }

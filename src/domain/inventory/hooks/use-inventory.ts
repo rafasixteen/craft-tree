@@ -18,7 +18,9 @@ export function useInventory(inventoryId: Inventory['id'])
 
 	if (!inventory)
 	{
-		throw new Error('Inventory not found. This hook must be used within a component wrapped by a <InventoryLayout> that provides the inventory data via SWR fallback.');
+		throw new Error(
+			`Inventory with id ${inventoryId} not found. This hook must be used within a component wrapped by a <InventoryLayout> that provides the inventory data via SWR fallback.`,
+		);
 	}
 
 	const updateInventory = useCallback(

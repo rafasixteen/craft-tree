@@ -15,7 +15,7 @@ type DeleteTagParams = Parameters<typeof TagServerActions.deleteTag>[0];
 
 export function useTags({ inventoryId, options }: UseTagsParams)
 {
-	const swrKey = ['tags', inventoryId, options];
+	const swrKey = ['inventory-tags', inventoryId, options];
 	const fetcher = () => getTags({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {

@@ -8,7 +8,7 @@ export const productionGraphs = pgTable(
 
 		name: text('name').notNull(),
 
-		data: jsonb('data').notNull(),
+		data: jsonb('data'),
 
 		inventoryId: uuid('inventory_id')
 			.references(() => inventories.id, { onDelete: 'cascade' })
