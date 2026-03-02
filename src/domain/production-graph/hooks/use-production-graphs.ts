@@ -28,7 +28,7 @@ export function useProductionGraphs({ inventoryId }: UseProductionGraphsParams)
 			const optimistic: ProductionGraph = {
 				id: crypto.randomUUID(),
 				name,
-				data: null,
+				data: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
 				inventoryId,
 			};
 
@@ -79,7 +79,7 @@ export function useProductionGraphs({ inventoryId }: UseProductionGraphsParams)
 							return {
 								...graph,
 								name: name ?? graph.name,
-								data,
+								data: data ?? graph.data,
 							};
 						});
 					},

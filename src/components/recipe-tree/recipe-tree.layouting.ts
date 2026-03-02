@@ -17,7 +17,13 @@ const elkOptions = {
 	'elk.spacing.nodeNode': '50',
 };
 
-export async function getLayoutedElements(nodes: Node[], edges: Edge[]): Promise<{ nodes: Node[]; edges: Edge[] }>
+interface LayoutedElements
+{
+	nodes: Node[];
+	edges: Edge[];
+}
+
+export async function layoutRecipeTree(nodes: Node[], edges: Edge[]): Promise<LayoutedElements>
 {
 	const graph = {
 		id: 'root',

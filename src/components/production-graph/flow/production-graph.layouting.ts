@@ -24,7 +24,7 @@ interface LayoutedElements
 	edges: ProductionGraphEdge[];
 }
 
-export async function getLayoutedElements(nodes: ProductionGraphNode[], edges: ProductionGraphEdge[]): Promise<LayoutedElements>
+export async function layoutProductionGraph(nodes: ProductionGraphNode[], edges: ProductionGraphEdge[]): Promise<LayoutedElements>
 {
 	const graph = {
 		id: 'root',

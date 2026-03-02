@@ -8,7 +8,7 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/flow/context-menus';
 import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/flow/types';
-import { graphConfig, getLayoutedElements } from '@/components/production-graph';
+import { graphConfig, layoutProductionGraph } from '@/components/production-graph';
 import { useProductionGraph } from '@/domain/production-graph';
 import { useParams } from 'next/navigation';
 
@@ -227,7 +227,7 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 	const layoutGraph = useCallback(async function layoutGraph()
 	{
-		const { nodes: layoutedNodes, edges: layoutedEdges } = await getLayoutedElements(getNodes(), getEdges());
+		const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutProductionGraph(getNodes(), getEdges());
 
 		setNodes(layoutedNodes);
 		setEdges(layoutedEdges);
