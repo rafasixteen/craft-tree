@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { NodeProps, Position, useNodeConnections, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import { SplitGraphNode } from '@/components/production-graph/flow/types';
 import { PlusIcon, XIcon } from 'lucide-react';
-import { ItemRate, ProductionRate } from '@/domain/production-graph';
+import { ProductionRate } from '@/domain/production-graph';
 import { ProductionRateComponent } from '@/components/production-graph/flow/production-rate';
 import { useSupply } from '@/components/production-graph/flow/hooks';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
@@ -34,101 +34,67 @@ export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 
 	const { rates } = data;
 
-	function addOutput()
-	{
-		const newRate: ItemRate = {
-			itemId: supply?.itemId || '',
-			amount: 0,
-			per: 'second',
-		};
-
-		const newRates = [...rates, newRate];
-
-		updateNodeData(id, { rates: newRates });
-		updateNodeInternals(id);
-	}
-
-	function onProductionRateChange(index: number, value: ProductionRate)
-	{
-		if (!rates)
+	const onProductionRateChange = useCallback(
+		function onProductionRateChange(index: number, value: ProductionRate)
 		{
-			return;
-		}
+			const newRates = [...rates];
+			newRates[index] = value;
 
-		// Limit the amount based on the supply and other output rates
-		// to ensure the total output does not exceed the input.
-		let maxAmount = value.amount;
+			updateNodeData(id, { rates: newRates });
+		},
+		[id, rates, updateNodeData],
+	);
 
-		if (supply)
+	const addOutput = useCallback(
+		function addOutput()
 		{
-			// Calculate total output except this index.
-			const totalOtherOutput = rates.reduce((sum, r, i) => (i !== index ? sum + r.amount : sum), 0);
-			const available = supply.amount - totalOtherOutput;
-			maxAmount = Math.max(0, Math.min(value.amount, available));
-		}
+			const newRate: ProductionRate = {
+				amount: 0,
+				per: 'second',
+			};
 
-		const newRate: ItemRate = {
-			itemId: rates[index].itemId,
-			amount: Math.round(maxAmount * 100) / 100, // Round to 2 decimal places
-			per: value.per,
-		};
+			const newRates = [...rates, newRate];
 
-		const newRates = [...rates];
-		newRates[index] = newRate;
+			updateNodeData(id, { rates: newRates });
+			updateNodeInternals(id);
+		},
+		[id, rates, updateNodeData, updateNodeInternals],
+	);
 
-		updateNodeData(id, { rates: newRates });
-	}
-
-	function removeOutput(index: number)
-	{
-		if (!rates)
+	const removeOutput = useCallback(
+		function removeOutput(index: number)
 		{
-			return;
-		}
-
-		const edges = getEdges();
-		const handleId = String(index);
-
-		// Remove any edges connected to this output handle.
-		edges.forEach((edge) =>
-		{
-			if (edge.source === id && edge.sourceHandle === handleId)
+			if (!rates)
 			{
-				deleteElements({ edges: [edge] });
+				return;
 			}
-		});
 
-		const newRates = rates.filter((_, i) => i !== index);
+			const edges = getEdges();
+			const handleId = String(index);
 
-		updateNodeData(id, { rates: newRates });
-		updateNodeInternals(id);
-	}
+			// Remove any edges connected to this output handle.
+			edges.forEach((edge) =>
+			{
+				if (edge.source === id && edge.sourceHandle === handleId)
+				{
+					deleteElements({ edges: [edge] });
+				}
+			});
+
+			const newRates = rates.filter((_, i) => i !== index);
+
+			updateNodeData(id, { rates: newRates });
+			updateNodeInternals(id);
+		},
+		[id, rates, getEdges, deleteElements, updateNodeData, updateNodeInternals],
+	);
 
 	useEffect(() =>
 	{
-		// TODO: When the supply changes, ensure the output rates don't exceed the new supply.
-
-		if (!rates?.length)
-		{
-			return;
-		}
-
-		const targetItemId = supply?.itemId || '';
-		const needsUpdate = rates.some((rate) => rate.itemId !== targetItemId);
-
-		if (!needsUpdate)
-		{
-			return;
-		}
-
-		const newRates = rates.map((rate) => ({
-			...rate,
-			itemId: targetItemId,
-		}));
-
-		updateNodeData(id, { rates: newRates });
+		// When the supply changes, we need to update the itemId of the split node to match the itemId of the supply.
+		updateNodeData(id, { itemId: supply?.itemId });
 		updateNodeInternals(id);
-	}, [supply?.itemId, rates, id, updateNodeData, updateNodeInternals]);
+	}, [supply?.itemId, id]);
 
 	return (
 		<BaseNode className={cn('flex flex-col p-0', selected && 'ring-2 ring-primary')}>
@@ -142,8 +108,7 @@ export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 			</BaseNodeHeader>
 			{rates.length > 0 && (
 				<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
-					<LabeledHandle type="target" position={Position.Left} title="" />
-
+					<LabeledHandle type="target" position={Position.Left} title="Input" />
 					<div className="flex flex-col justify-center gap-3">
 						{rates.map((rate, index) =>
 						{

@@ -5,7 +5,7 @@ import { getProducerOutputs, Producer, useProducersOutputs } from '@/domain/prod
 
 type UseProducerOutputsReturn = Awaited<ReturnType<typeof getProducerOutputs>> | undefined;
 
-export function useProducerOutputsV2(producerId?: Producer['id']): UseProducerOutputsReturn
+export function useProducerOutputsV2(producerId?: Producer['id'] | null): UseProducerOutputsReturn
 {
 	const inventory = useCurrentInventory();
 	const outputs = useProducersOutputs({ inventoryId: inventory.id });

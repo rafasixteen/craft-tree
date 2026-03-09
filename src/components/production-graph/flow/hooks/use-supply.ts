@@ -19,17 +19,16 @@ export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): It
 
 	if (node.type === 'item')
 	{
-		const { item, rate } = node.data;
+		const { itemId, rate } = node.data;
 
-		if (!item)
+		if (!itemId)
 		{
 			return null;
 		}
 
 		return {
-			itemId: item.id,
-			amount: rate.amount,
-			per: rate.per,
+			...rate,
+			itemId: itemId,
 		};
 	}
 
@@ -42,21 +41,26 @@ export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): It
 			return null;
 		}
 
-		// The sourceHandleId corresponds to the itemId of the output rate in the producer node.
+		// The sourceHandleId corresponds to the itemId.
 		return outputRates.find((rate) => rate.itemId === sourceHandleId) ?? null;
 	}
 
 	if (node.type === 'split')
 	{
-		const { rates } = node.data;
+		const { rates, itemId } = node.data;
 
-		if (!rates || !sourceHandleId)
+		if (!rates || !itemId || !sourceHandleId)
 		{
 			return null;
 		}
 
-		// The sourceHandleId corresponds to the index of the rate in the split node.
-		return rates[Number(sourceHandleId)];
+		// The sourceHandleId corresponds to the index.
+		const rate = rates[Number(sourceHandleId)];
+
+		return {
+			...rate,
+			itemId: itemId,
+		};
 	}
 
 	return null;

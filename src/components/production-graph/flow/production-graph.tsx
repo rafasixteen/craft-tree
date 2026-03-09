@@ -8,7 +8,7 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/flow/context-menus';
 import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/flow/types';
-import { graphConfig, layoutProductionGraph } from '@/components/production-graph';
+import { graphConfig, layoutProductionGraph, DevTools } from '@/components/production-graph';
 import { useProductionGraph } from '@/domain/production-graph';
 import { useParams } from 'next/navigation';
 
@@ -348,6 +348,7 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 					</Button>
 					<Button onClick={layoutGraph}>layout</Button>
 				</Panel>
+				<DevTools />
 			</ReactFlow>
 		</div>
 	);

@@ -1,22 +1,20 @@
 import { NodeProps, Handle, Position, Node } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree/hooks/use-recipe-tree';
 import { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { useNodeDemand } from '@/domain/recipe-tree/hooks/use-node-demand';
-import { useProducerCount } from '@/domain/recipe-tree/hooks/use-producer-count';
-import { useSelectedProducerThroughput } from '@/domain/recipe-tree/hooks/use-selected-producer-throughput';
+import { useProducerCount, useRecipeTree, useNodeDemand, useSelectedProducerThroughput } from '@/domain/recipe-tree';
 import { Card, CardContent } from '@/components/ui/card';
 import { PackageIcon, ClockIcon, FactoryIcon, ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { formatNumber } from '@/lib/utils';
 import { Producer } from '@/domain/producer';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
+import { convertProductionRate } from '@/domain/production-graph';
 
 export function ProcessedMaterialNode({ id }: NodeProps)
 {
 	const { recipeTree } = useRecipeTree();
 
-	const demand = useNodeDemand(id);
+	const demand = convertProductionRate(useNodeDemand(id), 'second');
 	const producerCount = useProducerCount(id);
 	const producerThroughput = useSelectedProducerThroughput(id);
 

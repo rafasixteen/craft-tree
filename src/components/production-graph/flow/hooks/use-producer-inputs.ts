@@ -44,32 +44,34 @@ export function useProducerInputs(): ItemRate[]
 
 		for (const node of itemNodes)
 		{
-			const { item, rate } = node.data;
+			const { itemId, rate } = node.data;
 
-			if (item)
+			if (itemId)
 			{
 				newRates.push({
-					itemId: item.id,
-					amount: rate.amount,
-					per: rate.per,
+					...rate,
+					itemId: itemId,
 				});
 			}
 		}
 
 		for (const node of splitNodes)
 		{
-			const { rates } = node.data;
+			const { itemId, rates } = node.data;
 
-			if (rates)
+			if (itemId && rates)
 			{
 				for (let i = 0; i < rates.length; i++)
 				{
-					const itemRate = rates[i];
+					const rate = rates[i];
 
-					// For split nodes, the source handle id is the index as a string
+					// For split nodes, the source handle id is the index as a string.
 					if (sourceHandleIds.includes(String(i)))
 					{
-						newRates.push(itemRate);
+						newRates.push({
+							...rate,
+							itemId: itemId,
+						});
 					}
 				}
 			}

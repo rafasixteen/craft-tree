@@ -1,6 +1,6 @@
 import { EdgeStatus } from '@/components/production-graph/flow/types';
 import { convertProductionRate, ProductionRate } from '@/domain/production-graph';
-import { useDemand, useSupply, useNodeType } from '@/components/production-graph/flow/hooks';
+import { useDemand, useSupply } from '@/components/production-graph/flow/hooks';
 
 type UseEdgeStatusParams = Parameters<typeof useSupply>[0] & Parameters<typeof useDemand>[0];
 
@@ -8,13 +8,6 @@ export function useEdgeStatus({ sourceNodeId, targetNodeId, sourceHandleId, targ
 {
 	const supply = useSupply({ sourceNodeId, sourceHandleId });
 	const demand = useDemand({ targetNodeId, targetHandleId });
-
-	const targetNodeType = useNodeType(targetNodeId);
-
-	if (targetNodeType === 'split')
-	{
-		return 'valid';
-	}
 
 	if (!supply || !demand)
 	{

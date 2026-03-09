@@ -4,7 +4,7 @@ import useSWR from 'swr';
 import { getProducersByOutputItem, Producer } from '@/domain/producer';
 import { Item } from '@/domain/item';
 
-export function useProducersByOutputItem(itemId?: Item['id'])
+export function useProducersByOutputItem(itemId?: Item['id'] | null)
 {
 	const key = itemId ? ['producers-by-output-item', itemId] : null;
 	const fetcher = () => (itemId ? getProducersByOutputItem({ itemId }) : Promise.resolve([]));

@@ -8,14 +8,21 @@ const elk = new ELK();
 // Reference: https://eclipse.dev/elk/reference/options.html
 
 const elkOptions = {
-	'elk.algorithm': 'layered',
-	'elk.direction': 'RIGHT',
-	'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
-	'elk.layered.considerModelOrder': 'true',
-	'elk.layered.crossingMinimization.forceNodeModelOrder': 'true',
-	'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
-	'elk.layered.spacing.nodeNodeBetweenLayers': '240',
-	'elk.spacing.nodeNode': '120',
+	'org.eclipse.elk.algorithm': 'layered',
+	'org.eclipse.elk.direction': 'RIGHT',
+	'org.eclipse.elk.edgeRouting': 'POLYLINE',
+
+	'org.eclipse.elk.layered.layering.strategy': 'NETWORK_SIMPLEX',
+
+	'org.eclipse.elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+	'org.eclipse.elk.layered.crossingMinimization.iterations': '24',
+	'org.eclipse.elk.layered.crossingMinimization.forceNodeModelOrder': 'false',
+
+	'org.eclipse.elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
+	'org.eclipse.elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
+
+	'org.eclipse.elk.layered.spacing.nodeNodeBetweenLayers': '240',
+	'org.eclipse.elk.spacing.nodeNode': '120',
 };
 
 interface LayoutedElements

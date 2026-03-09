@@ -29,7 +29,7 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 		function addItem(e: React.MouseEvent)
 		{
 			const data: ItemNodeData = {
-				item: null,
+				itemId: null,
 				rate: {
 					amount: 1,
 					per: 'second',
@@ -50,13 +50,11 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 		function addProducer(e: React.MouseEvent)
 		{
 			const data: ProducerNodeData = {
-				producer: null,
-				inputs: null,
-				outputs: null,
+				itemId: null,
+				producerId: null,
+				producerCount: 1,
 				inputRates: null,
 				outputRates: null,
-				producerCount: 1,
-				extraInfo: false,
 			};
 
 			addNodes({
@@ -72,9 +70,9 @@ export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneCont
 	function addSplitNode(e: React.MouseEvent)
 	{
 		const data: SplitNodeData = {
+			itemId: null,
 			rates: [
 				{
-					itemId: '',
 					amount: 1,
 					per: 'second',
 				},

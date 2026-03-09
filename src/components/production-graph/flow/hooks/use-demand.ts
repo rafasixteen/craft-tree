@@ -17,26 +17,45 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 	const inputs = useProducerInputsV2(producerId);
 	const producer = useProducerV2(producerId);
 
-	if (!node || node.type !== 'producer')
+	if (!node)
 	{
 		return null;
 	}
 
-	if (!inputs || !producer)
+	if (node.type === 'producer' && inputs && producer)
 	{
-		return null;
+		// The sourceHandleId corresponds to the itemId.
+		const input = inputs.find((i) => i.itemId === targetHandleId);
+
+		if (!input)
+		{
+			return null;
+		}
+
+		return {
+			itemId: input.itemId,
+			amount: (input.quantity / producer.time) * node.data.producerCount,
+			per: 'second',
+		};
 	}
 
-	const input = inputs.find((i) => i.itemId === targetHandleId);
-
-	if (!input)
+	if (node.type === 'split')
 	{
-		return null;
+		const { rates, itemId } = node.data;
+
+		if (!itemId)
+		{
+			return null;
+		}
+
+		const amount = rates.map((rate) => rate.amount).reduce((sum, curr) => sum + curr, 0);
+
+		return {
+			amount: amount,
+			per: 'second',
+			itemId: itemId,
+		};
 	}
 
-	return {
-		itemId: input.itemId,
-		amount: (input.quantity / producer.time) * node.data.producerCount,
-		per: 'second',
-	};
+	return null;
 }
