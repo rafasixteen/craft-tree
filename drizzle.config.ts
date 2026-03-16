@@ -4,7 +4,7 @@ import dotenvExpand from 'dotenv-expand';
 
 dotenvExpand.expand(
 	dotenv.config({
-		path: ['.env', '.env.development', '.env.production', '.env.local'],
+		path: ['.env', '.env.local'],
 		override: true,
 	}),
 );

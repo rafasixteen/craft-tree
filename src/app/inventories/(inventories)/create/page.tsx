@@ -11,13 +11,14 @@ import { Field } from '@/components/ui/field';
 import { toast } from 'sonner';
 import { useCallback, useTransition } from 'react';
 import { InventoryForm, InventoryFormValues, inventoryFormSchema } from '@/components/inventory';
-import { useUserId } from '@/domain/user';
+import { useUser } from '@/domain/user';
 
 export default function InventoryAddPage()
 {
 	const router = useRouter();
 
-	const { userId } = useUserId();
+	const user = useUser();
+	const userId = user?.id;
 
 	const [isCreating, startTransition] = useTransition();
 

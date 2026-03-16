@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 import { getInventoriesByUserId } from '@/domain/inventory';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { createClient } from '@/lib/supabase/server';
@@ -11,18 +10,11 @@ export default async function InventoriesRootLayout({ children }: LayoutProps<'/
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	if (!user)
-	{
-		redirect('/sign-in');
-	}
-
-	const userId = user.id;
-
 	return (
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['inventories', userId])]: getInventoriesByUserId(userId),
+					[unstable_serialize(['inventories', user?.id])]: getInventoriesByUserId(user?.id ?? ''),
 				},
 			}}
 		>

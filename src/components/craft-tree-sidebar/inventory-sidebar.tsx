@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { ArrowLeftFromLineIcon, ArrowRightFromLineIcon, FactoryIcon, PackageIcon, TagsIcon, WaypointsIcon } from 'lucide-react';
+import { FactoryIcon, HomeIcon, PackageIcon, TagsIcon, WaypointsIcon } from 'lucide-react';
 import { NavUser } from '@/components/user';
-import { InventorySwitcher } from '@/components/inventory';
 import { Inventory } from '@/domain/inventory';
 import {
 	Sidebar,
@@ -26,17 +25,41 @@ export function InventorySidebar({ inventoryId, ...props }: InventorySidebarProp
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
-				<InventorySwitcher />
+				<Link href="/">
+					<SidebarMenuButton>
+						<HomeIcon />
+						<span>Home</span>
+					</SidebarMenuButton>
+				</Link>
 			</SidebarHeader>
 			<SidebarContent>
+				<NavigationGroup />
 				<InventoryGroup inventoryId={inventoryId} />
-				<DocumentsGroup />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser />
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
+	);
+}
+
+function NavigationGroup()
+{
+	return (
+		<SidebarGroup>
+			<SidebarGroupLabel>General</SidebarGroupLabel>
+			<SidebarMenu>
+				<SidebarMenuItem>
+					<SidebarMenuButton tooltip="Inventories" asChild>
+						<Link href="/inventories">
+							<PackageIcon />
+							<span>Inventories</span>
+						</Link>
+					</SidebarMenuButton>
+				</SidebarMenuItem>
+			</SidebarMenu>
+		</SidebarGroup>
 	);
 }
 
@@ -75,33 +98,6 @@ function InventoryGroup({ inventoryId }: { inventoryId: Inventory['id'] })
 						<Link href={`/inventories/${inventoryId}/production-graphs`}>
 							<WaypointsIcon />
 							<span>Production Graphs</span>
-						</Link>
-					</SidebarMenuButton>
-				</SidebarMenuItem>
-			</SidebarMenu>
-		</SidebarGroup>
-	);
-}
-
-function DocumentsGroup()
-{
-	return (
-		<SidebarGroup>
-			<SidebarGroupLabel>Documents</SidebarGroupLabel>
-			<SidebarMenu>
-				<SidebarMenuItem>
-					<SidebarMenuButton tooltip="Import" asChild>
-						<Link href="/inventories/import">
-							<ArrowRightFromLineIcon />
-							<span>Import</span>
-						</Link>
-					</SidebarMenuButton>
-				</SidebarMenuItem>
-				<SidebarMenuItem>
-					<SidebarMenuButton tooltip="Export" asChild>
-						<Link href="/inventories/export">
-							<ArrowLeftFromLineIcon />
-							<span>Export</span>
 						</Link>
 					</SidebarMenuButton>
 				</SidebarMenuItem>

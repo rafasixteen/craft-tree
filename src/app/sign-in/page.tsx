@@ -1,39 +1,12 @@
-import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/server';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { SignInForm } from '@/components/auth';
 
 export default function SignInPage()
 {
-	async function signIn()
-	{
-		'use server';
-
-		const supabase = await createClient();
-		const origin = (await headers()).get('origin');
-
-		const { error, data } = await supabase.auth.signInWithOAuth({
-			provider: 'google',
-			options: {
-				redirectTo: `${origin}/auth/callback`,
-			},
-		});
-
-		if (error)
-		{
-			throw error;
-		}
-		else
-		{
-			redirect(data.url);
-		}
-	}
-
 	return (
-		<form action={signIn} className="flex min-h-screen flex-1 items-center justify-center">
-			<Button type="submit" size="lg">
-				Sign In
-			</Button>
-		</form>
+		<div className="flex size-full flex-col items-center justify-center gap-6 p-6 md:p-10">
+			<div className="flex w-full max-w-sm flex-col gap-6">
+				<SignInForm />
+			</div>
+		</div>
 	);
 }

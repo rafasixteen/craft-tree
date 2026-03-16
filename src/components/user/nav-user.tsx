@@ -3,9 +3,9 @@
 import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { createClient } from '@/lib/supabase/client';
 import { useUser } from '@/domain/user';
-import { redirect } from 'next/navigation';
+import { signOut } from '@/lib/auth';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -20,24 +20,27 @@ export function NavUser()
 {
 	const user = useUser();
 
-	const name = user?.user_metadata.name ?? 'Unknown User';
-	const email = user?.email ?? '';
-	const avatar = user?.user_metadata.avatar_url ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
-
-	async function signOut()
+	if (!user)
 	{
-		const supabase = createClient();
-		const { error } = await supabase.auth.signOut();
-
-		if (error)
-		{
-			throw error;
-		}
-		else
-		{
-			redirect('/sign-in');
-		}
+		return (
+			<SidebarMenu>
+				<SidebarMenuItem>
+					<div className="flex items-center gap-2 px-2 py-1.5">
+						<Skeleton className="size-8 shrink-0 rounded-lg" />
+						<div className="flex flex-1 flex-col gap-1.5">
+							<Skeleton className="h-2.5 w-20 rounded-sm" />
+							<Skeleton className="h-2 w-28 rounded-sm" />
+						</div>
+						<Skeleton className="ml-auto size-4 shrink-0 rounded-sm" />
+					</div>
+				</SidebarMenuItem>
+			</SidebarMenu>
+		);
 	}
+
+	const name = user.user_metadata.name;
+	const email = user.email;
+	const avatar = user.user_metadata.avatar_url ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
 
 	return (
 		<SidebarMenu>
@@ -83,9 +86,13 @@ export function NavUser()
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onSelect={() => signOut()}>
-							<LogOut />
-							Sign Out
+						<DropdownMenuItem asChild>
+							<form action={signOut}>
+								<button type="submit" className="flex w-full items-center gap-2">
+									<LogOut />
+									Sign Out
+								</button>
+							</form>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
