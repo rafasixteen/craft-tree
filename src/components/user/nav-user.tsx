@@ -1,9 +1,6 @@
-'use client';
-
 import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
-import { useSession, signOut } from 'next-auth/react';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,17 +10,27 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { createClient } from '@/lib/supabase/server';
 
-export function NavUser()
+export async function NavUser()
 {
-	const { isMobile } = useSidebar();
-	const { data: session } = useSession();
+	const supabase = await createClient();
 
-	if (session == null) return null;
+	const claims = await supabase.auth.getClaims();
 
-	const avatar = session?.user?.image ?? '';
-	const name = session?.user?.name ?? '';
-	const email = session?.user?.email ?? '';
+	const name = claims?.data?.claims.name || 'Unknown User';
+	const email = claims?.data?.claims.email || '';
+	const avatar = claims?.data?.claims.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+
+	async function signOut()
+	{
+		const { error } = await supabase.auth.signOut();
+
+		if (error)
+		{
+			console.error('Error signing out:', error);
+		}
+	}
 
 	return (
 		<SidebarMenu>
@@ -42,7 +49,7 @@ export function NavUser()
 							<ChevronsUpDown className="ml-auto size-4" />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" side={isMobile ? 'bottom' : 'right'} align="end" sideOffset={4}>
+					<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" side="right" align="end" sideOffset={4}>
 						<DropdownMenuLabel className="p-0 font-normal">
 							<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 								<Avatar className="size-8 rounded-lg">
@@ -69,7 +76,7 @@ export function NavUser()
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onSelect={() => signOut({ callbackUrl: '/sign-in' })}>
+						<DropdownMenuItem onSelect={() => signOut()}>
 							<LogOut />
 							Sign Out
 						</DropdownMenuItem>

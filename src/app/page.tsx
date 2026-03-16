@@ -1,10 +1,14 @@
 import { Button } from '@/components/ui/button';
-import { auth } from '@/auth';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 
 export default async function Home()
 {
-	const session = await auth();
+	const supabase = await createClient();
+
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 
 	return (
 		<div className="flex flex-1 py-4">
@@ -43,7 +47,7 @@ export default async function Home()
 
 					{/* Call-to-action buttons */}
 					<div className="animate-fade-in flex flex-wrap justify-center gap-3 pt-8 sm:gap-4" style={{ animationDelay: '0.6s' }}>
-						{session ? (
+						{user ? (
 							<Button size="lg" className="text-sm sm:text-base">
 								<Link href="/inventories">Inventories</Link>
 							</Button>
