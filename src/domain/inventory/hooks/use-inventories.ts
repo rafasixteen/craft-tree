@@ -1,6 +1,6 @@
 'use client';
 
-import { useUserId } from '@/domain/user';
+import { useUser } from '@/domain/user';
 import { getInventoriesByUserId, Inventory } from '@/domain/inventory';
 import { useCallback } from 'react';
 import * as InventoryServerActions from '@/domain/inventory/server';
@@ -14,7 +14,8 @@ type DeleteInventoryParams = Parameters<typeof InventoryServerActions.deleteInve
 
 export function useInventories()
 {
-	const { userId } = useUserId();
+	const user = useUser();
+	const userId = user?.id ?? null;
 
 	const swrKey = userId ? ['inventories', userId] : null;
 	const fetcher = () => getInventoriesByUserId(userId!);
