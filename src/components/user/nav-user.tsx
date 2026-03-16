@@ -1,6 +1,11 @@
+'use client';
+
 import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { createClient } from '@/lib/supabase/client';
+import { useUser } from '@/domain/user';
+import { redirect } from 'next/navigation';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -10,25 +15,27 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { createClient } from '@/lib/supabase/server';
 
-export async function NavUser()
+export function NavUser()
 {
-	const supabase = await createClient();
+	const user = useUser();
 
-	const claims = await supabase.auth.getClaims();
-
-	const name = claims?.data?.claims.name || 'Unknown User';
-	const email = claims?.data?.claims.email || '';
-	const avatar = claims?.data?.claims.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
+	const name = user?.user_metadata.name ?? 'Unknown User';
+	const email = user?.email ?? '';
+	const avatar = user?.user_metadata.avatar_url ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`;
 
 	async function signOut()
 	{
+		const supabase = createClient();
 		const { error } = await supabase.auth.signOut();
 
 		if (error)
 		{
-			console.error('Error signing out:', error);
+			throw error;
+		}
+		else
+		{
+			redirect('/sign-in');
 		}
 	}
 

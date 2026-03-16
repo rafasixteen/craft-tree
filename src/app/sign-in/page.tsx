@@ -21,7 +21,7 @@ export default function SignInPage()
 
 		if (error)
 		{
-			console.error('Error signing in:', error);
+			throw error;
 		}
 		else
 		{
