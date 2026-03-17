@@ -1,6 +1,6 @@
 export * from './base-handle';
 export * from './base-node';
-export * from './craft-tree-sidebar';
+export * from './sidebar';
 export * from './data-table';
 export * from './inventory';
 export * from './item';

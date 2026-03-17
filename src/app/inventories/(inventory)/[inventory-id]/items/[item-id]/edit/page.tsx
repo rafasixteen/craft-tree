@@ -2,7 +2,7 @@
 
 import { useItemTags } from '@/domain/item';
 import { useParams, useRouter } from 'next/navigation';
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { useItem } from '@/domain/item';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';

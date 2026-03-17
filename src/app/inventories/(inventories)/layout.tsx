@@ -1,5 +1,5 @@
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { InventoriesSidebar } from '@/components/craft-tree-sidebar';
+import { InventoriesSidebar } from '@/components/sidebar';
 import { cookies } from 'next/headers';
 
 export default async function InventoriesLayout({ children }: LayoutProps<'/inventories'>)

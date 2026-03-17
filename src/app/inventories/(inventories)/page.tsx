@@ -5,7 +5,7 @@ import { DataTable, DataTableFilter, DataTablePagination, useDataTable } from '@
 import { inventoryColumnns } from '@/components/inventory';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import Link from 'next/link';
 
 export default function InventoriesPage()

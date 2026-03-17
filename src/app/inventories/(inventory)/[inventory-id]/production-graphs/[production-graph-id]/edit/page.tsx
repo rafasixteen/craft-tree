@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { useProductionGraph } from '@/domain/production-graph';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';

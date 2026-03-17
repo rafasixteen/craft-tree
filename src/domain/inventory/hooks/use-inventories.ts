@@ -18,7 +18,7 @@ export function useInventories()
 	const userId = user?.id;
 
 	const swrKey = userId ? ['inventories', userId] : null;
-	const fetcher = () => getInventoriesByUserId(userId!);
+	const fetcher = () => (userId ? getInventoriesByUserId(userId) : Promise.resolve([]));
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,

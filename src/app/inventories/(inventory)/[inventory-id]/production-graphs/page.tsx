@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { useDataTable, DataTableFilter, DataTable, DataTablePagination } from '@/components/data-table';
 import { useCurrentInventory } from '@/components/inventory';
 import { productionGraphColumnns } from '@/components/production-graph';

@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { ProductionGraph } from '@/components/production-graph/flow';
 import { ReactFlowProvider } from '@xyflow/react';
 import { getProductionGraphById } from '@/domain/production-graph';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { itemColumnns } from '@/components/item';
 import { useMemo } from 'react';
 import { useItems } from '@/domain/item';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { tagColumnns } from '@/components/tag';
 import { useMemo } from 'react';
 import { useTags } from '@/domain/tag';

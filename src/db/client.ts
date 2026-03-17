@@ -9,11 +9,20 @@ if (!connectionString)
 	throw new Error('DATABASE_URL environment variable is not set');
 }
 
-const client = postgres(connectionString, {
-	prepare: false,
-});
+const globalForDb = globalThis as unknown as { client: postgres.Sql };
+
+const client =
+	globalForDb.client ??
+	postgres(connectionString, {
+		prepare: false,
+	});
+
+if (process.env.NODE_ENV !== 'production')
+{
+	globalForDb.client = client;
+}
 
 export default drizzle({
-	client,
+	client: client,
 	casing: 'snake_case',
 });

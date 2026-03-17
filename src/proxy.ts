@@ -1,8 +1,15 @@
-import { type NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/proxy';
 
 export async function proxy(request: NextRequest)
 {
+	const { pathname } = request.nextUrl;
+
+	if (pathname === '/settings')
+	{
+		return NextResponse.redirect(new URL('/settings/general', request.url), 307);
+	}
+
 	return await updateSession(request);
 }
 

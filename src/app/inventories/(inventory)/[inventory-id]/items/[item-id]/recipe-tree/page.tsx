@@ -1,4 +1,4 @@
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { RecipeTree } from '@/components/recipe-tree';
 import { RecipeTreeProvider } from '@/domain/recipe-tree/hooks';
 import { ReactFlowProvider } from '@xyflow/react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { useProducer, useProducerInputs, useProducerOutputs, useProducerTags } from '@/domain/producer';
 import { useTags } from '@/domain/tag';
 import { useParams } from 'next/navigation';

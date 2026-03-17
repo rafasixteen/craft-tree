@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@/components/craft-tree-sidebar';
+import { Header } from '@/components/sidebar';
 import { Button } from '@/components/ui/button';
 import { useItemTags, useItem } from '@/domain/item';
 import { useTags } from '@/domain/tag';

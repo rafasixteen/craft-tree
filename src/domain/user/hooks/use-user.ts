@@ -8,10 +8,15 @@ export function useUser(): User | null
 {
 	const [user, setUser] = useState<User | null>(null);
 
-	const supabase = createClient();
-
 	useEffect(() =>
 	{
+		const supabase = createClient();
+
+		supabase.auth.getSession().then(({ data: { session } }) =>
+		{
+			setUser(session?.user ?? null);
+		});
+
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_, session) =>
