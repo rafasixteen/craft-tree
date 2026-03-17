@@ -2,7 +2,6 @@
 
 import { useMemo, createContext, useContext, useCallback, useEffect, useState } from 'react';
 import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData } from '@/domain/recipe-tree';
-import { ProductionRate } from '@/domain/production-graph/types';
 import { Item } from '@/domain/item';
 import useSWR from 'swr';
 
@@ -16,7 +15,6 @@ interface RecipeTreeContext
 		order?: 'pre' | 'post',
 	) => void;
 	changeProducer: (nodeId: RecipeTreeNode['id'], delta: number) => void;
-	setRate: (rate: ProductionRate) => void;
 }
 
 const RecipeTreeContext = createContext<RecipeTreeContext | undefined>(undefined);
@@ -128,23 +126,7 @@ export function RecipeTreeProvider({ itemId, children }: RecipeTreeProviderProps
 		});
 	}, []);
 
-	const setRate = useCallback(function setRate(rate: ProductionRate): void
-	{
-		setRecipeTree((prev) =>
-		{
-			if (!prev)
-			{
-				throw new Error('Recipe tree data is not available.');
-			}
-
-			return {
-				...prev,
-				rate,
-			};
-		});
-	}, []);
-
-	const value = useMemo(() => ({ recipeTree, dfs, changeProducer, setRate }), [recipeTree, dfs, changeProducer, setRate]);
+	const value = useMemo(() => ({ recipeTree, dfs, changeProducer }), [recipeTree, dfs, changeProducer]);
 	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }
 

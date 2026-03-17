@@ -1,11 +1,10 @@
 import { DefaultEdgeOptions, FitViewOptions, ReactFlowProps } from '@xyflow/react';
 import { RecipeTreeNodeType } from '@/components/recipe-tree/types';
-import { ProcessedMaterialNode, RateControlNode, RawMaterialNode } from '@/components/recipe-tree/nodes';
+import { ProcessedMaterialNode, RawMaterialNode } from '@/components/recipe-tree/nodes';
 
 const nodeTypes: Record<RecipeTreeNodeType, React.ComponentType<any>> = {
 	'processed-material': ProcessedMaterialNode,
 	'raw-material': RawMaterialNode,
-	'rate-control': RateControlNode,
 };
 
 const fitViewOptions: FitViewOptions = {
@@ -14,7 +13,7 @@ const fitViewOptions: FitViewOptions = {
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
 	animated: true,
-	type: 'smoothstep',
+	type: 'straight',
 };
 
 export const config = {

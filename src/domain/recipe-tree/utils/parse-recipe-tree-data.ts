@@ -109,10 +109,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 
 	const rootNode = buildNode(rootItem.id, null);
 
-	// TODO: Store the rate in local storage and load it here.
-
 	return {
-		rate: { amount: 1, per: 'second' },
 		rootNodeId: rootNode.id,
 		nodes,
 	};

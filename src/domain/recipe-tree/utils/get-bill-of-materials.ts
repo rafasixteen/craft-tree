@@ -1,4 +1,4 @@
-import { RecipeTreeState, BillOfMaterials, RecipeTreeNode, BillOfMaterialsEntry, getNodeDemand, dfs } from '@/domain/recipe-tree';
+import { RecipeTreeState, BillOfMaterials, RecipeTreeNode, BillOfMaterialsEntry, dfs, getResolvedQuantity } from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
 
 export function getBillOfMaterials(state: RecipeTreeState): BillOfMaterials
@@ -41,18 +41,18 @@ export function getBillOfMaterials(state: RecipeTreeState): BillOfMaterials
 			continue;
 		}
 
-		const demand = getNodeDemand(state, node.id);
+		const quantity = getResolvedQuantity(state, node.id);
 
 		if (bom.has(node.item.id))
 		{
 			const entry = bom.get(node.item.id)!;
-			entry.demand.amount += demand.amount;
+			entry.amount += quantity;
 		}
 		else
 		{
-			bom.set(node.item.id, { item: node.item, demand: demand });
+			bom.set(node.item.id, { item: node.item, amount: quantity });
 		}
 	}
 
-	return Array.from(bom.values()).sort((a, b) => a.item.name.localeCompare(b.item.name));
+	return Array.from(bom.values()).sort((a, b) => b.amount - a.amount);
 }

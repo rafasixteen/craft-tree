@@ -1,6 +1,5 @@
 import { Item } from '@/domain/item';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
-import { ProductionRate } from '@/domain/production-graph';
 
 export interface RecipeTreeNode
 {
@@ -16,7 +15,6 @@ export interface RecipeTreeNode
 
 export interface RecipeTreeState
 {
-	rate: ProductionRate;
 	rootNodeId: string;
 	nodes: Record<string, RecipeTreeNode>;
 }

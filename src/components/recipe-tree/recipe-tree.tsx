@@ -3,8 +3,7 @@
 import '@xyflow/react/dist/style.css';
 import { ReactFlow, Controls, Background, useNodesState, Edge, Node, useEdgesState, useReactFlow, useNodesInitialized } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { config, layoutRecipeTree, BillOfMaterialsOverlay, ProducersOverlay } from '@/components/recipe-tree';
-import { buildNode, buildEdge } from '@/components/recipe-tree/utils';
+import { config, layoutRecipeTree, BillOfMaterialsOverlay } from '@/components/recipe-tree';
 import { useRecipeTreeNodes } from '@/components/recipe-tree/hooks';
 import { useEffect } from 'react';
 
@@ -23,6 +22,9 @@ export function RecipeTree({ initialTheme }: RecipeTreeProps)
 	const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
 	const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
+	const { getNodes, getEdges } = useReactFlow<Node, Edge>();
+	const nodesInitialized = useNodesInitialized();
+
 	useEffect(() =>
 	{
 		if (baseNodes.length === 0 || baseEdges.length === 0)
@@ -30,28 +32,9 @@ export function RecipeTree({ initialTheme }: RecipeTreeProps)
 			return;
 		}
 
-		const rateControlNodeId = 'rate-control-node';
-		const rateControlNode = buildNode({ nodeId: rateControlNodeId, type: 'rate-control' });
-		const rateControlEdge = buildEdge({ parentId: rateControlNodeId, childId: baseNodes[0].id });
-
-		const mergedNodes = [
-			rateControlNode,
-			...baseNodes.map((newNode) =>
-			{
-				const existingNode = nodes.find((n) => n.id === newNode.id);
-				return existingNode ? { ...newNode, position: existingNode.position } : newNode;
-			}),
-		];
-
-		const mergedEdges = [...baseEdges, rateControlEdge];
-
-		setNodes(mergedNodes);
-		setEdges(mergedEdges);
+		setNodes(baseNodes);
+		setEdges(baseEdges);
 	}, [baseNodes, baseEdges]);
-
-	const { getNodes, getEdges } = useReactFlow<Node, Edge>();
-
-	const nodesInitialized = useNodesInitialized();
 
 	useEffect(() =>
 	{
@@ -71,7 +54,6 @@ export function RecipeTree({ initialTheme }: RecipeTreeProps)
 				<Controls />
 				<Background gap={20} size={1} />
 				<BillOfMaterialsOverlay position="top-right" />
-				<ProducersOverlay />
 			</ReactFlow>
 		</div>
 	);

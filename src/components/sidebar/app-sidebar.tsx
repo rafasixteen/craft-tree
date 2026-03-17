@@ -15,7 +15,7 @@ export function AppSidebar({ children, ...props }: AppSidebar)
 				<SidebarMenu>
 					<SidebarMenuButton
 						size="lg"
-						className="active:bg-transparent hover:bg-transparent items-center data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+						className="items-center hover:bg-transparent active:bg-transparent data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 					>
 						<div className="flex aspect-square size-8 items-center justify-center rounded-lg">
 							<Link href="/" className="flex items-center gap-2">

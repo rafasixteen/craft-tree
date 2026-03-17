@@ -1,1 +1,1 @@
-export type RecipeTreeNodeType = 'processed-material' | 'raw-material' | 'rate-control';
+export type RecipeTreeNodeType = 'processed-material' | 'raw-material';
