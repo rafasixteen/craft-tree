@@ -1,10 +1,11 @@
 'use client';
 
 import { ColumnDef, Row } from '@tanstack/react-table';
-import { Inventory, useInventories } from '@/domain/inventory';
+import { exportInventory, Inventory, useInventories } from '@/domain/inventory';
 import { DataTableColumnHeader } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { DownloadIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { downloadJSON } from '@/lib/download-json';
 import Link from 'next/link';
 
 export type InventoryColumnData = Inventory;
@@ -45,13 +46,20 @@ function Actions({ row }: ActionsProps)
 
 	const { deleteInventory } = useInventories();
 
+	async function onExport(inventory: Inventory)
+	{
+		const json = await exportInventory(inventory.id);
+		downloadJSON(json, `${inventory.name.toLowerCase().replace(/\s+/g, '_')}.json`);
+	}
+
 	return (
-		<div className="flex justify-center gap-2">
-			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${id}/edit`}>
-					<PencilIcon className="size-3" />
-				</Link>
+		<div className="flex items-center justify-center gap-2">
+			<Button variant="outline" size="icon-sm" onClick={() => onExport(row.original)}>
+				<DownloadIcon className="size-3" />
 			</Button>
+			<Link href={`/inventories/${id}/edit`}>
+				<PencilIcon className="size-3" />
+			</Link>
 			<Button variant="destructive" size="icon-sm" onClick={() => deleteInventory(id)}>
 				<TrashIcon className="size-3" />
 			</Button>
