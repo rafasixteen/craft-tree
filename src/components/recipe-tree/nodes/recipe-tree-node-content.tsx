@@ -31,7 +31,7 @@ export function RecipeTreeNodeContent({ nodeId }: RecipeTreeNodeContentProps)
 			</div>
 			<div className="flex items-center gap-1 text-muted-foreground">
 				<PackageIcon className="size-3" />
-				<span>{quantity}x</span>
+				<span>{Math.ceil(quantity)}x</span>
 			</div>
 
 			{/* Time row */}

@@ -54,5 +54,7 @@ export function getBillOfMaterials(state: RecipeTreeState): BillOfMaterials
 		}
 	}
 
-	return Array.from(bom.values()).sort((a, b) => b.amount - a.amount);
+	return Array.from(bom.values())
+		.map((entry) => ({ ...entry, amount: Math.ceil(entry.amount) }))
+		.sort((a, b) => b.amount - a.amount);
 }
