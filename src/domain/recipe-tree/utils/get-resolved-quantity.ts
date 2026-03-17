@@ -39,5 +39,9 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: string): num
 		return 0;
 	}
 
-	return getResolvedQuantity(state, parent.id) * input.quantity;
+	const parentOutputs = parent.producerOutputs[parentProducer.id] || [];
+	const parentOutput = parentOutputs.find((o) => o.itemId === parent.item.id);
+	const parentOutputQuantity = parentOutput?.quantity ?? 1;
+
+	return (getResolvedQuantity(state, parent.id) / parentOutputQuantity) * input.quantity;
 }
