@@ -3,7 +3,7 @@ import { z } from 'zod';
 const InventoryImportItemSchema = z.object({
 	id: z.number(),
 	name: z.string().min(1),
-	tags: z.array(z.number()).optional(),
+	tags: z.array(z.number()),
 });
 
 const InventoryImportProducerInputOutputSchema = z.object({
@@ -17,7 +17,7 @@ const InventoryImportProducerSchema = z.object({
 	time: z.number().positive(),
 	inputs: z.array(InventoryImportProducerInputOutputSchema),
 	outputs: z.array(InventoryImportProducerInputOutputSchema).min(1),
-	tags: z.array(z.number()).optional(),
+	tags: z.array(z.number()),
 });
 
 const InventoryImportTagSchema = z.object({
@@ -32,10 +32,10 @@ const InventoryImportProductionGraphSchema = z.object({
 
 export const InventoryImportSchema = z.object({
 	inventory: z.string().min(1),
-	tags: z.array(InventoryImportTagSchema).optional(),
+	tags: z.array(InventoryImportTagSchema),
 	items: z.array(InventoryImportItemSchema),
 	producers: z.array(InventoryImportProducerSchema),
-	productionGraphs: z.array(InventoryImportProductionGraphSchema).optional(),
+	productionGraphs: z.array(InventoryImportProductionGraphSchema),
 });
 
 export type InventoryImport = z.infer<typeof InventoryImportSchema>;

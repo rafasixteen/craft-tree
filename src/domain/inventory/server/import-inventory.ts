@@ -44,93 +44,82 @@ export async function importInventory(data: InventoryImport): Promise<Inventory>
 			.returning();
 
 		const [createdItems, createdProducers, createdTags] = await Promise.all([
-			tx
-				.insert(itemsTable)
-				.values(
-					items.map((item) => ({
-						name: item.name,
-						inventoryId: newInventory.id,
-					})),
-				)
-				.returning(),
-
-			tx
-				.insert(producersTable)
-				.values(
-					producers.map((producer) => ({
-						name: producer.name,
-						time: producer.time,
-						inventoryId: newInventory.id,
-					})),
-				)
-				.returning(),
-
-			tags?.length
+			items.length
 				? tx
-						.insert(tagsTable)
+						.insert(itemsTable)
+						.values(items.map((item) => ({ name: item.name, inventoryId: newInventory.id })))
+						.returning()
+				: Promise.resolve([]),
+
+			producers.length
+				? tx
+						.insert(producersTable)
 						.values(
-							tags.map((tag) => ({
-								name: tag.name,
+							producers.map((producer) => ({
+								name: producer.name,
+								time: producer.time,
 								inventoryId: newInventory.id,
 							})),
 						)
 						.returning()
 				: Promise.resolve([]),
+
+			tags.length
+				? tx
+						.insert(tagsTable)
+						.values(tags.map((tag) => ({ name: tag.name, inventoryId: newInventory.id })))
+						.returning()
+				: Promise.resolve([]),
 		]);
 
-		await Promise.all([
-			tx.insert(producerInputsTable).values(
-				producers.flatMap((producer, producerIndex) =>
-					producer.inputs.map((input) => ({
-						producerId: createdProducers[producerIndex].id,
-						itemId: createdItems[input.itemId - 1].id,
-						quantity: input.quantity,
-					})),
-				),
-			),
+		const producerInputValues = producers.flatMap((producer, producerIndex) =>
+			producer.inputs.map((input) => ({
+				producerId: createdProducers[producerIndex].id,
+				itemId: createdItems[input.itemId - 1].id,
+				quantity: input.quantity,
+			})),
+		);
 
-			tx.insert(producerOutputsTable).values(
-				producers.flatMap((producer, producerIndex) =>
-					producer.outputs.map((output) => ({
-						producerId: createdProducers[producerIndex].id,
-						itemId: createdItems[output.itemId - 1].id,
-						quantity: output.quantity,
-					})),
-				),
-			),
+		const producerOutputValues = producers.flatMap((producer, producerIndex) =>
+			producer.outputs.map((output) => ({
+				producerId: createdProducers[producerIndex].id,
+				itemId: createdItems[output.itemId - 1].id,
+				quantity: output.quantity,
+			})),
+		);
 
-			...(createdTags.length
-				? [
-						tx.insert(itemTagsTable).values(
-							items.flatMap((item, itemIndex) =>
-								(item.tags ?? []).map((tagId) => ({
-									itemId: createdItems[itemIndex].id,
-									tagId: createdTags[tagId - 1].id,
-								})),
-							),
-						),
+		const itemTagValues = items.flatMap((item, itemIndex) =>
+			(item.tags ?? []).map((tagId) => ({
+				itemId: createdItems[itemIndex].id,
+				tagId: createdTags[tagId - 1].id,
+			})),
+		);
 
-						tx.insert(producerTagsTable).values(
-							producers.flatMap((producer, producerIndex) =>
-								(producer.tags ?? []).map((tagId) => ({
-									producerId: createdProducers[producerIndex].id,
-									tagId: createdTags[tagId - 1].id,
-								})),
-							),
-						),
-					]
-				: []),
+		const producerTagValues = producers.flatMap((producer, producerIndex) =>
+			(producer.tags ?? []).map((tagId) => ({
+				producerId: createdProducers[producerIndex].id,
+				tagId: createdTags[tagId - 1].id,
+			})),
+		);
 
-			...(!productionGraphs
-				? []
-				: productionGraphs.map((graph) =>
-						tx.insert(productionGraphsTable).values({
-							name: graph.name,
-							data: graph.data,
-							inventoryId: newInventory.id,
-						}),
-					)),
-		]);
+		const productionGraphValues = productionGraphs.map((graph) => ({
+			name: graph.name,
+			data: graph.data,
+			inventoryId: newInventory.id,
+		}));
+
+		const secondBatch = [
+			...(producerInputValues.length ? [tx.insert(producerInputsTable).values(producerInputValues)] : []),
+			...(producerOutputValues.length ? [tx.insert(producerOutputsTable).values(producerOutputValues)] : []),
+			...(itemTagValues.length ? [tx.insert(itemTagsTable).values(itemTagValues)] : []),
+			...(producerTagValues.length ? [tx.insert(producerTagsTable).values(producerTagValues)] : []),
+			...(productionGraphValues.length ? [tx.insert(productionGraphsTable).values(productionGraphValues)] : []),
+		];
+
+		if (secondBatch.length)
+		{
+			await Promise.all(secondBatch);
+		}
 
 		return newInventory;
 	});
