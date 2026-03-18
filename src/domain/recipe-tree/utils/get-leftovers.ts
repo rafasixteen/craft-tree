@@ -1,29 +1,82 @@
-import { RecipeTreeState, getResolvedQuantity } from '@/domain/recipe-tree';
+import { BillOfMaterials, dfs, getResolvedQuantity, RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
+import { Item } from '@/domain/item';
 
-export function getLeftovers(state: RecipeTreeState, nodeId: string): number
+export function getLeftovers(state: RecipeTreeState): BillOfMaterials
 {
-	const node = state.nodes[nodeId];
+	const quantityNeededMap = new Map<Item['id'], { item: Item; needed: number; outputQuantity: number }>();
 
-	const selectedProducer = node.producers.find((p) => p.id === node.selectedProducerId);
-
-	if (!selectedProducer)
+	function getSelectedProducerChildren(node: RecipeTreeNode): string[]
 	{
-		return 0;
+		if (!node.selectedProducerId)
+		{
+			return [];
+		}
+
+		return node.children[node.selectedProducerId] || [];
 	}
 
-	const outputs = node.producerOutputs[selectedProducer.id] || [];
-	const output = outputs.find((o) => o.itemId === node.item.id);
-
-	if (!output)
+	function visit(node: RecipeTreeNode)
 	{
-		return 0;
+		if (node.id === state.rootNodeId)
+		{
+			return;
+		}
+
+		const selectedProducer = node.producers.find((p) => p.id === node.selectedProducerId);
+
+		if (!selectedProducer)
+		{
+			return;
+		}
+
+		const outputs = node.producerOutputs[selectedProducer.id] || [];
+		const output = outputs.find((o) => o.itemId === node.item.id);
+
+		if (!output)
+		{
+			return;
+		}
+
+		const needed = Math.ceil(getResolvedQuantity(state, node.id));
+		const existing = quantityNeededMap.get(node.item.id);
+
+		if (existing)
+		{
+			existing.needed += needed;
+		}
+		else
+		{
+			const entry = {
+				item: node.item,
+				needed,
+				outputQuantity: output.quantity,
+			};
+
+			quantityNeededMap.set(node.item.id, entry);
+		}
 	}
 
-	const outputQuantity = output.quantity;
-	const quantityNeeded = getResolvedQuantity(state, nodeId);
+	dfs({
+		state,
+		startNodeId: state.rootNodeId,
+		visit,
+		getChildren: getSelectedProducerChildren,
+		order: 'pre',
+	});
 
-	const cyclesNeeded = Math.ceil(quantityNeeded / outputQuantity);
-	const totalProduced = cyclesNeeded * outputQuantity;
+	const leftovers: BillOfMaterials = [];
 
-	return totalProduced - quantityNeeded;
+	for (const { item, needed, outputQuantity } of quantityNeededMap.values())
+	{
+		const cyclesNeeded = Math.ceil(needed / outputQuantity);
+		const totalProduced = cyclesNeeded * outputQuantity;
+		const leftover = totalProduced - needed;
+
+		if (leftover > 0)
+		{
+			leftovers.push({ item, amount: Math.ceil(leftover) });
+		}
+	}
+
+	return leftovers.sort((a, b) => b.amount - a.amount);
 }

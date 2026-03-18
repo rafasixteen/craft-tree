@@ -1,7 +1,7 @@
 import { RecipeTreeState, BillOfMaterials, RecipeTreeNode, BillOfMaterialsEntry, dfs, getResolvedQuantity } from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
 
-export function getBillOfMaterials(state: RecipeTreeState): BillOfMaterials
+export function getMaterials(state: RecipeTreeState): BillOfMaterials
 {
 	const leafNodes: RecipeTreeNode[] = [];
 
@@ -31,7 +31,7 @@ export function getBillOfMaterials(state: RecipeTreeState): BillOfMaterials
 		order: 'pre',
 	});
 
-	const bom = new Map<Item['id'], BillOfMaterialsEntry>();
+	const materials = new Map<Item['id'], BillOfMaterialsEntry>();
 
 	for (const node of leafNodes)
 	{
@@ -43,18 +43,23 @@ export function getBillOfMaterials(state: RecipeTreeState): BillOfMaterials
 
 		const quantity = getResolvedQuantity(state, node.id);
 
-		if (bom.has(node.item.id))
+		if (materials.has(node.item.id))
 		{
-			const entry = bom.get(node.item.id)!;
+			const entry = materials.get(node.item.id)!;
 			entry.amount += quantity;
 		}
 		else
 		{
-			bom.set(node.item.id, { item: node.item, amount: quantity });
+			const entry: BillOfMaterialsEntry = {
+				item: node.item,
+				amount: quantity,
+			};
+
+			materials.set(node.item.id, entry);
 		}
 	}
 
-	return Array.from(bom.values())
+	return Array.from(materials.values())
 		.map((entry) => ({ ...entry, amount: Math.ceil(entry.amount) }))
 		.sort((a, b) => b.amount - a.amount);
 }
