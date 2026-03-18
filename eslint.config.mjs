@@ -7,7 +7,14 @@ const eslintConfig = defineConfig([
 	...nextVitals,
 	...nextTs,
 	betterTailwindcss.configs.recommended,
-	globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'src/graphql/generated/**', 'src/components/ui']),
+	globalIgnores([
+		'.next/**',
+		'out/**',
+		'build/**',
+		'next-env.d.ts',
+		'src/graphql/generated/**',
+		'src/components/ui',
+	]),
 	{
 		settings: {
 			'better-tailwindcss': {

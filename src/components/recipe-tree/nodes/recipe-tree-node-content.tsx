@@ -1,4 +1,8 @@
-import { getNodeTime, getResolvedQuantity, useRecipeTree } from '@/domain/recipe-tree';
+import {
+	getNodeTime,
+	getResolvedQuantity,
+	useRecipeTree,
+} from '@/domain/recipe-tree';
 import { formatNumber } from '@/lib/utils';
 import { ClockIcon, PackageIcon } from 'lucide-react';
 
@@ -10,10 +14,13 @@ interface RecipeTreeNodeContentProps
 export function RecipeTreeNodeContent({ nodeId }: RecipeTreeNodeContentProps)
 {
 	const { recipeTree } = useRecipeTree();
-	const { item, producers, producerOutputs, selectedProducerId } = recipeTree!.nodes[nodeId];
+	const { item, producers, producerOutputs, selectedProducerId } =
+		recipeTree!.nodes[nodeId];
 
 	const selectedProducer = producers.find((p) => p.id === selectedProducerId);
-	const output = selectedProducerId ? producerOutputs[selectedProducerId].find((o) => o.itemId === item.id) : undefined;
+	const output = selectedProducerId
+		? producerOutputs[selectedProducerId].find((o) => o.itemId === item.id)
+		: undefined;
 
 	const quantity = getResolvedQuantity(recipeTree!, nodeId);
 	const time = selectedProducerId ? getNodeTime(recipeTree!, nodeId) : 0;

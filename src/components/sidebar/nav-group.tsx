@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
-import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
+import {
+	SidebarGroup,
+	SidebarGroupLabel,
+	SidebarMenu,
+	SidebarMenuItem,
+	SidebarMenuButton,
+} from '@/components/ui/sidebar';
 
 export interface NavItem
 {

@@ -14,10 +14,7 @@ export const producerTags = pgTable(
 	},
 	(table) => [
 		primaryKey({
-			columns: [
-				table.producerId,
-				table.tagId,
-			],
+			columns: [table.producerId, table.tagId],
 		}),
 	],
 );

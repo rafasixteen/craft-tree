@@ -12,11 +12,16 @@ interface SetProducerTagsParams
 	tagIds: Tag['id'][];
 }
 
-export async function setProducerTags({ producerId, tagIds }: SetProducerTagsParams): Promise<ProducerTag[]>
+export async function setProducerTags({
+	producerId,
+	tagIds,
+}: SetProducerTagsParams): Promise<ProducerTag[]>
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(producerTags).where(eq(producerTags.producerId, producerId));
+		await tx
+			.delete(producerTags)
+			.where(eq(producerTags.producerId, producerId));
 
 		if (tagIds.length === 0)
 		{

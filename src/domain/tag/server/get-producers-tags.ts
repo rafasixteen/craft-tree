@@ -11,7 +11,9 @@ interface GetProducersTagsParams
 	inventoryId: Inventory['id'];
 }
 
-export async function getProducersTags({ inventoryId }: GetProducersTagsParams): Promise<ProducerTag[]>
+export async function getProducersTags({
+	inventoryId,
+}: GetProducersTagsParams): Promise<ProducerTag[]>
 {
 	return await db
 		.select({

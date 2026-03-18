@@ -5,7 +5,13 @@ import { producerColumnns } from '@/components/producer';
 import { useMemo } from 'react';
 import { useProducers } from '@/domain/producer';
 import { useCurrentInventory } from '@/components/inventory';
-import { useDataTable, DataTablePagination, DataTableFilter, DataTableFacetedFilter, DataTable } from '@/components/data-table';
+import {
+	useDataTable,
+	DataTablePagination,
+	DataTableFilter,
+	DataTableFacetedFilter,
+	DataTable,
+} from '@/components/data-table';
 import { useProducersTags, useTags } from '@/domain/tag';
 import { Button } from '@/components/ui/button';
 import { TagsIcon } from 'lucide-react';
@@ -26,8 +32,14 @@ export default function ProducersPage()
 			producers.map((producer) => ({
 				...producer,
 				tags: producersTags
-					.filter((producerTag) => producerTag.producerId === producer.id)
-					.map((producerTag) => tags.find((tag) => tag.id === producerTag.tagId)?.name || ''),
+					.filter(
+						(producerTag) => producerTag.producerId === producer.id,
+					)
+					.map(
+						(producerTag) =>
+							tags.find((tag) => tag.id === producerTag.tagId)
+								?.name || '',
+					),
 			})),
 		[producers, producersTags, tags],
 	);
@@ -46,19 +58,33 @@ export default function ProducersPage()
 		<>
 			<Header>
 				<div className="flex items-center space-x-2">
-					<DataTableFilter table={table} filterKey="name" type="search" placeholder="Filter producers..." className="h-8 w-64" />
+					<DataTableFilter
+						table={table}
+						filterKey="name"
+						type="search"
+						placeholder="Filter producers..."
+						className="h-8 w-64"
+					/>
 					<DataTableFacetedFilter
 						column={table.getColumn('tags')}
 						title="Tags"
 						options={tagsOptions}
 						trigger={
-							<Button variant="secondary" size="icon-lg" className="h-8">
+							<Button
+								variant="secondary"
+								size="icon-lg"
+								className="h-8"
+							>
 								<TagsIcon className="size-3" />
 							</Button>
 						}
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link href={`/inventories/${inventory.id}/producers/add`}>Add Producer</Link>
+						<Link
+							href={`/inventories/${inventory.id}/producers/add`}
+						>
+							Add Producer
+						</Link>
 					</Button>
 				</div>
 			</Header>

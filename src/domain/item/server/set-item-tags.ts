@@ -12,7 +12,10 @@ interface SetItemTagsParams
 	tagIds: Tag['id'][];
 }
 
-export async function setItemTags({ itemId, tagIds }: SetItemTagsParams): Promise<ItemTag[]>
+export async function setItemTags({
+	itemId,
+	tagIds,
+}: SetItemTagsParams): Promise<ItemTag[]>
 {
 	return db.transaction(async (tx) =>
 	{

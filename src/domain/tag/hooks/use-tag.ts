@@ -5,7 +5,10 @@ import { useCallback } from 'react';
 import * as TagServerActions from '@/domain/tag/server';
 import useSWR from 'swr';
 
-type UpdateTagParams = Omit<Parameters<typeof TagServerActions.updateTag>[0], 'id'>;
+type UpdateTagParams = Omit<
+	Parameters<typeof TagServerActions.updateTag>[0],
+	'id'
+>;
 
 export function useTag(tagId: Tag['id'])
 {
@@ -18,7 +21,9 @@ export function useTag(tagId: Tag['id'])
 
 	if (!tag)
 	{
-		throw new Error('Tag not found. This hook must be used within a component wrapped by a <TagLayout> that provides the tag data via SWR fallback.');
+		throw new Error(
+			'Tag not found. This hook must be used within a component wrapped by a <TagLayout> that provides the tag data via SWR fallback.',
+		);
 	}
 
 	const updateTag = useCallback(
@@ -27,7 +32,10 @@ export function useTag(tagId: Tag['id'])
 			await mutate(
 				async () =>
 				{
-					return await TagServerActions.updateTag({ id: tagId, name });
+					return await TagServerActions.updateTag({
+						id: tagId,
+						name,
+					});
 				},
 				{
 					optimisticData: (currentData, displayedData) =>
@@ -36,7 +44,11 @@ export function useTag(tagId: Tag['id'])
 
 						if (!current)
 						{
-							return { id: tagId, name: name ?? '', inventoryId: '' };
+							return {
+								id: tagId,
+								name: name ?? '',
+								inventoryId: '',
+							};
 						}
 
 						return { ...current, name: name ?? current.name };

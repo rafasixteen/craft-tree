@@ -6,8 +6,15 @@ import db from '@/db/client';
 
 type CreateProducerParams = Omit<Producer, 'id'>;
 
-export async function createProducer({ name, time, inventoryId }: CreateProducerParams): Promise<Producer>
+export async function createProducer({
+	name,
+	time,
+	inventoryId,
+}: CreateProducerParams): Promise<Producer>
 {
-	const [producer] = await db.insert(producers).values({ name, time, inventoryId }).returning();
+	const [producer] = await db
+		.insert(producers)
+		.values({ name, time, inventoryId })
+		.returning();
 	return producer;
 }

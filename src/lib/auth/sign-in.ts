@@ -25,10 +25,19 @@ export async function signInWithProvider(provider: Provider)
 	redirect(data.url);
 }
 
-export async function signInWithPassword({ email, password }: { email: string; password: string })
+export async function signInWithPassword({
+	email,
+	password,
+}: {
+	email: string;
+	password: string;
+})
 {
 	const supabase = await createClient();
-	const { error } = await supabase.auth.signInWithPassword({ email, password });
+	const { error } = await supabase.auth.signInWithPassword({
+		email,
+		password,
+	});
 
 	if (error)
 	{

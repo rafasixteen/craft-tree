@@ -40,7 +40,9 @@ export function useItemTags(itemId: Item['id'])
 
 	if (!data)
 	{
-		throw new Error('Item tags not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item tags data via SWR fallback.');
+		throw new Error(
+			'Item tags not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item tags data via SWR fallback.',
+		);
 	}
 
 	return {

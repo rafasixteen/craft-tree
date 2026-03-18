@@ -1,7 +1,12 @@
 'use client';
 
 import { Header } from '@/components/sidebar';
-import { useProducer, useProducerInputs, useProducerOutputs, useProducerTags } from '@/domain/producer';
+import {
+	useProducer,
+	useProducerInputs,
+	useProducerOutputs,
+	useProducerTags,
+} from '@/domain/producer';
 import { useTags } from '@/domain/tag';
 import { useParams } from 'next/navigation';
 
@@ -15,9 +20,13 @@ export default function ProducerPage()
 	const { outputs } = useProducerOutputs(producerId);
 
 	const { tags: producerTags } = useProducerTags(producerId);
-	const { tags: inventoryTags } = useTags({ inventoryId: producer.inventoryId });
+	const { tags: inventoryTags } = useTags({
+		inventoryId: producer.inventoryId,
+	});
 
-	const tags = producerTags.map((tag) => inventoryTags.find((t) => t.id === tag.tagId));
+	const tags = producerTags.map((tag) =>
+		inventoryTags.find((t) => t.id === tag.tagId),
+	);
 
 	return (
 		<>
@@ -25,22 +34,36 @@ export default function ProducerPage()
 			<div className="mx-auto max-w-3xl px-6 py-8">
 				<section className="mb-8">
 					<h2 className="mb-2 text-xl font-semibold">Producer</h2>
-					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">{JSON.stringify(producer, null, 2)}</pre>
+					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+						{JSON.stringify(producer, null, 2)}
+					</pre>
 				</section>
 
 				<section className="mb-8">
-					<h2 className="mb-2 text-xl font-semibold">Producer Inputs</h2>
-					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">{JSON.stringify(inputs, null, 2)}</pre>
+					<h2 className="mb-2 text-xl font-semibold">
+						Producer Inputs
+					</h2>
+					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+						{JSON.stringify(inputs, null, 2)}
+					</pre>
 				</section>
 
 				<section className="mb-8">
-					<h2 className="mb-2 text-xl font-semibold">Producer Outputs</h2>
-					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">{JSON.stringify(outputs, null, 2)}</pre>
+					<h2 className="mb-2 text-xl font-semibold">
+						Producer Outputs
+					</h2>
+					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+						{JSON.stringify(outputs, null, 2)}
+					</pre>
 				</section>
 
 				<section className="mb-8">
-					<h2 className="mb-2 text-xl font-semibold">Producer Tags</h2>
-					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">{JSON.stringify(tags, null, 2)}</pre>
+					<h2 className="mb-2 text-xl font-semibold">
+						Producer Tags
+					</h2>
+					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+						{JSON.stringify(tags, null, 2)}
+					</pre>
 				</section>
 			</div>
 		</>

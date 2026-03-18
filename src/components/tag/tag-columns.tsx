@@ -12,14 +12,19 @@ export type TagColumnData = Tag;
 export const tagColumnns: ColumnDef<TagColumnData>[] = [
 	{
 		accessorKey: 'name',
-		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+		header: ({ column }) => (
+			<DataTableColumnHeader column={column} title="Name" />
+		),
 		cell: ({ row }) =>
 		{
 			const name = row.original.name;
 			const href = `/inventories/${row.original.inventoryId}/tags/${row.original.id}`;
 
 			return (
-				<Link href={href} className="ml-3 truncate font-medium hover:underline">
+				<Link
+					href={href}
+					className="ml-3 truncate font-medium hover:underline"
+				>
 					{name}
 				</Link>
 			);
@@ -27,7 +32,13 @@ export const tagColumnns: ColumnDef<TagColumnData>[] = [
 	},
 	{
 		id: 'actions',
-		header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" className="text-center" />,
+		header: ({ column }) => (
+			<DataTableColumnHeader
+				column={column}
+				title="Actions"
+				className="text-center"
+			/>
+		),
 		cell: ({ row }) => <Actions row={row} />,
 		enableSorting: false,
 		enableHiding: false,
@@ -53,7 +64,11 @@ function Actions({ row }: ActionsProps)
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button variant="destructive" size="icon-sm" onClick={() => deleteTag(id)}>
+			<Button
+				variant="destructive"
+				size="icon-sm"
+				onClick={() => deleteTag(id)}
+			>
 				<TrashIcon className="size-3" />
 			</Button>
 		</div>

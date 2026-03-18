@@ -1,16 +1,23 @@
 import { RecipeTreeState } from '@/domain/recipe-tree';
 
-export function getResolvedQuantity(state: RecipeTreeState, nodeId: string): number
+export function getResolvedQuantity(
+	state: RecipeTreeState,
+	nodeId: string,
+): number
 {
 	const node = state.nodes[nodeId];
 
 	if (!node.parentId)
 	{
-		const selectedProducer = node.producers.find((p) => p.id === node.selectedProducerId);
+		const selectedProducer = node.producers.find(
+			(p) => p.id === node.selectedProducerId,
+		);
 
 		if (!selectedProducer)
 		{
-			throw new Error(`Node with item "${node.item.name}" has no selected producer.`);
+			throw new Error(
+				`Node with item "${node.item.name}" has no selected producer.`,
+			);
 		}
 
 		// Use output quantity from producerOutputs if available
@@ -23,11 +30,15 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: string): num
 	}
 
 	const parent = state.nodes[node.parentId];
-	const parentProducer = parent.producers.find((p) => p.id === parent.selectedProducerId);
+	const parentProducer = parent.producers.find(
+		(p) => p.id === parent.selectedProducerId,
+	);
 
 	if (!parentProducer)
 	{
-		throw new Error(`Parent node with item "${parent.item.name}" has no selected producer.`);
+		throw new Error(
+			`Parent node with item "${parent.item.name}" has no selected producer.`,
+		);
 	}
 
 	// Find the input for this node's item in the parent producer
@@ -43,5 +54,8 @@ export function getResolvedQuantity(state: RecipeTreeState, nodeId: string): num
 	const parentOutput = parentOutputs.find((o) => o.itemId === parent.item.id);
 	const parentOutputQuantity = parentOutput?.quantity ?? 1;
 
-	return (getResolvedQuantity(state, parent.id) / parentOutputQuantity) * input.quantity;
+	return (
+		(getResolvedQuantity(state, parent.id) / parentOutputQuantity) *
+		input.quantity
+	);
 }

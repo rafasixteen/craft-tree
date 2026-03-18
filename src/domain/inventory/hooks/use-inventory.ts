@@ -5,7 +5,10 @@ import { useCallback } from 'react';
 import * as InventoryServerActions from '@/domain/inventory/server';
 import useSWR from 'swr';
 
-type UpdateInventoryParams = Omit<Parameters<typeof InventoryServerActions.updateInventory>[0], 'id'>;
+type UpdateInventoryParams = Omit<
+	Parameters<typeof InventoryServerActions.updateInventory>[0],
+	'id'
+>;
 
 export function useInventory(inventoryId: Inventory['id'])
 {
@@ -29,7 +32,10 @@ export function useInventory(inventoryId: Inventory['id'])
 			await mutate(
 				async () =>
 				{
-					return await InventoryServerActions.updateInventory({ id: inventory.id, name });
+					return await InventoryServerActions.updateInventory({
+						id: inventory.id,
+						name,
+					});
 				},
 				{
 					optimisticData: (current) => ({

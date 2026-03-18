@@ -12,12 +12,16 @@ export async function createClient()
 
 	if (!supabaseUrl)
 	{
-		throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+		throw new Error(
+			'Missing NEXT_PUBLIC_SUPABASE_URL environment variable',
+		);
 	}
 
 	if (!supabaseKey)
 	{
-		throw new Error('Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable');
+		throw new Error(
+			'Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable',
+		);
 	}
 
 	return createServerClient(supabaseUrl, supabaseKey, {
@@ -30,7 +34,9 @@ export async function createClient()
 			{
 				try
 				{
-					cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+					cookiesToSet.forEach(({ name, value, options }) =>
+						cookieStore.set(name, value, options),
+					);
 				}
 				catch
 				{

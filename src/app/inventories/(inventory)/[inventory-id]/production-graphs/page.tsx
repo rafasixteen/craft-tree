@@ -1,7 +1,12 @@
 'use client';
 
 import { Header } from '@/components/sidebar';
-import { useDataTable, DataTableFilter, DataTable, DataTablePagination } from '@/components/data-table';
+import {
+	useDataTable,
+	DataTableFilter,
+	DataTable,
+	DataTablePagination,
+} from '@/components/data-table';
 import { useCurrentInventory } from '@/components/inventory';
 import { productionGraphColumnns } from '@/components/production-graph';
 import { Button } from '@/components/ui/button';
@@ -13,7 +18,9 @@ export default function ProductionGraphsPage()
 {
 	const inventory = useCurrentInventory();
 
-	const { productionGraphs } = useProductionGraphs({ inventoryId: inventory.id });
+	const { productionGraphs } = useProductionGraphs({
+		inventoryId: inventory.id,
+	});
 
 	const table = useDataTable({
 		columns: productionGraphColumnns,
@@ -24,9 +31,19 @@ export default function ProductionGraphsPage()
 		<>
 			<Header>
 				<div className="flex items-center space-x-2">
-					<DataTableFilter table={table} filterKey="name" type="search" placeholder="Filter production graphs..." className="h-8 w-64" />
+					<DataTableFilter
+						table={table}
+						filterKey="name"
+						type="search"
+						placeholder="Filter production graphs..."
+						className="h-8 w-64"
+					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link href={`/inventories/${inventory.id}/production-graphs/add`}>Add Production Graph</Link>
+						<Link
+							href={`/inventories/${inventory.id}/production-graphs/add`}
+						>
+							Add Production Graph
+						</Link>
 					</Button>
 				</div>
 			</Header>

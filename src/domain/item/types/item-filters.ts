@@ -6,7 +6,11 @@ export interface ItemFilters
 	tagIds?: Tag['id'][];
 }
 
-export type ItemSort = 'name_asc' | 'name_desc' | 'created_at_asc' | 'created_at_desc';
+export type ItemSort =
+	| 'name_asc'
+	| 'name_desc'
+	| 'created_at_asc'
+	| 'created_at_desc';
 
 export interface ItemQueryOptions
 {

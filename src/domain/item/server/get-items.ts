@@ -12,7 +12,10 @@ interface GetItemsParams
 	options?: ItemQueryOptions;
 }
 
-export async function getItems({ inventoryId, options }: GetItemsParams): Promise<Item[]>
+export async function getItems({
+	inventoryId,
+	options,
+}: GetItemsParams): Promise<Item[]>
 {
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';
@@ -31,7 +34,12 @@ export async function getItems({ inventoryId, options }: GetItemsParams): Promis
 				db
 					.select()
 					.from(itemTags)
-					.where(and(eq(itemTags.itemId, items.id), inArray(itemTags.tagId, filters.tagIds))),
+					.where(
+						and(
+							eq(itemTags.itemId, items.id),
+							inArray(itemTags.tagId, filters.tagIds),
+						),
+					),
 			),
 		);
 	}

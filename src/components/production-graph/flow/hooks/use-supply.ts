@@ -8,7 +8,10 @@ interface UseSupplyParams
 	sourceHandleId?: string | null;
 }
 
-export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): ItemRate | null
+export function useSupply({
+	sourceNodeId,
+	sourceHandleId,
+}: UseSupplyParams): ItemRate | null
 {
 	const node = useNodesData<ProductionGraphNode>(sourceNodeId ?? '');
 
@@ -42,7 +45,9 @@ export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): It
 		}
 
 		// The sourceHandleId corresponds to the itemId.
-		return outputRates.find((rate) => rate.itemId === sourceHandleId) ?? null;
+		return (
+			outputRates.find((rate) => rate.itemId === sourceHandleId) ?? null
+		);
 	}
 
 	if (node.type === 'split')

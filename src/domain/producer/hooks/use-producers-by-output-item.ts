@@ -7,7 +7,8 @@ import { Item } from '@/domain/item';
 export function useProducersByOutputItem(itemId?: Item['id'] | null)
 {
 	const key = itemId ? ['producers-by-output-item', itemId] : null;
-	const fetcher = () => (itemId ? getProducersByOutputItem({ itemId }) : Promise.resolve([]));
+	const fetcher = () =>
+		itemId ? getProducersByOutputItem({ itemId }) : Promise.resolve([]);
 
 	const { data } = useSWR<Producer[]>(key, fetcher, {
 		revalidateOnMount: true,

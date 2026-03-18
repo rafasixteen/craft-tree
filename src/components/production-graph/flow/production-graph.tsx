@@ -2,13 +2,40 @@
 
 import '@xyflow/react/dist/style.css';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { ReactFlow, addEdge, applyNodeChanges, applyEdgeChanges, Controls, Background, useReactFlow, Panel, getOutgoers, useKeyPress } from '@xyflow/react';
-import type { ReactFlowInstance, Connection, NodeChange, EdgeChange, Viewport } from '@xyflow/react';
+import {
+	ReactFlow,
+	addEdge,
+	applyNodeChanges,
+	applyEdgeChanges,
+	Controls,
+	Background,
+	useReactFlow,
+	Panel,
+	getOutgoers,
+	useKeyPress,
+} from '@xyflow/react';
+import type {
+	ReactFlowInstance,
+	Connection,
+	NodeChange,
+	EdgeChange,
+	Viewport,
+} from '@xyflow/react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
-import { PaneContextMenu, NodeContextMenu } from '@/components/production-graph/flow/context-menus';
-import { ProductionGraphNode, ProductionGraphEdge } from '@/components/production-graph/flow/types';
-import { graphConfig, layoutProductionGraph, DevTools } from '@/components/production-graph';
+import {
+	PaneContextMenu,
+	NodeContextMenu,
+} from '@/components/production-graph/flow/context-menus';
+import {
+	ProductionGraphNode,
+	ProductionGraphEdge,
+} from '@/components/production-graph/flow/types';
+import {
+	graphConfig,
+	layoutProductionGraph,
+	DevTools,
+} from '@/components/production-graph';
 import { useProductionGraph } from '@/domain/production-graph';
 import { useParams } from 'next/navigation';
 
@@ -35,7 +62,12 @@ interface ProductionGraphProps
 	initialTheme: 'light' | 'dark';
 }
 
-export function ProductionGraph({ initialNodes, initialEdges, initialViewport, initialTheme }: ProductionGraphProps)
+export function ProductionGraph({
+	initialNodes,
+	initialEdges,
+	initialViewport,
+	initialTheme,
+}: ProductionGraphProps)
 {
 	const { resolvedTheme } = useTheme();
 
@@ -43,12 +75,20 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 	const [nodes, setNodes] = useState<ProductionGraphNode[]>(initialNodes);
 	const [edges, setEdges] = useState<ProductionGraphEdge[]>(initialEdges);
-	const [viewport, setViewport] = useState<Viewport>(initialViewport || { x: 0, y: 0, zoom: 1 });
+	const [viewport, setViewport] = useState<Viewport>(
+		initialViewport || { x: 0, y: 0, zoom: 1 },
+	);
 
 	const [isDirty, setIsDirty] = useState<boolean>(false);
 
-	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<ProductionGraphNode, ProductionGraphEdge> | null>(null);
-	const { getNodes, getEdges } = useReactFlow<ProductionGraphNode, ProductionGraphEdge>();
+	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<
+		ProductionGraphNode,
+		ProductionGraphEdge
+	> | null>(null);
+	const { getNodes, getEdges } = useReactFlow<
+		ProductionGraphNode,
+		ProductionGraphEdge
+	>();
 
 	const params = useParams();
 	const graphId = params['production-graph-id'] as string;
@@ -109,12 +149,15 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 			const MENU_WIDTH = 200;
 			const MENU_HEIGHT = 150;
 
-			const horizontal = clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
-			const vertical = clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
+			const horizontal =
+				clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
+			const vertical =
+				clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
 
 			const menu: PaneMenu = {
 				top: vertical === 'top' ? clickY : undefined,
-				bottom: vertical === 'bottom' ? pane.height - clickY : undefined,
+				bottom:
+					vertical === 'bottom' ? pane.height - clickY : undefined,
 				left: horizontal === 'left' ? clickX : undefined,
 				right: horizontal === 'right' ? pane.width - clickX : undefined,
 			};
@@ -126,7 +169,10 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 	);
 
 	const onNodeContextMenu = useCallback(
-		function onNodeContextMenu(event: React.MouseEvent, node: ProductionGraphNode)
+		function onNodeContextMenu(
+			event: React.MouseEvent,
+			node: ProductionGraphNode,
+		)
 		{
 			// Prevent native context menu from showing.
 			event.preventDefault();
@@ -147,13 +193,16 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 			const MENU_WIDTH = 200;
 			const MENU_HEIGHT = 150;
 
-			const horizontal = clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
-			const vertical = clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
+			const horizontal =
+				clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
+			const vertical =
+				clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
 
 			const menu: NodeMenu = {
 				id: node.id,
 				top: vertical === 'top' ? clickY : undefined,
-				bottom: vertical === 'bottom' ? pane.height - clickY : undefined,
+				bottom:
+					vertical === 'bottom' ? pane.height - clickY : undefined,
 				left: horizontal === 'left' ? clickX : undefined,
 				right: horizontal === 'right' ? pane.width - clickX : undefined,
 			};
@@ -185,14 +234,19 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 		[rfInstance],
 	);
 
-	const isValidConnection = useCallback(function isValidConnection(connection: ProductionGraphEdge | Connection): boolean
+	const isValidConnection = useCallback(function isValidConnection(
+		connection: ProductionGraphEdge | Connection,
+	): boolean
 	{
 		const nodes = getNodes();
 		const edges = getEdges();
 
 		const target = nodes.find((node) => node.id === connection.target);
 
-		function hasCycle(node: ProductionGraphNode, visited = new Set()): boolean
+		function hasCycle(
+			node: ProductionGraphNode,
+			visited = new Set(),
+		): boolean
 		{
 			if (visited.has(node.id))
 			{
@@ -227,7 +281,8 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 
 	const layoutGraph = useCallback(async function layoutGraph()
 	{
-		const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutProductionGraph(getNodes(), getEdges());
+		const { nodes: layoutedNodes, edges: layoutedEdges } =
+			await layoutProductionGraph(getNodes(), getEdges());
 
 		setNodes(layoutedNodes);
 		setEdges(layoutedEdges);
@@ -266,8 +321,11 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 		const newEdges = edges
 			.filter(
 				(edge) =>
-					selectedEdges.some((selectedEdge) => selectedEdge.id === edge.id) ||
-					(selectedNodes.some((node) => node.id === edge.source) && selectedNodes.some((node) => node.id === edge.target)),
+					selectedEdges.some(
+						(selectedEdge) => selectedEdge.id === edge.id,
+					) ||
+					(selectedNodes.some((node) => node.id === edge.source) &&
+						selectedNodes.some((node) => node.id === edge.target)),
 			)
 			.map((edge) =>
 			{
@@ -338,8 +396,12 @@ export function ProductionGraph({ initialNodes, initialEdges, initialViewport, i
 				onPaneClick={onPaneClick}
 				colorMode={theme === 'dark' ? 'dark' : 'light'}
 			>
-				{paneMenu && <PaneContextMenu {...paneMenu} onClick={onPaneClick} />}
-				{nodeMenu && <NodeContextMenu {...nodeMenu} onClick={onPaneClick} />}
+				{paneMenu && (
+					<PaneContextMenu {...paneMenu} onClick={onPaneClick} />
+				)}
+				{nodeMenu && (
+					<NodeContextMenu {...nodeMenu} onClick={onPaneClick} />
+				)}
 				<Controls />
 				<Background gap={20} size={1} />
 				<Panel position="top-right">

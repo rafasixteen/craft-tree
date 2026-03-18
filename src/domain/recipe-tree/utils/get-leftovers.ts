@@ -1,9 +1,18 @@
-import { BillOfMaterials, dfs, getResolvedQuantity, RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
+import {
+	BillOfMaterials,
+	dfs,
+	getResolvedQuantity,
+	RecipeTreeNode,
+	RecipeTreeState,
+} from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
 
 export function getLeftovers(state: RecipeTreeState): BillOfMaterials
 {
-	const quantityNeededMap = new Map<Item['id'], { item: Item; needed: number; outputQuantity: number }>();
+	const quantityNeededMap = new Map<
+		Item['id'],
+		{ item: Item; needed: number; outputQuantity: number }
+	>();
 
 	function getSelectedProducerChildren(node: RecipeTreeNode): string[]
 	{
@@ -22,7 +31,9 @@ export function getLeftovers(state: RecipeTreeState): BillOfMaterials
 			return;
 		}
 
-		const selectedProducer = node.producers.find((p) => p.id === node.selectedProducerId);
+		const selectedProducer = node.producers.find(
+			(p) => p.id === node.selectedProducerId,
+		);
 
 		if (!selectedProducer)
 		{

@@ -26,7 +26,10 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 
 		function callback(node: RecipeTreeNode): void
 		{
-			const type: RecipeTreeNodeType = node.producers.length > 0 ? 'processed-material' : 'raw-material';
+			const type: RecipeTreeNodeType =
+				node.producers.length > 0
+					? 'processed-material'
+					: 'raw-material';
 
 			nodes.push(
 				buildNode({
@@ -37,7 +40,9 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 
 			if (node.parentId)
 			{
-				edges.push(buildEdge({ parentId: node.parentId, childId: node.id }));
+				edges.push(
+					buildEdge({ parentId: node.parentId, childId: node.id }),
+				);
 			}
 		}
 
@@ -51,7 +56,12 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 			return node.children[node.selectedProducerId] || [];
 		}
 
-		dfs(recipeTree.rootNodeId, callback, getSelectedProducerChildren, 'pre');
+		dfs(
+			recipeTree.rootNodeId,
+			callback,
+			getSelectedProducerChildren,
+			'pre',
+		);
 
 		setNodes(nodes);
 		setEdges(edges);

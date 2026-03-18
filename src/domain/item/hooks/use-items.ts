@@ -7,7 +7,10 @@ import useSWR from 'swr';
 
 type UseItemsParams = Parameters<typeof ItemServerActions.getItems>[0];
 
-type CreateItemParams = Omit<Parameters<typeof ItemServerActions.createItem>[0], 'inventoryId'>;
+type CreateItemParams = Omit<
+	Parameters<typeof ItemServerActions.createItem>[0],
+	'inventoryId'
+>;
 
 type UpdateItemParams = Parameters<typeof ItemServerActions.updateItem>[0];
 
@@ -15,7 +18,9 @@ type DeleteItemParams = Parameters<typeof ItemServerActions.deleteItem>[0];
 
 export function useItems({ inventoryId, options }: UseItemsParams)
 {
-	const swrKey = options ? ['inventory-items', inventoryId, options] : ['inventory-items', inventoryId];
+	const swrKey = options
+		? ['inventory-items', inventoryId, options]
+		: ['inventory-items', inventoryId];
 	const fetcher = () => ItemServerActions.getItems({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
@@ -34,11 +39,17 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 			await mutate(
 				async (current = []) =>
 				{
-					const created = await ItemServerActions.createItem({ name, inventoryId });
+					const created = await ItemServerActions.createItem({
+						name,
+						inventoryId,
+					});
 					return [...current, created];
 				},
 				{
-					optimisticData: (current: Item[] = []) => [...current, optimistic],
+					optimisticData: (current: Item[] = []) => [
+						...current,
+						optimistic,
+					],
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -53,8 +64,13 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await ItemServerActions.updateItem({ id, name });
-					return current.map((item) => (item.id === id ? { ...item, ...updated } : item));
+					const updated = await ItemServerActions.updateItem({
+						id,
+						name,
+					});
+					return current.map((item) =>
+						item.id === id ? { ...item, ...updated } : item,
+					);
 				},
 				{
 					optimisticData: (current: Item[] = []) =>
@@ -84,7 +100,8 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 					return current.filter((item) => item.id !== id);
 				},
 				{
-					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== id),
+					optimisticData: (current: Item[] = []) =>
+						current.filter((item) => item.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},

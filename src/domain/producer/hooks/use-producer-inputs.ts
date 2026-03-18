@@ -1,10 +1,17 @@
 'use client';
 
-import { getProducerInputs, Producer, setProducerInputs } from '@/domain/producer';
+import {
+	getProducerInputs,
+	Producer,
+	setProducerInputs,
+} from '@/domain/producer';
 import { useCallback } from 'react';
 import useSWR from 'swr';
 
-type SetInputsParams = Omit<Parameters<typeof setProducerInputs>[0], 'producerId'>;
+type SetInputsParams = Omit<
+	Parameters<typeof setProducerInputs>[0],
+	'producerId'
+>;
 
 export function useProducerInputs(producerId: Producer['id'])
 {

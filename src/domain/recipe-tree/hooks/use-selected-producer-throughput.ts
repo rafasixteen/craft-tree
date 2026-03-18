@@ -21,7 +21,9 @@ export function useSelectedProducerThroughput(nodeId: string): ProductionRate
 			return { amount: 0, per: 'second' };
 		}
 
-		const selectedProducer = node.producers.find((p) => p.id === node.selectedProducerId);
+		const selectedProducer = node.producers.find(
+			(p) => p.id === node.selectedProducerId,
+		);
 
 		if (!selectedProducer)
 		{

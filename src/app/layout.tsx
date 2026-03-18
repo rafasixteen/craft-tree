@@ -27,8 +27,19 @@ export default async function RootLayout({ children }: LayoutProps<'/'>)
 {
 	return (
 		<html lang="en" className={inter.variable} suppressHydrationWarning>
-			<body className={cn(geistSans.variable, geistMono.variable, 'flex h-screen')}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+			<body
+				className={cn(
+					geistSans.variable,
+					geistMono.variable,
+					'flex h-screen',
+				)}
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
 					<TooltipProvider>{children}</TooltipProvider>
 					<Toaster />
 				</ThemeProvider>

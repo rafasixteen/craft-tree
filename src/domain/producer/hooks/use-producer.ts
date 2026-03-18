@@ -5,7 +5,10 @@ import { useCallback } from 'react';
 import * as ProducerServerActions from '@/domain/producer/server';
 import useSWR from 'swr';
 
-type UpdateProducerParams = Omit<Parameters<typeof ProducerServerActions.updateProducer>[0], 'id'>;
+type UpdateProducerParams = Omit<
+	Parameters<typeof ProducerServerActions.updateProducer>[0],
+	'id'
+>;
 
 export function useProducer(producerId: Producer['id'])
 {
@@ -18,7 +21,9 @@ export function useProducer(producerId: Producer['id'])
 
 	if (!producer)
 	{
-		throw new Error('Producer not found. This hook must be used within a component wrapped by a <ProducerLayout> that provides the producer data via SWR fallback.');
+		throw new Error(
+			'Producer not found. This hook must be used within a component wrapped by a <ProducerLayout> that provides the producer data via SWR fallback.',
+		);
 	}
 
 	const updateProducer = useCallback(
@@ -27,7 +32,11 @@ export function useProducer(producerId: Producer['id'])
 			await mutate(
 				async () =>
 				{
-					return await ProducerServerActions.updateProducer({ id: producerId, name, time });
+					return await ProducerServerActions.updateProducer({
+						id: producerId,
+						name,
+						time,
+					});
 				},
 				{
 					optimisticData: (currentData, displayedData) =>
@@ -36,10 +45,19 @@ export function useProducer(producerId: Producer['id'])
 
 						if (!current)
 						{
-							return { id: producerId, name: name ?? '', time: time ?? 0, inventoryId: '' };
+							return {
+								id: producerId,
+								name: name ?? '',
+								time: time ?? 0,
+								inventoryId: '',
+							};
 						}
 
-						return { ...current, name: name ?? current.name, time: time ?? current.time };
+						return {
+							...current,
+							name: name ?? current.name,
+							time: time ?? current.time,
+						};
 					},
 					rollbackOnError: true,
 					revalidate: true,

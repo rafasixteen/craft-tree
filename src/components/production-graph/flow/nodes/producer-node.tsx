@@ -1,22 +1,52 @@
 'use client';
 
-import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/flow/types';
+import {
+	ProducerGraphNode,
+	ProducerNodeData,
+} from '@/components/production-graph/flow/types';
 import { useProducerInputs } from '@/components/production-graph/flow/hooks';
-import { Edge, useReactFlow, Node, Position, useUpdateNodeInternals, NodeProps } from '@xyflow/react';
+import {
+	Edge,
+	useReactFlow,
+	Node,
+	Position,
+	useUpdateNodeInternals,
+	NodeProps,
+} from '@xyflow/react';
 import { useCurrentInventory } from '@/components/inventory';
 import { Item, useItems } from '@/domain/item';
 import { LabeledHandle } from '@/components/labeled-handle';
-import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
-import { convertProductionRate, ProductionRate, TimeUnit } from '@/domain/production-graph';
+import {
+	BaseNode,
+	BaseNodeContent,
+	BaseNodeFooter,
+	BaseNodeHeader,
+} from '@/components/base-node';
+import {
+	convertProductionRate,
+	ProductionRate,
+	TimeUnit,
+} from '@/domain/production-graph';
 import { Input } from '@/components/ui/input';
 import { memo, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { ItemCombobox } from '@/components/item';
 import { cn, formatNumber } from '@/lib/utils';
-import { getProducersByOutputItem, Producer, useProducersByOutputItem, useProducerInputsV2, useProducerOutputsV2, useProducerV2 } from '@/domain/producer';
+import {
+	getProducersByOutputItem,
+	Producer,
+	useProducersByOutputItem,
+	useProducerInputsV2,
+	useProducerOutputsV2,
+	useProducerV2,
+} from '@/domain/producer';
 
-export const ProducerNode = memo(function ProducerNode({ id, data, selected }: NodeProps<ProducerGraphNode>)
+export const ProducerNode = memo(function ProducerNode({
+	id,
+	data,
+	selected,
+}: NodeProps<ProducerGraphNode>)
 {
 	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -45,26 +75,28 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 			}
 			else
 			{
-				getProducersByOutputItem({ itemId: itemId }).then((producers) =>
-				{
-					if (producers.length === 0)
+				getProducersByOutputItem({ itemId: itemId }).then(
+					(producers) =>
 					{
-						updateNodeData(id, {
-							itemId: itemId,
-							producerId: null,
-						});
-					}
-					else
-					{
-						const index = 0;
-						const producerId = producers[index].id;
+						if (producers.length === 0)
+						{
+							updateNodeData(id, {
+								itemId: itemId,
+								producerId: null,
+							});
+						}
+						else
+						{
+							const index = 0;
+							const producerId = producers[index].id;
 
-						updateNodeData(id, {
-							itemId: itemId,
-							producerId: producerId,
-						});
-					}
-				});
+							updateNodeData(id, {
+								itemId: itemId,
+								producerId: producerId,
+							});
+						}
+					},
+				);
 			}
 		},
 		[id, updateNodeData],
@@ -141,7 +173,10 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 		// ----------------------------
 		// 3️⃣ Final production rate
 		// ----------------------------
-		const actualCycles = Math.min(supplyLimitedCycles, machineLimitedCycles);
+		const actualCycles = Math.min(
+			supplyLimitedCycles,
+			machineLimitedCycles,
+		);
 
 		if (actualCycles <= 0 || actualCycles === Infinity)
 		{
@@ -169,14 +204,34 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 	}, [inputs, outputs, id]);
 
 	return (
-		<BaseNode className={cn('flex flex-col p-0', selected && 'ring-2 ring-primary')}>
+		<BaseNode
+			className={cn(
+				'flex flex-col p-0',
+				selected && 'ring-2 ring-primary',
+			)}
+		>
 			<BaseNodeHeader className="flex flex-col border-b p-3">
 				<div className="flex w-full items-start justify-between gap-2">
-					<ItemCombobox items={items} value={itemId ?? null} onChange={onItemComboboxChange} className="nodrag w-[70%]" />
-					<Input type="number" min={1} value={producerCount} onChange={(e) => onProducerCountChange(Number(e.target.value))} className="nodrag w-[30%]" />
+					<ItemCombobox
+						items={items}
+						value={itemId ?? null}
+						onChange={onItemComboboxChange}
+						className="nodrag w-[70%]"
+					/>
+					<Input
+						type="number"
+						min={1}
+						value={producerCount}
+						onChange={(e) =>
+							onProducerCountChange(Number(e.target.value))
+						}
+						className="nodrag w-[30%]"
+					/>
 				</div>
 				<div className="flex w-full min-w-0 flex-row items-center justify-between gap-2">
-					<p className="truncate px-1 text-xs text-muted-foreground">{producer ? producer.name : 'Select a producer'}</p>
+					<p className="truncate px-1 text-xs text-muted-foreground">
+						{producer ? producer.name : 'Select a producer'}
+					</p>
 				</div>
 			</BaseNodeHeader>
 			{producer && inputs && outputs && (
@@ -186,11 +241,22 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 						{inputs?.map((input, index) =>
 						{
 							const inputRate = {
-								amount: (input.quantity / producer.time) * producerCount,
+								amount:
+									(input.quantity / producer.time) *
+									producerCount,
 								per: 'second',
 							};
 							const title = `${getItemName(input.itemId)}: ${formatNumber(inputRate.amount, 3)}/${inputRate.per.charAt(0)}`;
-							return <LabeledHandle key={index} id={input.itemId} type="target" position={Position.Left} title={title} labelClassName="text-xs" />;
+							return (
+								<LabeledHandle
+									key={index}
+									id={input.itemId}
+									type="target"
+									position={Position.Left}
+									title={title}
+									labelClassName="text-xs"
+								/>
+							);
 						})}
 					</div>
 
@@ -198,20 +264,35 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 					<div className="flex flex-col justify-center gap-3">
 						{outputs?.map((output, index) =>
 						{
-							const outputRate = outputRates?.find((r) => r.itemId === output.itemId);
+							const outputRate = outputRates?.find(
+								(r) => r.itemId === output.itemId,
+							);
 
 							const title = outputRate
 								? `${getItemName(output.itemId)}: ${formatNumber(outputRate.amount, 3)}/${outputRate.per.charAt(0)}`
 								: `${getItemName(output.itemId)}: ${0}/${'s'}`;
 
-							return <LabeledHandle key={index} id={output.itemId} type="source" position={Position.Right} title={title} labelClassName="text-xs" />;
+							return (
+								<LabeledHandle
+									key={index}
+									id={output.itemId}
+									type="source"
+									position={Position.Right}
+									title={title}
+									labelClassName="text-xs"
+								/>
+							);
 						})}
 					</div>
 				</BaseNodeContent>
 			)}
 			{itemId && (
 				<BaseNodeFooter className="m-0 flex-col border-t p-1">
-					<ProducerCarousel nodeId={id} itemId={itemId} producerId={producerId}></ProducerCarousel>
+					<ProducerCarousel
+						nodeId={id}
+						itemId={itemId}
+						producerId={producerId}
+					></ProducerCarousel>
 				</BaseNodeFooter>
 			)}
 		</BaseNode>
@@ -225,19 +306,26 @@ interface ProducerCarouselProps
 	producerId: Producer['id'] | null;
 }
 
-function ProducerCarousel({ nodeId, itemId, producerId }: ProducerCarouselProps)
+function ProducerCarousel({
+	nodeId,
+	itemId,
+	producerId,
+}: ProducerCarouselProps)
 {
 	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
 
 	const { producers } = useProducersByOutputItem(itemId);
 
-	const selectedProducerIndex = producerId ? producers.findIndex((p) => p.id === producerId) : 0;
+	const selectedProducerIndex = producerId
+		? producers.findIndex((p) => p.id === producerId)
+		: 0;
 
 	const changeRecipe = useCallback(
 		function changeRecipe(delta: number)
 		{
 			const length = producers.length;
-			const newIndex = (((selectedProducerIndex + delta) % length) + length) % length;
+			const newIndex =
+				(((selectedProducerIndex + delta) % length) + length) % length;
 
 			const producer = producers[newIndex];
 
@@ -269,13 +357,23 @@ function ProducerCarousel({ nodeId, itemId, producerId }: ProducerCarouselProps)
 
 	return (
 		<div className="flex w-full items-center justify-between">
-			<Button variant="ghost" onClick={previousRecipe} size="icon" className="nopan nodrag">
+			<Button
+				variant="ghost"
+				onClick={previousRecipe}
+				size="icon"
+				className="nopan nodrag"
+			>
 				<ArrowLeftIcon />
 			</Button>
 			<span className="text-xs text-muted-foreground">
 				{selectedProducerIndex + 1} / {producers.length}
 			</span>
-			<Button variant="ghost" onClick={nextRecipe} size="icon" className="nopan nodrag">
+			<Button
+				variant="ghost"
+				onClick={nextRecipe}
+				size="icon"
+				className="nopan nodrag"
+			>
 				<ArrowRightIcon />
 			</Button>
 		</div>

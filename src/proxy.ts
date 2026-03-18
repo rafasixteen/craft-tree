@@ -7,7 +7,10 @@ export async function proxy(request: NextRequest)
 
 	if (pathname === '/settings')
 	{
-		return NextResponse.redirect(new URL('/settings/general', request.url), 307);
+		return NextResponse.redirect(
+			new URL('/settings/general', request.url),
+			307,
+		);
 	}
 
 	return await updateSession(request);

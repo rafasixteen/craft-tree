@@ -33,20 +33,32 @@ export default async function Home()
 						<h1 className="animate-fade-in bg-linear-to-r from-primary via-primary/80 to-secondary bg-clip-text text-3xl font-bold text-transparent sm:text-5xl md:text-6xl lg:text-7xl">
 							Craft Your Tree
 						</h1>
-						<p className="animate-fade-in text-base text-foreground/80 sm:text-lg md:text-xl lg:text-2xl" style={{ animationDelay: '0.2s' }}>
-							Visualize crafting dependencies and material requirements
+						<p
+							className="animate-fade-in text-base text-foreground/80 sm:text-lg md:text-xl lg:text-2xl"
+							style={{ animationDelay: '0.2s' }}
+						>
+							Visualize crafting dependencies and material
+							requirements
 						</p>
 					</div>
 
 					{/* Description */}
 					<div className="space-y-3 pt-2">
-						<p className="animate-fade-in mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base md:text-lg" style={{ animationDelay: '0.4s' }}>
-							See everything you need to craft your item. Track materials, view dependencies, and plan your crafting.
+						<p
+							className="animate-fade-in mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base md:text-lg"
+							style={{ animationDelay: '0.4s' }}
+						>
+							See everything you need to craft your item. Track
+							materials, view dependencies, and plan your
+							crafting.
 						</p>
 					</div>
 
 					{/* Call-to-action buttons */}
-					<div className="animate-fade-in flex flex-wrap justify-center gap-3 pt-8 sm:gap-4" style={{ animationDelay: '0.6s' }}>
+					<div
+						className="animate-fade-in flex flex-wrap justify-center gap-3 pt-8 sm:gap-4"
+						style={{ animationDelay: '0.6s' }}
+					>
 						{user ? (
 							<Button size="lg" className="text-sm sm:text-base">
 								<Link href="/inventories">Inventories</Link>
@@ -59,21 +71,36 @@ export default async function Home()
 					</div>
 
 					{/* Feature highlights */}
-					<div className="animate-fade-in grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 sm:gap-6 sm:pt-12 lg:grid-cols-3" style={{ animationDelay: '0.8s' }}>
+					<div
+						className="animate-fade-in grid grid-cols-1 gap-4 pt-8 sm:grid-cols-2 sm:gap-6 sm:pt-12 lg:grid-cols-3"
+						style={{ animationDelay: '0.8s' }}
+					>
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:p-6">
 							<div className="mb-2 text-2xl sm:text-3xl">🌳</div>
-							<h3 className="mb-2 text-sm font-semibold sm:text-base">Dependency Trees</h3>
-							<p className="text-xs text-muted-foreground sm:text-sm">Visualize all materials in a tree structure</p>
+							<h3 className="mb-2 text-sm font-semibold sm:text-base">
+								Dependency Trees
+							</h3>
+							<p className="text-xs text-muted-foreground sm:text-sm">
+								Visualize all materials in a tree structure
+							</p>
 						</div>
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:p-6">
 							<div className="mb-2 text-2xl sm:text-3xl">📦</div>
-							<h3 className="mb-2 text-sm font-semibold sm:text-base">Material Overview</h3>
-							<p className="text-xs text-muted-foreground sm:text-sm">List of all required materials and quantities</p>
+							<h3 className="mb-2 text-sm font-semibold sm:text-base">
+								Material Overview
+							</h3>
+							<p className="text-xs text-muted-foreground sm:text-sm">
+								List of all required materials and quantities
+							</p>
 						</div>
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:col-span-2 sm:p-6 lg:col-span-1">
 							<div className="mb-2 text-2xl sm:text-3xl">🎮</div>
-							<h3 className="mb-2 text-sm font-semibold sm:text-base">Multi-Game Support</h3>
-							<p className="text-xs text-muted-foreground sm:text-sm">Separate inventories for each game</p>
+							<h3 className="mb-2 text-sm font-semibold sm:text-base">
+								Multi-Game Support
+							</h3>
+							<p className="text-xs text-muted-foreground sm:text-sm">
+								Separate inventories for each game
+							</p>
 						</div>
 					</div>
 				</div>

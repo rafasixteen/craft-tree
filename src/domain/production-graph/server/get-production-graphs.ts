@@ -11,7 +11,12 @@ interface GetProductionGraphsParams
 	inventoryId: Inventory['id'];
 }
 
-export async function getProductionGraphs({ inventoryId }: GetProductionGraphsParams): Promise<ProductionGraph[]>
+export async function getProductionGraphs({
+	inventoryId,
+}: GetProductionGraphsParams): Promise<ProductionGraph[]>
 {
-	return await db.select().from(productionGraphs).where(eq(productionGraphs.inventoryId, inventoryId));
+	return await db
+		.select()
+		.from(productionGraphs)
+		.where(eq(productionGraphs.inventoryId, inventoryId));
 }

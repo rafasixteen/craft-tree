@@ -6,11 +6,18 @@ import { useCallback } from 'react';
 import * as InventoryServerActions from '@/domain/inventory/server';
 import useSWR from 'swr';
 
-type CreateInventoryParams = Omit<Parameters<typeof InventoryServerActions.createInventory>[0], 'userId'>;
+type CreateInventoryParams = Omit<
+	Parameters<typeof InventoryServerActions.createInventory>[0],
+	'userId'
+>;
 
-type UpdateInventoryParams = Parameters<typeof InventoryServerActions.updateInventory>[0];
+type UpdateInventoryParams = Parameters<
+	typeof InventoryServerActions.updateInventory
+>[0];
 
-type DeleteInventoryParams = Parameters<typeof InventoryServerActions.deleteInventory>[0];
+type DeleteInventoryParams = Parameters<
+	typeof InventoryServerActions.deleteInventory
+>[0];
 
 export function useInventories()
 {
@@ -18,7 +25,8 @@ export function useInventories()
 	const userId = user?.id;
 
 	const swrKey = userId ? ['inventories', userId] : null;
-	const fetcher = () => (userId ? getInventoriesByUserId(userId) : Promise.resolve([]));
+	const fetcher = () =>
+		userId ? getInventoriesByUserId(userId) : Promise.resolve([]);
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,
@@ -41,11 +49,18 @@ export function useInventories()
 			await mutate(
 				async (current = []) =>
 				{
-					const created = await InventoryServerActions.createInventory({ name, userId });
+					const created =
+						await InventoryServerActions.createInventory({
+							name,
+							userId,
+						});
 					return [...current, created];
 				},
 				{
-					optimisticData: (current: Inventory[] = []) => [...current, optimistic],
+					optimisticData: (current: Inventory[] = []) => [
+						...current,
+						optimistic,
+					],
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -65,15 +80,21 @@ export function useInventories()
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await InventoryServerActions.updateInventory({
-						id: id,
-						name: name,
-					});
+					const updated =
+						await InventoryServerActions.updateInventory({
+							id: id,
+							name: name,
+						});
 
-					return current.map((inventory) => (inventory.id === id ? updated : inventory));
+					return current.map((inventory) =>
+						inventory.id === id ? updated : inventory,
+					);
 				},
 				{
-					optimisticData: (current: Inventory[] = []) => current.map((inv) => (inv.id === id ? { ...inv, name } : inv)),
+					optimisticData: (current: Inventory[] = []) =>
+						current.map((inv) =>
+							inv.id === id ? { ...inv, name } : inv,
+						),
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -92,7 +113,8 @@ export function useInventories()
 					return current.filter((inv) => inv.id !== id);
 				},
 				{
-					optimisticData: (current: Inventory[] = []) => current.filter((inv) => inv.id !== id),
+					optimisticData: (current: Inventory[] = []) =>
+						current.filter((inv) => inv.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},

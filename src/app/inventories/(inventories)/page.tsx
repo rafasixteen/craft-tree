@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { useInventories } from '@/domain/inventory';
-import { ImportInventoryButton, inventoryColumnns } from '@/components/inventory';
+import {
+	ImportInventoryButton,
+	inventoryColumnns,
+} from '@/components/inventory';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/sidebar';

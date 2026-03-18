@@ -6,8 +6,14 @@ import db from '@/db/client';
 
 type CreateTagParams = Omit<Tag, 'id'>;
 
-export async function createTag({ name, inventoryId }: CreateTagParams): Promise<Tag>
+export async function createTag({
+	name,
+	inventoryId,
+}: CreateTagParams): Promise<Tag>
 {
-	const [tag] = await db.insert(tags).values({ name, inventoryId }).returning();
+	const [tag] = await db
+		.insert(tags)
+		.values({ name, inventoryId })
+		.returning();
 	return tag;
 }

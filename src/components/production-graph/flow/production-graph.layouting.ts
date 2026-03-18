@@ -1,7 +1,10 @@
 import type { Node } from '@xyflow/react';
 import { Position } from '@xyflow/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
-import { ProductionGraphEdge, ProductionGraphNode } from '@/components/production-graph';
+import {
+	ProductionGraphEdge,
+	ProductionGraphNode,
+} from '@/components/production-graph';
 
 const elk = new ELK();
 
@@ -31,7 +34,10 @@ interface LayoutedElements
 	edges: ProductionGraphEdge[];
 }
 
-export async function layoutProductionGraph(nodes: ProductionGraphNode[], edges: ProductionGraphEdge[]): Promise<LayoutedElements>
+export async function layoutProductionGraph(
+	nodes: ProductionGraphNode[],
+	edges: ProductionGraphEdge[],
+): Promise<LayoutedElements>
 {
 	const graph = {
 		id: 'root',

@@ -13,7 +13,13 @@ export function Header({ children }: HeaderProps)
 	return (
 		<header className="sticky top-0 flex h-16 shrink-0 items-center border-b bg-background px-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
 			<SidebarTrigger />
-			<Separator orientation="vertical" className={cn('mx-4 my-auto h-8', 'group-data-[state=collapsed]/sidebar-wrapper:h-6')} />
+			<Separator
+				orientation="vertical"
+				className={cn(
+					'mx-4 my-auto h-8',
+					'group-data-[state=collapsed]/sidebar-wrapper:h-6',
+				)}
+			/>
 			{children}
 			<ThemeToggle className="ml-auto" variant="ghost" size="icon-sm" />
 		</header>

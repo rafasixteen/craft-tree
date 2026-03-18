@@ -1,7 +1,12 @@
 'use client';
 
 import { useNodeConnections, useNodesData } from '@xyflow/react';
-import { ItemGraphNode, ProducerGraphNode, ProductionGraphNode, SplitGraphNode } from '@/components/production-graph/flow/types';
+import {
+	ItemGraphNode,
+	ProducerGraphNode,
+	ProductionGraphNode,
+	SplitGraphNode,
+} from '@/components/production-graph/flow/types';
 import { ItemRate } from '@/domain/production-graph';
 import { useMemo } from 'react';
 
@@ -15,13 +20,21 @@ export function useProducerInputs(): ItemRate[]
 		handleType: 'target',
 	});
 
-	const nodesData = useNodesData<ProductionGraphNode>(connections.map((c) => c.source));
+	const nodesData = useNodesData<ProductionGraphNode>(
+		connections.map((c) => c.source),
+	);
 
 	return useMemo(() =>
 	{
-		const producerNodes = nodesData.filter((n) => n.type === 'producer') as ProducerGraphNode[];
-		const itemNodes = nodesData.filter((n) => n.type === 'item') as ItemGraphNode[];
-		const splitNodes = nodesData.filter((n) => n.type === 'split') as SplitGraphNode[];
+		const producerNodes = nodesData.filter(
+			(n) => n.type === 'producer',
+		) as ProducerGraphNode[];
+		const itemNodes = nodesData.filter(
+			(n) => n.type === 'item',
+		) as ItemGraphNode[];
+		const splitNodes = nodesData.filter(
+			(n) => n.type === 'split',
+		) as SplitGraphNode[];
 
 		const sourceHandleIds = connections.map((c) => c.sourceHandle);
 		const newRates: ItemRate[] = [];

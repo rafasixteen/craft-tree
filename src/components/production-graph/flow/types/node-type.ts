@@ -1,5 +1,9 @@
 import type { Node as RFNode } from '@xyflow/react';
-import { ItemNodeData, ProducerNodeData, SplitNodeData } from '@/components/production-graph/flow/types';
+import {
+	ItemNodeData,
+	ProducerNodeData,
+	SplitNodeData,
+} from '@/components/production-graph/flow/types';
 
 export type NodeType = 'item' | 'producer' | 'split';
 
@@ -9,4 +13,7 @@ export type ItemGraphNode = RFNode<ItemNodeData, 'item'>;
 
 export type SplitGraphNode = RFNode<SplitNodeData, 'split'>;
 
-export type ProductionGraphNode = ProducerGraphNode | ItemGraphNode | SplitGraphNode;
+export type ProductionGraphNode =
+	| ProducerGraphNode
+	| ItemGraphNode
+	| SplitGraphNode;

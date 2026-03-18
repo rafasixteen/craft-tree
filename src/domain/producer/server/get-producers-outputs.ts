@@ -11,7 +11,9 @@ interface GetProducersOutputsParams
 	inventoryId: Inventory['id'];
 }
 
-export async function getProducersOutputs({ inventoryId }: GetProducersOutputsParams): Promise<ProducerOutput[]>
+export async function getProducersOutputs({
+	inventoryId,
+}: GetProducersOutputsParams): Promise<ProducerOutput[]>
 {
 	const outputs = await db
 		.select({

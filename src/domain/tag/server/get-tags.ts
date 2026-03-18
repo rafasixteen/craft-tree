@@ -12,7 +12,10 @@ export interface GetTagsParams
 	options?: TagQueryOptions;
 }
 
-export async function getTags({ inventoryId, options }: GetTagsParams): Promise<Tag[]>
+export async function getTags({
+	inventoryId,
+	options,
+}: GetTagsParams): Promise<Tag[]>
 {
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';

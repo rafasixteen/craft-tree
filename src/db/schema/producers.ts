@@ -18,6 +18,9 @@ export const producers = pgTable(
 	},
 	(table) => [
 		check('time_positive', sql`${table.time} > 0`),
-		unique('unique_inventory_producer_name').on(table.inventoryId, table.name),
+		unique('unique_inventory_producer_name').on(
+			table.inventoryId,
+			table.name,
+		),
 	],
 );

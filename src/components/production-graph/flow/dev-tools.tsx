@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button';
 
 export function DevTools()
 {
-	const [nodeInspectorActive, setNodeInspectorActive] = useState<boolean>(false);
+	const [nodeInspectorActive, setNodeInspectorActive] =
+		useState<boolean>(false);
 
 	return (
 		<div>
 			<Panel position="top-left">
-				<Button onClick={() => setNodeInspectorActive((a) => !a)}>Node Inspector</Button>
+				<Button onClick={() => setNodeInspectorActive((a) => !a)}>
+					Node Inspector
+				</Button>
 			</Panel>
 			{nodeInspectorActive && <NodeInspector />}
 		</div>

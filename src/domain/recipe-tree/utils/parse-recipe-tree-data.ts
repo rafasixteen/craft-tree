@@ -1,5 +1,8 @@
-import { RecipeTreeData } from '@/domain/recipe-tree/types/recipe-tree-data';
-import { RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree/types';
+import {
+	RecipeTreeData,
+	RecipeTreeNode,
+	RecipeTreeState,
+} from '@/domain/recipe-tree';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
 
 export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
@@ -18,7 +21,9 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 
 	for (const producer of producers)
 	{
-		for (const output of producerOutputs.filter((o) => o.producerId === producer.id))
+		for (const output of producerOutputs.filter(
+			(o) => o.producerId === producer.id,
+		))
 		{
 			if (!producersByOutputItemId.has(output.itemId))
 			{
@@ -99,7 +104,9 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 			id: nodeId,
 			item,
 			producers: visiting.has(itemId) ? [] : nodeProducers,
-			selectedProducerId: visiting.has(itemId) ? null : (nodeProducers[0]?.id ?? null),
+			selectedProducerId: visiting.has(itemId)
+				? null
+				: (nodeProducers[0]?.id ?? null),
 			parentId,
 			children: nodeChildren,
 			producerInputs: nodeProducerInputs,

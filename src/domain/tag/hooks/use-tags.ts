@@ -7,7 +7,10 @@ import useSWR from 'swr';
 
 type UseTagsParams = Parameters<typeof TagServerActions.getTags>[0];
 
-type CreateTagParams = Omit<Parameters<typeof TagServerActions.createTag>[0], 'inventoryId'>;
+type CreateTagParams = Omit<
+	Parameters<typeof TagServerActions.createTag>[0],
+	'inventoryId'
+>;
 
 type UpdateTagParams = Parameters<typeof TagServerActions.updateTag>[0];
 
@@ -15,7 +18,9 @@ type DeleteTagParams = Parameters<typeof TagServerActions.deleteTag>[0];
 
 export function useTags({ inventoryId, options }: UseTagsParams)
 {
-	const swrKey = options ? ['inventory-tags', inventoryId, options] : ['inventory-tags', inventoryId];
+	const swrKey = options
+		? ['inventory-tags', inventoryId, options]
+		: ['inventory-tags', inventoryId];
 	const fetcher = () => getTags({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
@@ -34,11 +39,17 @@ export function useTags({ inventoryId, options }: UseTagsParams)
 			await mutate(
 				async (current: Tag[] = []) =>
 				{
-					const created = await TagServerActions.createTag({ name, inventoryId });
+					const created = await TagServerActions.createTag({
+						name,
+						inventoryId,
+					});
 					return [...current, created];
 				},
 				{
-					optimisticData: (current: Tag[] = []) => [...current, optimistic],
+					optimisticData: (current: Tag[] = []) => [
+						...current,
+						optimistic,
+					],
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -53,11 +64,19 @@ export function useTags({ inventoryId, options }: UseTagsParams)
 			await mutate(
 				async (current: Tag[] = []) =>
 				{
-					const updated = await TagServerActions.updateTag({ id, name });
-					return current.map((tag) => (tag.id === id ? { ...tag, ...updated } : tag));
+					const updated = await TagServerActions.updateTag({
+						id,
+						name,
+					});
+					return current.map((tag) =>
+						tag.id === id ? { ...tag, ...updated } : tag,
+					);
 				},
 				{
-					optimisticData: (current: Tag[] = []) => current.map((tag) => (tag.id === id ? { ...tag, name } : tag)),
+					optimisticData: (current: Tag[] = []) =>
+						current.map((tag) =>
+							tag.id === id ? { ...tag, name } : tag,
+						),
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -76,7 +95,8 @@ export function useTags({ inventoryId, options }: UseTagsParams)
 					return current.filter((tag) => tag.id !== id);
 				},
 				{
-					optimisticData: (current: Tag[] = []) => current.filter((tag) => tag.id !== id),
+					optimisticData: (current: Tag[] = []) =>
+						current.filter((tag) => tag.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},

@@ -13,11 +13,16 @@ interface SetProducerInputsParams
 	inputs: Input[];
 }
 
-export async function setProducerInputs({ producerId, inputs }: SetProducerInputsParams): Promise<ProducerInput[]>
+export async function setProducerInputs({
+	producerId,
+	inputs,
+}: SetProducerInputsParams): Promise<ProducerInput[]>
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(producerInputs).where(eq(producerInputs.producerId, producerId));
+		await tx
+			.delete(producerInputs)
+			.where(eq(producerInputs.producerId, producerId));
 
 		if (inputs.length === 0)
 		{

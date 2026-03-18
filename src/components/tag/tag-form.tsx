@@ -1,7 +1,13 @@
 'use client';
 
 import { Controller, useForm } from 'react-hook-form';
-import { Field, FieldError, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field';
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+	FieldDescription,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import z from 'zod';
 
@@ -26,7 +32,11 @@ interface TagFormProps
 export function TagForm({ id, form, onSubmit }: TagFormProps)
 {
 	return (
-		<form id={id} onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
+		<form
+			id={id}
+			onSubmit={form.handleSubmit(onSubmit)}
+			className="flex min-h-0 flex-1 flex-col"
+		>
 			<FieldGroup className="flex min-h-0 flex-1 flex-col">
 				<Controller
 					name="name"
@@ -34,9 +44,19 @@ export function TagForm({ id, form, onSubmit }: TagFormProps)
 					render={({ field, fieldState }) => (
 						<Field data-invalid={fieldState.invalid}>
 							<FieldLabel htmlFor="name">Name</FieldLabel>
-							<FieldDescription>Name of the tag for display purposes.</FieldDescription>
-							<Input {...field} id="name" aria-invalid={fieldState.invalid} placeholder="Tag name" autoComplete="off" />
-							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+							<FieldDescription>
+								Name of the tag for display purposes.
+							</FieldDescription>
+							<Input
+								{...field}
+								id="name"
+								aria-invalid={fieldState.invalid}
+								placeholder="Tag name"
+								autoComplete="off"
+							/>
+							{fieldState.invalid && (
+								<FieldError errors={[fieldState.error]} />
+							)}
 						</Field>
 					)}
 				/>

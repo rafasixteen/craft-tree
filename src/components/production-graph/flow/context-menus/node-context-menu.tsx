@@ -10,7 +10,14 @@ interface NodeContextMenuProps extends React.HTMLAttributes<HTMLDivElement>
 	bottom?: number;
 }
 
-export function NodeContextMenu({ id, top, left, right, bottom, ...props }: NodeContextMenuProps)
+export function NodeContextMenu({
+	id,
+	top,
+	left,
+	right,
+	bottom,
+	...props
+}: NodeContextMenuProps)
 {
 	const style: React.CSSProperties = {
 		top,

@@ -1,4 +1,11 @@
-import { RecipeTreeState, BillOfMaterials, RecipeTreeNode, BillOfMaterialsEntry, dfs, getResolvedQuantity } from '@/domain/recipe-tree';
+import {
+	RecipeTreeState,
+	BillOfMaterials,
+	RecipeTreeNode,
+	BillOfMaterialsEntry,
+	dfs,
+	getResolvedQuantity,
+} from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
 
 export function getMaterials(state: RecipeTreeState): BillOfMaterials

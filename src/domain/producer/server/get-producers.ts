@@ -12,7 +12,10 @@ interface GetProducersParams
 	options?: ProducerQueryOptions;
 }
 
-export async function getProducers({ inventoryId, options }: GetProducersParams): Promise<Producer[]>
+export async function getProducers({
+	inventoryId,
+	options,
+}: GetProducersParams): Promise<Producer[]>
 {
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';
@@ -31,7 +34,12 @@ export async function getProducers({ inventoryId, options }: GetProducersParams)
 				db
 					.select()
 					.from(producerTags)
-					.where(and(eq(producerTags.producerId, producers.id), inArray(producerTags.tagId, filters.tagIds))),
+					.where(
+						and(
+							eq(producerTags.producerId, producers.id),
+							inArray(producerTags.tagId, filters.tagIds),
+						),
+					),
 			),
 		);
 	}

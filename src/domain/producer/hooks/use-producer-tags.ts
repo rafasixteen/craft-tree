@@ -40,7 +40,9 @@ export function useProducerTags(producerId: Producer['id'])
 
 	if (!data)
 	{
-		throw new Error('Producer tags not found. This hook must be used within a component wrapped by a <ProducerLayout> that provides the producer tags data via SWR fallback.');
+		throw new Error(
+			'Producer tags not found. This hook must be used within a component wrapped by a <ProducerLayout> that provides the producer tags data via SWR fallback.',
+		);
 	}
 
 	return {

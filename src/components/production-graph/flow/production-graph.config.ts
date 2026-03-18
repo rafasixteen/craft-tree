@@ -1,5 +1,14 @@
-import { DefaultEdgeOptions, FitViewOptions, ReactFlowProps, SelectionMode } from '@xyflow/react';
-import { ItemNode, ProducerNode, SplitNode } from '@/components/production-graph/flow/nodes';
+import {
+	DefaultEdgeOptions,
+	FitViewOptions,
+	ReactFlowProps,
+	SelectionMode,
+} from '@xyflow/react';
+import {
+	ItemNode,
+	ProducerNode,
+	SplitNode,
+} from '@/components/production-graph/flow/nodes';
 import { ItemFlowEdge } from '@/components/production-graph/flow/edges';
 import { EdgeType, NodeType } from '@/components/production-graph/flow/types';
 

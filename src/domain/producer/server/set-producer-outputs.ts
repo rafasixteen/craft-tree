@@ -13,11 +13,16 @@ interface SetProducerOutputsParams
 	outputs: Output[];
 }
 
-export async function setProducerOutputs({ producerId, outputs }: SetProducerOutputsParams): Promise<ProducerOutput[]>
+export async function setProducerOutputs({
+	producerId,
+	outputs,
+}: SetProducerOutputsParams): Promise<ProducerOutput[]>
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(producerOutputs).where(eq(producerOutputs.producerId, producerId));
+		await tx
+			.delete(producerOutputs)
+			.where(eq(producerOutputs.producerId, producerId));
 
 		if (outputs.length === 0)
 		{

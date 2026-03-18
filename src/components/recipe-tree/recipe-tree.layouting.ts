@@ -23,7 +23,10 @@ interface LayoutedElements
 	edges: Edge[];
 }
 
-export async function layoutRecipeTree(nodes: Node[], edges: Edge[]): Promise<LayoutedElements>
+export async function layoutRecipeTree(
+	nodes: Node[],
+	edges: Edge[],
+): Promise<LayoutedElements>
 {
 	const graph = {
 		id: 'root',

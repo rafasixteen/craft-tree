@@ -1,7 +1,10 @@
 import { getItemById, getItemTags } from '@/domain/item';
 import { SWRConfig, unstable_serialize } from 'swr';
 
-export default async function ItemLayout({ params, children }: LayoutProps<'/inventories/[inventory-id]/items/[item-id]'>)
+export default async function ItemLayout({
+	params,
+	children,
+}: LayoutProps<'/inventories/[inventory-id]/items/[item-id]'>)
 {
 	const { 'item-id': itemId } = await params;
 
@@ -10,7 +13,8 @@ export default async function ItemLayout({ params, children }: LayoutProps<'/inv
 			value={{
 				fallback: {
 					[unstable_serialize(['item', itemId])]: getItemById(itemId),
-					[unstable_serialize(['item-tags', itemId])]: getItemTags(itemId),
+					[unstable_serialize(['item-tags', itemId])]:
+						getItemTags(itemId),
 				},
 			}}
 		>

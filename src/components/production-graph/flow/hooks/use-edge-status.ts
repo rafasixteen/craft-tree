@@ -1,10 +1,19 @@
 import { EdgeStatus } from '@/components/production-graph/flow/types';
-import { convertProductionRate, ProductionRate } from '@/domain/production-graph';
+import {
+	convertProductionRate,
+	ProductionRate,
+} from '@/domain/production-graph';
 import { useDemand, useSupply } from '@/components/production-graph/flow/hooks';
 
-type UseEdgeStatusParams = Parameters<typeof useSupply>[0] & Parameters<typeof useDemand>[0];
+type UseEdgeStatusParams = Parameters<typeof useSupply>[0] &
+	Parameters<typeof useDemand>[0];
 
-export function useEdgeStatus({ sourceNodeId, targetNodeId, sourceHandleId, targetHandleId }: UseEdgeStatusParams): EdgeStatus
+export function useEdgeStatus({
+	sourceNodeId,
+	targetNodeId,
+	sourceHandleId,
+	targetHandleId,
+}: UseEdgeStatusParams): EdgeStatus
 {
 	const supply = useSupply({ sourceNodeId, sourceHandleId });
 	const demand = useDemand({ targetNodeId, targetHandleId });

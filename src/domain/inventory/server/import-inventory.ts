@@ -12,7 +12,9 @@ import {
 	producerOutputs as producerOutputsTable,
 } from '@/db/schema';
 
-export async function importInventory(data: InventoryImport): Promise<Inventory>
+export async function importInventory(
+	data: InventoryImport,
+): Promise<Inventory>
 {
 	const { inventory, items, producers } = data;
 

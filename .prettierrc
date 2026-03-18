@@ -1,7 +1,8 @@
 {
 	"plugins": [
-		"prettier-plugin-multiline-arrays",
-		"prettier-plugin-brace-style"
+		"@trivago/prettier-plugin-sort-imports",
+		"prettier-plugin-brace-style",
+		"prettier-plugin-packagejson"
 	],
 	"braceStyle": "allman",
 	"useTabs": true,
@@ -11,7 +12,18 @@
 	"trailingComma": "all",
 	"bracketSpacing": true,
 	"arrowParens": "always",
-	"printWidth": 180,
-	"multilineArraysWrapThreshold": 0,
-	"multilineArraysLinePattern": "1"
+	"printWidth": 80,
+	"importOrder": [
+		"<BUILTIN_MODULES>",
+		"<THIRD_PARTY_MODULES>",
+		"^@core/(.*)$",
+		"^@server/(.*)$",
+		"^@ui/(.*)$",
+		"^[./]"
+	],
+	"importOrderSeparation": true,
+	"importOrderSortSpecifiers": true,
+	"importOrderSortByLength": "asc",
+	"importOrderSideEffects": false,
+	"packageSortOrder": ["name", "version", "description", "main"]
 }

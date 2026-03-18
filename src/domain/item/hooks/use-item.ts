@@ -5,7 +5,10 @@ import { useCallback } from 'react';
 import * as ItemServerActions from '@/domain/item/server';
 import useSWR from 'swr';
 
-type UpdateItemParams = Omit<Parameters<typeof ItemServerActions.updateItem>[0], 'id'>;
+type UpdateItemParams = Omit<
+	Parameters<typeof ItemServerActions.updateItem>[0],
+	'id'
+>;
 
 export function useItem(itemId: Item['id'])
 {
@@ -18,7 +21,9 @@ export function useItem(itemId: Item['id'])
 
 	if (!item)
 	{
-		throw new Error('Item not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item data via SWR fallback.');
+		throw new Error(
+			'Item not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item data via SWR fallback.',
+		);
 	}
 
 	const updateItem = useCallback(
@@ -27,7 +32,10 @@ export function useItem(itemId: Item['id'])
 			await mutate(
 				async () =>
 				{
-					return await ItemServerActions.updateItem({ id: itemId, name });
+					return await ItemServerActions.updateItem({
+						id: itemId,
+						name,
+					});
 				},
 				{
 					optimisticData: (current) => ({

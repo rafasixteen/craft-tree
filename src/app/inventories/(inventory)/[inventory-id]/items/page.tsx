@@ -5,7 +5,13 @@ import { itemColumnns } from '@/components/item';
 import { useMemo } from 'react';
 import { useItems } from '@/domain/item';
 import { useCurrentInventory } from '@/components/inventory';
-import { useDataTable, DataTablePagination, DataTableFilter, DataTableFacetedFilter, DataTable } from '@/components/data-table';
+import {
+	useDataTable,
+	DataTablePagination,
+	DataTableFilter,
+	DataTableFacetedFilter,
+	DataTable,
+} from '@/components/data-table';
 import { useItemsTags, useTags } from '@/domain/tag';
 import { Button } from '@/components/ui/button';
 import { TagsIcon } from 'lucide-react';
@@ -25,7 +31,13 @@ export default function ItemsPage()
 		() =>
 			items.map((item) => ({
 				...item,
-				tags: itemsTags.filter((itemTag) => itemTag.itemId === item.id).map((itemTag) => tags.find((tag) => tag.id === itemTag.tagId)?.name || ''),
+				tags: itemsTags
+					.filter((itemTag) => itemTag.itemId === item.id)
+					.map(
+						(itemTag) =>
+							tags.find((tag) => tag.id === itemTag.tagId)
+								?.name || '',
+					),
 			})),
 		[items, itemsTags, tags],
 	);
@@ -44,19 +56,31 @@ export default function ItemsPage()
 		<>
 			<Header>
 				<div className="flex items-center space-x-2">
-					<DataTableFilter table={table} filterKey="name" type="search" placeholder="Filter items..." className="h-8 w-64" />
+					<DataTableFilter
+						table={table}
+						filterKey="name"
+						type="search"
+						placeholder="Filter items..."
+						className="h-8 w-64"
+					/>
 					<DataTableFacetedFilter
 						column={table.getColumn('tags')}
 						title="Tags"
 						options={tagsOptions}
 						trigger={
-							<Button variant="secondary" size="icon-lg" className="h-8">
+							<Button
+								variant="secondary"
+								size="icon-lg"
+								className="h-8"
+							>
 								<TagsIcon className="size-3" />
 							</Button>
 						}
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link href={`/inventories/${inventory.id}/items/add`}>Add Item</Link>
+						<Link href={`/inventories/${inventory.id}/items/add`}>
+							Add Item
+						</Link>
 					</Button>
 				</div>
 			</Header>

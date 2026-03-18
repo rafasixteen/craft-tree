@@ -28,9 +28,23 @@ export function LabeledHandle({
 	const { ref, ...handleProps } = props;
 
 	return (
-		<div title={title} className={cn('relative flex items-center', flexDirections[position], className)} ref={ref}>
-			<BaseHandle position={position} className={handleClassName} {...handleProps} />
-			<label className={cn('px-3 text-foreground', labelClassName)}>{title}</label>
+		<div
+			title={title}
+			className={cn(
+				'relative flex items-center',
+				flexDirections[position],
+				className,
+			)}
+			ref={ref}
+		>
+			<BaseHandle
+				position={position}
+				className={handleClassName}
+				{...handleProps}
+			/>
+			<label className={cn('px-3 text-foreground', labelClassName)}>
+				{title}
+			</label>
 		</div>
 	);
 }

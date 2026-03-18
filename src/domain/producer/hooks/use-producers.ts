@@ -5,17 +5,28 @@ import { useCallback } from 'react';
 import * as ProducerServerActions from '@/domain/producer/server';
 import useSWR from 'swr';
 
-type UseProducersParams = Parameters<typeof ProducerServerActions.getProducers>[0];
+type UseProducersParams = Parameters<
+	typeof ProducerServerActions.getProducers
+>[0];
 
-type CreateProducerParams = Omit<Parameters<typeof ProducerServerActions.createProducer>[0], 'inventoryId'>;
+type CreateProducerParams = Omit<
+	Parameters<typeof ProducerServerActions.createProducer>[0],
+	'inventoryId'
+>;
 
-type UpdateProducerParams = Parameters<typeof ProducerServerActions.updateProducer>[0];
+type UpdateProducerParams = Parameters<
+	typeof ProducerServerActions.updateProducer
+>[0];
 
-type DeleteProducerParams = Parameters<typeof ProducerServerActions.deleteProducer>[0];
+type DeleteProducerParams = Parameters<
+	typeof ProducerServerActions.deleteProducer
+>[0];
 
 export function useProducers({ inventoryId, options }: UseProducersParams)
 {
-	const swrKey = options ? ['inventory-producers', inventoryId, options] : ['inventory-producers', inventoryId];
+	const swrKey = options
+		? ['inventory-producers', inventoryId, options]
+		: ['inventory-producers', inventoryId];
 	const fetcher = () => ProducerServerActions.getProducers({ inventoryId });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
@@ -35,11 +46,18 @@ export function useProducers({ inventoryId, options }: UseProducersParams)
 			await mutate(
 				async (current = []) =>
 				{
-					const created = await ProducerServerActions.createProducer({ name, time, inventoryId });
+					const created = await ProducerServerActions.createProducer({
+						name,
+						time,
+						inventoryId,
+					});
 					return [...current, created];
 				},
 				{
-					optimisticData: (current: Producer[] = []) => [...current, optimistic],
+					optimisticData: (current: Producer[] = []) => [
+						...current,
+						optimistic,
+					],
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -49,13 +67,25 @@ export function useProducers({ inventoryId, options }: UseProducersParams)
 	);
 
 	const updateProducer = useCallback(
-		async function updateProducer({ id, name, time }: UpdateProducerParams)
+		async function updateProducer({
+			id,
+			name,
+			time,
+		}: UpdateProducerParams)
 		{
 			await mutate(
 				async (current = []) =>
 				{
-					const updated = await ProducerServerActions.updateProducer({ id, name, time });
-					return current.map((producer) => (producer.id === id ? { ...producer, ...updated } : producer));
+					const updated = await ProducerServerActions.updateProducer({
+						id,
+						name,
+						time,
+					});
+					return current.map((producer) =>
+						producer.id === id
+							? { ...producer, ...updated }
+							: producer,
+					);
 				},
 				{
 					optimisticData: (current: Producer[] = []) =>
@@ -86,7 +116,8 @@ export function useProducers({ inventoryId, options }: UseProducersParams)
 					return current.filter((producer) => producer.id !== id);
 				},
 				{
-					optimisticData: (current: Producer[] = []) => current.filter((producer) => producer.id !== id),
+					optimisticData: (current: Producer[] = []) =>
+						current.filter((producer) => producer.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},

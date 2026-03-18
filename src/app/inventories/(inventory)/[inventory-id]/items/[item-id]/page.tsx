@@ -17,24 +17,34 @@ export default function ItemPage()
 	const { tags: itemTags } = useItemTags(itemId);
 	const { tags: inventoryTags } = useTags({ inventoryId: item.inventoryId });
 
-	const tags = itemTags.map((tag) => inventoryTags.find((t) => t.id === tag.tagId));
+	const tags = itemTags.map((tag) =>
+		inventoryTags.find((t) => t.id === tag.tagId),
+	);
 
 	return (
 		<>
 			<Header />
 			<div className="mx-auto max-w-3xl px-6 py-8">
 				<Button className="mb-4" variant="outline" size="sm" asChild>
-					<Link href={`/inventories/${item.inventoryId}/items/${itemId}/recipe-tree`}>Recipe Tree</Link>
+					<Link
+						href={`/inventories/${item.inventoryId}/items/${itemId}/recipe-tree`}
+					>
+						Recipe Tree
+					</Link>
 				</Button>
 
 				<section className="mb-8">
 					<h2 className="mb-2 text-xl font-semibold">Item</h2>
-					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">{JSON.stringify(item, null, 2)}</pre>
+					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+						{JSON.stringify(item, null, 2)}
+					</pre>
 				</section>
 
 				<section className="mb-8">
 					<h2 className="mb-2 text-xl font-semibold">Item Tags</h2>
-					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">{JSON.stringify(tags, null, 2)}</pre>
+					<pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+						{JSON.stringify(tags, null, 2)}
+					</pre>
 				</section>
 			</div>
 		</>

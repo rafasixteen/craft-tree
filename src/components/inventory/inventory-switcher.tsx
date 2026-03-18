@@ -1,9 +1,21 @@
 'use client';
 
 import { ChevronsUpDown, Plus } from 'lucide-react';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import {
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
+	useSidebar,
+} from '@/components/ui/sidebar';
 import { useInventories } from '@/domain/inventory';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useCurrentInventory } from '@/components/inventory';
 import Link from 'next/link';
 
@@ -19,24 +31,49 @@ export function InventorySwitcher()
 			<SidebarMenuItem>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+						<SidebarMenuButton
+							size="lg"
+							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+						>
 							<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-								<p>{inventory.name.substring(0, 2).toUpperCase()}</p>
+								<p>
+									{inventory.name
+										.substring(0, 2)
+										.toUpperCase()}
+								</p>
 							</div>
 							<div className="grid flex-1 text-left text-sm/tight">
-								<span className="truncate font-medium">{inventory.name}</span>
-								<span className="truncate text-xs">{inventory.id}</span>
+								<span className="truncate font-medium">
+									{inventory.name}
+								</span>
+								<span className="truncate text-xs">
+									{inventory.id}
+								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto" />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg" align="start" side={isMobile ? 'bottom' : 'right'} sideOffset={4}>
-						<DropdownMenuLabel className="text-xs text-muted-foreground">Inventories</DropdownMenuLabel>
+					<DropdownMenuContent
+						className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+						align="start"
+						side={isMobile ? 'bottom' : 'right'}
+						sideOffset={4}
+					>
+						<DropdownMenuLabel className="text-xs text-muted-foreground">
+							Inventories
+						</DropdownMenuLabel>
 						{inventories.map((inventory) => (
-							<Link href={`/inventories/${inventory.id}/items`} key={inventory.id}>
+							<Link
+								href={`/inventories/${inventory.id}/items`}
+								key={inventory.id}
+							>
 								<DropdownMenuItem className="gap-2 p-2">
 									<div className="flex size-7 items-center justify-center rounded-md border">
-										<p>{inventory.name.substring(0, 2).toUpperCase()}</p>
+										<p>
+											{inventory.name
+												.substring(0, 2)
+												.toUpperCase()}
+										</p>
 									</div>
 									{inventory.name}
 								</DropdownMenuItem>
@@ -44,11 +81,16 @@ export function InventorySwitcher()
 						))}
 						<DropdownMenuSeparator />
 						<DropdownMenuItem className="gap-2 p-2">
-							<Link href="/inventories/create" className="flex items-center gap-2">
+							<Link
+								href="/inventories/create"
+								className="flex items-center gap-2"
+							>
 								<div className="flex size-7 items-center justify-center rounded-md border bg-transparent">
 									<Plus className="size-4" />
 								</div>
-								<div className="font-medium text-muted-foreground">Create inventory</div>
+								<div className="font-medium text-muted-foreground">
+									Create inventory
+								</div>
 							</Link>
 						</DropdownMenuItem>
 					</DropdownMenuContent>

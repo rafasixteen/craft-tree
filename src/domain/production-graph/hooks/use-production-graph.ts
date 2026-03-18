@@ -5,12 +5,16 @@ import { useCallback } from 'react';
 import * as ProductionGraphServerActions from '@/domain/production-graph/server';
 import useSWR from 'swr';
 
-type UpdateProductionGraphParams = Omit<Parameters<typeof ProductionGraphServerActions.updateProductionGraph>[0], 'id'>;
+type UpdateProductionGraphParams = Omit<
+	Parameters<typeof ProductionGraphServerActions.updateProductionGraph>[0],
+	'id'
+>;
 
 export function useProductionGraph(productionGraphId: ProductionGraph['id'])
 {
 	const swrKey = ['production-graph', productionGraphId];
-	const fetcher = () => ProductionGraphServerActions.getProductionGraphById(productionGraphId);
+	const fetcher = () =>
+		ProductionGraphServerActions.getProductionGraphById(productionGraphId);
 
 	const { data: productionGraph, mutate } = useSWR(swrKey, fetcher, {
 		revalidateOnMount: true,
@@ -24,19 +28,30 @@ export function useProductionGraph(productionGraphId: ProductionGraph['id'])
 	}
 
 	const updateProductionGraph = useCallback(
-		async function updateProductionGraph({ name, data }: UpdateProductionGraphParams)
+		async function updateProductionGraph({
+			name,
+			data,
+		}: UpdateProductionGraphParams)
 		{
 			await mutate(
 				async () =>
 				{
-					return await ProductionGraphServerActions.updateProductionGraph({ id: productionGraph.id, name, data });
+					return await ProductionGraphServerActions.updateProductionGraph(
+						{
+							id: productionGraph.id,
+							name,
+							data,
+						},
+					);
 				},
 				{
 					optimisticData: (current) =>
 					{
 						if (!current)
 						{
-							throw new Error('No current production graph data available for optimistic update.');
+							throw new Error(
+								'No current production graph data available for optimistic update.',
+							);
 						}
 
 						return {

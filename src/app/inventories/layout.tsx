@@ -2,7 +2,9 @@ import { getInventoriesByUserId } from '@/domain/inventory';
 import { SWRConfig, unstable_serialize } from 'swr';
 import { createClient } from '@/lib/supabase/server';
 
-export default async function InventoriesRootLayout({ children }: LayoutProps<'/inventories'>)
+export default async function InventoriesRootLayout({
+	children,
+}: LayoutProps<'/inventories'>)
 {
 	const supabase = await createClient();
 
@@ -14,7 +16,8 @@ export default async function InventoriesRootLayout({ children }: LayoutProps<'/
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['inventories', user?.id])]: getInventoriesByUserId(user?.id ?? ''),
+					[unstable_serialize(['inventories', user?.id])]:
+						getInventoriesByUserId(user?.id ?? ''),
 				},
 			}}
 		>

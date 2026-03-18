@@ -2,7 +2,9 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { InventoriesSidebar } from '@/components/sidebar';
 import { cookies } from 'next/headers';
 
-export default async function InventoriesLayout({ children }: LayoutProps<'/inventories'>)
+export default async function InventoriesLayout({
+	children,
+}: LayoutProps<'/inventories'>)
 {
 	const cookieStore = await cookies();
 	const sidebarState = cookieStore.get('sidebar_state')?.value !== 'false';
