@@ -1,14 +1,14 @@
-import { NodeProps, Handle, Position, Node } from '@xyflow/react';
-import { useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { useRecipeTree } from '@/domain/recipe-tree';
-import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
-import { Producer } from '@/domain/producer';
 import { BaseNode, BaseNodeFooter } from '@/components/base-node';
-import {
-	RecipeTreeNodeContent,
-	RecipeTreeNodeHeader,
-} from '@/components/recipe-tree';
+import { RecipeTreeNodeContent, RecipeTreeNodeHeader } from '@/components/recipe-tree';
+
+import { Button } from '@/components/ui/button';
+
+import { Producer } from '@/domain/producer';
+import { useRecipeTree } from '@/domain/recipe-tree';
+
+import { useCallback } from 'react';
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
+import { Handle, Node, NodeProps, Position } from '@xyflow/react';
 
 export function ProcessedMaterialNode({ id }: NodeProps)
 {
@@ -21,9 +21,7 @@ export function ProcessedMaterialNode({ id }: NodeProps)
 
 	const { producers, selectedProducerId } = recipeTree.nodes[id];
 
-	const selectedProducerIndex = producers.findIndex(
-		(p) => p.id === selectedProducerId,
-	);
+	const selectedProducerIndex = producers.findIndex((p) => p.id === selectedProducerId);
 	const isRootNode = recipeTree.rootNodeId === id;
 
 	return (
@@ -32,11 +30,7 @@ export function ProcessedMaterialNode({ id }: NodeProps)
 			<RecipeTreeNodeHeader nodeId={id} />
 			<RecipeTreeNodeContent nodeId={id} />
 			<BaseNodeFooter className="p-2">
-				<ProducerCarousel
-					nodeId={id}
-					producers={producers}
-					selectedProducerIndex={selectedProducerIndex}
-				/>
+				<ProducerCarousel nodeId={id} producers={producers} selectedProducerIndex={selectedProducerIndex} />
 			</BaseNodeFooter>
 			<Handle type="source" position={Position.Bottom} />
 		</BaseNode>
@@ -50,11 +44,7 @@ interface ProducerCarouselProps
 	selectedProducerIndex: number;
 }
 
-function ProducerCarousel({
-	nodeId,
-	producers,
-	selectedProducerIndex,
-}: ProducerCarouselProps)
+function ProducerCarousel({ nodeId, producers, selectedProducerIndex }: ProducerCarouselProps)
 {
 	const { changeProducer } = useRecipeTree();
 
@@ -77,10 +67,7 @@ function ProducerCarousel({
 				className="nopan"
 				disabled={producers.length < 2}
 			>
-				<ArrowLeftIcon
-					className="size-4"
-					aria-label="Previous producer"
-				/>
+				<ArrowLeftIcon className="size-4" aria-label="Previous producer" />
 			</Button>
 			<span className="text-xs text-muted-foreground">
 				{selectedProducerIndex + 1} / {producers.length}

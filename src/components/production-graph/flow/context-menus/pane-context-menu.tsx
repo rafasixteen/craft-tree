@@ -1,12 +1,10 @@
+import { ItemNodeData, ProducerNodeData, SplitNodeData } from '@/components/production-graph/flow';
+
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useReactFlow } from '@xyflow/react';
-import {
-	ItemNodeData,
-	ProducerNodeData,
-	SplitNodeData,
-} from '@/components/production-graph/flow';
+
 import React, { useCallback } from 'react';
+import { useReactFlow } from '@xyflow/react';
 
 interface PaneContextMenuProps extends React.HTMLAttributes<HTMLDivElement>
 {
@@ -16,13 +14,7 @@ interface PaneContextMenuProps extends React.HTMLAttributes<HTMLDivElement>
 	bottom?: number;
 }
 
-export function PaneContextMenu({
-	top,
-	left,
-	right,
-	bottom,
-	...props
-}: PaneContextMenuProps)
+export function PaneContextMenu({ top, left, right, bottom, ...props }: PaneContextMenuProps)
 {
 	const { addNodes, screenToFlowPosition } = useReactFlow();
 
@@ -99,28 +91,13 @@ export function PaneContextMenu({
 
 	return (
 		<Card style={style} {...props} className="gap-0 p-1">
-			<Button
-				variant="ghost"
-				size="sm"
-				className="w-full justify-start"
-				onClick={addItem}
-			>
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addItem}>
 				Add Item Node
 			</Button>
-			<Button
-				variant="ghost"
-				size="sm"
-				className="w-full justify-start"
-				onClick={addProducer}
-			>
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addProducer}>
 				Add Producer Node
 			</Button>
-			<Button
-				variant="ghost"
-				size="sm"
-				className="w-full justify-start"
-				onClick={addSplitNode}
-			>
+			<Button variant="ghost" size="sm" className="w-full justify-start" onClick={addSplitNode}>
 				Add Split Node
 			</Button>
 		</Card>

@@ -1,6 +1,8 @@
-import { pgTable, text, jsonb, uuid, uniqueIndex } from 'drizzle-orm/pg-core';
 import { inventories } from '@/db/schema';
+
 import { ProductionGraphData } from '@/domain/production-graph';
+
+import { jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 export const productionGraphs = pgTable(
 	'production_graphs',
@@ -22,10 +24,5 @@ export const productionGraphs = pgTable(
 			.references(() => inventories.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
-	(table) => [
-		uniqueIndex('unique_inventory_producer_graph_name').on(
-			table.inventoryId,
-			table.name,
-		),
-	],
+	(table) => [uniqueIndex('unique_inventory_producer_graph_name').on(table.inventoryId, table.name)],
 );

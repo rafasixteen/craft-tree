@@ -1,15 +1,9 @@
 'use client';
 
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '@/components/ui/table';
-import { flexRender, Table as TanStackTable } from '@tanstack/react-table';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+import { Table as TanStackTable, flexRender } from '@tanstack/react-table';
 
 interface DataTableProps<TData>
 {
@@ -27,17 +21,10 @@ export function DataTable<TData>({ table }: DataTableProps<TData>)
 							{headerGroup.headers.map((header) =>
 							{
 								return (
-									<TableHead
-										key={header.id}
-										colSpan={header.colSpan}
-									>
+									<TableHead key={header.id} colSpan={header.colSpan}>
 										{header.isPlaceholder
 											? null
-											: flexRender(
-													header.column.columnDef
-														.header,
-													header.getContext(),
-												)}
+											: flexRender(header.column.columnDef.header, header.getContext())}
 									</TableHead>
 								);
 							})}
@@ -47,26 +34,17 @@ export function DataTable<TData>({ table }: DataTableProps<TData>)
 				<TableBody>
 					{table.getRowModel().rows?.length ? (
 						table.getRowModel().rows.map((row) => (
-							<TableRow
-								key={row.id}
-								data-state={row.getIsSelected() && 'selected'}
-							>
+							<TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
 								{row.getVisibleCells().map((cell) => (
 									<TableCell key={cell.id}>
-										{flexRender(
-											cell.column.columnDef.cell,
-											cell.getContext(),
-										)}
+										{flexRender(cell.column.columnDef.cell, cell.getContext())}
 									</TableCell>
 								))}
 							</TableRow>
 						))
 					) : (
 						<TableRow>
-							<TableCell
-								colSpan={table.getAllColumns().length}
-								className="h-24 text-center"
-							>
+							<TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
 								No results.
 							</TableCell>
 						</TableRow>

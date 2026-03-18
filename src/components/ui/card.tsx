@@ -1,12 +1,8 @@
-import * as React from 'react';
-
 import { cn } from '@/lib/utils';
 
-function Card({
-	className,
-	size = 'default',
-	...props
-}: React.ComponentProps<'div'> & { size?: 'default' | 'sm' })
+import * as React from 'react';
+
+function Card({ className, size = 'default', ...props }: React.ComponentProps<'div'> & { size?: 'default' | 'sm' })
 {
 	return (
 		<div
@@ -37,13 +33,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>)
 
 function CardTitle({ className, ...props }: React.ComponentProps<'div'>)
 {
-	return (
-		<div
-			data-slot="card-title"
-			className={cn('text-sm font-medium', className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="card-title" className={cn('text-sm font-medium', className)} {...props} />;
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<'div'>)
@@ -62,10 +52,7 @@ function CardAction({ className, ...props }: React.ComponentProps<'div'>)
 	return (
 		<div
 			data-slot="card-action"
-			className={cn(
-				'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
-				className,
-			)}
+			className={cn('col-start-2 row-span-2 row-start-1 self-start justify-self-end', className)}
 			{...props}
 		/>
 	);
@@ -73,13 +60,7 @@ function CardAction({ className, ...props }: React.ComponentProps<'div'>)
 
 function CardContent({ className, ...props }: React.ComponentProps<'div'>)
 {
-	return (
-		<div
-			data-slot="card-content"
-			className={cn('px-4 group-data-[size=sm]/card:px-3', className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="card-content" className={cn('px-4 group-data-[size=sm]/card:px-3', className)} {...props} />;
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<'div'>)
@@ -96,12 +77,4 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>)
 	);
 }
 
-export {
-	Card,
-	CardHeader,
-	CardFooter,
-	CardTitle,
-	CardAction,
-	CardDescription,
-	CardContent,
-};
+export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };

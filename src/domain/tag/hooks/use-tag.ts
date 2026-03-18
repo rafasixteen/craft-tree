@@ -1,14 +1,12 @@
 'use client';
 
 import { Tag } from '@/domain/tag';
-import { useCallback } from 'react';
 import * as TagServerActions from '@/domain/tag/server';
-import useSWR from 'swr';
 
-type UpdateTagParams = Omit<
-	Parameters<typeof TagServerActions.updateTag>[0],
-	'id'
->;
+import useSWR from 'swr';
+import { useCallback } from 'react';
+
+type UpdateTagParams = Omit<Parameters<typeof TagServerActions.updateTag>[0], 'id'>;
 
 export function useTag(tagId: Tag['id'])
 {

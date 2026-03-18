@@ -1,9 +1,8 @@
-import { PackageIcon } from 'lucide-react';
 import { AppSidebar, NavGroup } from '@/components/sidebar';
 
-export function InventoriesSidebar(
-	props: React.ComponentProps<typeof AppSidebar>,
-)
+import { PackageIcon } from 'lucide-react';
+
+export function InventoriesSidebar(props: React.ComponentProps<typeof AppSidebar>)
 {
 	return (
 		<AppSidebar {...props}>

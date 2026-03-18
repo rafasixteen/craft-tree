@@ -1,12 +1,7 @@
-import {
-	integer,
-	pgTable,
-	uuid,
-	check,
-	uniqueIndex,
-} from 'drizzle-orm/pg-core';
-import { producers, items } from '@/db/schema';
+import { items, producers } from '@/db/schema';
+
 import { sql } from 'drizzle-orm';
+import { check, integer, pgTable, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 export const producerOutputs = pgTable(
 	'producer_outputs',
@@ -25,9 +20,6 @@ export const producerOutputs = pgTable(
 	},
 	(table) => [
 		check('quantity_positive', sql`${table.quantity} > 0`),
-		uniqueIndex('unique_item_per_producer_output').on(
-			table.itemId,
-			table.producerId,
-		),
+		uniqueIndex('unique_item_per_producer_output').on(table.itemId, table.producerId),
 	],
 );

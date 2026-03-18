@@ -1,32 +1,20 @@
 'use client';
 
-import {
-	useProducerInputs,
-	useProducerOutputs,
-	useProducerTags,
-} from '@/domain/producer';
-import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/sidebar';
-import { useProducer } from '@/domain/producer';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/components/producer';
+
 import { Field } from '@/components/ui/field';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { useProducer } from '@/domain/producer';
+import { useProducerInputs, useProducerOutputs, useProducerTags } from '@/domain/producer';
+
 import { toast } from 'sonner';
 import { useCallback } from 'react';
-import {
-	ProducerForm,
-	ProducerFormValues,
-	producerFormSchema,
-} from '@/components/producer';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function ProducerEditPage()
 {
@@ -73,14 +61,7 @@ export default function ProducerEditPage()
 				toast.error('Failed to update producer');
 			}
 		},
-		[
-			updateProducer,
-			setInputs,
-			setOutputs,
-			setTags,
-			producer.inventoryId,
-			router,
-		],
+		[updateProducer, setInputs, setOutputs, setTags, producer.inventoryId, router],
 	);
 
 	return (
@@ -89,37 +70,20 @@ export default function ProducerEditPage()
 			<Card className="flex min-h-0 flex-1 flex-col bg-transparent ring-0">
 				<CardHeader>
 					<CardTitle>Edit Producer</CardTitle>
-					<CardDescription>
-						Edit an existing producer.
-					</CardDescription>
+					<CardDescription>Edit an existing producer.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<ProducerForm
-						id="edit-producer-form"
-						form={form}
-						onSubmit={onSubmit}
-					/>
+					<ProducerForm id="edit-producer-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
-					<Field
-						orientation="horizontal"
-						className="flex w-full flex-row items-center justify-end gap-2"
-					>
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={() => router.back()}
-							className="flex-1"
-						>
+					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
+						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							form="edit-producer-form"
-							disabled={
-								!form.formState.isDirty ||
-								!form.formState.isValid
-							}
+							disabled={!form.formState.isDirty || !form.formState.isValid}
 							className="flex-1"
 						>
 							Save Changes

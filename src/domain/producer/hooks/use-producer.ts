@@ -1,14 +1,12 @@
 'use client';
 
 import { Producer } from '@/domain/producer';
-import { useCallback } from 'react';
 import * as ProducerServerActions from '@/domain/producer/server';
-import useSWR from 'swr';
 
-type UpdateProducerParams = Omit<
-	Parameters<typeof ProducerServerActions.updateProducer>[0],
-	'id'
->;
+import useSWR from 'swr';
+import { useCallback } from 'react';
+
+type UpdateProducerParams = Omit<Parameters<typeof ProducerServerActions.updateProducer>[0], 'id'>;
 
 export function useProducer(producerId: Producer['id'])
 {

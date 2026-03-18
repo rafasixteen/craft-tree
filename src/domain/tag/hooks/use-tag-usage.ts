@@ -1,6 +1,7 @@
 'use client';
 
-import { getTagUsage, Tag } from '@/domain/tag';
+import { Tag, getTagUsage } from '@/domain/tag';
+
 import useSWR from 'swr';
 
 export function useTagUsage(tagId: Tag['id'])

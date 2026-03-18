@@ -1,30 +1,28 @@
 'use client';
 
-import { ColumnDef, Row } from '@tanstack/react-table';
-import { Item, useItems } from '@/domain/item';
 import { DataTableColumnHeader } from '@/components/data-table';
+
 import { Button } from '@/components/ui/button';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+
+import { Item, useItems } from '@/domain/item';
+
 import Link from 'next/link';
+import { PencilIcon, TrashIcon } from 'lucide-react';
+import { ColumnDef, Row } from '@tanstack/react-table';
 
 export type ItemColumnData = Item & { tags: string[] };
 
 export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 	{
 		accessorKey: 'name',
-		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Name" />
-		),
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
 			const name = row.original.name;
 			const href = `/inventories/${row.original.inventoryId}/items/${row.original.id}`;
 
 			return (
-				<Link
-					href={href}
-					className="ml-3 truncate font-medium hover:underline"
-				>
+				<Link href={href} className="ml-3 truncate font-medium hover:underline">
 					{name}
 				</Link>
 			);
@@ -32,31 +30,22 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 	},
 	{
 		accessorKey: 'tags',
-		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Tags" />
-		),
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Tags" />,
 		cell: ({ row }) =>
 		{
 			const tags = row.original.tags;
-			const sortedTags = [...tags].sort((a, b) =>
-				a.localeCompare(b, undefined, { sensitivity: 'base' }),
-			);
+			const sortedTags = [...tags].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
 			return (
 				<div className="flex flex-wrap gap-1">
 					{sortedTags.length > 0 ? (
 						sortedTags.map((tag, index) => (
-							<span
-								key={index}
-								className="rounded-md bg-muted px-2 py-1 text-xs"
-							>
+							<span key={index} className="rounded-md bg-muted px-2 py-1 text-xs">
 								{tag}
 							</span>
 						))
 					) : (
-						<span className="text-xs text-muted-foreground">
-							No tags
-						</span>
+						<span className="text-xs text-muted-foreground">No tags</span>
 					)}
 				</div>
 			);
@@ -70,13 +59,7 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 	},
 	{
 		id: 'actions',
-		header: ({ column }) => (
-			<DataTableColumnHeader
-				column={column}
-				title="Actions"
-				className="text-center"
-			/>
-		),
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" className="text-center" />,
 		cell: ({ row }) => <Actions row={row} />,
 		enableSorting: false,
 		enableHiding: false,
@@ -102,11 +85,7 @@ function Actions({ row }: ActionsProps)
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button
-				variant="destructive"
-				size="icon-sm"
-				onClick={() => deleteItem(id)}
-			>
+			<Button variant="destructive" size="icon-sm" onClick={() => deleteItem(id)}>
 				<TrashIcon className="size-3" />
 			</Button>
 		</div>

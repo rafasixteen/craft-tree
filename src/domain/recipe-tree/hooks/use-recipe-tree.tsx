@@ -1,21 +1,10 @@
 'use client';
 
-import {
-	useMemo,
-	createContext,
-	useContext,
-	useCallback,
-	useEffect,
-	useState,
-} from 'react';
-import {
-	RecipeTreeNode,
-	RecipeTreeState,
-	getRecipeTreeData,
-	parseRecipeTreeData,
-} from '@/domain/recipe-tree';
 import { Item } from '@/domain/item';
+import { RecipeTreeNode, RecipeTreeState, getRecipeTreeData, parseRecipeTreeData } from '@/domain/recipe-tree';
+
 import useSWR from 'swr';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 interface RecipeTreeContext
 {
@@ -29,9 +18,7 @@ interface RecipeTreeContext
 	changeProducer: (nodeId: RecipeTreeNode['id'], delta: number) => void;
 }
 
-const RecipeTreeContext = createContext<RecipeTreeContext | undefined>(
-	undefined,
-);
+const RecipeTreeContext = createContext<RecipeTreeContext | undefined>(undefined);
 
 interface RecipeTreeProviderProps
 {
@@ -39,18 +26,11 @@ interface RecipeTreeProviderProps
 	children: React.ReactNode;
 }
 
-export function RecipeTreeProvider({
-	itemId,
-	children,
-}: RecipeTreeProviderProps)
+export function RecipeTreeProvider({ itemId, children }: RecipeTreeProviderProps)
 {
-	const { data: rawData } = useSWR(
-		['recipe-tree', itemId],
-		() => getRecipeTreeData(itemId),
-		{
-			revalidateOnFocus: false,
-		},
-	);
+	const { data: rawData } = useSWR(['recipe-tree', itemId], () => getRecipeTreeData(itemId), {
+		revalidateOnFocus: false,
+	});
 	const [recipeTree, setRecipeTree] = useState<RecipeTreeState | null>(null);
 
 	useEffect(() =>
@@ -110,10 +90,7 @@ export function RecipeTreeProvider({
 		[recipeTree],
 	);
 
-	const changeProducer = useCallback(function changeProducer(
-		nodeId: RecipeTreeNode['id'],
-		delta: number,
-	): void
+	const changeProducer = useCallback(function changeProducer(nodeId: RecipeTreeNode['id'], delta: number): void
 	{
 		setRecipeTree((prev) =>
 		{
@@ -134,12 +111,9 @@ export function RecipeTreeProvider({
 				return prev;
 			}
 
-			const currentIndex = node.producers.findIndex(
-				(p) => p.id === node.selectedProducerId,
-			);
+			const currentIndex = node.producers.findIndex((p) => p.id === node.selectedProducerId);
 			const length = node.producers.length;
-			const newIndex =
-				(((currentIndex + delta) % length) + length) % length;
+			const newIndex = (((currentIndex + delta) % length) + length) % length;
 			const newSelectedProducerId = node.producers[newIndex].id;
 
 			return {
@@ -155,15 +129,8 @@ export function RecipeTreeProvider({
 		});
 	}, []);
 
-	const value = useMemo(
-		() => ({ recipeTree, dfs, changeProducer }),
-		[recipeTree, dfs, changeProducer],
-	);
-	return (
-		<RecipeTreeContext.Provider value={value}>
-			{children}
-		</RecipeTreeContext.Provider>
-	);
+	const value = useMemo(() => ({ recipeTree, dfs, changeProducer }), [recipeTree, dfs, changeProducer]);
+	return <RecipeTreeContext.Provider value={value}>{children}</RecipeTreeContext.Provider>;
 }
 
 export function useRecipeTree(): RecipeTreeContext
@@ -172,9 +139,7 @@ export function useRecipeTree(): RecipeTreeContext
 
 	if (context === undefined)
 	{
-		throw new Error(
-			'useRecipeTree must be used within a RecipeTreeProvider',
-		);
+		throw new Error('useRecipeTree must be used within a RecipeTreeProvider');
 	}
 
 	return context;

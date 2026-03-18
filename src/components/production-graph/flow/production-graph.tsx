@@ -1,43 +1,31 @@
 'use client';
 
 import '@xyflow/react/dist/style.css';
-import { useState, useCallback, useRef, useEffect } from 'react';
+
+import { DevTools, graphConfig, layoutProductionGraph } from '@/components/production-graph';
+import { NodeContextMenu, PaneContextMenu } from '@/components/production-graph/flow/context-menus';
+import { ProductionGraphEdge, ProductionGraphNode } from '@/components/production-graph/flow/types';
+
+import { Button } from '@/components/ui/button';
+
+import { useProductionGraph } from '@/domain/production-graph';
+
+import { useTheme } from 'next-themes';
+import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { Connection, EdgeChange, NodeChange, ReactFlowInstance, Viewport } from '@xyflow/react';
 import {
+	Background,
+	Controls,
+	Panel,
 	ReactFlow,
 	addEdge,
-	applyNodeChanges,
 	applyEdgeChanges,
-	Controls,
-	Background,
-	useReactFlow,
-	Panel,
+	applyNodeChanges,
 	getOutgoers,
 	useKeyPress,
+	useReactFlow,
 } from '@xyflow/react';
-import type {
-	ReactFlowInstance,
-	Connection,
-	NodeChange,
-	EdgeChange,
-	Viewport,
-} from '@xyflow/react';
-import { useTheme } from 'next-themes';
-import { Button } from '@/components/ui/button';
-import {
-	PaneContextMenu,
-	NodeContextMenu,
-} from '@/components/production-graph/flow/context-menus';
-import {
-	ProductionGraphNode,
-	ProductionGraphEdge,
-} from '@/components/production-graph/flow/types';
-import {
-	graphConfig,
-	layoutProductionGraph,
-	DevTools,
-} from '@/components/production-graph';
-import { useProductionGraph } from '@/domain/production-graph';
-import { useParams } from 'next/navigation';
 
 type PaneMenu = {
 	top?: number;
@@ -62,12 +50,7 @@ interface ProductionGraphProps
 	initialTheme: 'light' | 'dark';
 }
 
-export function ProductionGraph({
-	initialNodes,
-	initialEdges,
-	initialViewport,
-	initialTheme,
-}: ProductionGraphProps)
+export function ProductionGraph({ initialNodes, initialEdges, initialViewport, initialTheme }: ProductionGraphProps)
 {
 	const { resolvedTheme } = useTheme();
 
@@ -75,20 +58,14 @@ export function ProductionGraph({
 
 	const [nodes, setNodes] = useState<ProductionGraphNode[]>(initialNodes);
 	const [edges, setEdges] = useState<ProductionGraphEdge[]>(initialEdges);
-	const [viewport, setViewport] = useState<Viewport>(
-		initialViewport || { x: 0, y: 0, zoom: 1 },
-	);
+	const [viewport, setViewport] = useState<Viewport>(initialViewport || { x: 0, y: 0, zoom: 1 });
 
 	const [isDirty, setIsDirty] = useState<boolean>(false);
 
-	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<
-		ProductionGraphNode,
-		ProductionGraphEdge
-	> | null>(null);
-	const { getNodes, getEdges } = useReactFlow<
-		ProductionGraphNode,
-		ProductionGraphEdge
-	>();
+	const [rfInstance, setRfInstance] = useState<ReactFlowInstance<ProductionGraphNode, ProductionGraphEdge> | null>(
+		null,
+	);
+	const { getNodes, getEdges } = useReactFlow<ProductionGraphNode, ProductionGraphEdge>();
 
 	const params = useParams();
 	const graphId = params['production-graph-id'] as string;
@@ -149,15 +126,12 @@ export function ProductionGraph({
 			const MENU_WIDTH = 200;
 			const MENU_HEIGHT = 150;
 
-			const horizontal =
-				clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
-			const vertical =
-				clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
+			const horizontal = clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
+			const vertical = clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
 
 			const menu: PaneMenu = {
 				top: vertical === 'top' ? clickY : undefined,
-				bottom:
-					vertical === 'bottom' ? pane.height - clickY : undefined,
+				bottom: vertical === 'bottom' ? pane.height - clickY : undefined,
 				left: horizontal === 'left' ? clickX : undefined,
 				right: horizontal === 'right' ? pane.width - clickX : undefined,
 			};
@@ -169,10 +143,7 @@ export function ProductionGraph({
 	);
 
 	const onNodeContextMenu = useCallback(
-		function onNodeContextMenu(
-			event: React.MouseEvent,
-			node: ProductionGraphNode,
-		)
+		function onNodeContextMenu(event: React.MouseEvent, node: ProductionGraphNode)
 		{
 			// Prevent native context menu from showing.
 			event.preventDefault();
@@ -193,16 +164,13 @@ export function ProductionGraph({
 			const MENU_WIDTH = 200;
 			const MENU_HEIGHT = 150;
 
-			const horizontal =
-				clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
-			const vertical =
-				clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
+			const horizontal = clickX > pane.width - MENU_WIDTH ? 'right' : 'left';
+			const vertical = clickY > pane.height - MENU_HEIGHT ? 'bottom' : 'top';
 
 			const menu: NodeMenu = {
 				id: node.id,
 				top: vertical === 'top' ? clickY : undefined,
-				bottom:
-					vertical === 'bottom' ? pane.height - clickY : undefined,
+				bottom: vertical === 'bottom' ? pane.height - clickY : undefined,
 				left: horizontal === 'left' ? clickX : undefined,
 				right: horizontal === 'right' ? pane.width - clickX : undefined,
 			};
@@ -243,10 +211,7 @@ export function ProductionGraph({
 
 		const target = nodes.find((node) => node.id === connection.target);
 
-		function hasCycle(
-			node: ProductionGraphNode,
-			visited = new Set(),
-		): boolean
+		function hasCycle(node: ProductionGraphNode, visited = new Set()): boolean
 		{
 			if (visited.has(node.id))
 			{
@@ -281,8 +246,7 @@ export function ProductionGraph({
 
 	const layoutGraph = useCallback(async function layoutGraph()
 	{
-		const { nodes: layoutedNodes, edges: layoutedEdges } =
-			await layoutProductionGraph(getNodes(), getEdges());
+		const { nodes: layoutedNodes, edges: layoutedEdges } = await layoutProductionGraph(getNodes(), getEdges());
 
 		setNodes(layoutedNodes);
 		setEdges(layoutedEdges);
@@ -321,9 +285,7 @@ export function ProductionGraph({
 		const newEdges = edges
 			.filter(
 				(edge) =>
-					selectedEdges.some(
-						(selectedEdge) => selectedEdge.id === edge.id,
-					) ||
+					selectedEdges.some((selectedEdge) => selectedEdge.id === edge.id) ||
 					(selectedNodes.some((node) => node.id === edge.source) &&
 						selectedNodes.some((node) => node.id === edge.target)),
 			)
@@ -396,12 +358,8 @@ export function ProductionGraph({
 				onPaneClick={onPaneClick}
 				colorMode={theme === 'dark' ? 'dark' : 'light'}
 			>
-				{paneMenu && (
-					<PaneContextMenu {...paneMenu} onClick={onPaneClick} />
-				)}
-				{nodeMenu && (
-					<NodeContextMenu {...nodeMenu} onClick={onPaneClick} />
-				)}
+				{paneMenu && <PaneContextMenu {...paneMenu} onClick={onPaneClick} />}
+				{nodeMenu && <NodeContextMenu {...nodeMenu} onClick={onPaneClick} />}
 				<Controls />
 				<Background gap={20} size={1} />
 				<Panel position="top-right">

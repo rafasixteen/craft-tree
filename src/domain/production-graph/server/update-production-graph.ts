@@ -1,18 +1,15 @@
 'use server';
 
-import { productionGraphs } from '@/db/schema';
-import { ProductionGraph } from '@/domain/production-graph';
-import { eq } from 'drizzle-orm';
 import db from '@/db/client';
+import { productionGraphs } from '@/db/schema';
 
-type UpdateProductionGraphParams = Pick<ProductionGraph, 'id'> &
-	Partial<Omit<ProductionGraph, 'id' | 'inventoryId'>>;
+import { ProductionGraph } from '@/domain/production-graph';
 
-export async function updateProductionGraph({
-	id,
-	name,
-	data,
-}: UpdateProductionGraphParams): Promise<ProductionGraph>
+import { eq } from 'drizzle-orm';
+
+type UpdateProductionGraphParams = Pick<ProductionGraph, 'id'> & Partial<Omit<ProductionGraph, 'id' | 'inventoryId'>>;
+
+export async function updateProductionGraph({ id, name, data }: UpdateProductionGraphParams): Promise<ProductionGraph>
 {
 	const [productionGraph] = await db
 		.update(productionGraphs)

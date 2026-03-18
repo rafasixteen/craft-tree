@@ -1,7 +1,7 @@
 'use client';
 
-import { useNodes, ViewportPortal, useReactFlow } from '@xyflow/react';
 import React from 'react';
+import { ViewportPortal, useNodes, useReactFlow } from '@xyflow/react';
 
 export function NodeInspector()
 {

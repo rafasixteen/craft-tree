@@ -1,4 +1,5 @@
 import { NavUser } from '@/components/user';
+
 import {
 	Sidebar,
 	SidebarContent,
@@ -8,6 +9,7 @@ import {
 	SidebarMenuButton,
 	SidebarRail,
 } from '@/components/ui/sidebar';
+
 import Link from 'next/link';
 
 interface AppSidebar extends React.ComponentProps<typeof Sidebar>
@@ -31,13 +33,8 @@ export function AppSidebar({ children, ...props }: AppSidebar)
 							</Link>
 						</div>
 						<div className="grid flex-1 text-left text-sm/tight">
-							<Link
-								href="/"
-								className="flex w-fit items-center gap-2"
-							>
-								<span className="truncate font-medium">
-									Craft Tree
-								</span>
+							<Link href="/" className="flex w-fit items-center gap-2">
+								<span className="truncate font-medium">Craft Tree</span>
 							</Link>
 						</div>
 					</SidebarMenuButton>

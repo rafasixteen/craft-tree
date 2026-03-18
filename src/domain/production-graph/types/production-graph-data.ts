@@ -1,5 +1,6 @@
-import { ProductionGraphEdge, ProductionGraphNode } from '@/components';
 import { Viewport } from '@xyflow/react';
+
+import { ProductionGraphEdge, ProductionGraphNode } from '@/components';
 
 export interface ProductionGraphData
 {

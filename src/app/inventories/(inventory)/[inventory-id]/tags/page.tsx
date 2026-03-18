@@ -2,18 +2,16 @@
 
 import { Header } from '@/components/sidebar';
 import { tagColumnns } from '@/components/tag';
-import { useMemo } from 'react';
-import { useTags } from '@/domain/tag';
 import { useCurrentInventory } from '@/components/inventory';
-import {
-	useDataTable,
-	DataTablePagination,
-	DataTableFilter,
-	DataTable,
-} from '@/components/data-table';
-import { Button } from '@/components/ui/button';
+import { DataTable, DataTableFilter, DataTablePagination, useDataTable } from '@/components/data-table';
+
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+import { useTags } from '@/domain/tag';
+
 import Link from 'next/link';
+import { useMemo } from 'react';
 
 export default function TagsPage()
 {
@@ -46,9 +44,7 @@ export default function TagsPage()
 						className="h-8 w-64"
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link href={`/inventories/${inventory.id}/tags/add`}>
-							Add Tag
-						</Link>
+						<Link href={`/inventories/${inventory.id}/tags/add`}>Add Tag</Link>
 					</Button>
 				</div>
 			</Header>

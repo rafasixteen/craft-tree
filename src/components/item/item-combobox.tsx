@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import {
 	Combobox,
 	ComboboxContent,
@@ -7,15 +6,14 @@ import {
 	ComboboxItem,
 	ComboboxList,
 } from '@/components/ui/combobox';
+
 import { Item } from '@/domain/item';
+
+import { useCallback } from 'react';
 
 interface ItemComboboxProps extends Omit<
 	React.ComponentProps<typeof Combobox<Item>>,
-	| 'items'
-	| 'value'
-	| 'onValueChange'
-	| 'itemToStringValue'
-	| 'itemToStringLabel'
+	'items' | 'value' | 'onValueChange' | 'itemToStringValue' | 'itemToStringLabel'
 >
 {
 	items: Item[];
@@ -25,21 +23,11 @@ interface ItemComboboxProps extends Omit<
 	'aria-invalid'?: boolean;
 }
 
-export function ItemCombobox({
-	items,
-	value,
-	onChange,
-	...props
-}: ItemComboboxProps)
+export function ItemCombobox({ items, value, onChange, ...props }: ItemComboboxProps)
 {
 	const selectedItem = items.find((item) => item.id === value) ?? null;
 
-	const {
-		'aria-invalid': ariaInvalid,
-		disabled,
-		className,
-		...restProps
-	} = props;
+	const { 'aria-invalid': ariaInvalid, disabled, className, ...restProps } = props;
 
 	const onValueChange = useCallback(
 		function onValueChange(item: Item | null)

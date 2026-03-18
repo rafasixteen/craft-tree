@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function updateSession(request: NextRequest)
 {
@@ -12,16 +12,12 @@ export async function updateSession(request: NextRequest)
 
 	if (!supabaseUrl)
 	{
-		throw new Error(
-			'Missing NEXT_PUBLIC_SUPABASE_URL environment variable',
-		);
+		throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
 	}
 
 	if (!supabaseKey)
 	{
-		throw new Error(
-			'Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable',
-		);
+		throw new Error('Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable');
 	}
 
 	// With Fluid compute, don't put this client in a global environment
@@ -34,15 +30,11 @@ export async function updateSession(request: NextRequest)
 			},
 			setAll(cookiesToSet)
 			{
-				cookiesToSet.forEach(({ name, value }) =>
-					request.cookies.set(name, value),
-				);
+				cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
 				supabaseResponse = NextResponse.next({
 					request,
 				});
-				cookiesToSet.forEach(({ name, value, options }) =>
-					supabaseResponse.cookies.set(name, value, options),
-				);
+				cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
 			},
 		},
 	});
@@ -57,11 +49,7 @@ export async function updateSession(request: NextRequest)
 
 	const user = data?.claims;
 
-	if (
-		!user &&
-		!request.nextUrl.pathname.startsWith('/sign-in') &&
-		!request.nextUrl.pathname.startsWith('/auth')
-	)
+	if (!user && !request.nextUrl.pathname.startsWith('/sign-in') && !request.nextUrl.pathname.startsWith('/auth'))
 	{
 		// no user, potentially respond by redirecting the user to the sign-in page
 		const url = request.nextUrl.clone();

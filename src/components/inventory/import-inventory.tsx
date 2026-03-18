@@ -1,10 +1,13 @@
+import { Button } from '@/components/ui/button';
+
+import { importInventory } from '@/domain/inventory';
+
 import { uploadJson } from '@/lib/upload-json';
-import { Button } from '../ui/button';
-import { useRef } from 'react';
-import { InventoryImportSchema } from '@/lib/validation/inventory';
-import { toast } from 'sonner';
-import { importInventory } from '@/domain/inventory/server/import-inventory';
+import { InventoryImportSchema } from '@/lib/validation';
+
 import z from 'zod';
+import { useRef } from 'react';
+import { toast } from 'sonner';
 
 export function ImportInventoryButton()
 {
@@ -49,13 +52,7 @@ export function ImportInventoryButton()
 
 	return (
 		<>
-			<input
-				ref={inputRef}
-				type="file"
-				accept=".json"
-				className="hidden"
-				onChange={handleFileChange}
-			/>
+			<input ref={inputRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
 			<Button variant="outline" onClick={() => inputRef.current?.click()}>
 				Import
 			</Button>

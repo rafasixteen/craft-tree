@@ -1,15 +1,10 @@
 'use client';
 
-import { Controller, useForm } from 'react-hook-form';
-import {
-	Field,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-	FieldDescription,
-} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+
 import z from 'zod';
+import { Controller, useForm } from 'react-hook-form';
 
 export const productionGraphFormSchema = z.object({
 	name: z
@@ -20,9 +15,7 @@ export const productionGraphFormSchema = z.object({
 		.transform((val) => val.split(' ').filter(Boolean).join(' ')),
 });
 
-export type ProductionGraphFormValues = z.infer<
-	typeof productionGraphFormSchema
->;
+export type ProductionGraphFormValues = z.infer<typeof productionGraphFormSchema>;
 
 interface ProductionGraphFormProps
 {
@@ -31,18 +24,10 @@ interface ProductionGraphFormProps
 	onSubmit: (data: ProductionGraphFormValues) => Promise<void>;
 }
 
-export function ProductionGraphForm({
-	id,
-	form,
-	onSubmit,
-}: ProductionGraphFormProps)
+export function ProductionGraphForm({ id, form, onSubmit }: ProductionGraphFormProps)
 {
 	return (
-		<form
-			id={id}
-			onSubmit={form.handleSubmit(onSubmit)}
-			className="flex min-h-0 flex-1 flex-col"
-		>
+		<form id={id} onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
 			<FieldGroup className="flex min-h-0 flex-1 flex-col">
 				<Controller
 					name="name"
@@ -50,10 +35,7 @@ export function ProductionGraphForm({
 					render={({ field, fieldState }) => (
 						<Field data-invalid={fieldState.invalid}>
 							<FieldLabel htmlFor="name">Name</FieldLabel>
-							<FieldDescription>
-								Name of the production graph for display
-								purposes.
-							</FieldDescription>
+							<FieldDescription>Name of the production graph for display purposes.</FieldDescription>
 							<Input
 								{...field}
 								id="name"
@@ -61,9 +43,7 @@ export function ProductionGraphForm({
 								placeholder="Production graph name"
 								autoComplete="off"
 							/>
-							{fieldState.invalid && (
-								<FieldError errors={[fieldState.error]} />
-							)}
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 						</Field>
 					)}
 				/>

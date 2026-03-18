@@ -1,19 +1,19 @@
 'use server';
 
-import { Item } from '@/domain/item';
-import { producerOutputs, producers } from '@/db/schema';
-import { Producer } from '@/domain/producer';
-import { asc, eq } from 'drizzle-orm';
 import db from '@/db/client';
+import { producerOutputs, producers } from '@/db/schema';
+
+import { Item } from '@/domain/item';
+import { Producer } from '@/domain/producer';
+
+import { asc, eq } from 'drizzle-orm';
 
 interface GetProducersByOutputItemParams
 {
 	itemId: Item['id'];
 }
 
-export async function getProducersByOutputItem({
-	itemId,
-}: GetProducersByOutputItemParams): Promise<Producer[]>
+export async function getProducersByOutputItem({ itemId }: GetProducersByOutputItemParams): Promise<Producer[]>
 {
 	return await db
 		.selectDistinct({
@@ -23,10 +23,7 @@ export async function getProducersByOutputItem({
 			inventoryId: producers.inventoryId,
 		})
 		.from(producers)
-		.innerJoin(
-			producerOutputs,
-			eq(producerOutputs.producerId, producers.id),
-		)
+		.innerJoin(producerOutputs, eq(producerOutputs.producerId, producers.id))
 		.where(eq(producerOutputs.itemId, itemId))
 		.orderBy(asc(producers.name));
 }

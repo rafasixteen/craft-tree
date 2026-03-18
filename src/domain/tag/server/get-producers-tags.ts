@@ -1,19 +1,19 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
-import { producerTags, tags } from '@/db/schema';
-import { ProducerTag } from '@/domain/producer';
-import { Inventory } from '@/domain/inventory';
 import db from '@/db/client';
+import { producerTags, tags } from '@/db/schema';
+
+import { Inventory } from '@/domain/inventory';
+import { ProducerTag } from '@/domain/producer';
+
+import { eq } from 'drizzle-orm';
 
 interface GetProducersTagsParams
 {
 	inventoryId: Inventory['id'];
 }
 
-export async function getProducersTags({
-	inventoryId,
-}: GetProducersTagsParams): Promise<ProducerTag[]>
+export async function getProducersTags({ inventoryId }: GetProducersTagsParams): Promise<ProducerTag[]>
 {
 	return await db
 		.select({

@@ -1,15 +1,15 @@
 'use server';
 
-import { inArray } from 'drizzle-orm';
-import { items, producers, producerInputs, producerOutputs } from '@/db/schema';
+import db from '@/db/client';
+import { items, producerInputs, producerOutputs, producers } from '@/db/schema';
+
 import { Item } from '@/domain/item';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
 import { RecipeTreeData } from '@/domain/recipe-tree/types/recipe-tree-data';
-import db from '@/db/client';
 
-export async function getRecipeTreeData(
-	itemId: string,
-): Promise<RecipeTreeData>
+import { inArray } from 'drizzle-orm';
+
+export async function getRecipeTreeData(itemId: string): Promise<RecipeTreeData>
 {
 	const itemsResult: Item[] = [];
 	const producersResult: Producer[] = [];
@@ -21,9 +21,7 @@ export async function getRecipeTreeData(
 
 	while (pendingItemIds.length > 0)
 	{
-		const currentItemIds = pendingItemIds.filter(
-			(itemId) => !visitedItemIds.has(itemId),
-		);
+		const currentItemIds = pendingItemIds.filter((itemId) => !visitedItemIds.has(itemId));
 		pendingItemIds = [];
 
 		if (currentItemIds.length === 0)
@@ -34,10 +32,7 @@ export async function getRecipeTreeData(
 		currentItemIds.forEach((itemId) => visitedItemIds.add(itemId));
 
 		// Fetch items
-		const nextItems = await db
-			.select()
-			.from(items)
-			.where(inArray(items.id, currentItemIds));
+		const nextItems = await db.select().from(items).where(inArray(items.id, currentItemIds));
 		itemsResult.push(...nextItems);
 
 		// Fetch producers that output these items
@@ -47,18 +42,13 @@ export async function getRecipeTreeData(
 			.where(inArray(producerOutputs.itemId, currentItemIds));
 		producerOutputsResult.push(...nextProducerOutputs);
 
-		const producerIds = nextProducerOutputs.map(
-			(output) => output.producerId,
-		);
+		const producerIds = nextProducerOutputs.map((output) => output.producerId);
 
 		let nextProducers: Producer[] = [];
 
 		if (producerIds.length > 0)
 		{
-			nextProducers = await db
-				.select()
-				.from(producers)
-				.where(inArray(producers.id, producerIds));
+			nextProducers = await db.select().from(producers).where(inArray(producers.id, producerIds));
 			producersResult.push(...nextProducers);
 		}
 
@@ -67,23 +57,16 @@ export async function getRecipeTreeData(
 
 		if (producerIds.length > 0)
 		{
-			nextInputs = await db
-				.select()
-				.from(producerInputs)
-				.where(inArray(producerInputs.producerId, producerIds));
+			nextInputs = await db.select().from(producerInputs).where(inArray(producerInputs.producerId, producerIds));
 			producerInputsResult.push(...nextInputs);
 		}
 
 		// Add input items to pending if not visited
-		const nextItemIds = nextInputs
-			.map((input) => input.itemId)
-			.filter((iid) => !visitedItemIds.has(iid));
+		const nextItemIds = nextInputs.map((input) => input.itemId).filter((iid) => !visitedItemIds.has(iid));
 
 		if (nextItemIds.length > 0)
 		{
-			pendingItemIds = Array.from(
-				new Set([...pendingItemIds, ...nextItemIds]),
-			);
+			pendingItemIds = Array.from(new Set([...pendingItemIds, ...nextItemIds]));
 		}
 	}
 

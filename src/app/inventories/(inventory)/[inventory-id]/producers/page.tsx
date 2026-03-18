@@ -2,21 +2,24 @@
 
 import { Header } from '@/components/sidebar';
 import { producerColumnns } from '@/components/producer';
-import { useMemo } from 'react';
-import { useProducers } from '@/domain/producer';
 import { useCurrentInventory } from '@/components/inventory';
 import {
-	useDataTable,
-	DataTablePagination,
-	DataTableFilter,
-	DataTableFacetedFilter,
 	DataTable,
+	DataTableFacetedFilter,
+	DataTableFilter,
+	DataTablePagination,
+	useDataTable,
 } from '@/components/data-table';
-import { useProducersTags, useTags } from '@/domain/tag';
-import { Button } from '@/components/ui/button';
-import { TagsIcon } from 'lucide-react';
+
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+import { useProducers } from '@/domain/producer';
+import { useProducersTags, useTags } from '@/domain/tag';
+
 import Link from 'next/link';
+import { useMemo } from 'react';
+import { TagsIcon } from 'lucide-react';
 
 export default function ProducersPage()
 {
@@ -32,14 +35,8 @@ export default function ProducersPage()
 			producers.map((producer) => ({
 				...producer,
 				tags: producersTags
-					.filter(
-						(producerTag) => producerTag.producerId === producer.id,
-					)
-					.map(
-						(producerTag) =>
-							tags.find((tag) => tag.id === producerTag.tagId)
-								?.name || '',
-					),
+					.filter((producerTag) => producerTag.producerId === producer.id)
+					.map((producerTag) => tags.find((tag) => tag.id === producerTag.tagId)?.name || ''),
 			})),
 		[producers, producersTags, tags],
 	);
@@ -70,21 +67,13 @@ export default function ProducersPage()
 						title="Tags"
 						options={tagsOptions}
 						trigger={
-							<Button
-								variant="secondary"
-								size="icon-lg"
-								className="h-8"
-							>
+							<Button variant="secondary" size="icon-lg" className="h-8">
 								<TagsIcon className="size-3" />
 							</Button>
 						}
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link
-							href={`/inventories/${inventory.id}/producers/add`}
-						>
-							Add Producer
-						</Link>
+						<Link href={`/inventories/${inventory.id}/producers/add`}>Add Producer</Link>
 					</Button>
 				</div>
 			</Header>

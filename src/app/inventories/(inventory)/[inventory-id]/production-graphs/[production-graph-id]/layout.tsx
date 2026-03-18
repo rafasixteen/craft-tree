@@ -1,4 +1,5 @@
 import { getProductionGraphById } from '@/domain/production-graph';
+
 import { SWRConfig, unstable_serialize } from 'swr';
 
 export default async function ProductionGraphLayout({
@@ -12,10 +13,8 @@ export default async function ProductionGraphLayout({
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize([
-						'production-graph',
-						productionGraphId,
-					])]: getProductionGraphById(productionGraphId),
+					[unstable_serialize(['production-graph', productionGraphId])]:
+						getProductionGraphById(productionGraphId),
 				},
 			}}
 		>

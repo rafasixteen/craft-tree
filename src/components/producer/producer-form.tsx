@@ -1,24 +1,21 @@
 'use client';
 
-import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Field,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-	FieldContent,
-	FieldDescription,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { TagsCombobox } from '@/components/tag/tags-combo-box';
-import { useItems } from '@/domain/item';
-import { XIcon } from 'lucide-react';
 import { ItemCombobox } from '@/components/item';
 import { useCurrentInventory } from '@/components/inventory';
+import { TagsCombobox } from '@/components/tag/tags-combo-box';
+
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+
+import { useItems } from '@/domain/item';
+
 import { cn } from '@/lib/utils';
+
 import z from 'zod';
+import { XIcon } from 'lucide-react';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 const pairSchema = z.object({
 	itemId: z.string('Item must be selected').min(1, 'Item must be selected.'),
@@ -56,11 +53,7 @@ interface ProducerFormProps
 export function ProducerForm({ id, form, onSubmit }: ProducerFormProps)
 {
 	return (
-		<form
-			id={id}
-			onSubmit={form.handleSubmit(onSubmit)}
-			className="flex min-h-0 flex-1 flex-col"
-		>
+		<form id={id} onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
 			<FieldGroup className="flex min-h-0 flex-1 flex-col">
 				<div className="flex flex-row gap-4">
 					<Controller
@@ -69,9 +62,7 @@ export function ProducerForm({ id, form, onSubmit }: ProducerFormProps)
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid}>
 								<FieldLabel htmlFor="name">Name</FieldLabel>
-								<FieldDescription>
-									Name of the producer for display purposes.
-								</FieldDescription>
+								<FieldDescription>Name of the producer for display purposes.</FieldDescription>
 								<Input
 									{...field}
 									id="name"
@@ -79,9 +70,7 @@ export function ProducerForm({ id, form, onSubmit }: ProducerFormProps)
 									placeholder="Producer name"
 									autoComplete="off"
 								/>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
+								{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 							</Field>
 						)}
 					/>
@@ -90,12 +79,8 @@ export function ProducerForm({ id, form, onSubmit }: ProducerFormProps)
 						control={form.control}
 						render={({ field, fieldState }) => (
 							<Field data-invalid={fieldState.invalid}>
-								<FieldLabel htmlFor="time">
-									Time (seconds)
-								</FieldLabel>
-								<FieldDescription>
-									Time required to produce the outputs.
-								</FieldDescription>
+								<FieldLabel htmlFor="time">Time (seconds)</FieldLabel>
+								<FieldDescription>Time required to produce the outputs.</FieldDescription>
 								<Input
 									{...field}
 									type="number"
@@ -104,13 +89,9 @@ export function ProducerForm({ id, form, onSubmit }: ProducerFormProps)
 									id="time"
 									aria-invalid={fieldState.invalid}
 									placeholder="Time in seconds"
-									onChange={(e) =>
-										field.onChange(e.target.valueAsNumber)
-									}
+									onChange={(e) => field.onChange(e.target.valueAsNumber)}
 								/>
-								{fieldState.invalid && (
-									<FieldError errors={[fieldState.error]} />
-								)}
+								{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 							</Field>
 						)}
 					/>
@@ -122,18 +103,14 @@ export function ProducerForm({ id, form, onSubmit }: ProducerFormProps)
 					render={({ field, fieldState }) => (
 						<Field data-invalid={fieldState.invalid}>
 							<FieldLabel htmlFor="tagIds">Tags</FieldLabel>
-							<FieldDescription>
-								Optional tags for categorizing producers.
-							</FieldDescription>
+							<FieldDescription>Optional tags for categorizing producers.</FieldDescription>
 							<TagsCombobox
 								{...field}
 								onIdsChange={field.onChange}
 								id="tagIds"
 								aria-invalid={fieldState.invalid}
 							/>
-							{fieldState.invalid && (
-								<FieldError errors={[fieldState.error]} />
-							)}
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 						</Field>
 					)}
 				/>
@@ -176,11 +153,7 @@ interface ItemPairsFieldArrayProps
 	description?: string;
 }
 
-function ItemPairsFieldArray({
-	name,
-	form,
-	description,
-}: ItemPairsFieldArrayProps)
+function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayProps)
 {
 	const fieldArray = useFieldArray({
 		control: form.control,
@@ -213,17 +186,12 @@ function ItemPairsFieldArray({
 
 	return (
 		<Field className="min-h-0 flex-1 basis-0 flex-col">
-			<FieldLabel className={cn(dataInvalid && 'text-destructive')}>
-				{legend}
-			</FieldLabel>
+			<FieldLabel className={cn(dataInvalid && 'text-destructive')}>{legend}</FieldLabel>
 			{description && <FieldDescription>{description}</FieldDescription>}
 
 			{/* Scrollable container */}
 			<ScrollArea
-				className={cn(
-					classNameFromInput,
-					'min-h-0 flex-1 basis-0 rounded-md border p-3 pb-0',
-				)}
+				className={cn(classNameFromInput, 'min-h-0 flex-1 basis-0 rounded-md border p-3 pb-0')}
 				aria-invalid={dataInvalid}
 			>
 				{/* Sticky top button */}
@@ -232,9 +200,7 @@ function ItemPairsFieldArray({
 						<Button
 							type="button"
 							variant="secondary"
-							onClick={() =>
-								fieldArray.append({ itemId: '', quantity: 1 })
-							}
+							onClick={() => fieldArray.append({ itemId: '', quantity: 1 })}
 							disabled={disableAdd}
 							className="w-full"
 						>
@@ -247,9 +213,7 @@ function ItemPairsFieldArray({
 				{
 					// Filter out already selected items except current row
 					const filteredItems = items.filter(
-						(item) =>
-							!usedItemIds.includes(item.id) ||
-							item.id === fieldValues[index].itemId,
+						(item) => !usedItemIds.includes(item.id) || item.id === fieldValues[index].itemId,
 					);
 
 					return (
@@ -259,28 +223,16 @@ function ItemPairsFieldArray({
 								key={`${field.id}-itemId`}
 								name={`${name}.${index}.itemId`}
 								control={form.control}
-								render={({
-									field: controllerField,
-									fieldState,
-								}) => (
-									<Field
-										orientation="horizontal"
-										data-invalid={fieldState.invalid}
-									>
+								render={({ field: controllerField, fieldState }) => (
+									<Field orientation="horizontal" data-invalid={fieldState.invalid}>
 										<FieldContent>
 											<ItemCombobox
 												{...controllerField}
 												items={filteredItems}
 												id={`${name}-item-${index}`}
-												aria-invalid={
-													fieldState.invalid
-												}
+												aria-invalid={fieldState.invalid}
 											/>
-											{fieldState.invalid && (
-												<FieldError
-													errors={[fieldState.error]}
-												/>
-											)}
+											{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 										</FieldContent>
 									</Field>
 								)}
@@ -291,35 +243,19 @@ function ItemPairsFieldArray({
 								key={`${field.id}-quantity`}
 								name={`${name}.${index}.quantity`}
 								control={form.control}
-								render={({
-									field: controllerField,
-									fieldState,
-								}) => (
-									<Field
-										orientation="horizontal"
-										data-invalid={fieldState.invalid}
-									>
+								render={({ field: controllerField, fieldState }) => (
+									<Field orientation="horizontal" data-invalid={fieldState.invalid}>
 										<FieldContent>
 											<Input
 												{...controllerField}
 												type="number"
 												min={1}
 												id={`${name}-quantity-${index}`}
-												aria-invalid={
-													fieldState.invalid
-												}
+												aria-invalid={fieldState.invalid}
 												placeholder="Qty"
-												onChange={(e) =>
-													controllerField.onChange(
-														e.target.valueAsNumber,
-													)
-												}
+												onChange={(e) => controllerField.onChange(e.target.valueAsNumber)}
 											/>
-											{fieldState.invalid && (
-												<FieldError
-													errors={[fieldState.error]}
-												/>
-											)}
+											{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 										</FieldContent>
 									</Field>
 								)}
@@ -340,9 +276,7 @@ function ItemPairsFieldArray({
 				})}
 			</ScrollArea>
 
-			{form.formState.errors[name]?.message && (
-				<FieldError errors={[form.formState.errors[name]]} />
-			)}
+			{form.formState.errors[name]?.message && <FieldError errors={[form.formState.errors[name]]} />}
 		</Field>
 	);
 }

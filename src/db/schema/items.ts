@@ -1,5 +1,6 @@
-import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
 import { inventories } from '@/db/schema';
+
+import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 export const items = pgTable('items', {
 	id: uuid('id').defaultRandom().primaryKey(),

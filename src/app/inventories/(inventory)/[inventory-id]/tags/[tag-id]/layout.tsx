@@ -1,4 +1,5 @@
 import { getTagById } from '@/domain/tag';
+
 import { SWRConfig, unstable_serialize } from 'swr';
 
 export default async function TagLayout({

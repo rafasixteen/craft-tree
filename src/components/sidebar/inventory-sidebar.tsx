@@ -1,23 +1,15 @@
-import {
-	FactoryIcon,
-	PackageIcon,
-	TagsIcon,
-	WaypointsIcon,
-} from 'lucide-react';
-import { Inventory } from '@/domain/inventory';
 import { AppSidebar, NavGroup } from '@/components/sidebar';
 
-interface InventorySidebarProps extends React.ComponentProps<
-	typeof AppSidebar
->
+import { Inventory } from '@/domain/inventory';
+
+import { FactoryIcon, PackageIcon, TagsIcon, WaypointsIcon } from 'lucide-react';
+
+interface InventorySidebarProps extends React.ComponentProps<typeof AppSidebar>
 {
 	inventoryId: Inventory['id'];
 }
 
-export function InventorySidebar({
-	inventoryId,
-	...props
-}: InventorySidebarProps)
+export function InventorySidebar({ inventoryId, ...props }: InventorySidebarProps)
 {
 	const base = `/inventories/${inventoryId}`;
 

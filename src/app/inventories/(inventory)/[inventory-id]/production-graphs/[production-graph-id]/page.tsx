@@ -1,8 +1,10 @@
-import { cookies } from 'next/headers';
 import { Header } from '@/components/sidebar';
 import { ProductionGraph } from '@/components/production-graph/flow';
-import { ReactFlowProvider } from '@xyflow/react';
+
 import { getProductionGraphById } from '@/domain/production-graph';
+
+import { cookies } from 'next/headers';
+import { ReactFlowProvider } from '@xyflow/react';
 
 export default async function ProductionGraphPage({
 	params,
@@ -11,10 +13,7 @@ export default async function ProductionGraphPage({
 	const cookieStore = await cookies();
 	const themeCookie = cookieStore.get('theme')?.value;
 
-	const initialTheme =
-		themeCookie === 'dark' || themeCookie === 'light'
-			? themeCookie
-			: 'light';
+	const initialTheme = themeCookie === 'dark' || themeCookie === 'light' ? themeCookie : 'light';
 
 	const { 'production-graph-id': productionGraphId } = await params;
 	const productionGraph = await getProductionGraphById(productionGraphId);

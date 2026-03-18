@@ -1,8 +1,9 @@
 'use client';
 
-import { getItemTags, Item, setItemTags } from '@/domain/item';
-import { useCallback } from 'react';
+import { Item, getItemTags, setItemTags } from '@/domain/item';
+
 import useSWR from 'swr';
+import { useCallback } from 'react';
 
 type SetTagsParams = Omit<Parameters<typeof setItemTags>[0], 'itemId'>;
 

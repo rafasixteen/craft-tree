@@ -1,24 +1,11 @@
-import {
-	BaseEdge,
-	EdgeProps,
-	EdgeLabelRenderer,
-	getBezierPath,
-} from '@xyflow/react';
-import {
-	EdgeStatus,
-	ItemFlowGraphEdge,
-} from '@/components/production-graph/flow/types';
-import {
-	useEdgeStatus,
-	useSupply,
-} from '@/components/production-graph/flow/hooks';
+import { useEdgeStatus, useSupply } from '@/components/production-graph/flow/hooks';
+import { EdgeStatus, ItemFlowGraphEdge } from '@/components/production-graph/flow/types';
+
 import { formatNumber } from '@/lib/utils';
 
-export function ItemFlowEdge({
-	id,
-	selected,
-	...otherProps
-}: EdgeProps<ItemFlowGraphEdge>)
+import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
+
+export function ItemFlowEdge({ id, selected, ...otherProps }: EdgeProps<ItemFlowGraphEdge>)
 {
 	const { source, target, sourceHandleId, targetHandleId } = otherProps;
 
@@ -46,18 +33,10 @@ export function ItemFlowEdge({
 
 	return (
 		<>
-			<BaseEdge
-				id={id}
-				path={edgePath}
-				style={{ stroke: color, strokeWidth: 2 }}
-			/>
+			<BaseEdge id={id} path={edgePath} style={{ stroke: color, strokeWidth: 2 }} />
 			<EdgeLabelRenderer>
-				<div
-					style={{ ...style, color }}
-					className="nodrag nopan absolute"
-				>
-					{supply &&
-						`${formatNumber(supply.amount, 3)}/${supply.per.charAt(0)}`}
+				<div style={{ ...style, color }} className="nodrag nopan absolute">
+					{supply && `${formatNumber(supply.amount, 3)}/${supply.per.charAt(0)}`}
 				</div>
 			</EdgeLabelRenderer>
 		</>

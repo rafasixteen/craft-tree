@@ -1,10 +1,12 @@
 'use server';
 
-import { items, itemTags } from '@/db/schema';
-import { Item, ItemQueryOptions } from '@/domain/item';
-import { Inventory } from '@/domain/inventory';
-import { asc, desc, and, eq, ilike, exists, inArray } from 'drizzle-orm';
 import db from '@/db/client';
+import { itemTags, items } from '@/db/schema';
+
+import { Inventory } from '@/domain/inventory';
+import { Item, ItemQueryOptions } from '@/domain/item';
+
+import { and, asc, desc, eq, exists, ilike, inArray } from 'drizzle-orm';
 
 interface GetItemsParams
 {
@@ -12,10 +14,7 @@ interface GetItemsParams
 	options?: ItemQueryOptions;
 }
 
-export async function getItems({
-	inventoryId,
-	options,
-}: GetItemsParams): Promise<Item[]>
+export async function getItems({ inventoryId, options }: GetItemsParams): Promise<Item[]>
 {
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';
@@ -34,12 +33,7 @@ export async function getItems({
 				db
 					.select()
 					.from(itemTags)
-					.where(
-						and(
-							eq(itemTags.itemId, items.id),
-							inArray(itemTags.tagId, filters.tagIds),
-						),
-					),
+					.where(and(eq(itemTags.itemId, items.id), inArray(itemTags.tagId, filters.tagIds))),
 			),
 		);
 	}

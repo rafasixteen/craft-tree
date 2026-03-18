@@ -1,11 +1,14 @@
 'use client';
 
 import { Header } from '@/components/sidebar';
+
 import { Button } from '@/components/ui/button';
-import { useItemTags, useItem } from '@/domain/item';
+
 import { useTags } from '@/domain/tag';
-import { useParams } from 'next/navigation';
+import { useItem, useItemTags } from '@/domain/item';
+
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function ItemPage()
 {
@@ -17,20 +20,14 @@ export default function ItemPage()
 	const { tags: itemTags } = useItemTags(itemId);
 	const { tags: inventoryTags } = useTags({ inventoryId: item.inventoryId });
 
-	const tags = itemTags.map((tag) =>
-		inventoryTags.find((t) => t.id === tag.tagId),
-	);
+	const tags = itemTags.map((tag) => inventoryTags.find((t) => t.id === tag.tagId));
 
 	return (
 		<>
 			<Header />
 			<div className="mx-auto max-w-3xl px-6 py-8">
 				<Button className="mb-4" variant="outline" size="sm" asChild>
-					<Link
-						href={`/inventories/${item.inventoryId}/items/${itemId}/recipe-tree`}
-					>
-						Recipe Tree
-					</Link>
+					<Link href={`/inventories/${item.inventoryId}/items/${itemId}/recipe-tree`}>Recipe Tree</Link>
 				</Button>
 
 				<section className="mb-8">

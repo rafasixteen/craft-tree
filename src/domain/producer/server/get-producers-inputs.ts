@@ -1,19 +1,19 @@
 'use server';
 
-import { producerInputs, producers } from '@/db/schema';
-import { ProducerInput } from '@/domain/producer';
-import { eq } from 'drizzle-orm';
-import { Inventory } from '@/domain/inventory';
 import db from '@/db/client';
+import { producerInputs, producers } from '@/db/schema';
+
+import { Inventory } from '@/domain/inventory';
+import { ProducerInput } from '@/domain/producer';
+
+import { eq } from 'drizzle-orm';
 
 interface GetProducersInputsParams
 {
 	inventoryId: Inventory['id'];
 }
 
-export async function getProducersInputs({
-	inventoryId,
-}: GetProducersInputsParams): Promise<ProducerInput[]>
+export async function getProducersInputs({ inventoryId }: GetProducersInputsParams): Promise<ProducerInput[]>
 {
 	const inputs = await db
 		.select({

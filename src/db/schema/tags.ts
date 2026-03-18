@@ -1,5 +1,6 @@
-import { pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 import { inventories } from '@/db/schema';
+
+import { pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 
 export const tags = pgTable(
 	'tags',
@@ -12,7 +13,5 @@ export const tags = pgTable(
 			.notNull()
 			.references(() => inventories.id, { onDelete: 'cascade' }),
 	},
-	(table) => [
-		unique('unique_inventory_tag_name').on(table.inventoryId, table.name),
-	],
+	(table) => [unique('unique_inventory_tag_name').on(table.inventoryId, table.name)],
 );

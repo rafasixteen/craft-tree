@@ -1,6 +1,4 @@
-import { Column } from '@tanstack/react-table';
-import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
 	Command,
 	CommandEmpty,
@@ -10,11 +8,11 @@ import {
 	CommandList,
 	CommandSeparator,
 } from '@/components/ui/command';
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@/components/ui/popover';
+
+import { cn } from '@/lib/utils';
+
+import { Check } from 'lucide-react';
+import { Column } from '@tanstack/react-table';
 
 interface Option
 {
@@ -51,9 +49,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 						<CommandGroup>
 							{options.map((option) =>
 							{
-								const isSelected = selectedValues.has(
-									option.value,
-								);
+								const isSelected = selectedValues.has(option.value);
 
 								return (
 									<CommandItem
@@ -62,24 +58,15 @@ export function DataTableFacetedFilter<TData, TValue>({
 										{
 											if (isSelected)
 											{
-												selectedValues.delete(
-													option.value,
-												);
+												selectedValues.delete(option.value);
 											}
 											else
 											{
-												selectedValues.add(
-													option.value,
-												);
+												selectedValues.add(option.value);
 											}
 
-											const filterValues =
-												Array.from(selectedValues);
-											column?.setFilterValue(
-												filterValues.length
-													? filterValues
-													: undefined,
-											);
+											const filterValues = Array.from(selectedValues);
+											column?.setFilterValue(filterValues.length ? filterValues : undefined);
 										}}
 									>
 										<div
@@ -107,9 +94,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 								<CommandSeparator />
 								<CommandGroup>
 									<CommandItem
-										onSelect={() =>
-											column?.setFilterValue(undefined)
-										}
+										onSelect={() => column?.setFilterValue(undefined)}
 										className="justify-center text-center"
 									>
 										Clear filters

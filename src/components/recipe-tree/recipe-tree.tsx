@@ -1,25 +1,23 @@
 'use client';
 
 import '@xyflow/react/dist/style.css';
-import {
-	ReactFlow,
-	Controls,
-	Background,
-	useNodesState,
-	Edge,
-	Node,
-	useEdgesState,
-	useReactFlow,
-	useNodesInitialized,
-} from '@xyflow/react';
+
+import { useRecipeTreeNodes } from '@/components/recipe-tree/hooks';
+import { BillOfMaterialsOverlay, config, layoutRecipeTree } from '@/components/recipe-tree';
+
+import { useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import {
-	config,
-	layoutRecipeTree,
-	BillOfMaterialsOverlay,
-} from '@/components/recipe-tree';
-import { useRecipeTreeNodes } from '@/components/recipe-tree/hooks';
-import { useEffect } from 'react';
+	Background,
+	Controls,
+	Edge,
+	Node,
+	ReactFlow,
+	useEdgesState,
+	useNodesInitialized,
+	useNodesState,
+	useReactFlow,
+} from '@xyflow/react';
 
 interface RecipeTreeProps
 {
@@ -54,13 +52,11 @@ export function RecipeTree({ initialTheme }: RecipeTreeProps)
 	{
 		if (nodesInitialized)
 		{
-			layoutRecipeTree(getNodes(), getEdges()).then(
-				({ nodes: layoutedNodes, edges: layoutedEdges }) =>
-				{
-					setNodes(layoutedNodes);
-					setEdges(layoutedEdges);
-				},
-			);
+			layoutRecipeTree(getNodes(), getEdges()).then(({ nodes: layoutedNodes, edges: layoutedEdges }) =>
+			{
+				setNodes(layoutedNodes);
+				setEdges(layoutedEdges);
+			});
 		}
 	}, [nodesInitialized]);
 

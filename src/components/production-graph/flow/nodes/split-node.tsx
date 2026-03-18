@@ -1,31 +1,24 @@
 'use client';
 
-import {
-	BaseNode,
-	BaseNodeHeader,
-	BaseNodeContent,
-} from '@/components/base-node';
 import { LabeledHandle } from '@/components/labeled-handle';
-import { Button } from '@/components/ui/button';
-import {
-	NodeProps,
-	Position,
-	useNodeConnections,
-	useReactFlow,
-	useUpdateNodeInternals,
-} from '@xyflow/react';
-import { SplitGraphNode } from '@/components/production-graph/flow/types';
-import { PlusIcon, XIcon } from 'lucide-react';
-import { ProductionRate } from '@/domain/production-graph';
-import { ProductionRateComponent } from '@/components/production-graph/flow/production-rate';
 import { useSupply } from '@/components/production-graph/flow/hooks';
-import { useCallback, useEffect } from 'react';
+import { SplitGraphNode } from '@/components/production-graph/flow/types';
+import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
+import { ProductionRateComponent } from '@/components/production-graph/flow/production-rate';
+
+import { Button } from '@/components/ui/button';
+
+import { ProductionRate } from '@/domain/production-graph';
+
 import { cn } from '@/lib/utils';
+
+import { PlusIcon, XIcon } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
+import { NodeProps, Position, useNodeConnections, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 
 export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 {
-	const { updateNodeData, getEdges, deleteElements } =
-		useReactFlow<SplitGraphNode>();
+	const { updateNodeData, getEdges, deleteElements } = useReactFlow<SplitGraphNode>();
 	const updateNodeInternals = useUpdateNodeInternals();
 
 	// TODO: Can we make the useSupply hook use the useNodeConnections
@@ -97,14 +90,7 @@ export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 			updateNodeData(id, { rates: newRates });
 			updateNodeInternals(id);
 		},
-		[
-			id,
-			rates,
-			getEdges,
-			deleteElements,
-			updateNodeData,
-			updateNodeInternals,
-		],
+		[id, rates, getEdges, deleteElements, updateNodeData, updateNodeInternals],
 	);
 
 	useEffect(() =>
@@ -115,48 +101,29 @@ export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 	}, [supply?.itemId, id]);
 
 	return (
-		<BaseNode
-			className={cn(
-				'flex flex-col p-0',
-				selected && 'ring-2 ring-primary',
-			)}
-		>
+		<BaseNode className={cn('flex flex-col p-0', selected && 'ring-2 ring-primary')}>
 			<BaseNodeHeader className="flex flex-col border-b">
 				<div className="flex w-full items-center justify-between gap-2">
 					<span>Split Node</span>
-					<Button
-						variant="ghost"
-						size="icon-xs"
-						onClick={addOutput}
-						className="nodrag"
-					>
+					<Button variant="ghost" size="icon-xs" onClick={addOutput} className="nodrag">
 						<PlusIcon className="size-3" />
 					</Button>
 				</div>
 			</BaseNodeHeader>
 			{rates.length > 0 && (
 				<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
-					<LabeledHandle
-						type="target"
-						position={Position.Left}
-						title="Input"
-					/>
+					<LabeledHandle type="target" position={Position.Left} title="Input" />
 					<div className="flex flex-col justify-center gap-3">
 						{rates.map((rate, index) =>
 						{
 							const edges = getEdges();
 							const handleId = String(index);
 							const hasConnection = edges.some(
-								(edge) =>
-									edge.source === id &&
-									edge.sourceHandle === handleId,
+								(edge) => edge.source === id && edge.sourceHandle === handleId,
 							);
 
 							return (
-								<div
-									key={index}
-									className="flex items-center gap-2"
-								>
+								<div key={index} className="flex items-center gap-2">
 									<Button
 										variant="destructive"
 										size="icon-xs"
@@ -168,12 +135,7 @@ export function SplitNode({ id, data, selected }: NodeProps<SplitGraphNode>)
 									</Button>
 									<ProductionRateComponent
 										value={rate}
-										onChange={(newRate) =>
-											onProductionRateChange(
-												index,
-												newRate,
-											)
-										}
+										onChange={(newRate) => onProductionRateChange(index, newRate)}
 										className="nodrag w-full"
 									/>
 									<LabeledHandle

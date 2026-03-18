@@ -1,15 +1,11 @@
+import { cn } from '@/lib/utils';
+
 import type { ComponentProps } from 'react';
 import { Handle, type HandleProps } from '@xyflow/react';
 
-import { cn } from '@/lib/utils';
-
 export type BaseHandleProps = HandleProps;
 
-export function BaseHandle({
-	className,
-	children,
-	...props
-}: ComponentProps<typeof Handle>)
+export function BaseHandle({ className, children, ...props }: ComponentProps<typeof Handle>)
 {
 	return (
 		<Handle

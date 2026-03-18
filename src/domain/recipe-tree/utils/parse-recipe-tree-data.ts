@@ -1,9 +1,5 @@
-import {
-	RecipeTreeData,
-	RecipeTreeNode,
-	RecipeTreeState,
-} from '@/domain/recipe-tree';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
+import { RecipeTreeData, RecipeTreeNode, RecipeTreeState } from '@/domain/recipe-tree';
 
 export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 {
@@ -21,9 +17,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 
 	for (const producer of producers)
 	{
-		for (const output of producerOutputs.filter(
-			(o) => o.producerId === producer.id,
-		))
+		for (const output of producerOutputs.filter((o) => o.producerId === producer.id))
 		{
 			if (!producersByOutputItemId.has(output.itemId))
 			{
@@ -57,11 +51,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 	const nodes: Record<string, RecipeTreeNode> = {};
 	let nodeCounter = 0;
 
-	function buildNode(
-		itemId: string,
-		parentId: string | null,
-		visiting: Set<string> = new Set(),
-	): RecipeTreeNode
+	function buildNode(itemId: string, parentId: string | null, visiting: Set<string> = new Set()): RecipeTreeNode
 	{
 		const item = itemsById.get(itemId);
 
@@ -104,9 +94,7 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 			id: nodeId,
 			item,
 			producers: visiting.has(itemId) ? [] : nodeProducers,
-			selectedProducerId: visiting.has(itemId)
-				? null
-				: (nodeProducers[0]?.id ?? null),
+			selectedProducerId: visiting.has(itemId) ? null : (nodeProducers[0]?.id ?? null),
 			parentId,
 			children: nodeChildren,
 			producerInputs: nodeProducerInputs,

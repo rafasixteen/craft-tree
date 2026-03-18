@@ -1,24 +1,20 @@
 'use client';
 
-import { useItemTags } from '@/domain/item';
-import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/sidebar';
-import { useItem } from '@/domain/item';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { ItemForm, ItemFormValues, itemFormSchema } from '@/components/item';
+
 import { Field } from '@/components/ui/field';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { useItem } from '@/domain/item';
+import { useItemTags } from '@/domain/item';
+
 import { toast } from 'sonner';
 import { useCallback } from 'react';
-import { ItemForm, ItemFormValues, itemFormSchema } from '@/components/item';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function ItemEditPage()
 {
@@ -69,32 +65,17 @@ export default function ItemEditPage()
 					<CardDescription>Edit an existing item.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<ItemForm
-						id="edit-item-form"
-						form={form}
-						onSubmit={onSubmit}
-					/>
+					<ItemForm id="edit-item-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
-					<Field
-						orientation="horizontal"
-						className="flex w-full flex-row items-center justify-end gap-2"
-					>
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={() => router.back()}
-							className="flex-1"
-						>
+					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
+						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							form="edit-item-form"
-							disabled={
-								!form.formState.isDirty ||
-								!form.formState.isValid
-							}
+							disabled={!form.formState.isDirty || !form.formState.isValid}
 							className="flex-1"
 						>
 							Save Changes

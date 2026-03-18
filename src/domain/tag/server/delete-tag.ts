@@ -1,9 +1,11 @@
 'use server';
 
-import { tags } from '@/db/schema';
-import { Tag } from '@/domain/tag';
-import { eq } from 'drizzle-orm';
 import db from '@/db/client';
+import { tags } from '@/db/schema';
+
+import { Tag } from '@/domain/tag';
+
+import { eq } from 'drizzle-orm';
 
 export async function deleteTag(id: Tag['id']): Promise<Tag>
 {

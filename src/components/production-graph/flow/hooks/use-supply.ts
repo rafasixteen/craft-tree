@@ -1,6 +1,8 @@
-import { useNodesData } from '@xyflow/react';
-import { ItemRate } from '@/domain/production-graph';
 import { ProductionGraphNode } from '@/components/production-graph/flow/types';
+
+import { ItemRate } from '@/domain/production-graph';
+
+import { useNodesData } from '@xyflow/react';
 
 interface UseSupplyParams
 {
@@ -8,10 +10,7 @@ interface UseSupplyParams
 	sourceHandleId?: string | null;
 }
 
-export function useSupply({
-	sourceNodeId,
-	sourceHandleId,
-}: UseSupplyParams): ItemRate | null
+export function useSupply({ sourceNodeId, sourceHandleId }: UseSupplyParams): ItemRate | null
 {
 	const node = useNodesData<ProductionGraphNode>(sourceNodeId ?? '');
 
@@ -45,9 +44,7 @@ export function useSupply({
 		}
 
 		// The sourceHandleId corresponds to the itemId.
-		return (
-			outputRates.find((rate) => rate.itemId === sourceHandleId) ?? null
-		);
+		return outputRates.find((rate) => rate.itemId === sourceHandleId) ?? null;
 	}
 
 	if (node.type === 'split')

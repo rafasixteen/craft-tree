@@ -1,16 +1,8 @@
 'use client';
 
-import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react';
-import Link from 'next/link';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-} from '@/components/ui/sidebar';
-import { useUser } from '@/domain/user';
-import { signOut } from '@/lib/auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -20,6 +12,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+import { useUser } from '@/domain/user';
+
+import { signOut } from '@/lib/auth';
+
+import Link from 'next/link';
+import { ChevronsUpDown, LogOut, Settings, User } from 'lucide-react';
 
 export function NavUser()
 {
@@ -60,17 +59,11 @@ export function NavUser()
 						>
 							<Avatar className="size-8 rounded-lg">
 								<AvatarImage src={avatar} alt={name} />
-								<AvatarFallback className="rounded-lg">
-									{name.slice(0, 2).toUpperCase()}
-								</AvatarFallback>
+								<AvatarFallback className="rounded-lg">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm/tight">
-								<span className="truncate font-medium">
-									{name}
-								</span>
-								<span className="truncate text-xs">
-									{email}
-								</span>
+								<span className="truncate font-medium">{name}</span>
+								<span className="truncate text-xs">{email}</span>
 							</div>
 							<ChevronsUpDown className="ml-auto size-4" />
 						</SidebarMenuButton>
@@ -90,22 +83,15 @@ export function NavUser()
 									</AvatarFallback>
 								</Avatar>
 								<div className="grid flex-1 text-left text-sm/tight">
-									<span className="truncate font-medium">
-										{name}
-									</span>
-									<span className="truncate text-xs">
-										{email}
-									</span>
+									<span className="truncate font-medium">{name}</span>
+									<span className="truncate text-xs">{email}</span>
 								</div>
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
 							<DropdownMenuItem asChild>
-								<Link
-									href="/settings"
-									className="flex items-center gap-2"
-								>
+								<Link href="/settings" className="flex items-center gap-2">
 									<Settings />
 									Settings
 								</Link>
@@ -114,10 +100,7 @@ export function NavUser()
 						<DropdownMenuSeparator />
 						<DropdownMenuItem asChild>
 							<form action={signOut}>
-								<button
-									type="submit"
-									className="flex w-full items-center gap-2"
-								>
+								<button type="submit" className="flex w-full items-center gap-2">
 									<LogOut />
 									Sign Out
 								</button>

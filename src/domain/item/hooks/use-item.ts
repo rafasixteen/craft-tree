@@ -1,14 +1,12 @@
 'use client';
 
 import { Item } from '@/domain/item';
-import { useCallback } from 'react';
 import * as ItemServerActions from '@/domain/item/server';
-import useSWR from 'swr';
 
-type UpdateItemParams = Omit<
-	Parameters<typeof ItemServerActions.updateItem>[0],
-	'id'
->;
+import useSWR from 'swr';
+import { useCallback } from 'react';
+
+type UpdateItemParams = Omit<Parameters<typeof ItemServerActions.updateItem>[0], 'id'>;
 
 export function useItem(itemId: Item['id'])
 {

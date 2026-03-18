@@ -1,8 +1,9 @@
-import React, { type ComponentProps } from 'react';
-import { type HandleProps } from '@xyflow/react';
+import { BaseHandle } from '@/components/base-handle';
 
 import { cn } from '@/lib/utils';
-import { BaseHandle } from '@/components/base-handle';
+
+import { type HandleProps } from '@xyflow/react';
+import React, { type ComponentProps } from 'react';
 
 const flexDirections = {
 	top: 'flex-col',
@@ -28,23 +29,9 @@ export function LabeledHandle({
 	const { ref, ...handleProps } = props;
 
 	return (
-		<div
-			title={title}
-			className={cn(
-				'relative flex items-center',
-				flexDirections[position],
-				className,
-			)}
-			ref={ref}
-		>
-			<BaseHandle
-				position={position}
-				className={handleClassName}
-				{...handleProps}
-			/>
-			<label className={cn('px-3 text-foreground', labelClassName)}>
-				{title}
-			</label>
+		<div title={title} className={cn('relative flex items-center', flexDirections[position], className)} ref={ref}>
+			<BaseHandle position={position} className={handleClassName} {...handleProps} />
+			<label className={cn('px-3 text-foreground', labelClassName)}>{title}</label>
 		</div>
 	);
 }

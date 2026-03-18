@@ -1,7 +1,9 @@
 'use client';
 
 import { Header } from '@/components/sidebar';
+
 import { useTag } from '@/domain/tag';
+
 import { useParams } from 'next/navigation';
 
 export default function TagPage()

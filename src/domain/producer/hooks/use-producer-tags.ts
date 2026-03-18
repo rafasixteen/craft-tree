@@ -1,8 +1,9 @@
 'use client';
 
-import { getProducerTags, Producer, setProducerTags } from '@/domain/producer';
-import { useCallback } from 'react';
+import { Producer, getProducerTags, setProducerTags } from '@/domain/producer';
+
 import useSWR from 'swr';
+import { useCallback } from 'react';
 
 type SetTagsParams = Omit<Parameters<typeof setProducerTags>[0], 'producerId'>;
 

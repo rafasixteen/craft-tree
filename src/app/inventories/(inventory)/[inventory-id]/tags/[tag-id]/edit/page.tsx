@@ -1,23 +1,19 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/sidebar';
-import { useTag } from '@/domain/tag';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { TagForm, TagFormValues, tagFormSchema } from '@/components/tag';
+
 import { Field } from '@/components/ui/field';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { useTag } from '@/domain/tag';
+
 import { toast } from 'sonner';
 import { useCallback } from 'react';
-import { TagForm, TagFormValues, tagFormSchema } from '@/components/tag';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function TagEditPage()
 {
@@ -66,32 +62,17 @@ export default function TagEditPage()
 					<CardDescription>Edit an existing tag.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<TagForm
-						id="edit-tag-form"
-						form={form}
-						onSubmit={onSubmit}
-					/>
+					<TagForm id="edit-tag-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
-					<Field
-						orientation="horizontal"
-						className="flex w-full flex-row items-center justify-end gap-2"
-					>
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={() => router.back()}
-							className="flex-1"
-						>
+					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
+						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							form="edit-tag-form"
-							disabled={
-								!form.formState.isDirty ||
-								!form.formState.isValid
-							}
+							disabled={!form.formState.isDirty || !form.formState.isValid}
 							className="flex-1"
 						>
 							Save Changes

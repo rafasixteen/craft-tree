@@ -1,9 +1,7 @@
-import { NodeProps, Handle, Position } from '@xyflow/react';
 import { BaseNode } from '@/components/base-node';
-import {
-	RecipeTreeNodeContent,
-	RecipeTreeNodeHeader,
-} from '@/components/recipe-tree';
+import { RecipeTreeNodeContent, RecipeTreeNodeHeader } from '@/components/recipe-tree';
+
+import { Handle, NodeProps, Position } from '@xyflow/react';
 
 export function RawMaterialNode({ id }: NodeProps)
 {

@@ -22,15 +22,10 @@ interface DataTableParams<TData, TValue>
 	data: TData[];
 }
 
-export function useDataTable<TData, TValue>({
-	columns,
-	data,
-}: DataTableParams<TData, TValue>)
+export function useDataTable<TData, TValue>({ columns, data }: DataTableParams<TData, TValue>)
 {
 	const [rowSelection, setRowSelection] = useState({});
-	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-		{},
-	);
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [sorting, setSorting] = useState<SortingState>([]);
 

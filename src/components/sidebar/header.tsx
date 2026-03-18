@@ -1,6 +1,8 @@
 import { ThemeToggle } from '@/components/theme-toggle';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+
 import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+
 import { cn } from '@/lib/utils';
 
 interface HeaderProps
@@ -15,10 +17,7 @@ export function Header({ children }: HeaderProps)
 			<SidebarTrigger />
 			<Separator
 				orientation="vertical"
-				className={cn(
-					'mx-4 my-auto h-8',
-					'group-data-[state=collapsed]/sidebar-wrapper:h-6',
-				)}
+				className={cn('mx-4 my-auto h-8', 'group-data-[state=collapsed]/sidebar-wrapper:h-6')}
 			/>
 			{children}
 			<ThemeToggle className="ml-auto" variant="ghost" size="icon-sm" />

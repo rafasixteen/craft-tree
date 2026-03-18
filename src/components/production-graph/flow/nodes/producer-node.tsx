@@ -1,52 +1,33 @@
 'use client';
 
-import {
-	ProducerGraphNode,
-	ProducerNodeData,
-} from '@/components/production-graph/flow/types';
-import { useProducerInputs } from '@/components/production-graph/flow/hooks';
-import {
-	Edge,
-	useReactFlow,
-	Node,
-	Position,
-	useUpdateNodeInternals,
-	NodeProps,
-} from '@xyflow/react';
-import { useCurrentInventory } from '@/components/inventory';
-import { Item, useItems } from '@/domain/item';
-import { LabeledHandle } from '@/components/labeled-handle';
-import {
-	BaseNode,
-	BaseNodeContent,
-	BaseNodeFooter,
-	BaseNodeHeader,
-} from '@/components/base-node';
-import {
-	convertProductionRate,
-	ProductionRate,
-	TimeUnit,
-} from '@/domain/production-graph';
-import { Input } from '@/components/ui/input';
-import { memo, useCallback, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { ItemCombobox } from '@/components/item';
-import { cn, formatNumber } from '@/lib/utils';
+import { LabeledHandle } from '@/components/labeled-handle';
+import { useCurrentInventory } from '@/components/inventory';
+import { useProducerInputs } from '@/components/production-graph/flow/hooks';
+import { ProducerGraphNode, ProducerNodeData } from '@/components/production-graph/flow/types';
+import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
+
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
+import { Item, useItems } from '@/domain/item';
+import { ProductionRate, TimeUnit, convertProductionRate } from '@/domain/production-graph';
 import {
-	getProducersByOutputItem,
 	Producer,
-	useProducersByOutputItem,
+	getProducersByOutputItem,
 	useProducerInputsV2,
 	useProducerOutputsV2,
 	useProducerV2,
+	useProducersByOutputItem,
 } from '@/domain/producer';
 
-export const ProducerNode = memo(function ProducerNode({
-	id,
-	data,
-	selected,
-}: NodeProps<ProducerGraphNode>)
+import { cn, formatNumber } from '@/lib/utils';
+
+import { memo, useCallback, useEffect } from 'react';
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
+import { Edge, Node, NodeProps, Position, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+
+export const ProducerNode = memo(function ProducerNode({ id, data, selected }: NodeProps<ProducerGraphNode>)
 {
 	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -75,28 +56,26 @@ export const ProducerNode = memo(function ProducerNode({
 			}
 			else
 			{
-				getProducersByOutputItem({ itemId: itemId }).then(
-					(producers) =>
+				getProducersByOutputItem({ itemId: itemId }).then((producers) =>
+				{
+					if (producers.length === 0)
 					{
-						if (producers.length === 0)
-						{
-							updateNodeData(id, {
-								itemId: itemId,
-								producerId: null,
-							});
-						}
-						else
-						{
-							const index = 0;
-							const producerId = producers[index].id;
+						updateNodeData(id, {
+							itemId: itemId,
+							producerId: null,
+						});
+					}
+					else
+					{
+						const index = 0;
+						const producerId = producers[index].id;
 
-							updateNodeData(id, {
-								itemId: itemId,
-								producerId: producerId,
-							});
-						}
-					},
-				);
+						updateNodeData(id, {
+							itemId: itemId,
+							producerId: producerId,
+						});
+					}
+				});
 			}
 		},
 		[id, updateNodeData],
@@ -173,10 +152,7 @@ export const ProducerNode = memo(function ProducerNode({
 		// ----------------------------
 		// 3️⃣ Final production rate
 		// ----------------------------
-		const actualCycles = Math.min(
-			supplyLimitedCycles,
-			machineLimitedCycles,
-		);
+		const actualCycles = Math.min(supplyLimitedCycles, machineLimitedCycles);
 
 		if (actualCycles <= 0 || actualCycles === Infinity)
 		{
@@ -204,12 +180,7 @@ export const ProducerNode = memo(function ProducerNode({
 	}, [inputs, outputs, id]);
 
 	return (
-		<BaseNode
-			className={cn(
-				'flex flex-col p-0',
-				selected && 'ring-2 ring-primary',
-			)}
-		>
+		<BaseNode className={cn('flex flex-col p-0', selected && 'ring-2 ring-primary')}>
 			<BaseNodeHeader className="flex flex-col border-b p-3">
 				<div className="flex w-full items-start justify-between gap-2">
 					<ItemCombobox
@@ -222,9 +193,7 @@ export const ProducerNode = memo(function ProducerNode({
 						type="number"
 						min={1}
 						value={producerCount}
-						onChange={(e) =>
-							onProducerCountChange(Number(e.target.value))
-						}
+						onChange={(e) => onProducerCountChange(Number(e.target.value))}
 						className="nodrag w-[30%]"
 					/>
 				</div>
@@ -241,9 +210,7 @@ export const ProducerNode = memo(function ProducerNode({
 						{inputs?.map((input, index) =>
 						{
 							const inputRate = {
-								amount:
-									(input.quantity / producer.time) *
-									producerCount,
+								amount: (input.quantity / producer.time) * producerCount,
 								per: 'second',
 							};
 							const title = `${getItemName(input.itemId)}: ${formatNumber(inputRate.amount, 3)}/${inputRate.per.charAt(0)}`;
@@ -264,9 +231,7 @@ export const ProducerNode = memo(function ProducerNode({
 					<div className="flex flex-col justify-center gap-3">
 						{outputs?.map((output, index) =>
 						{
-							const outputRate = outputRates?.find(
-								(r) => r.itemId === output.itemId,
-							);
+							const outputRate = outputRates?.find((r) => r.itemId === output.itemId);
 
 							const title = outputRate
 								? `${getItemName(output.itemId)}: ${formatNumber(outputRate.amount, 3)}/${outputRate.per.charAt(0)}`
@@ -288,11 +253,7 @@ export const ProducerNode = memo(function ProducerNode({
 			)}
 			{itemId && (
 				<BaseNodeFooter className="m-0 flex-col border-t p-1">
-					<ProducerCarousel
-						nodeId={id}
-						itemId={itemId}
-						producerId={producerId}
-					></ProducerCarousel>
+					<ProducerCarousel nodeId={id} itemId={itemId} producerId={producerId}></ProducerCarousel>
 				</BaseNodeFooter>
 			)}
 		</BaseNode>
@@ -306,26 +267,19 @@ interface ProducerCarouselProps
 	producerId: Producer['id'] | null;
 }
 
-function ProducerCarousel({
-	nodeId,
-	itemId,
-	producerId,
-}: ProducerCarouselProps)
+function ProducerCarousel({ nodeId, itemId, producerId }: ProducerCarouselProps)
 {
 	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
 
 	const { producers } = useProducersByOutputItem(itemId);
 
-	const selectedProducerIndex = producerId
-		? producers.findIndex((p) => p.id === producerId)
-		: 0;
+	const selectedProducerIndex = producerId ? producers.findIndex((p) => p.id === producerId) : 0;
 
 	const changeRecipe = useCallback(
 		function changeRecipe(delta: number)
 		{
 			const length = producers.length;
-			const newIndex =
-				(((selectedProducerIndex + delta) % length) + length) % length;
+			const newIndex = (((selectedProducerIndex + delta) % length) + length) % length;
 
 			const producer = producers[newIndex];
 
@@ -357,23 +311,13 @@ function ProducerCarousel({
 
 	return (
 		<div className="flex w-full items-center justify-between">
-			<Button
-				variant="ghost"
-				onClick={previousRecipe}
-				size="icon"
-				className="nopan nodrag"
-			>
+			<Button variant="ghost" onClick={previousRecipe} size="icon" className="nopan nodrag">
 				<ArrowLeftIcon />
 			</Button>
 			<span className="text-xs text-muted-foreground">
 				{selectedProducerIndex + 1} / {producers.length}
 			</span>
-			<Button
-				variant="ghost"
-				onClick={nextRecipe}
-				size="icon"
-				className="nopan nodrag"
-			>
+			<Button variant="ghost" onClick={nextRecipe} size="icon" className="nopan nodrag">
 				<ArrowRightIcon />
 			</Button>
 		</div>

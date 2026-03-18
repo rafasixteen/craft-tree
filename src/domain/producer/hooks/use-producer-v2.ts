@@ -1,11 +1,10 @@
 'use client';
 
 import { useCurrentInventory } from '@/components/inventory';
+
 import { Producer, useProducers } from '@/domain/producer';
 
-export function useProducerV2(
-	producerId?: Producer['id'] | null,
-): Producer | undefined
+export function useProducerV2(producerId?: Producer['id'] | null): Producer | undefined
 {
 	const inventory = useCurrentInventory();
 	const { producers } = useProducers({ inventoryId: inventory.id });

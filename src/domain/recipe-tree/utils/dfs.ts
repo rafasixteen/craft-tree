@@ -9,13 +9,7 @@ interface DfsParams
 	order?: 'pre' | 'post';
 }
 
-export function dfs({
-	state,
-	startNodeId,
-	visit,
-	getChildren,
-	order = 'pre',
-}: DfsParams)
+export function dfs({ state, startNodeId, visit, getChildren, order = 'pre' }: DfsParams)
 {
 	function visitInternal(node: RecipeTreeNode)
 	{

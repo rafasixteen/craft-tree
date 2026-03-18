@@ -1,17 +1,15 @@
 'use client';
 
 import { Header } from '@/components/sidebar';
-import {
-	useDataTable,
-	DataTableFilter,
-	DataTable,
-	DataTablePagination,
-} from '@/components/data-table';
 import { useCurrentInventory } from '@/components/inventory';
 import { productionGraphColumnns } from '@/components/production-graph';
-import { Button } from '@/components/ui/button';
+import { DataTable, DataTableFilter, DataTablePagination, useDataTable } from '@/components/data-table';
+
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
 import { useProductionGraphs } from '@/domain/production-graph';
+
 import Link from 'next/link';
 
 export default function ProductionGraphsPage()
@@ -39,11 +37,7 @@ export default function ProductionGraphsPage()
 						className="h-8 w-64"
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link
-							href={`/inventories/${inventory.id}/production-graphs/add`}
-						>
-							Add Production Graph
-						</Link>
+						<Link href={`/inventories/${inventory.id}/production-graphs/add`}>Add Production Graph</Link>
 					</Button>
 				</div>
 			</Header>

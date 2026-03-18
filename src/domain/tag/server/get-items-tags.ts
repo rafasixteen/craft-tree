@@ -1,19 +1,19 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import db from '@/db/client';
 import { itemTags, tags } from '@/db/schema';
+
 import { ItemTag } from '@/domain/item';
 import { Inventory } from '@/domain/inventory';
-import db from '@/db/client';
+
+import { eq } from 'drizzle-orm';
 
 interface GetItemsTagsParams
 {
 	inventoryId: Inventory['id'];
 }
 
-export async function getItemsTags({
-	inventoryId,
-}: GetItemsTagsParams): Promise<ItemTag[]>
+export async function getItemsTags({ inventoryId }: GetItemsTagsParams): Promise<ItemTag[]>
 {
 	return await db
 		.select({

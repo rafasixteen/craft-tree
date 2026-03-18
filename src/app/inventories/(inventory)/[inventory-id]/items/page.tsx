@@ -2,21 +2,24 @@
 
 import { Header } from '@/components/sidebar';
 import { itemColumnns } from '@/components/item';
-import { useMemo } from 'react';
-import { useItems } from '@/domain/item';
 import { useCurrentInventory } from '@/components/inventory';
 import {
-	useDataTable,
-	DataTablePagination,
-	DataTableFilter,
-	DataTableFacetedFilter,
 	DataTable,
+	DataTableFacetedFilter,
+	DataTableFilter,
+	DataTablePagination,
+	useDataTable,
 } from '@/components/data-table';
-import { useItemsTags, useTags } from '@/domain/tag';
-import { Button } from '@/components/ui/button';
-import { TagsIcon } from 'lucide-react';
+
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+import { useItems } from '@/domain/item';
+import { useItemsTags, useTags } from '@/domain/tag';
+
 import Link from 'next/link';
+import { useMemo } from 'react';
+import { TagsIcon } from 'lucide-react';
 
 export default function ItemsPage()
 {
@@ -33,11 +36,7 @@ export default function ItemsPage()
 				...item,
 				tags: itemsTags
 					.filter((itemTag) => itemTag.itemId === item.id)
-					.map(
-						(itemTag) =>
-							tags.find((tag) => tag.id === itemTag.tagId)
-								?.name || '',
-					),
+					.map((itemTag) => tags.find((tag) => tag.id === itemTag.tagId)?.name || ''),
 			})),
 		[items, itemsTags, tags],
 	);
@@ -68,19 +67,13 @@ export default function ItemsPage()
 						title="Tags"
 						options={tagsOptions}
 						trigger={
-							<Button
-								variant="secondary"
-								size="icon-lg"
-								className="h-8"
-							>
+							<Button variant="secondary" size="icon-lg" className="h-8">
 								<TagsIcon className="size-3" />
 							</Button>
 						}
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link href={`/inventories/${inventory.id}/items/add`}>
-							Add Item
-						</Link>
+						<Link href={`/inventories/${inventory.id}/items/add`}>Add Item</Link>
 					</Button>
 				</div>
 			</Header>

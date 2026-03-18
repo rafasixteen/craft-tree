@@ -1,8 +1,9 @@
 'use client';
 
-import useSWR from 'swr';
 import { ProducerTag } from '@/domain/producer';
 import { getProducersTags } from '@/domain/tag';
+
+import useSWR from 'swr';
 
 type UseProducersTagsParams = Parameters<typeof getProducersTags>[0];
 

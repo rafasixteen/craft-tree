@@ -1,8 +1,7 @@
 'use client';
 
-import { Tag, useTags } from '@/domain/tag';
 import { useCurrentInventory } from '@/components/inventory';
-import { useEffect, useState } from 'react';
+
 import {
 	Combobox,
 	ComboboxChip,
@@ -16,6 +15,10 @@ import {
 	useComboboxAnchor,
 } from '@/components/ui/combobox';
 
+import { Tag, useTags } from '@/domain/tag';
+
+import { useEffect, useState } from 'react';
+
 interface TagsComboboxProps extends Omit<
 	React.ComponentPropsWithoutRef<typeof ComboboxChips>,
 	'children' | 'value' | 'onValueChange' | 'multiple' | 'autoHighlight'
@@ -27,12 +30,7 @@ interface TagsComboboxProps extends Omit<
 	maxChips?: number;
 }
 
-export function TagsCombobox({
-	className,
-	value,
-	onIdsChange,
-	maxChips,
-}: TagsComboboxProps)
+export function TagsCombobox({ className, value, onIdsChange, maxChips }: TagsComboboxProps)
 {
 	const anchor = useComboboxAnchor();
 
@@ -46,15 +44,11 @@ export function TagsCombobox({
 	const tagIdsSet = new Set(tags.map((t) => t.id));
 
 	// Convert external ID array -> internal Tag[] for Combobox
-	const selectedTags = value
-		.map((id) => idToTag.get(id))
-		.filter(Boolean) as Tag[];
+	const selectedTags = value.map((id) => idToTag.get(id)).filter(Boolean) as Tag[];
 
 	function onValueChange(newTags: Tag[])
 	{
-		const newTagIds = newTags
-			.map((t) => t.id)
-			.filter((id) => tagIdsSet.has(id));
+		const newTagIds = newTags.map((t) => t.id).filter((id) => tagIdsSet.has(id));
 		onIdsChange(newTagIds);
 	}
 
@@ -68,8 +62,7 @@ export function TagsCombobox({
 	}, [selectedTags.length, maxChips]);
 
 	const isLimited = typeof maxChips === 'number';
-	const shouldCollapse =
-		isLimited && !expanded && selectedTags.length > maxChips;
+	const shouldCollapse = isLimited && !expanded && selectedTags.length > maxChips;
 
 	return (
 		<Combobox
@@ -87,38 +80,26 @@ export function TagsCombobox({
 						if (!isLimited)
 						{
 							// No limit → render everything
-							return selected.map((tag) => (
-								<ComboboxChip key={tag.id}>
-									{tag.name}
-								</ComboboxChip>
-							));
+							return selected.map((tag) => <ComboboxChip key={tag.id}>{tag.name}</ComboboxChip>);
 						}
 
-						const displayTags = shouldCollapse
-							? selected.slice(0, maxChips)
-							: selected;
+						const displayTags = shouldCollapse ? selected.slice(0, maxChips) : selected;
 
 						const extraCount = selected.length - maxChips!;
 
 						return (
 							<>
 								{displayTags.map((tag) => (
-									<ComboboxChip key={tag.id}>
-										{tag.name}
-									</ComboboxChip>
+									<ComboboxChip key={tag.id}>{tag.name}</ComboboxChip>
 								))}
 
 								{selected.length > maxChips! && (
 									<ComboboxChip
-										onClick={() =>
-											setExpanded((prev) => !prev)
-										}
+										onClick={() => setExpanded((prev) => !prev)}
 										style={{ cursor: 'pointer' }}
 										showRemove={false}
 									>
-										{expanded
-											? 'Show less'
-											: `+${extraCount} more`}
+										{expanded ? 'Show less' : `+${extraCount} more`}
 									</ComboboxChip>
 								)}
 							</>

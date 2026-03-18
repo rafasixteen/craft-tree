@@ -1,33 +1,20 @@
 'use client';
 
-import {
-	createProducer,
-	setProducerInputs,
-	setProducerOutputs,
-	setProducerTags,
-} from '@/domain/producer';
-import { useRouter } from 'next/navigation';
 import { Header } from '@/components/sidebar';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
-import { Field } from '@/components/ui/field';
 import { useCurrentInventory } from '@/components/inventory';
+import { ProducerForm, ProducerFormValues, producerFormSchema } from '@/components/producer';
+
+import { Field } from '@/components/ui/field';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { createProducer, setProducerInputs, setProducerOutputs, setProducerTags } from '@/domain/producer';
+
 import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { useCallback, useTransition } from 'react';
-import {
-	ProducerForm,
-	ProducerFormValues,
-	producerFormSchema,
-} from '@/components/producer';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function ProducerAddPage()
 {
@@ -78,11 +65,7 @@ export default function ProducerAddPage()
 						tagIds: tagIds,
 					});
 
-					await Promise.all([
-						createdInputs,
-						createdOutputs,
-						createdTags,
-					]);
+					await Promise.all([createdInputs, createdOutputs, createdTags]);
 
 					toast.success(`Producer '${name}' created`);
 
@@ -105,28 +88,14 @@ export default function ProducerAddPage()
 			<Card className="flex min-h-0 flex-1 flex-col bg-transparent ring-0">
 				<CardHeader>
 					<CardTitle>Add Producer</CardTitle>
-					<CardDescription>
-						Add a new producer to this inventory.
-					</CardDescription>
+					<CardDescription>Add a new producer to this inventory.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<ProducerForm
-						id="add-producer-form"
-						form={form}
-						onSubmit={onSubmit}
-					/>
+					<ProducerForm id="add-producer-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
-					<Field
-						orientation="horizontal"
-						className="flex w-full flex-row items-center justify-end gap-2"
-					>
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={() => router.back()}
-							className="flex-1"
-						>
+					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
+						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
 						<Button

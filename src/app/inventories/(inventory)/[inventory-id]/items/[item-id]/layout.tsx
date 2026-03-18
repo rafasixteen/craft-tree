@@ -1,4 +1,5 @@
 import { getItemById, getItemTags } from '@/domain/item';
+
 import { SWRConfig, unstable_serialize } from 'swr';
 
 export default async function ItemLayout({
@@ -13,8 +14,7 @@ export default async function ItemLayout({
 			value={{
 				fallback: {
 					[unstable_serialize(['item', itemId])]: getItemById(itemId),
-					[unstable_serialize(['item-tags', itemId])]:
-						getItemTags(itemId),
+					[unstable_serialize(['item-tags', itemId])]: getItemTags(itemId),
 				},
 			}}
 		>

@@ -1,20 +1,15 @@
 'use client';
 
-import Link from 'next/link';
-import { useInventories } from '@/domain/inventory';
-import {
-	ImportInventoryButton,
-	inventoryColumnns,
-} from '@/components/inventory';
+import { Header } from '@/components/sidebar';
+import { ImportInventoryButton, inventoryColumnns } from '@/components/inventory';
+import { DataTable, DataTableFilter, DataTablePagination, useDataTable } from '@/components/data-table';
+
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Header } from '@/components/sidebar';
-import {
-	DataTable,
-	DataTableFilter,
-	DataTablePagination,
-	useDataTable,
-} from '@/components/data-table';
+
+import { useInventories } from '@/domain/inventory';
+
+import Link from 'next/link';
 
 export default function InventoriesPage()
 {

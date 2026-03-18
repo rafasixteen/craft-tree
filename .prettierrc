@@ -1,9 +1,5 @@
 {
-	"plugins": [
-		"@trivago/prettier-plugin-sort-imports",
-		"prettier-plugin-brace-style",
-		"prettier-plugin-packagejson"
-	],
+	"plugins": ["prettier-plugin-brace-style"],
 	"braceStyle": "allman",
 	"useTabs": true,
 	"tabWidth": 4,
@@ -12,13 +8,17 @@
 	"trailingComma": "all",
 	"bracketSpacing": true,
 	"arrowParens": "always",
-	"printWidth": 80,
+	"printWidth": 120,
 	"importOrder": [
 		"<BUILTIN_MODULES>",
+		"^@/components/(?!ui(?:/|$)).*$",
+		"^@/components/ui(?:/.*)?$",
+		"^@/db(?:/.*)?$",
+		"^@/domain(?:/.*)?$",
+		"^@/hooks(?:/.*)?$",
+		"^@/lib(?:/.*)?$",
 		"<THIRD_PARTY_MODULES>",
-		"^@core/(.*)$",
-		"^@server/(.*)$",
-		"^@ui/(.*)$",
+		"^@/(.*)$",
 		"^[./]"
 	],
 	"importOrderSeparation": true,

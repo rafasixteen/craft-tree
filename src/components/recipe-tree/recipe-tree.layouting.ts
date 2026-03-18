@@ -1,5 +1,5 @@
-import type { Node, Edge } from '@xyflow/react';
 import { Position } from '@xyflow/react';
+import type { Edge, Node } from '@xyflow/react';
 import ELK, { ElkNode } from 'elkjs/lib/elk.bundled.js';
 
 const elk = new ELK();
@@ -23,10 +23,7 @@ interface LayoutedElements
 	edges: Edge[];
 }
 
-export async function layoutRecipeTree(
-	nodes: Node[],
-	edges: Edge[],
-): Promise<LayoutedElements>
+export async function layoutRecipeTree(nodes: Node[], edges: Edge[]): Promise<LayoutedElements>
 {
 	const graph = {
 		id: 'root',

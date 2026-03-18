@@ -5,8 +5,7 @@ export default function AccountSettingsPage()
 			<div className="container">
 				<h2 className="mb-4 text-lg font-semibold">Account Settings</h2>
 				<p className="text-sm text-muted-foreground">
-					Manage your account settings, including email, password, and
-					more.
+					Manage your account settings, including email, password, and more.
 				</p>
 			</div>
 		</div>

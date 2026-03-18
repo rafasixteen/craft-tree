@@ -1,16 +1,12 @@
 'use client';
 
-import { Controller, useForm } from 'react-hook-form';
-import {
-	Field,
-	FieldError,
-	FieldGroup,
-	FieldLabel,
-	FieldDescription,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { TagsCombobox } from '@/components/tag/tags-combo-box';
+
+import { Input } from '@/components/ui/input';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+
 import z from 'zod';
+import { Controller, useForm } from 'react-hook-form';
 
 export const itemFormSchema = z.object({
 	name: z
@@ -34,11 +30,7 @@ interface ItemFormProps
 export function ItemForm({ id, form, onSubmit }: ItemFormProps)
 {
 	return (
-		<form
-			id={id}
-			onSubmit={form.handleSubmit(onSubmit)}
-			className="flex min-h-0 flex-1 flex-col"
-		>
+		<form id={id} onSubmit={form.handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col">
 			<FieldGroup className="flex min-h-0 flex-1 flex-col">
 				<Controller
 					name="name"
@@ -46,9 +38,7 @@ export function ItemForm({ id, form, onSubmit }: ItemFormProps)
 					render={({ field, fieldState }) => (
 						<Field data-invalid={fieldState.invalid}>
 							<FieldLabel htmlFor="name">Name</FieldLabel>
-							<FieldDescription>
-								Name of the item for display purposes.
-							</FieldDescription>
+							<FieldDescription>Name of the item for display purposes.</FieldDescription>
 							<Input
 								{...field}
 								id="name"
@@ -56,9 +46,7 @@ export function ItemForm({ id, form, onSubmit }: ItemFormProps)
 								placeholder="Item name"
 								autoComplete="off"
 							/>
-							{fieldState.invalid && (
-								<FieldError errors={[fieldState.error]} />
-							)}
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 						</Field>
 					)}
 				/>
@@ -69,18 +57,14 @@ export function ItemForm({ id, form, onSubmit }: ItemFormProps)
 					render={({ field, fieldState }) => (
 						<Field data-invalid={fieldState.invalid}>
 							<FieldLabel htmlFor="tagIds">Tags</FieldLabel>
-							<FieldDescription>
-								Optional tags for categorizing items.
-							</FieldDescription>
+							<FieldDescription>Optional tags for categorizing items.</FieldDescription>
 							<TagsCombobox
 								{...field}
 								onIdsChange={field.onChange}
 								id="tagIds"
 								aria-invalid={fieldState.invalid}
 							/>
-							{fieldState.invalid && (
-								<FieldError errors={[fieldState.error]} />
-							)}
+							{fieldState.invalid && <FieldError errors={[fieldState.error]} />}
 						</Field>
 					)}
 				/>

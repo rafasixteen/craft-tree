@@ -1,12 +1,11 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
-import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 
-export function ThemeToggle(
-	props: React.ComponentPropsWithoutRef<typeof Button>,
-)
+import { useTheme } from 'next-themes';
+import { Moon, Sun } from 'lucide-react';
+
+export function ThemeToggle(props: React.ComponentPropsWithoutRef<typeof Button>)
 {
 	const { theme, setTheme } = useTheme();
 

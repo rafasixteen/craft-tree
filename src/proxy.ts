@@ -1,5 +1,6 @@
-import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/proxy';
+
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function proxy(request: NextRequest)
 {
@@ -7,10 +8,7 @@ export async function proxy(request: NextRequest)
 
 	if (pathname === '/settings')
 	{
-		return NextResponse.redirect(
-			new URL('/settings/general', request.url),
-			307,
-		);
+		return NextResponse.redirect(new URL('/settings/general', request.url), 307);
 	}
 
 	return await updateSession(request);

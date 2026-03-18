@@ -1,16 +1,14 @@
 'use client';
 
 import { Item } from '@/domain/item';
-import { useCallback } from 'react';
 import * as ItemServerActions from '@/domain/item/server';
+
 import useSWR from 'swr';
+import { useCallback } from 'react';
 
 type UseItemsParams = Parameters<typeof ItemServerActions.getItems>[0];
 
-type CreateItemParams = Omit<
-	Parameters<typeof ItemServerActions.createItem>[0],
-	'inventoryId'
->;
+type CreateItemParams = Omit<Parameters<typeof ItemServerActions.createItem>[0], 'inventoryId'>;
 
 type UpdateItemParams = Parameters<typeof ItemServerActions.updateItem>[0];
 
@@ -18,9 +16,7 @@ type DeleteItemParams = Parameters<typeof ItemServerActions.deleteItem>[0];
 
 export function useItems({ inventoryId, options }: UseItemsParams)
 {
-	const swrKey = options
-		? ['inventory-items', inventoryId, options]
-		: ['inventory-items', inventoryId];
+	const swrKey = options ? ['inventory-items', inventoryId, options] : ['inventory-items', inventoryId];
 	const fetcher = () => ItemServerActions.getItems({ inventoryId, options });
 
 	const { data, mutate } = useSWR(swrKey, fetcher, {
@@ -46,10 +42,7 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 					return [...current, created];
 				},
 				{
-					optimisticData: (current: Item[] = []) => [
-						...current,
-						optimistic,
-					],
+					optimisticData: (current: Item[] = []) => [...current, optimistic],
 					rollbackOnError: true,
 					revalidate: true,
 				},
@@ -68,9 +61,7 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 						id,
 						name,
 					});
-					return current.map((item) =>
-						item.id === id ? { ...item, ...updated } : item,
-					);
+					return current.map((item) => (item.id === id ? { ...item, ...updated } : item));
 				},
 				{
 					optimisticData: (current: Item[] = []) =>
@@ -100,8 +91,7 @@ export function useItems({ inventoryId, options }: UseItemsParams)
 					return current.filter((item) => item.id !== id);
 				},
 				{
-					optimisticData: (current: Item[] = []) =>
-						current.filter((item) => item.id !== id),
+					optimisticData: (current: Item[] = []) => current.filter((item) => item.id !== id),
 					rollbackOnError: true,
 					revalidate: true,
 				},

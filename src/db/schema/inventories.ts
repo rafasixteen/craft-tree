@@ -14,7 +14,5 @@ export const inventories = pgTable(
 		// FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
 		userId: uuid('user_id').notNull(),
 	},
-	(table) => [
-		unique('unique_user_inventory_name').on(table.userId, table.name),
-	],
+	(table) => [unique('unique_user_inventory_name').on(table.userId, table.name)],
 );

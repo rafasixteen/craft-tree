@@ -1,5 +1,3 @@
-import { Column } from '@tanstack/react-table';
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
 	DropdownMenu,
@@ -9,10 +7,10 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-interface DataTableColumnHeaderProps<
-	TData,
-	TValue,
-> extends React.HTMLAttributes<HTMLDivElement>
+import { Column } from '@tanstack/react-table';
+import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from 'lucide-react';
+
+interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement>
 {
 	column: Column<TData, TValue>;
 	title: string;
@@ -32,11 +30,7 @@ export function DataTableColumnHeader<TData, TValue>({
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button
-					variant="ghost"
-					size="sm"
-					className="data-[state=open]:bg-accent"
-				>
+				<Button variant="ghost" size="sm" className="data-[state=open]:bg-accent">
 					<div {...props}>{title}</div>
 					{column.getIsSorted() === 'desc' ? (
 						<ArrowDown />
@@ -57,9 +51,7 @@ export function DataTableColumnHeader<TData, TValue>({
 					Desc
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem
-					onClick={() => column.toggleVisibility(false)}
-				>
+				<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
 					<EyeOff className="size-3.5 text-muted-foreground/70" />
 					Hide
 				</DropdownMenuItem>

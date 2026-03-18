@@ -1,7 +1,9 @@
-import { useNodesData } from '@xyflow/react';
 import { ProductionGraphNode } from '@/components/production-graph/flow/types';
+
 import { ItemRate } from '@/domain/production-graph';
 import { useProducerInputsV2, useProducerV2 } from '@/domain/producer';
+
+import { useNodesData } from '@xyflow/react';
 
 interface UseDemandParams
 {
@@ -9,16 +11,10 @@ interface UseDemandParams
 	targetHandleId?: string | null;
 }
 
-export function useDemand({
-	targetNodeId,
-	targetHandleId,
-}: UseDemandParams): ItemRate | null
+export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): ItemRate | null
 {
 	const node = useNodesData<ProductionGraphNode>(targetNodeId ?? '');
-	const producerId =
-		node?.type === 'producer'
-			? (node.data.producerId ?? undefined)
-			: undefined;
+	const producerId = node?.type === 'producer' ? (node.data.producerId ?? undefined) : undefined;
 
 	const inputs = useProducerInputsV2(producerId);
 	const producer = useProducerV2(producerId);
@@ -54,9 +50,7 @@ export function useDemand({
 			return null;
 		}
 
-		const amount = rates
-			.map((rate) => rate.amount)
-			.reduce((sum, curr) => sum + curr, 0);
+		const amount = rates.map((rate) => rate.amount).reduce((sum, curr) => sum + curr, 0);
 
 		return {
 			amount: amount,

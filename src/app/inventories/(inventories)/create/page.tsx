@@ -1,28 +1,20 @@
 'use client';
 
-import { createInventory } from '@/domain/inventory';
-import { useRouter } from 'next/navigation';
 import { Header } from '@/components/sidebar';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
+import { InventoryForm, InventoryFormValues, inventoryFormSchema } from '@/components/inventory';
+
 import { Field } from '@/components/ui/field';
-import { toast } from 'sonner';
-import { useCallback, useTransition } from 'react';
-import {
-	InventoryForm,
-	InventoryFormValues,
-	inventoryFormSchema,
-} from '@/components/inventory';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { useUser } from '@/domain/user';
+import { createInventory } from '@/domain/inventory';
+
+import { toast } from 'sonner';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import { useCallback, useTransition } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function InventoryAddPage()
 {
@@ -79,28 +71,14 @@ export default function InventoryAddPage()
 			<Card className="flex min-h-0 flex-1 flex-col bg-transparent ring-0">
 				<CardHeader>
 					<CardTitle>Create Inventory</CardTitle>
-					<CardDescription>
-						Add a new inventory to your account.
-					</CardDescription>
+					<CardDescription>Add a new inventory to your account.</CardDescription>
 				</CardHeader>
 				<CardContent className="flex min-h-0 flex-1 flex-col">
-					<InventoryForm
-						id="add-inventory-form"
-						form={form}
-						onSubmit={onSubmit}
-					/>
+					<InventoryForm id="add-inventory-form" form={form} onSubmit={onSubmit} />
 				</CardContent>
 				<CardFooter>
-					<Field
-						orientation="horizontal"
-						className="flex w-full flex-row items-center justify-end gap-2"
-					>
-						<Button
-							type="button"
-							variant="secondary"
-							onClick={() => router.back()}
-							className="flex-1"
-						>
+					<Field orientation="horizontal" className="flex w-full flex-row items-center justify-end gap-2">
+						<Button type="button" variant="secondary" onClick={() => router.back()} className="flex-1">
 							Cancel
 						</Button>
 						<Button

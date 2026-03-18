@@ -1,11 +1,13 @@
 import './globals.css';
 
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter } from 'next/font/google';
-import { ThemeProvider } from 'next-themes';
-import { cn } from '@/lib/utils';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+
+import { cn } from '@/lib/utils';
+
+import type { Metadata } from 'next';
+import { ThemeProvider } from 'next-themes';
+import { Geist, Geist_Mono, Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -27,19 +29,8 @@ export default async function RootLayout({ children }: LayoutProps<'/'>)
 {
 	return (
 		<html lang="en" className={inter.variable} suppressHydrationWarning>
-			<body
-				className={cn(
-					geistSans.variable,
-					geistMono.variable,
-					'flex h-screen',
-				)}
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
+			<body className={cn(geistSans.variable, geistMono.variable, 'flex h-screen')}>
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<TooltipProvider>{children}</TooltipProvider>
 					<Toaster />
 				</ThemeProvider>

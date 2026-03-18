@@ -1,7 +1,9 @@
-import { useRecipeTree } from './use-recipe-tree';
-import { useMemo } from 'react';
-import { getProducerThroughput } from '@/domain/recipe-tree';
 import { ProductionRate } from '@/domain/production-graph';
+import { getProducerThroughput } from '@/domain/recipe-tree';
+
+import { useMemo } from 'react';
+
+import { useRecipeTree } from './use-recipe-tree';
 
 export function useSelectedProducerThroughput(nodeId: string): ProductionRate
 {
@@ -21,9 +23,7 @@ export function useSelectedProducerThroughput(nodeId: string): ProductionRate
 			return { amount: 0, per: 'second' };
 		}
 
-		const selectedProducer = node.producers.find(
-			(p) => p.id === node.selectedProducerId,
-		);
+		const selectedProducer = node.producers.find((p) => p.id === node.selectedProducerId);
 
 		if (!selectedProducer)
 		{

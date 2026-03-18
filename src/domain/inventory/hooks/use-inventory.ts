@@ -1,14 +1,12 @@
 'use client';
 
 import { Inventory } from '@/domain/inventory';
-import { useCallback } from 'react';
 import * as InventoryServerActions from '@/domain/inventory/server';
-import useSWR from 'swr';
 
-type UpdateInventoryParams = Omit<
-	Parameters<typeof InventoryServerActions.updateInventory>[0],
-	'id'
->;
+import useSWR from 'swr';
+import { useCallback } from 'react';
+
+type UpdateInventoryParams = Omit<Parameters<typeof InventoryServerActions.updateInventory>[0], 'id'>;
 
 export function useInventory(inventoryId: Inventory['id'])
 {

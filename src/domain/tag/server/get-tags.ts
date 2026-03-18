@@ -1,10 +1,12 @@
 'use server';
 
-import { tags } from '@/db/schema';
-import { Tag, TagQueryOptions } from '@/domain/tag';
-import { Inventory } from '@/domain/inventory';
-import { asc, desc, and, eq, ilike } from 'drizzle-orm';
 import db from '@/db/client';
+import { tags } from '@/db/schema';
+
+import { Inventory } from '@/domain/inventory';
+import { Tag, TagQueryOptions } from '@/domain/tag';
+
+import { and, asc, desc, eq, ilike } from 'drizzle-orm';
 
 export interface GetTagsParams
 {
@@ -12,10 +14,7 @@ export interface GetTagsParams
 	options?: TagQueryOptions;
 }
 
-export async function getTags({
-	inventoryId,
-	options,
-}: GetTagsParams): Promise<Tag[]>
+export async function getTags({ inventoryId, options }: GetTagsParams): Promise<Tag[]>
 {
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';

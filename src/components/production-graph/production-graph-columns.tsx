@@ -1,23 +1,21 @@
 'use client';
 
-import { ColumnDef, Row } from '@tanstack/react-table';
-import {
-	ProductionGraph,
-	useProductionGraphs,
-} from '@/domain/production-graph';
 import { DataTableColumnHeader } from '@/components/data-table';
+
 import { Button } from '@/components/ui/button';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+
+import { ProductionGraph, useProductionGraphs } from '@/domain/production-graph';
+
 import Link from 'next/link';
+import { PencilIcon, TrashIcon } from 'lucide-react';
+import { ColumnDef, Row } from '@tanstack/react-table';
 
 export type ProductionGraphColumnData = ProductionGraph;
 
 export const productionGraphColumnns: ColumnDef<ProductionGraphColumnData>[] = [
 	{
 		accessorKey: 'name',
-		header: ({ column }) => (
-			<DataTableColumnHeader column={column} title="Name" />
-		),
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
 			const name = row.original.name;
@@ -27,10 +25,7 @@ export const productionGraphColumnns: ColumnDef<ProductionGraphColumnData>[] = [
 			const href = `/inventories/${inventoryId}/production-graphs/${id}`;
 
 			return (
-				<Link
-					href={href}
-					className="ml-3 truncate font-medium hover:underline"
-				>
+				<Link href={href} className="ml-3 truncate font-medium hover:underline">
 					{name}
 				</Link>
 			);
@@ -38,13 +33,7 @@ export const productionGraphColumnns: ColumnDef<ProductionGraphColumnData>[] = [
 	},
 	{
 		id: 'actions',
-		header: ({ column }) => (
-			<DataTableColumnHeader
-				column={column}
-				title="Actions"
-				className="text-center"
-			/>
-		),
+		header: ({ column }) => <DataTableColumnHeader column={column} title="Actions" className="text-center" />,
 		cell: ({ row }) => <Actions row={row} />,
 		enableSorting: false,
 		enableHiding: false,
@@ -66,17 +55,11 @@ function Actions({ row }: ActionsProps)
 	return (
 		<div className="flex justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link
-					href={`/inventories/${inventoryId}/production-graphs/${id}/edit`}
-				>
+				<Link href={`/inventories/${inventoryId}/production-graphs/${id}/edit`}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button
-				variant="destructive"
-				size="icon-sm"
-				onClick={() => deleteProductionGraph(id)}
-			>
+			<Button variant="destructive" size="icon-sm" onClick={() => deleteProductionGraph(id)}>
 				<TrashIcon className="size-3" />
 			</Button>
 		</div>

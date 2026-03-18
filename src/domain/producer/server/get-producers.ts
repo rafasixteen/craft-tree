@@ -1,10 +1,12 @@
 'use server';
 
-import { producers, producerTags } from '@/db/schema';
-import { Producer, ProducerQueryOptions } from '@/domain/producer';
-import { Inventory } from '@/domain/inventory';
-import { asc, desc, and, eq, ilike, exists, inArray } from 'drizzle-orm';
 import db from '@/db/client';
+import { producerTags, producers } from '@/db/schema';
+
+import { Inventory } from '@/domain/inventory';
+import { Producer, ProducerQueryOptions } from '@/domain/producer';
+
+import { and, asc, desc, eq, exists, ilike, inArray } from 'drizzle-orm';
 
 interface GetProducersParams
 {
@@ -12,10 +14,7 @@ interface GetProducersParams
 	options?: ProducerQueryOptions;
 }
 
-export async function getProducers({
-	inventoryId,
-	options,
-}: GetProducersParams): Promise<Producer[]>
+export async function getProducers({ inventoryId, options }: GetProducersParams): Promise<Producer[]>
 {
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';
@@ -34,12 +33,7 @@ export async function getProducers({
 				db
 					.select()
 					.from(producerTags)
-					.where(
-						and(
-							eq(producerTags.producerId, producers.id),
-							inArray(producerTags.tagId, filters.tagIds),
-						),
-					),
+					.where(and(eq(producerTags.producerId, producers.id), inArray(producerTags.tagId, filters.tagIds))),
 			),
 		);
 	}

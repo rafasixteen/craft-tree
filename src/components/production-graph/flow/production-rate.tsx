@@ -1,9 +1,4 @@
-import {
-	InputGroup,
-	InputGroupAddon,
-	InputGroupButton,
-	InputGroupInput,
-} from '@/components/ui/input-group';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,8 +6,10 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useCallback } from 'react';
+
 import { ProductionRate, TimeUnit } from '@/domain/production-graph';
+
+import { useCallback } from 'react';
 
 const UNIT_OPTIONS: { value: TimeUnit; label: string }[] = [
 	{ value: 'second', label: 'Second' },
@@ -20,20 +17,13 @@ const UNIT_OPTIONS: { value: TimeUnit; label: string }[] = [
 	{ value: 'hour', label: 'Hour' },
 ];
 
-interface ProductionRateComponentProps extends Omit<
-	React.ComponentProps<typeof InputGroup>,
-	'onChange'
->
+interface ProductionRateComponentProps extends Omit<React.ComponentProps<typeof InputGroup>, 'onChange'>
 {
 	value: ProductionRate;
 	onChange: (value: ProductionRate) => void;
 }
 
-export function ProductionRateComponent({
-	value,
-	onChange,
-	...props
-}: ProductionRateComponentProps)
+export function ProductionRateComponent({ value, onChange, ...props }: ProductionRateComponentProps)
 {
 	const onAmountChange = useCallback(
 		function handleAmountChange(amount: number)
@@ -69,20 +59,12 @@ export function ProductionRateComponent({
 			<InputGroupAddon align="inline-end">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<InputGroupButton variant="secondary">
-							/ {value.per}
-						</InputGroupButton>
+						<InputGroupButton variant="secondary">/ {value.per}</InputGroupButton>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent
-						align="end"
-						className="[--radius:0.95rem]"
-					>
+					<DropdownMenuContent align="end" className="[--radius:0.95rem]">
 						<DropdownMenuGroup>
 							{UNIT_OPTIONS.map((unit) => (
-								<DropdownMenuItem
-									key={unit.value}
-									onSelect={() => onUnitChange(unit.value)}
-								>
+								<DropdownMenuItem key={unit.value} onSelect={() => onUnitChange(unit.value)}>
 									{unit.value}
 								</DropdownMenuItem>
 							))}

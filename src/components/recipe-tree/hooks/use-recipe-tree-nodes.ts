@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import type { Node, Edge } from '@xyflow/react';
-import { useRecipeTree } from '@/domain/recipe-tree/hooks/use-recipe-tree';
 import { buildEdge, buildNode } from '@/components/recipe-tree/utils';
 import type { RecipeTreeNodeType } from '@/components/recipe-tree/types';
+
 import { RecipeTreeNode } from '@/domain/recipe-tree';
+import { useRecipeTree } from '@/domain/recipe-tree/hooks/use-recipe-tree';
+
+import { useEffect, useState } from 'react';
+import type { Edge, Node } from '@xyflow/react';
 
 export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 {
@@ -26,10 +28,7 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 
 		function callback(node: RecipeTreeNode): void
 		{
-			const type: RecipeTreeNodeType =
-				node.producers.length > 0
-					? 'processed-material'
-					: 'raw-material';
+			const type: RecipeTreeNodeType = node.producers.length > 0 ? 'processed-material' : 'raw-material';
 
 			nodes.push(
 				buildNode({
@@ -40,9 +39,7 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 
 			if (node.parentId)
 			{
-				edges.push(
-					buildEdge({ parentId: node.parentId, childId: node.id }),
-				);
+				edges.push(buildEdge({ parentId: node.parentId, childId: node.id }));
 			}
 		}
 
@@ -56,12 +53,7 @@ export function useRecipeTreeNodes(): { nodes: Node[]; edges: Edge[] }
 			return node.children[node.selectedProducerId] || [];
 		}
 
-		dfs(
-			recipeTree.rootNodeId,
-			callback,
-			getSelectedProducerChildren,
-			'pre',
-		);
+		dfs(recipeTree.rootNodeId, callback, getSelectedProducerChildren, 'pre');
 
 		setNodes(nodes);
 		setEdges(edges);

@@ -1,9 +1,10 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { Provider } from '@supabase/supabase-js';
+
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { Provider } from '@supabase/supabase-js';
 
 export async function signInWithProvider(provider: Provider)
 {
@@ -25,13 +26,7 @@ export async function signInWithProvider(provider: Provider)
 	redirect(data.url);
 }
 
-export async function signInWithPassword({
-	email,
-	password,
-}: {
-	email: string;
-	password: string;
-})
+export async function signInWithPassword({ email, password }: { email: string; password: string })
 {
 	const supabase = await createClient();
 	const { error } = await supabase.auth.signInWithPassword({

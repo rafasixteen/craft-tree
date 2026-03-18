@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button';
+
 import { createClient } from '@/lib/supabase/server';
+
 import Link from 'next/link';
 
 export default async function Home()
@@ -37,8 +39,7 @@ export default async function Home()
 							className="animate-fade-in text-base text-foreground/80 sm:text-lg md:text-xl lg:text-2xl"
 							style={{ animationDelay: '0.2s' }}
 						>
-							Visualize crafting dependencies and material
-							requirements
+							Visualize crafting dependencies and material requirements
 						</p>
 					</div>
 
@@ -48,9 +49,8 @@ export default async function Home()
 							className="animate-fade-in mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base md:text-lg"
 							style={{ animationDelay: '0.4s' }}
 						>
-							See everything you need to craft your item. Track
-							materials, view dependencies, and plan your
-							crafting.
+							See everything you need to craft your item. Track materials, view dependencies, and plan
+							your crafting.
 						</p>
 					</div>
 
@@ -77,27 +77,21 @@ export default async function Home()
 					>
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:p-6">
 							<div className="mb-2 text-2xl sm:text-3xl">🌳</div>
-							<h3 className="mb-2 text-sm font-semibold sm:text-base">
-								Dependency Trees
-							</h3>
+							<h3 className="mb-2 text-sm font-semibold sm:text-base">Dependency Trees</h3>
 							<p className="text-xs text-muted-foreground sm:text-sm">
 								Visualize all materials in a tree structure
 							</p>
 						</div>
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:p-6">
 							<div className="mb-2 text-2xl sm:text-3xl">📦</div>
-							<h3 className="mb-2 text-sm font-semibold sm:text-base">
-								Material Overview
-							</h3>
+							<h3 className="mb-2 text-sm font-semibold sm:text-base">Material Overview</h3>
 							<p className="text-xs text-muted-foreground sm:text-sm">
 								List of all required materials and quantities
 							</p>
 						</div>
 						<div className="rounded-lg border border-primary/10 bg-card/50 p-4 backdrop-blur-md transition-colors hover:border-primary/30 sm:col-span-2 sm:p-6 lg:col-span-1">
 							<div className="mb-2 text-2xl sm:text-3xl">🎮</div>
-							<h3 className="mb-2 text-sm font-semibold sm:text-base">
-								Multi-Game Support
-							</h3>
+							<h3 className="mb-2 text-sm font-semibold sm:text-base">Multi-Game Support</h3>
 							<p className="text-xs text-muted-foreground sm:text-sm">
 								Separate inventories for each game
 							</p>

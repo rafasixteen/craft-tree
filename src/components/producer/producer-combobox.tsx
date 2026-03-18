@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import {
 	Combobox,
 	ComboboxContent,
@@ -7,15 +6,14 @@ import {
 	ComboboxItem,
 	ComboboxList,
 } from '@/components/ui/combobox';
+
 import { Producer } from '@/domain/producer';
+
+import { useCallback } from 'react';
 
 interface ProducerComboboxProps extends Omit<
 	React.ComponentProps<typeof Combobox<Producer>>,
-	| 'items'
-	| 'value'
-	| 'onValueChange'
-	| 'itemToStringValue'
-	| 'itemToStringLabel'
+	'items' | 'value' | 'onValueChange' | 'itemToStringValue' | 'itemToStringLabel'
 >
 {
 	producers: Producer[];
@@ -25,15 +23,9 @@ interface ProducerComboboxProps extends Omit<
 	'aria-invalid'?: boolean;
 }
 
-export function ProducerCombobox({
-	producers,
-	value,
-	onChange,
-	...props
-}: ProducerComboboxProps)
+export function ProducerCombobox({ producers, value, onChange, ...props }: ProducerComboboxProps)
 {
-	const selectedProducer =
-		producers.find((producer) => producer.id === value) ?? null;
+	const selectedProducer = producers.find((producer) => producer.id === value) ?? null;
 
 	const { 'aria-invalid': ariaInvalid, className, ...restProps } = props;
 
@@ -54,11 +46,7 @@ export function ProducerCombobox({
 			itemToStringLabel={(producer) => producer.name}
 			{...restProps}
 		>
-			<ComboboxInput
-				placeholder="Search producer..."
-				className={className}
-				aria-invalid={ariaInvalid}
-			/>
+			<ComboboxInput placeholder="Search producer..." className={className} aria-invalid={ariaInvalid} />
 			<ComboboxContent>
 				<ComboboxEmpty>No producers found.</ComboboxEmpty>
 				<ComboboxList>

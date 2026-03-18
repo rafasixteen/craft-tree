@@ -1,5 +1,6 @@
-import { pgTable, uuid, primaryKey } from 'drizzle-orm/pg-core';
 import { items, tags } from '@/db/schema';
+
+import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core';
 
 export const itemTags = pgTable(
 	'item_tags',

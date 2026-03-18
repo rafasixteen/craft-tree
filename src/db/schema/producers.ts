@@ -1,7 +1,8 @@
-import { check, integer, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 import { inventories } from '@/db/schema';
+
 import { sql } from 'drizzle-orm';
 import { unique } from 'drizzle-orm/pg-core';
+import { check, integer, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
 export const producers = pgTable(
 	'producers',
@@ -18,9 +19,6 @@ export const producers = pgTable(
 	},
 	(table) => [
 		check('time_positive', sql`${table.time} > 0`),
-		unique('unique_inventory_producer_name').on(
-			table.inventoryId,
-			table.name,
-		),
+		unique('unique_inventory_producer_name').on(table.inventoryId, table.name),
 	],
 );

@@ -1,7 +1,8 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { Inventory, useInventory } from '@/domain/inventory';
+
+import { useParams } from 'next/navigation';
 
 export function useCurrentInventory(): Inventory
 {

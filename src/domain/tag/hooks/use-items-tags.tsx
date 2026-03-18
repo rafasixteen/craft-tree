@@ -1,8 +1,9 @@
 'use client';
 
-import useSWR from 'swr';
 import { ItemTag } from '@/domain/item';
 import { getItemsTags } from '@/domain/tag';
+
+import useSWR from 'swr';
 
 type UseItemsTagsParams = Parameters<typeof getItemsTags>[0];
 

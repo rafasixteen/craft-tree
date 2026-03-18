@@ -7,16 +7,12 @@ export function createClient()
 
 	if (!supabaseUrl)
 	{
-		throw new Error(
-			'Missing NEXT_PUBLIC_SUPABASE_URL environment variable',
-		);
+		throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
 	}
 
 	if (!supabaseKey)
 	{
-		throw new Error(
-			'Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable',
-		);
+		throw new Error('Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY environment variable');
 	}
 
 	return createBrowserClient(supabaseUrl, supabaseKey);

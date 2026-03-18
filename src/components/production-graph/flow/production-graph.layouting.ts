@@ -1,10 +1,8 @@
-import type { Node } from '@xyflow/react';
+import { ProductionGraphEdge, ProductionGraphNode } from '@/components/production-graph';
+
 import { Position } from '@xyflow/react';
+import type { Node } from '@xyflow/react';
 import ELK from 'elkjs/lib/elk.bundled.js';
-import {
-	ProductionGraphEdge,
-	ProductionGraphNode,
-} from '@/components/production-graph';
 
 const elk = new ELK();
 

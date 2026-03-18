@@ -1,10 +1,12 @@
 'use server';
 
-import { itemTags } from '@/db/schema';
-import { Item, ItemTag } from '@/domain/item';
-import { Tag } from '@/domain/tag';
-import { eq } from 'drizzle-orm';
 import db from '@/db/client';
+import { itemTags } from '@/db/schema';
+
+import { Tag } from '@/domain/tag';
+import { Item, ItemTag } from '@/domain/item';
+
+import { eq } from 'drizzle-orm';
 
 interface SetItemTagsParams
 {
@@ -12,10 +14,7 @@ interface SetItemTagsParams
 	tagIds: Tag['id'][];
 }
 
-export async function setItemTags({
-	itemId,
-	tagIds,
-}: SetItemTagsParams): Promise<ItemTag[]>
+export async function setItemTags({ itemId, tagIds }: SetItemTagsParams): Promise<ItemTag[]>
 {
 	return db.transaction(async (tx) =>
 	{

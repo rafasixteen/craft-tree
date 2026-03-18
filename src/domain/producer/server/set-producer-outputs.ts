@@ -1,9 +1,11 @@
 'use server';
 
-import { producerOutputs } from '@/db/schema';
-import { Producer, ProducerOutput } from '@/domain/producer';
-import { eq } from 'drizzle-orm';
 import db from '@/db/client';
+import { producerOutputs } from '@/db/schema';
+
+import { Producer, ProducerOutput } from '@/domain/producer';
+
+import { eq } from 'drizzle-orm';
 
 type Output = Omit<ProducerOutput, 'id' | 'producerId'>;
 
@@ -13,16 +15,11 @@ interface SetProducerOutputsParams
 	outputs: Output[];
 }
 
-export async function setProducerOutputs({
-	producerId,
-	outputs,
-}: SetProducerOutputsParams): Promise<ProducerOutput[]>
+export async function setProducerOutputs({ producerId, outputs }: SetProducerOutputsParams): Promise<ProducerOutput[]>
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx
-			.delete(producerOutputs)
-			.where(eq(producerOutputs.producerId, producerId));
+		await tx.delete(producerOutputs).where(eq(producerOutputs.producerId, producerId));
 
 		if (outputs.length === 0)
 		{

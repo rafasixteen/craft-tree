@@ -6,10 +6,7 @@ const SECONDS_PER_UNIT: Record<TimeUnit, number> = {
 	hour: 3600,
 };
 
-export function convertProductionRate(
-	rate: ProductionRate,
-	to: TimeUnit,
-): ProductionRate
+export function convertProductionRate(rate: ProductionRate, to: TimeUnit): ProductionRate
 {
 	// No conversion needed
 	if (rate.per === to)

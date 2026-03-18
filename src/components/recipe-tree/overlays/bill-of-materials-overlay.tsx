@@ -1,19 +1,17 @@
 'use client';
 
 import { LinkableName } from '@/components/linkable-name';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-	useRecipeTree,
-	getMaterials,
-	getLeftovers,
-} from '@/domain/recipe-tree';
-import { getItemHref } from '@/lib/navigation';
-import { Panel } from '@xyflow/react';
-import React from 'react';
 
-export function BillOfMaterialsOverlay(
-	props: React.ComponentProps<typeof Panel>,
-)
+import { Card, CardContent } from '@/components/ui/card';
+
+import { getLeftovers, getMaterials, useRecipeTree } from '@/domain/recipe-tree';
+
+import { getItemHref } from '@/lib/navigation';
+
+import React from 'react';
+import { Panel } from '@xyflow/react';
+
+export function BillOfMaterialsOverlay(props: React.ComponentProps<typeof Panel>)
 {
 	const { recipeTree } = useRecipeTree();
 
@@ -30,15 +28,10 @@ export function BillOfMaterialsOverlay(
 			<Card className="gap-0 p-0">
 				{/* TODO - Can we use "<ScrollArea>" here to get a nice scrollbar? */}
 				<CardContent className="max-h-64 overflow-y-auto p-2">
-					<div className="text-center text-xs font-semibold">
-						Materials
-					</div>
+					<div className="text-center text-xs font-semibold">Materials</div>
 					<ul className="mt-2 space-y-1">
 						{materials.map(({ item, amount }) => (
-							<li
-								key={item.id}
-								className="flex items-center justify-between gap-4"
-							>
+							<li key={item.id} className="flex items-center justify-between gap-4">
 								<LinkableName
 									name={item.name}
 									href={getItemHref(item)}
@@ -53,15 +46,10 @@ export function BillOfMaterialsOverlay(
 					{leftovers.length > 0 && (
 						<>
 							<hr className="my-2" />
-							<div className="text-center text-xs font-semibold">
-								Leftovers
-							</div>
+							<div className="text-center text-xs font-semibold">Leftovers</div>
 							<ul className="mt-2 space-y-1">
 								{leftovers.map(({ item, amount }) => (
-									<li
-										key={item.id}
-										className="flex items-center justify-between gap-4"
-									>
+									<li key={item.id} className="flex items-center justify-between gap-4">
 										<LinkableName
 											name={item.name}
 											href={getItemHref(item)}
