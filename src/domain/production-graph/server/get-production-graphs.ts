@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { productionGraphs } from '@/db/schema';
+import { productionGraphsTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 import { ProductionGraph } from '@/domain/production-graph';
@@ -15,5 +15,5 @@ interface GetProductionGraphsParams
 
 export async function getProductionGraphs({ inventoryId }: GetProductionGraphsParams): Promise<ProductionGraph[]>
 {
-	return await db.select().from(productionGraphs).where(eq(productionGraphs.inventoryId, inventoryId));
+	return await db.select().from(productionGraphsTable).where(eq(productionGraphsTable.inventoryId, inventoryId));
 }

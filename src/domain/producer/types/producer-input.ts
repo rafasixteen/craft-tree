@@ -1,3 +1,3 @@
-import { producerInputs } from '@/db/schema';
+import { producerInputsTable } from '@/db/schema';
 
-export type ProducerInput = typeof producerInputs.$inferSelect;
+export type ProducerInput = typeof producerInputsTable.$inferSelect;

@@ -1,3 +1,3 @@
-import { productionGraphs } from '@/db/schema';
+import { productionGraphsTable } from '@/db/schema';
 
-export type ProductionGraph = typeof productionGraphs.$inferSelect;
+export type ProductionGraph = typeof productionGraphsTable.$inferSelect;

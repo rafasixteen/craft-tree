@@ -1,3 +1,3 @@
-import { items } from '@/db/schema';
+import { itemsTable } from '@/db/schema';
 
-export type Item = typeof items.$inferSelect;
+export type Item = typeof itemsTable.$inferSelect;

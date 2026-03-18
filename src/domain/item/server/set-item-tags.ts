@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { itemTags } from '@/db/schema';
+import { itemTagsTable } from '@/db/schema';
 
 import { Tag } from '@/domain/tag';
 import { Item, ItemTag } from '@/domain/item';
@@ -18,7 +18,7 @@ export async function setItemTags({ itemId, tagIds }: SetItemTagsParams): Promis
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(itemTags).where(eq(itemTags.itemId, itemId));
+		await tx.delete(itemTagsTable).where(eq(itemTagsTable.itemId, itemId));
 
 		if (tagIds.length === 0)
 		{
@@ -26,7 +26,7 @@ export async function setItemTags({ itemId, tagIds }: SetItemTagsParams): Promis
 		}
 
 		return await tx
-			.insert(itemTags)
+			.insert(itemTagsTable)
 			.values(
 				tagIds.map((tagId) => ({
 					itemId,

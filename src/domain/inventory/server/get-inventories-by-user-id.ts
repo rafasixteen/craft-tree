@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { inventories } from '@/db/schema';
+import { inventoriesTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 
@@ -10,5 +10,5 @@ import { User } from '@supabase/supabase-js';
 
 export async function getInventoriesByUserId(id: User['id']): Promise<Inventory[]>
 {
-	return await db.select().from(inventories).where(eq(inventories.userId, id));
+	return await db.select().from(inventoriesTable).where(eq(inventoriesTable.userId, id));
 }

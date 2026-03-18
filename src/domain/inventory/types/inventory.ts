@@ -1,3 +1,3 @@
-import { inventories } from '@/db/schema';
+import { inventoriesTable } from '@/db/schema';
 
-export type Inventory = typeof inventories.$inferSelect;
+export type Inventory = typeof inventoriesTable.$inferSelect;

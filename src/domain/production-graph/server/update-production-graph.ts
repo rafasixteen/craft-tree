@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { productionGraphs } from '@/db/schema';
+import { productionGraphsTable } from '@/db/schema';
 
 import { ProductionGraph } from '@/domain/production-graph';
 
@@ -12,9 +12,9 @@ type UpdateProductionGraphParams = Pick<ProductionGraph, 'id'> & Partial<Omit<Pr
 export async function updateProductionGraph({ id, name, data }: UpdateProductionGraphParams): Promise<ProductionGraph>
 {
 	const [productionGraph] = await db
-		.update(productionGraphs)
+		.update(productionGraphsTable)
 		.set({ name, data })
-		.where(eq(productionGraphs.id, id))
+		.where(eq(productionGraphsTable.id, id))
 		.returning();
 	return productionGraph;
 }

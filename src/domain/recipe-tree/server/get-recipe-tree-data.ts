@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { items, producerInputs, producerOutputs, producers } from '@/db/schema';
+import { itemsTable, producerInputsTable, producerOutputsTable, producersTable } from '@/db/schema';
 
 import { Item } from '@/domain/item';
 import { Producer, ProducerInput, ProducerOutput } from '@/domain/producer';
@@ -32,14 +32,14 @@ export async function getRecipeTreeData(itemId: string): Promise<RecipeTreeData>
 		currentItemIds.forEach((itemId) => visitedItemIds.add(itemId));
 
 		// Fetch items
-		const nextItems = await db.select().from(items).where(inArray(items.id, currentItemIds));
+		const nextItems = await db.select().from(itemsTable).where(inArray(itemsTable.id, currentItemIds));
 		itemsResult.push(...nextItems);
 
 		// Fetch producers that output these items
 		const nextProducerOutputs = await db
 			.select()
-			.from(producerOutputs)
-			.where(inArray(producerOutputs.itemId, currentItemIds));
+			.from(producerOutputsTable)
+			.where(inArray(producerOutputsTable.itemId, currentItemIds));
 		producerOutputsResult.push(...nextProducerOutputs);
 
 		const producerIds = nextProducerOutputs.map((output) => output.producerId);
@@ -48,7 +48,7 @@ export async function getRecipeTreeData(itemId: string): Promise<RecipeTreeData>
 
 		if (producerIds.length > 0)
 		{
-			nextProducers = await db.select().from(producers).where(inArray(producers.id, producerIds));
+			nextProducers = await db.select().from(producersTable).where(inArray(producersTable.id, producerIds));
 			producersResult.push(...nextProducers);
 		}
 
@@ -57,7 +57,10 @@ export async function getRecipeTreeData(itemId: string): Promise<RecipeTreeData>
 
 		if (producerIds.length > 0)
 		{
-			nextInputs = await db.select().from(producerInputs).where(inArray(producerInputs.producerId, producerIds));
+			nextInputs = await db
+				.select()
+				.from(producerInputsTable)
+				.where(inArray(producerInputsTable.producerId, producerIds));
 			producerInputsResult.push(...nextInputs);
 		}
 

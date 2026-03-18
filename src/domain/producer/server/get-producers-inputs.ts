@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerInputs, producers } from '@/db/schema';
+import { producerInputsTable, producersTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 import { ProducerInput } from '@/domain/producer';
@@ -17,14 +17,14 @@ export async function getProducersInputs({ inventoryId }: GetProducersInputsPara
 {
 	const inputs = await db
 		.select({
-			id: producerInputs.id,
-			quantity: producerInputs.quantity,
-			itemId: producerInputs.itemId,
-			producerId: producerInputs.producerId,
+			id: producerInputsTable.id,
+			quantity: producerInputsTable.quantity,
+			itemId: producerInputsTable.itemId,
+			producerId: producerInputsTable.producerId,
 		})
-		.from(producerInputs)
-		.innerJoin(producers, eq(producerInputs.producerId, producers.id))
-		.where(eq(producers.inventoryId, inventoryId));
+		.from(producerInputsTable)
+		.innerJoin(producersTable, eq(producerInputsTable.producerId, producersTable.id))
+		.where(eq(producersTable.inventoryId, inventoryId));
 
 	return inputs;
 }

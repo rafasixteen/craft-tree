@@ -1,4 +1,4 @@
-import { inventories } from '@/db/schema';
+import { inventoriesTable } from '@/db/schema';
 
 import { pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 
@@ -11,7 +11,7 @@ export const tags = pgTable(
 
 		inventoryId: uuid('inventory_id')
 			.notNull()
-			.references(() => inventories.id, { onDelete: 'cascade' }),
+			.references(() => inventoriesTable.id, { onDelete: 'cascade' }),
 	},
 	(table) => [unique('unique_inventory_tag_name').on(table.inventoryId, table.name)],
 );

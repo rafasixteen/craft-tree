@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerOutputs } from '@/db/schema';
+import { producerOutputsTable } from '@/db/schema';
 
 import { Producer, ProducerOutput } from '@/domain/producer';
 
@@ -19,7 +19,7 @@ export async function setProducerOutputs({ producerId, outputs }: SetProducerOut
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(producerOutputs).where(eq(producerOutputs.producerId, producerId));
+		await tx.delete(producerOutputsTable).where(eq(producerOutputsTable.producerId, producerId));
 
 		if (outputs.length === 0)
 		{
@@ -27,7 +27,7 @@ export async function setProducerOutputs({ producerId, outputs }: SetProducerOut
 		}
 
 		return await tx
-			.insert(producerOutputs)
+			.insert(producerOutputsTable)
 			.values(
 				outputs.map((input) => ({
 					...input,

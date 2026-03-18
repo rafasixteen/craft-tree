@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerTags } from '@/db/schema';
+import { producerTagsTable } from '@/db/schema';
 
 import { Tag } from '@/domain/tag';
 import { Producer, ProducerTag } from '@/domain/producer';
@@ -18,7 +18,7 @@ export async function setProducerTags({ producerId, tagIds }: SetProducerTagsPar
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(producerTags).where(eq(producerTags.producerId, producerId));
+		await tx.delete(producerTagsTable).where(eq(producerTagsTable.producerId, producerId));
 
 		if (tagIds.length === 0)
 		{
@@ -26,7 +26,7 @@ export async function setProducerTags({ producerId, tagIds }: SetProducerTagsPar
 		}
 
 		return await tx
-			.insert(producerTags)
+			.insert(producerTagsTable)
 			.values(
 				tagIds.map((tagId) => ({
 					producerId,

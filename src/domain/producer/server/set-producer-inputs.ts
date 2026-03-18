@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerInputs } from '@/db/schema';
+import { producerInputsTable } from '@/db/schema';
 
 import { Producer, ProducerInput } from '@/domain/producer';
 
@@ -19,7 +19,7 @@ export async function setProducerInputs({ producerId, inputs }: SetProducerInput
 {
 	return db.transaction(async (tx) =>
 	{
-		await tx.delete(producerInputs).where(eq(producerInputs.producerId, producerId));
+		await tx.delete(producerInputsTable).where(eq(producerInputsTable.producerId, producerId));
 
 		if (inputs.length === 0)
 		{
@@ -27,7 +27,7 @@ export async function setProducerInputs({ producerId, inputs }: SetProducerInput
 		}
 
 		return await tx
-			.insert(producerInputs)
+			.insert(producerInputsTable)
 			.values(
 				inputs.map((input) => ({
 					...input,

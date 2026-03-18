@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { itemTags, items } from '@/db/schema';
+import { itemTagsTable, itemsTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 import { Item, ItemQueryOptions } from '@/domain/item';
@@ -19,11 +19,11 @@ export async function getItems({ inventoryId, options }: GetItemsParams): Promis
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';
 
-	const conditions = [eq(items.inventoryId, inventoryId)];
+	const conditions = [eq(itemsTable.inventoryId, inventoryId)];
 
 	if (filters?.search?.trim())
 	{
-		conditions.push(ilike(items.name, `%${filters.search.trim()}%`));
+		conditions.push(ilike(itemsTable.name, `%${filters.search.trim()}%`));
 	}
 
 	if (filters?.tagIds?.length)
@@ -32,8 +32,8 @@ export async function getItems({ inventoryId, options }: GetItemsParams): Promis
 			exists(
 				db
 					.select()
-					.from(itemTags)
-					.where(and(eq(itemTags.itemId, items.id), inArray(itemTags.tagId, filters.tagIds))),
+					.from(itemTagsTable)
+					.where(and(eq(itemTagsTable.itemId, itemsTable.id), inArray(itemTagsTable.tagId, filters.tagIds))),
 			),
 		);
 	}
@@ -42,17 +42,17 @@ export async function getItems({ inventoryId, options }: GetItemsParams): Promis
 	{
 		const base = db
 			.select()
-			.from(items)
+			.from(itemsTable)
 			.where(and(...conditions));
 
 		switch (sortBy)
 		{
 			case 'name_asc':
-				return base.orderBy(asc(items.name));
+				return base.orderBy(asc(itemsTable.name));
 			case 'name_desc':
-				return base.orderBy(desc(items.name));
+				return base.orderBy(desc(itemsTable.name));
 			default:
-				return base.orderBy(asc(items.name));
+				return base.orderBy(asc(itemsTable.name));
 		}
 	})();
 

@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { itemTags, producerTags } from '@/db/schema';
+import { itemTagsTable, producerTagsTable } from '@/db/schema';
 
 import { Tag } from '@/domain/tag';
 
@@ -10,8 +10,8 @@ import { count, eq } from 'drizzle-orm';
 export async function getTagUsage(tagId: Tag['id'])
 {
 	const [itemResult, producerResult] = await Promise.all([
-		db.select({ count: count() }).from(itemTags).where(eq(itemTags.tagId, tagId)),
-		db.select({ count: count() }).from(producerTags).where(eq(producerTags.tagId, tagId)),
+		db.select({ count: count() }).from(itemTagsTable).where(eq(itemTagsTable.tagId, tagId)),
+		db.select({ count: count() }).from(producerTagsTable).where(eq(producerTagsTable.tagId, tagId)),
 	]);
 
 	const items = itemResult[0]?.count ?? 0;

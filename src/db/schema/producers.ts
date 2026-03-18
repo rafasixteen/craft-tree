@@ -1,10 +1,10 @@
-import { inventories } from '@/db/schema';
+import { inventoriesTable } from '@/db/schema';
 
 import { sql } from 'drizzle-orm';
 import { unique } from 'drizzle-orm/pg-core';
 import { check, integer, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
-export const producers = pgTable(
+export const producersTable = pgTable(
 	'producers',
 	{
 		id: uuid('id').defaultRandom().primaryKey().notNull(),
@@ -14,7 +14,7 @@ export const producers = pgTable(
 		time: integer('time').notNull(),
 
 		inventoryId: uuid('inventory_id')
-			.references(() => inventories.id, { onDelete: 'cascade' })
+			.references(() => inventoriesTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
 	(table) => [

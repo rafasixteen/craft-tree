@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { inventories } from '@/db/schema';
+import { inventoriesTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 
@@ -11,6 +11,6 @@ type UpdateInventoryParams = Pick<Inventory, 'id' | 'name'>;
 
 export async function updateInventory({ id, name }: UpdateInventoryParams): Promise<Inventory>
 {
-	const [inventory] = await db.update(inventories).set({ name }).where(eq(inventories.id, id)).returning();
+	const [inventory] = await db.update(inventoriesTable).set({ name }).where(eq(inventoriesTable.id, id)).returning();
 	return inventory;
 }

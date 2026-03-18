@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerOutputs, producers } from '@/db/schema';
+import { producerOutputsTable, producersTable } from '@/db/schema';
 
 import { Item } from '@/domain/item';
 import { Producer } from '@/domain/producer';
@@ -17,13 +17,13 @@ export async function getProducersByOutputItem({ itemId }: GetProducersByOutputI
 {
 	return await db
 		.selectDistinct({
-			id: producers.id,
-			name: producers.name,
-			time: producers.time,
-			inventoryId: producers.inventoryId,
+			id: producersTable.id,
+			name: producersTable.name,
+			time: producersTable.time,
+			inventoryId: producersTable.inventoryId,
 		})
-		.from(producers)
-		.innerJoin(producerOutputs, eq(producerOutputs.producerId, producers.id))
-		.where(eq(producerOutputs.itemId, itemId))
-		.orderBy(asc(producers.name));
+		.from(producersTable)
+		.innerJoin(producerOutputsTable, eq(producerOutputsTable.producerId, producersTable.id))
+		.where(eq(producerOutputsTable.itemId, itemId))
+		.orderBy(asc(producersTable.name));
 }

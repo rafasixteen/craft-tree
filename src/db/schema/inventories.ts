@@ -1,6 +1,6 @@
 import { pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 
-export const inventories = pgTable(
+export const inventoriesTable = pgTable(
 	'inventories',
 	{
 		id: uuid('id').defaultRandom().primaryKey(),

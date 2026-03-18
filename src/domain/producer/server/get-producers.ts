@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerTags, producers } from '@/db/schema';
+import { producerTagsTable, producersTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 import { Producer, ProducerQueryOptions } from '@/domain/producer';
@@ -19,11 +19,11 @@ export async function getProducers({ inventoryId, options }: GetProducersParams)
 	const filters = options?.filters;
 	const sortBy = options?.sort ?? 'name_asc';
 
-	const conditions = [eq(producers.inventoryId, inventoryId)];
+	const conditions = [eq(producersTable.inventoryId, inventoryId)];
 
 	if (filters?.search?.trim())
 	{
-		conditions.push(ilike(producers.name, `%${filters.search.trim()}%`));
+		conditions.push(ilike(producersTable.name, `%${filters.search.trim()}%`));
 	}
 
 	if (filters?.tagIds?.length)
@@ -32,8 +32,13 @@ export async function getProducers({ inventoryId, options }: GetProducersParams)
 			exists(
 				db
 					.select()
-					.from(producerTags)
-					.where(and(eq(producerTags.producerId, producers.id), inArray(producerTags.tagId, filters.tagIds))),
+					.from(producerTagsTable)
+					.where(
+						and(
+							eq(producerTagsTable.producerId, producersTable.id),
+							inArray(producerTagsTable.tagId, filters.tagIds),
+						),
+					),
 			),
 		);
 	}
@@ -42,17 +47,17 @@ export async function getProducers({ inventoryId, options }: GetProducersParams)
 	{
 		const base = db
 			.select()
-			.from(producers)
+			.from(producersTable)
 			.where(and(...conditions));
 
 		switch (sortBy)
 		{
 			case 'name_asc':
-				return base.orderBy(asc(producers.name));
+				return base.orderBy(asc(producersTable.name));
 			case 'name_desc':
-				return base.orderBy(desc(producers.name));
+				return base.orderBy(desc(producersTable.name));
 			default:
-				return base.orderBy(asc(producers.name));
+				return base.orderBy(asc(producersTable.name));
 		}
 	})();
 

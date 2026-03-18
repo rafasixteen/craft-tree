@@ -1,13 +1,13 @@
-import { producers, tags } from '@/db/schema';
+import { producersTable, tags } from '@/db/schema';
 
 import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core';
 
-export const producerTags = pgTable(
+export const producerTagsTable = pgTable(
 	'producer_tags',
 	{
 		producerId: uuid('producer_id')
 			.notNull()
-			.references(() => producers.id, { onDelete: 'cascade' }),
+			.references(() => producersTable.id, { onDelete: 'cascade' }),
 
 		tagId: uuid('tag_id')
 			.notNull()

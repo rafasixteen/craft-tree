@@ -1,9 +1,9 @@
-import { items, producers } from '@/db/schema';
+import { itemsTable, producersTable } from '@/db/schema';
 
 import { sql } from 'drizzle-orm';
 import { check, integer, pgTable, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
-export const producerOutputs = pgTable(
+export const producerOutputsTable = pgTable(
 	'producer_outputs',
 	{
 		id: uuid('id').defaultRandom().primaryKey().notNull(),
@@ -11,11 +11,11 @@ export const producerOutputs = pgTable(
 		quantity: integer('quantity').notNull(),
 
 		itemId: uuid('item_id')
-			.references(() => items.id, { onDelete: 'cascade' })
+			.references(() => itemsTable.id, { onDelete: 'cascade' })
 			.notNull(),
 
 		producerId: uuid('producer_id')
-			.references(() => producers.id, { onDelete: 'cascade' })
+			.references(() => producersTable.id, { onDelete: 'cascade' })
 			.notNull(),
 	},
 	(table) => [

@@ -1,18 +1,12 @@
 'use server';
 
 import db from '@/db/client';
-import {
-	inventories as inventoriesTable,
-	items as itemsTable,
-	producerInputs as producerInputsTable,
-	producerOutputs as producerOutputsTable,
-	producers as producersTable,
-} from '@/db/schema';
+import { inventoriesTable, itemsTable, producerInputsTable, producerOutputsTable, producersTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 
 import { createClient } from '@/lib/supabase/server';
-import { InventoryImport } from '@/lib/validation/inventory';
+import { InventoryImport } from '@/lib/validation';
 
 export async function importInventory(data: InventoryImport): Promise<Inventory>
 {

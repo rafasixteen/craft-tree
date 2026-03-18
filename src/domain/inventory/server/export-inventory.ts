@@ -1,12 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import {
-	items as itemsTable,
-	producerOutputs as prodproducerOutputsTable,
-	producerInputs as producerInputsTable,
-	producers as producersTable,
-} from '@/db/schema';
+import { itemsTable, producerInputsTable, producerOutputsTable, producersTable } from '@/db/schema';
 
 import { Inventory, getInventoryById } from '@/domain/inventory';
 
@@ -34,10 +29,10 @@ export async function exportInventory(inventoryId: Inventory['id'])
 
 	const producerOutputs = await db
 		.select()
-		.from(prodproducerOutputsTable)
+		.from(producerOutputsTable)
 		.where(
 			inArray(
-				prodproducerOutputsTable.producerId,
+				producerOutputsTable.producerId,
 				producers.map((p) => p.id),
 			),
 		);

@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { itemTags, tags } from '@/db/schema';
+import { itemTagsTable, tags } from '@/db/schema';
 
 import { ItemTag } from '@/domain/item';
 import { Inventory } from '@/domain/inventory';
@@ -17,10 +17,10 @@ export async function getItemsTags({ inventoryId }: GetItemsTagsParams): Promise
 {
 	return await db
 		.select({
-			itemId: itemTags.itemId,
-			tagId: itemTags.tagId,
+			itemId: itemTagsTable.itemId,
+			tagId: itemTagsTable.tagId,
 		})
-		.from(itemTags)
-		.innerJoin(tags, eq(itemTags.tagId, tags.id))
+		.from(itemTagsTable)
+		.innerJoin(tags, eq(itemTagsTable.tagId, tags.id))
 		.where(eq(tags.inventoryId, inventoryId));
 }
