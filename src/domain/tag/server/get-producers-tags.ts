@@ -1,7 +1,7 @@
 'use server';
 
 import db from '@/db/client';
-import { producerTagsTable, tags } from '@/db/schema';
+import { producerTagsTable, tagsTable } from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 import { ProducerTag } from '@/domain/producer';
@@ -21,6 +21,6 @@ export async function getProducersTags({ inventoryId }: GetProducersTagsParams):
 			tagId: producerTagsTable.tagId,
 		})
 		.from(producerTagsTable)
-		.innerJoin(tags, eq(producerTagsTable.tagId, tags.id))
-		.where(eq(tags.inventoryId, inventoryId));
+		.innerJoin(tagsTable, eq(producerTagsTable.tagId, tagsTable.id))
+		.where(eq(tagsTable.inventoryId, inventoryId));
 }

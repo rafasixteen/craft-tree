@@ -1,4 +1,4 @@
-import { itemsTable, tags } from '@/db/schema';
+import { itemsTable, tagsTable } from '@/db/schema';
 
 import { pgTable, primaryKey, uuid } from 'drizzle-orm/pg-core';
 
@@ -11,7 +11,7 @@ export const itemTagsTable = pgTable(
 
 		tagId: uuid('tag_id')
 			.notNull()
-			.references(() => tags.id, { onDelete: 'cascade' }),
+			.references(() => tagsTable.id, { onDelete: 'cascade' }),
 	},
 	(table) => [
 		primaryKey({

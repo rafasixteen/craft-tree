@@ -2,7 +2,7 @@ import { inventoriesTable } from '@/db/schema';
 
 import { pgTable, text, unique, uuid } from 'drizzle-orm/pg-core';
 
-export const tags = pgTable(
+export const tagsTable = pgTable(
 	'tags',
 	{
 		id: uuid('id').defaultRandom().primaryKey(),

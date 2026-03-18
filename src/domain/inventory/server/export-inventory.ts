@@ -1,7 +1,16 @@
 'use server';
 
 import db from '@/db/client';
-import { itemsTable, producerInputsTable, producerOutputsTable, producersTable } from '@/db/schema';
+import {
+	itemsTable,
+	itemTagsTable,
+	producerInputsTable,
+	producerOutputsTable,
+	producersTable,
+	producerTagsTable,
+	tagsTable,
+	productionGraphsTable,
+} from '@/db/schema';
 
 import { Inventory, getInventoryById } from '@/domain/inventory';
 
@@ -13,35 +22,64 @@ export async function exportInventory(inventoryId: Inventory['id'])
 {
 	const inventory = await getInventoryById(inventoryId);
 
-	const items = await db.select().from(itemsTable).where(eq(itemsTable.inventoryId, inventoryId));
+	const [items, producers, tags, productionGraphs] = await Promise.all([
+		db.select().from(itemsTable).where(eq(itemsTable.inventoryId, inventoryId)),
+		db.select().from(producersTable).where(eq(producersTable.inventoryId, inventoryId)),
+		db.select().from(tagsTable).where(eq(tagsTable.inventoryId, inventoryId)),
+		db.select().from(productionGraphsTable).where(eq(productionGraphsTable.inventoryId, inventoryId)),
+	]);
 
-	const producers = await db.select().from(producersTable).where(eq(producersTable.inventoryId, inventoryId));
-
-	const producerInputs = await db
-		.select()
-		.from(producerInputsTable)
-		.where(
-			inArray(
-				producerInputsTable.producerId,
-				producers.map((p) => p.id),
+	const [producerInputs, producerOutputs, itemTags, producerTags] = await Promise.all([
+		db
+			.select()
+			.from(producerInputsTable)
+			.where(
+				inArray(
+					producerInputsTable.producerId,
+					producers.map((p) => p.id),
+				),
 			),
-		);
-
-	const producerOutputs = await db
-		.select()
-		.from(producerOutputsTable)
-		.where(
-			inArray(
-				producerOutputsTable.producerId,
-				producers.map((p) => p.id),
+		db
+			.select()
+			.from(producerOutputsTable)
+			.where(
+				inArray(
+					producerOutputsTable.producerId,
+					producers.map((p) => p.id),
+				),
 			),
-		);
+		db
+			.select()
+			.from(itemTagsTable)
+			.where(
+				inArray(
+					itemTagsTable.itemId,
+					items.map((i) => i.id),
+				),
+			),
+		db
+			.select()
+			.from(producerTagsTable)
+			.where(
+				inArray(
+					producerTagsTable.producerId,
+					producers.map((p) => p.id),
+				),
+			),
+	]);
+
+	const tagExportId = (dbId: string) => tags.findIndex((t) => t.id === dbId) + 1;
 
 	const data = InventoryImportSchema.parse({
 		inventory: inventory.name,
+		tags: tags.map((tag, index) => ({
+			id: index + 1,
+			name: tag.name,
+		})),
 		items: items.map((item, index) => ({
 			id: index + 1,
 			name: item.name,
+			tags: itemTags.filter((it) => it.itemId === item.id).map((it) => tagExportId(it.tagId)),
 		})),
 		producers: producers.map((producer, index) => ({
 			id: index + 1,
@@ -59,6 +97,11 @@ export async function exportInventory(inventoryId: Inventory['id'])
 					itemId: items.findIndex((item) => item.id === output.itemId) + 1,
 					quantity: output.quantity,
 				})),
+			tags: producerTags.filter((pt) => pt.producerId === producer.id).map((pt) => tagExportId(pt.tagId)),
+		})),
+		productionGraphs: productionGraphs.map((graph) => ({
+			name: graph.name,
+			data: graph.data,
 		})),
 	});
 

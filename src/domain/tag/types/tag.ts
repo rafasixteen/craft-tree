@@ -1,3 +1,3 @@
-import { tags } from '@/db/schema';
+import { tagsTable } from '@/db/schema';
 
-export type Tag = typeof tags.$inferSelect;
+export type Tag = typeof tagsTable.$inferSelect;

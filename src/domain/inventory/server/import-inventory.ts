@@ -1,7 +1,17 @@
 'use server';
 
 import db from '@/db/client';
-import { inventoriesTable, itemsTable, producerInputsTable, producerOutputsTable, producersTable } from '@/db/schema';
+import {
+	inventoriesTable,
+	itemsTable,
+	itemTagsTable,
+	producerInputsTable,
+	producerOutputsTable,
+	producersTable,
+	producerTagsTable,
+	tagsTable,
+	productionGraphsTable,
+} from '@/db/schema';
 
 import { Inventory } from '@/domain/inventory';
 
@@ -10,7 +20,7 @@ import { InventoryImport } from '@/lib/validation';
 
 export async function importInventory(data: InventoryImport): Promise<Inventory>
 {
-	const { inventory, items, producers } = data;
+	const { inventory, items, producers, tags, productionGraphs } = data;
 
 	const supabase = await createClient();
 
@@ -33,46 +43,94 @@ export async function importInventory(data: InventoryImport): Promise<Inventory>
 			})
 			.returning();
 
-		const createdItems = await tx
-			.insert(itemsTable)
-			.values(
-				items.map((item) => ({
-					name: item.name,
-					inventoryId: newInventory.id,
-				})),
-			)
-			.returning();
+		const [createdItems, createdProducers, createdTags] = await Promise.all([
+			tx
+				.insert(itemsTable)
+				.values(
+					items.map((item) => ({
+						name: item.name,
+						inventoryId: newInventory.id,
+					})),
+				)
+				.returning(),
 
-		const createdProducers = await tx
-			.insert(producersTable)
-			.values(
-				producers.map((producer) => ({
-					name: producer.name,
-					time: producer.time,
-					inventoryId: newInventory.id,
-				})),
-			)
-			.returning();
+			tx
+				.insert(producersTable)
+				.values(
+					producers.map((producer) => ({
+						name: producer.name,
+						time: producer.time,
+						inventoryId: newInventory.id,
+					})),
+				)
+				.returning(),
 
-		await tx.insert(producerInputsTable).values(
-			producers.flatMap((producer, producerIndex) =>
-				producer.inputs.map((input) => ({
-					producerId: createdProducers[producerIndex].id,
-					itemId: createdItems[input.itemId - 1].id,
-					quantity: input.quantity,
-				})),
+			tags?.length
+				? tx
+						.insert(tagsTable)
+						.values(
+							tags.map((tag) => ({
+								name: tag.name,
+								inventoryId: newInventory.id,
+							})),
+						)
+						.returning()
+				: Promise.resolve([]),
+		]);
+
+		await Promise.all([
+			tx.insert(producerInputsTable).values(
+				producers.flatMap((producer, producerIndex) =>
+					producer.inputs.map((input) => ({
+						producerId: createdProducers[producerIndex].id,
+						itemId: createdItems[input.itemId - 1].id,
+						quantity: input.quantity,
+					})),
+				),
 			),
-		);
 
-		await tx.insert(producerOutputsTable).values(
-			producers.flatMap((producer, producerIndex) =>
-				producer.outputs.map((output) => ({
-					producerId: createdProducers[producerIndex].id,
-					itemId: createdItems[output.itemId - 1].id,
-					quantity: output.quantity,
-				})),
+			tx.insert(producerOutputsTable).values(
+				producers.flatMap((producer, producerIndex) =>
+					producer.outputs.map((output) => ({
+						producerId: createdProducers[producerIndex].id,
+						itemId: createdItems[output.itemId - 1].id,
+						quantity: output.quantity,
+					})),
+				),
 			),
-		);
+
+			...(createdTags.length
+				? [
+						tx.insert(itemTagsTable).values(
+							items.flatMap((item, itemIndex) =>
+								(item.tags ?? []).map((tagId) => ({
+									itemId: createdItems[itemIndex].id,
+									tagId: createdTags[tagId - 1].id,
+								})),
+							),
+						),
+
+						tx.insert(producerTagsTable).values(
+							producers.flatMap((producer, producerIndex) =>
+								(producer.tags ?? []).map((tagId) => ({
+									producerId: createdProducers[producerIndex].id,
+									tagId: createdTags[tagId - 1].id,
+								})),
+							),
+						),
+					]
+				: []),
+
+			...(!productionGraphs
+				? []
+				: productionGraphs.map((graph) =>
+						tx.insert(productionGraphsTable).values({
+							name: graph.name,
+							data: graph.data,
+							inventoryId: newInventory.id,
+						}),
+					)),
+		]);
 
 		return newInventory;
 	});
