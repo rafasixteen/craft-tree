@@ -52,7 +52,11 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 	const nodes: Record<string, RecipeTreeNode> = {};
 	let nodeCounter = 0;
 
-	function buildNode(itemId: string, parentId: string | null): RecipeTreeNode
+	function buildNode(
+		itemId: string,
+		parentId: string | null,
+		visiting: Set<string> = new Set(),
+	): RecipeTreeNode
 	{
 		const item = itemsById.get(itemId);
 
@@ -64,34 +68,42 @@ export function parseRecipeTreeData(data: RecipeTreeData): RecipeTreeState
 		const nodeId = `node-${++nodeCounter}`;
 		const nodeProducers = producersByOutputItemId.get(itemId) ?? [];
 		const nodeChildren: Record<string, string[]> = {};
-		const producerInputs: Record<string, ProducerInput[]> = {};
-		const producerOutputs: Record<string, ProducerOutput[]> = {};
+		const nodeProducerInputs: Record<string, ProducerInput[]> = {};
+		const nodeProducerOutputs: Record<string, ProducerOutput[]> = {};
 
-		for (const producer of nodeProducers)
+		// Only expand producers if this item isn't already an ancestor (cycle guard)
+		if (!visiting.has(itemId))
 		{
-			const inputs = inputsByProducerId.get(producer.id) ?? [];
-			const outputs = outputsByProducerId.get(producer.id) ?? [];
+			visiting.add(itemId);
 
-			nodeChildren[producer.id] = [];
-			producerInputs[producer.id] = inputs;
-			producerOutputs[producer.id] = outputs;
-
-			for (const input of inputs)
+			for (const producer of nodeProducers)
 			{
-				const childNode = buildNode(input.itemId, nodeId);
-				nodeChildren[producer.id].push(childNode.id);
+				const inputs = inputsByProducerId.get(producer.id) ?? [];
+				const outputs = outputsByProducerId.get(producer.id) ?? [];
+
+				nodeChildren[producer.id] = [];
+				nodeProducerInputs[producer.id] = inputs;
+				nodeProducerOutputs[producer.id] = outputs;
+
+				for (const input of inputs)
+				{
+					const childNode = buildNode(input.itemId, nodeId, visiting);
+					nodeChildren[producer.id].push(childNode.id);
+				}
 			}
+
+			visiting.delete(itemId);
 		}
 
 		const node: RecipeTreeNode = {
 			id: nodeId,
 			item,
-			producers: nodeProducers,
-			selectedProducerId: nodeProducers[0]?.id ?? null,
+			producers: visiting.has(itemId) ? [] : nodeProducers,
+			selectedProducerId: visiting.has(itemId) ? null : (nodeProducers[0]?.id ?? null),
 			parentId,
 			children: nodeChildren,
-			producerInputs,
-			producerOutputs,
+			producerInputs: nodeProducerInputs,
+			producerOutputs: nodeProducerOutputs,
 		};
 
 		nodes[nodeId] = node;
