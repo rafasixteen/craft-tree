@@ -1,6 +1,7 @@
 import { Inventory } from '@/domain/inventory';
 
-export function getInventoryHref(inventory: Inventory)
+export function getInventoryHref(inventory: Inventory, action?: string)
 {
-	return `/inventories/${inventory.id}`;
+	const base = `/inventories/${inventory.id}`;
+	return action ? `${base}/${action}` : base;
 }

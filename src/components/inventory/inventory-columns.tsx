@@ -4,13 +4,20 @@ import { DataTableColumnHeader } from '@/components/data-table';
 
 import { Button } from '@/components/ui/button';
 
-import { Inventory, exportInventory, useInventories } from '@/domain/inventory';
+import { Inventory, deleteInventory, exportInventory } from '@/domain/inventory';
 
 import { downloadJSON } from '@/lib/download-json';
 
 import Link from 'next/link';
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { DownloadIcon, PencilIcon, TrashIcon } from 'lucide-react';
+import { getInventoryHref } from '@/lib/navigation';
+import { buildInventoryReferences, DeleteConfirmationDialog, DeleteTarget } from '../confirmation-dialog';
+import { useItems } from '@/domain/item';
+import { useProducers } from '@/domain/producer/hooks/use-producers';
+import { useTags } from '@/domain/tag/hooks/use-tags';
+import { useProductionGraphs } from '@/domain/production-graph/hooks/use-production-graphs';
+import { useRouter } from 'next/navigation';
 
 export type InventoryColumnData = Inventory;
 
@@ -46,10 +53,6 @@ interface ActionsProps
 
 function Actions({ row }: ActionsProps)
 {
-	const id = row.original.id;
-
-	const { deleteInventory } = useInventories();
-
 	async function onExport(inventory: Inventory)
 	{
 		const json = await exportInventory(inventory.id);
@@ -61,12 +64,51 @@ function Actions({ row }: ActionsProps)
 			<Button variant="outline" size="icon-sm" onClick={() => onExport(row.original)}>
 				<DownloadIcon className="size-3" />
 			</Button>
-			<Link href={`/inventories/${id}/edit`}>
+			<Link href={getInventoryHref(row.original, 'edit')}>
 				<PencilIcon className="size-3" />
 			</Link>
-			<Button variant="destructive" size="icon-sm" onClick={() => deleteInventory(id)}>
-				<TrashIcon className="size-3" />
-			</Button>
+			<DeleteInventoryDialog inventory={row.original} />
 		</div>
+	);
+}
+
+interface DeleteInventoryDialogProps
+{
+	inventory: Inventory;
+}
+
+function DeleteInventoryDialog({ inventory }: DeleteInventoryDialogProps)
+{
+	const { items } = useItems({ inventoryId: inventory.id });
+	const { producers } = useProducers({ inventoryId: inventory.id });
+	const { tags } = useTags({ inventoryId: inventory.id });
+	const { productionGraphs } = useProductionGraphs({ inventoryId: inventory.id });
+
+	const target: DeleteTarget = {
+		resourceType: 'inventory',
+		resourceName: inventory.name,
+		references: buildInventoryReferences({
+			itemsCount: items.length,
+			producersCount: producers.length,
+			tagsCount: tags.length,
+			graphsCount: productionGraphs.length,
+		}),
+	};
+
+	async function onConfirm()
+	{
+		await deleteInventory(inventory.id);
+	}
+
+	return (
+		<DeleteConfirmationDialog
+			trigger={
+				<Button variant="destructive" size="icon-sm">
+					<TrashIcon className="size-3" />
+				</Button>
+			}
+			target={target}
+			onConfirm={onConfirm}
+		/>
 	);
 }
