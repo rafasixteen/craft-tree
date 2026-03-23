@@ -1,3 +1,5 @@
+export * from './use-item-input-usage';
+export * from './use-item-output-usage';
 export * from './use-producer-inputs-v2';
 export * from './use-producer-inputs';
 export * from './use-producer-outputs-v2';

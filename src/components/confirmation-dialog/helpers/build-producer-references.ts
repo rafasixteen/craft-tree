@@ -4,15 +4,15 @@ interface BuildProducerReferencesParams
 {
 	inputsCount: number;
 	outputsCount: number;
-	tagsCount: number;
 }
 
 export function buildProducerReferences({
 	inputsCount,
 	outputsCount,
-	tagsCount,
 }: BuildProducerReferencesParams): ResourceReference[]
 {
+	// TODO: Add how many nodes in production graphs reference this producer.
+
 	const refs: ResourceReference[] = [];
 
 	if (inputsCount > 0)
@@ -32,15 +32,6 @@ export function buildProducerReferences({
 			label: 'Output slots',
 			count: outputsCount,
 			critical: true,
-		});
-	}
-
-	if (tagsCount > 0)
-	{
-		refs.push({
-			type: 'producer_tags',
-			label: 'Tag associations',
-			count: tagsCount,
 		});
 	}
 

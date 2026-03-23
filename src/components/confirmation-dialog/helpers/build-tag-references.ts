@@ -2,32 +2,29 @@ import { ResourceReference } from '@/components/confirmation-dialog';
 
 interface BuildTagReferencesParams
 {
-	itemTagsCount: number;
-	producerTagsCount: number;
+	itemsCount: number;
+	producersCount: number;
 }
 
-export function buildTagReferences({
-	itemTagsCount,
-	producerTagsCount,
-}: BuildTagReferencesParams): ResourceReference[]
+export function buildTagReferences({ itemsCount, producersCount }: BuildTagReferencesParams): ResourceReference[]
 {
 	const refs: ResourceReference[] = [];
 
-	if (itemTagsCount > 0)
+	if (itemsCount > 0)
 	{
 		refs.push({
 			type: 'item_tags',
 			label: 'Items tagged',
-			count: itemTagsCount,
+			count: itemsCount,
 		});
 	}
 
-	if (producerTagsCount > 0)
+	if (producersCount > 0)
 	{
 		refs.push({
 			type: 'producer_tags',
 			label: 'Producers tagged',
-			count: producerTagsCount,
+			count: producersCount,
 		});
 	}
 

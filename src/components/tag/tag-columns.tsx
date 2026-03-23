@@ -4,11 +4,13 @@ import { DataTableColumnHeader } from '@/components/data-table';
 
 import { Button } from '@/components/ui/button';
 
-import { Tag, useTags } from '@/domain/tag';
+import { Tag } from '@/domain/tag';
 
 import Link from 'next/link';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { ColumnDef, Row } from '@tanstack/react-table';
+import { DeleteTagDialog } from './delete-tag-dialog';
+import { getTagHref } from '@/lib/navigation';
 
 export type TagColumnData = Tag;
 
@@ -44,21 +46,14 @@ interface ActionsProps
 
 function Actions({ row }: ActionsProps)
 {
-	const id = row.original.id;
-	const inventoryId = row.original.inventoryId;
-
-	const { deleteTag } = useTags({ inventoryId });
-
 	return (
 		<div className="flex justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${inventoryId}/tags/${id}/edit`}>
+				<Link href={getTagHref(row.original)}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button variant="destructive" size="icon-sm" onClick={() => deleteTag(id)}>
-				<TrashIcon className="size-3" />
-			</Button>
+			<DeleteTagDialog tag={row.original} />
 		</div>
 	);
 }

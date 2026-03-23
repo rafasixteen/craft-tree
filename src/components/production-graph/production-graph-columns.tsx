@@ -4,11 +4,13 @@ import { DataTableColumnHeader } from '@/components/data-table';
 
 import { Button } from '@/components/ui/button';
 
-import { ProductionGraph, useProductionGraphs } from '@/domain/production-graph';
+import { ProductionGraph } from '@/domain/production-graph';
 
 import Link from 'next/link';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { ColumnDef, Row } from '@tanstack/react-table';
+import { getProductionGraphHref } from '@/lib/navigation';
+import { DeleteProductionGraphDialog } from '@/components/production-graph';
 
 export type ProductionGraphColumnData = ProductionGraph;
 
@@ -18,15 +20,9 @@ export const productionGraphColumnns: ColumnDef<ProductionGraphColumnData>[] = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
-			const name = row.original.name;
-			const id = row.original.id;
-			const inventoryId = row.original.inventoryId;
-
-			const href = `/inventories/${inventoryId}/production-graphs/${id}`;
-
 			return (
-				<Link href={href} className="ml-3 truncate font-medium hover:underline">
-					{name}
+				<Link href={getProductionGraphHref(row.original)} className="ml-3 truncate font-medium hover:underline">
+					{row.original.name}
 				</Link>
 			);
 		},
@@ -47,21 +43,14 @@ interface ActionsProps
 
 function Actions({ row }: ActionsProps)
 {
-	const id = row.original.id;
-	const inventoryId = row.original.inventoryId;
-
-	const { deleteProductionGraph } = useProductionGraphs({ inventoryId });
-
 	return (
-		<div className="flex justify-center gap-2">
+		<div className="flex items-center justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${inventoryId}/production-graphs/${id}/edit`}>
+				<Link href={getProductionGraphHref(row.original, 'edit')}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button variant="destructive" size="icon-sm" onClick={() => deleteProductionGraph(id)}>
-				<TrashIcon className="size-3" />
-			</Button>
+			<DeleteProductionGraphDialog productionGraph={row.original} />
 		</div>
 	);
 }

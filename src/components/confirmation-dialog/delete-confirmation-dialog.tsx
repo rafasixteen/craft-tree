@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ResourceType, DeleteTarget } from '@/components/confirmation-dialog';
+import { useState } from 'react';
+import { DeleteTarget } from '@/components/confirmation-dialog';
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-interface ResourceMetaInfo
+export interface ResourceMetaInfo
 {
 	icon: string;
 	color: string;
@@ -12,67 +12,31 @@ interface ResourceMetaInfo
 	warningThreshold: number;
 }
 
-const RESOURCE_META: Record<ResourceType, ResourceMetaInfo> = {
-	inventory: {
-		icon: '▦',
-		color: '#e8643c',
-		description: (name) =>
-			`"${name}" is a top-level inventory. Deleting it will cascade through all its items, producers, tags, and production graphs.`,
-		warningThreshold: 1,
-	},
-	item: {
-		icon: '◈',
-		color: '#d4a843',
-		description: (name) => `"${name}" may be used as an input or output in producer pipelines.`,
-		warningThreshold: 1,
-	},
-	producer: {
-		icon: '⬡',
-		color: '#5b9cf6',
-		description: (name) => `"${name}" has inputs and outputs linked to items in the inventory.`,
-		warningThreshold: 1,
-	},
-	tag: {
-		icon: '⬙',
-		color: '#8b6cf7',
-		description: (name) => `Tag "${name}" may be attached to items and producers.`,
-		warningThreshold: 1,
-	},
-	production_graph: {
-		icon: '◎',
-		color: '#3cb87a',
-		description: (name) => `Production graph "${name}" stores complex graph data (jsonb) tied to this inventory.`,
-		warningThreshold: 1,
-	},
-};
-
 interface DeleteConfirmationDialogProps
 {
 	trigger: React.ReactNode;
-	target: DeleteTarget | null;
-	onConfirm: (target: DeleteTarget) => Promise<void>;
-	onCancel?: () => void;
+	meta: ResourceMetaInfo;
+	target: DeleteTarget;
+	onConfirm: (target: DeleteTarget) => Promise<void> | void;
+	onCancel?: () => Promise<void> | void;
 }
 
-export function DeleteConfirmationDialog({ trigger, target, onConfirm, onCancel }: DeleteConfirmationDialogProps)
+export function DeleteConfirmationDialog({
+	trigger,
+	meta,
+	target,
+	onConfirm,
+	onCancel,
+}: DeleteConfirmationDialogProps)
 {
 	const [confirmText, setConfirmText] = useState<string>('');
 	const [loading, setLoading] = useState<boolean>(false);
+	const [open, setOpen] = useState(false);
 
-	useEffect(() =>
-	{
-		if (!target)
-		{
-			setConfirmText('');
-			setLoading(false);
-		}
-	}, [target]);
-
-	const meta = target ? RESOURCE_META[target.resourceType] : null;
-	const hasCritical = target?.references.some((r) => r.critical) ?? false;
-	const totalRefs = target?.references.reduce((s, r) => s + r.count, 0) ?? 0;
-	const needsTyping = meta ? hasCritical || totalRefs >= meta.warningThreshold : false;
-	const canConfirm = !needsTyping || confirmText.trim() === target?.resourceName;
+	const hasCritical = target.references.some((r) => r.critical);
+	const totalRefs = target.references.reduce((s, r) => s + r.count, 0);
+	const needsTyping = hasCritical || totalRefs >= meta.warningThreshold;
+	const canConfirm = !needsTyping || confirmText.trim() === target.resourceName;
 
 	async function handleConfirm()
 	{
@@ -94,13 +58,11 @@ export function DeleteConfirmationDialog({ trigger, target, onConfirm, onCancel 
 		}
 	}
 
-	const [open, setOpen] = useState(false);
-
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>{trigger}</DialogTrigger>
 			<DialogContent
-				className="p-0 gap-0 overflow-hidden"
+				className="gap-0 overflow-hidden p-0"
 				style={{
 					background: '#0f1117',
 					border: `1px solid ${meta?.color ?? '#ffffff20'}44`,

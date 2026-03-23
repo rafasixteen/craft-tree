@@ -4,11 +4,13 @@ import { DataTableColumnHeader } from '@/components/data-table';
 
 import { Button } from '@/components/ui/button';
 
-import { Producer, useProducers } from '@/domain/producer';
+import { Producer } from '@/domain/producer';
 
 import Link from 'next/link';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { ColumnDef, Row } from '@tanstack/react-table';
+import { DeleteProducerDialog } from '@/components/producer';
+import { getProducerHref } from '@/lib/navigation';
 
 export type ProducerColumnData = Producer & { tags: string[] };
 
@@ -18,12 +20,9 @@ export const producerColumnns: ColumnDef<ProducerColumnData>[] = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
-			const name = row.original.name;
-			const href = `/inventories/${row.original.inventoryId}/producers/${row.original.id}`;
-
 			return (
-				<Link href={href} className="ml-3 truncate font-medium hover:underline">
-					{name}
+				<Link href={getProducerHref(row.original)} className="ml-3 truncate font-medium hover:underline">
+					{row.original.name}
 				</Link>
 			);
 		},
@@ -73,21 +72,14 @@ interface ActionsProps
 
 function Actions({ row }: ActionsProps)
 {
-	const id = row.original.id;
-	const inventoryId = row.original.inventoryId;
-
-	const { deleteProducer } = useProducers({ inventoryId });
-
 	return (
-		<div className="flex justify-center gap-2">
+		<div className="flex items-center justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${inventoryId}/producers/${id}/edit`}>
+				<Link href={getProducerHref(row.original, 'edit')}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button variant="destructive" size="icon-sm" onClick={() => deleteProducer(id)}>
-				<TrashIcon className="size-3" />
-			</Button>
+			<DeleteProducerDialog producer={row.original} />
 		</div>
 	);
 }

@@ -1,1 +1,1 @@
-export type ResourceType = 'inventory' | 'item' | 'producer' | 'tag' | 'production_graph';
+export type ResourceType = 'inventory' | 'item' | 'producer' | 'tag' | 'production graph';

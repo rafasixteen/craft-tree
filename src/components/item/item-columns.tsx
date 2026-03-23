@@ -4,11 +4,13 @@ import { DataTableColumnHeader } from '@/components/data-table';
 
 import { Button } from '@/components/ui/button';
 
-import { Item, useItems } from '@/domain/item';
+import { Item } from '@/domain/item';
 
 import Link from 'next/link';
-import { PencilIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon } from 'lucide-react';
 import { ColumnDef, Row } from '@tanstack/react-table';
+import { DeleteItemDialog } from '@/components/item';
+import { getItemHref } from '@/lib/navigation';
 
 export type ItemColumnData = Item & { tags: string[] };
 
@@ -18,12 +20,9 @@ export const itemColumnns: ColumnDef<ItemColumnData>[] = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
 		cell: ({ row }) =>
 		{
-			const name = row.original.name;
-			const href = `/inventories/${row.original.inventoryId}/items/${row.original.id}`;
-
 			return (
-				<Link href={href} className="ml-3 truncate font-medium hover:underline">
-					{name}
+				<Link href={getItemHref(row.original)} className="ml-3 truncate font-medium hover:underline">
+					{row.original.name}
 				</Link>
 			);
 		},
@@ -73,21 +72,14 @@ interface ActionsProps
 
 function Actions({ row }: ActionsProps)
 {
-	const id = row.original.id;
-	const inventoryId = row.original.inventoryId;
-
-	const { deleteItem } = useItems({ inventoryId });
-
 	return (
-		<div className="flex justify-center gap-2">
+		<div className="flex items-center justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={`/inventories/${inventoryId}/items/${id}/edit`}>
+				<Link href={getItemHref(row.original, 'edit')}>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>
-			<Button variant="destructive" size="icon-sm" onClick={() => deleteItem(id)}>
-				<TrashIcon className="size-3" />
-			</Button>
+			<DeleteItemDialog item={row.original} />
 		</div>
 	);
 }

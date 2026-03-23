@@ -4,15 +4,15 @@ interface BuildItemReferencesParams
 {
 	producerInputsCount: number;
 	producerOutputsCount: number;
-	itemTagsCount: number;
 }
 
 export function buildItemReferences({
 	producerInputsCount,
 	producerOutputsCount,
-	itemTagsCount,
 }: BuildItemReferencesParams): ResourceReference[]
 {
+	// TODO: Add how many nodes in production graphs reference this item (as input or output).
+
 	const refs: ResourceReference[] = [];
 
 	if (producerInputsCount > 0)
@@ -32,15 +32,6 @@ export function buildItemReferences({
 			label: 'Producer outputs using this item',
 			count: producerOutputsCount,
 			critical: true,
-		});
-	}
-
-	if (itemTagsCount > 0)
-	{
-		refs.push({
-			type: 'item_tags',
-			label: 'Tag associations',
-			count: itemTagsCount,
 		});
 	}
 

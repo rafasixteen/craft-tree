@@ -18,8 +18,7 @@ export async function getTagUsage(tagId: Tag['id'])
 	const producers = producerResult[0]?.count ?? 0;
 
 	return {
-		items,
-		producers,
-		total: items + producers,
+		itemsCount: items,
+		producersCount: producers,
 	};
 }

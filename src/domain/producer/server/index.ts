@@ -1,5 +1,7 @@
 export * from './create-producer';
 export * from './delete-producer';
+export * from './get-item-input-usage';
+export * from './get-item-output-usage';
 export * from './get-producer-by-id';
 export * from './get-producer-inputs';
 export * from './get-producer-outputs';
