@@ -70,6 +70,65 @@ export async function exportInventory(inventoryId: Inventory['id'])
 
 	const tagExportId = (dbId: string) => tags.findIndex((t) => t.id === dbId) + 1;
 
+	const itemExportId = (dbId: string) => items.findIndex((i) => i.id === dbId) + 1;
+
+	const producerExportId = (dbId: string) => producers.findIndex((p) => p.id === dbId) + 1;
+
+	const remapGraphData = (graph: (typeof productionGraphs)[number]) =>
+	{
+		const nodeId = (raw: string) =>
+		{
+			if (raw.startsWith('producer-')) return `producer-${producerExportId(raw.slice(9))}`;
+			if (raw.startsWith('item-')) return `item-${itemExportId(raw.slice(5))}`;
+			return raw;
+		};
+
+		const nodes = graph.data.nodes.map((node) => ({
+			...node,
+			id: nodeId(node.id),
+			data: {
+				...node.data,
+				...(node.data.producerId !== undefined && {
+					producerId: producerExportId(node.data.producerId),
+				}),
+				...(node.data.itemId !== undefined && {
+					itemId: itemExportId(node.data.itemId),
+				}),
+				...(node.data.inputRates && {
+					inputRates: node.data.inputRates.map((r) => ({
+						...r,
+						itemId: itemExportId(r.itemId),
+					})),
+				}),
+				...(node.data.outputRates && {
+					outputRates: node.data.outputRates.map((r) => ({
+						...r,
+						itemId: itemExportId(r.itemId),
+					})),
+				}),
+			},
+		}));
+
+		const edges = graph.data.edges.map((edge) =>
+		{
+			const source = nodeId(edge.source);
+			const target = nodeId(edge.target);
+			const targetHandle = edge.targetHandle ? itemExportId(edge.targetHandle).toString() : undefined;
+			const sourceHandle = edge.sourceHandle ? itemExportId(edge.sourceHandle).toString() : undefined;
+
+			return {
+				...edge,
+				id: `xy-edge__${source}-${target}${targetHandle}`,
+				source,
+				target,
+				targetHandle,
+				sourceHandle,
+			};
+		});
+
+		return { nodes, edges, viewport: graph.data.viewport };
+	};
+
 	const data = InventoryImportSchema.parse({
 		inventory: inventory.name,
 		tags: tags.map((tag, index) => ({
@@ -88,20 +147,20 @@ export async function exportInventory(inventoryId: Inventory['id'])
 			inputs: producerInputs
 				.filter((input) => input.producerId === producer.id)
 				.map((input) => ({
-					itemId: items.findIndex((item) => item.id === input.itemId) + 1,
+					itemId: itemExportId(input.itemId),
 					quantity: input.quantity,
 				})),
 			outputs: producerOutputs
 				.filter((output) => output.producerId === producer.id)
 				.map((output) => ({
-					itemId: items.findIndex((item) => item.id === output.itemId) + 1,
+					itemId: itemExportId(output.itemId),
 					quantity: output.quantity,
 				})),
 			tags: producerTags.filter((pt) => pt.producerId === producer.id).map((pt) => tagExportId(pt.tagId)),
 		})),
 		productionGraphs: productionGraphs.map((graph) => ({
 			name: graph.name,
-			data: graph.data,
+			data: remapGraphData(graph),
 		})),
 	});
 
