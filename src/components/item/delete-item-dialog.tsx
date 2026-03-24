@@ -7,8 +7,7 @@ import {
 	DeleteTarget,
 	ResourceMetaInfo,
 } from '@/components/confirmation-dialog';
-import { Item, deleteItem } from '@/domain/item';
-import { useItemInputUsage, useItemOutputUsage } from '@/domain/producer';
+import { Item, deleteItem, useItemProducerInputUsage, useItemProducerOutputUsage } from '@/domain/item';
 import { TrashIcon } from 'lucide-react';
 
 interface DeleteItemDialogProps
@@ -18,10 +17,11 @@ interface DeleteItemDialogProps
 
 export function DeleteItemDialog({ item }: DeleteItemDialogProps)
 {
-	const { count: inputUsage } = useItemInputUsage({ itemId: item.id });
-	const { count: outputUsage } = useItemOutputUsage({ itemId: item.id });
+	const { count: inputUsage } = useItemProducerInputUsage({ itemId: item.id });
+	const { count: outputUsage } = useItemProducerOutputUsage({ itemId: item.id });
 
-	// TODO: Add how many producer graphs are using this item.
+	// TODO: Add how many graphs are using this item.
+	// TODO: Add loading and validating states to the dialog, and disable the confirm button while loading/validating.
 
 	const target: DeleteTarget = {
 		resourceType: 'item',
@@ -34,7 +34,7 @@ export function DeleteItemDialog({ item }: DeleteItemDialogProps)
 
 	async function onConfirm()
 	{
-		await deleteItem(item.id);
+		await deleteItem({ itemId: item.id });
 	}
 
 	const meta: ResourceMetaInfo = {

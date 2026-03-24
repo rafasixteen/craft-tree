@@ -1,66 +1,17 @@
 'use client';
 
-import { Tag } from '@/domain/tag';
-import * as TagServerActions from '@/domain/tag/server';
+import { getTagById } from '@/domain/tag';
 
 import useSWR from 'swr';
-import { useCallback } from 'react';
 
-type UpdateTagParams = Omit<Parameters<typeof TagServerActions.updateTag>[0], 'id'>;
+type UseTagParams = Partial<Parameters<typeof getTagById>[0]>;
 
-export function useTag(tagId: Tag['id'])
+export function useTag({ tagId }: UseTagParams)
 {
-	const swrKey = ['tag', tagId];
-	const fetcher = () => TagServerActions.getTagById(tagId);
+	const swrKey = tagId ? ['tag', tagId] : null;
+	const fetcher = () => (tagId ? getTagById({ tagId }) : null);
 
-	const { data: tag, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
-	if (!tag)
-	{
-		throw new Error(
-			'Tag not found. This hook must be used within a component wrapped by a <TagLayout> that provides the tag data via SWR fallback.',
-		);
-	}
-
-	const updateTag = useCallback(
-		async function updateTag({ name }: UpdateTagParams)
-		{
-			await mutate(
-				async () =>
-				{
-					return await TagServerActions.updateTag({
-						id: tagId,
-						name,
-					});
-				},
-				{
-					optimisticData: (currentData, displayedData) =>
-					{
-						const current = currentData ?? displayedData;
-
-						if (!current)
-						{
-							return {
-								id: tagId,
-								name: name ?? '',
-								inventoryId: '',
-							};
-						}
-
-						return { ...current, name: name ?? current.name };
-					},
-					rollbackOnError: true,
-					revalidate: true,
-				},
-			);
-		},
-		[tagId, mutate],
-	);
-
-	return {
-		tag: tag,
-		updateTag,
-	};
+	return { tag: data, isLoading, isValidating };
 }

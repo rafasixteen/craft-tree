@@ -1,20 +1,17 @@
 'use client';
 
-import { Tag, getTagUsage } from '@/domain/tag';
+import { getTagUsage } from '@/domain/tag';
 
 import useSWR from 'swr';
 
-interface UseTagUsageParams
-{
-	tagId: Tag['id'];
-}
+type UseTagUsageParams = Partial<Parameters<typeof getTagUsage>[0]>;
 
 export function useTagUsage({ tagId }: UseTagUsageParams)
 {
-	const swrKey = ['tag-usage', tagId];
-	const fetcher = () => getTagUsage(tagId);
+	const swrKey = tagId ? ['tag-usage', tagId] : null;
+	const fetcher = () => (tagId ? getTagUsage({ tagId }) : null);
 
 	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
-	return { data, isLoading, isValidating };
+	return { usage: data, isLoading, isValidating };
 }

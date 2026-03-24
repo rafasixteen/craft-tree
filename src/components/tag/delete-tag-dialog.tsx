@@ -17,9 +17,11 @@ interface DeleteTagDialogProps
 
 export function DeleteTagDialog({ tag }: DeleteTagDialogProps)
 {
-	const { data } = useTagUsage({ tagId: tag.id });
+	const { usage } = useTagUsage({ tagId: tag.id });
 
-	const { itemsCount, producersCount } = data ?? { itemsCount: 0, producersCount: 0 };
+	const { itemsCount, producersCount } = usage ?? { itemsCount: 0, producersCount: 0 };
+
+	// TODO: Add loading and validating states to the dialog, and disable the confirm button while loading/validating.
 
 	const target: DeleteTarget = {
 		resourceType: 'tag',
@@ -32,7 +34,7 @@ export function DeleteTagDialog({ tag }: DeleteTagDialogProps)
 
 	async function onConfirm()
 	{
-		await deleteTag(tag.id);
+		await deleteTag({ tagId: tag.id });
 	}
 
 	const meta: ResourceMetaInfo = {

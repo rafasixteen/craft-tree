@@ -1,3 +1,9 @@
-import { inventoriesTable } from '@/db/schema';
+import z from 'zod';
 
-export type Inventory = typeof inventoriesTable.$inferSelect;
+export const InventorySchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	userId: z.string(),
+});
+
+export type Inventory = z.infer<typeof InventorySchema>;

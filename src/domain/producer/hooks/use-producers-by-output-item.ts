@@ -1,20 +1,20 @@
 'use client';
 
-import { Item } from '@/domain/item';
-import { Producer, getProducersByOutputItem } from '@/domain/producer';
-
+import { getProducersByOutputItem } from '@/domain/producer';
 import useSWR from 'swr';
 
-export function useProducersByOutputItem(itemId?: Item['id'] | null)
+type UseProducersByOutputItemParams = Partial<Parameters<typeof getProducersByOutputItem>[0]>;
+
+export function useProducersByOutputItem({ itemId }: UseProducersByOutputItemParams)
 {
 	const key = itemId ? ['producers-by-output-item', itemId] : null;
-	const fetcher = () => (itemId ? getProducersByOutputItem({ itemId }) : Promise.resolve([]));
+	const fetcher = () => (itemId ? getProducersByOutputItem({ itemId }) : null);
 
-	const { data } = useSWR<Producer[]>(key, fetcher, {
-		revalidateOnMount: true,
-	});
+	const { data, isLoading, isValidating } = useSWR(key, fetcher);
 
 	return {
-		producers: data ?? [],
+		producers: data,
+		isLoading,
+		isValidating,
 	};
 }

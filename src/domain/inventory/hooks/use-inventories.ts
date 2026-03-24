@@ -1,115 +1,20 @@
 'use client';
 
-import { useUser } from '@/domain/user';
-import * as InventoryServerActions from '@/domain/inventory/server';
-import { Inventory, getInventoriesByUserId } from '@/domain/inventory';
-
 import useSWR from 'swr';
-import { useCallback } from 'react';
+import { getInventoriesByUserId } from '@/domain/inventory';
 
-type CreateInventoryParams = Omit<Parameters<typeof InventoryServerActions.createInventory>[0], 'userId'>;
+type UseInventoriesParams = Partial<Parameters<typeof getInventoriesByUserId>[0]>;
 
-type UpdateInventoryParams = Parameters<typeof InventoryServerActions.updateInventory>[0];
-
-type DeleteInventoryParams = Parameters<typeof InventoryServerActions.deleteInventory>[0];
-
-export function useInventories()
+export function useInventories({ userId }: UseInventoriesParams)
 {
-	const user = useUser();
-	const userId = user?.id;
-
 	const swrKey = userId ? ['inventories', userId] : null;
-	const fetcher = () => (userId ? getInventoriesByUserId(userId) : Promise.resolve([]));
+	const fetcher = () => (userId ? getInventoriesByUserId({ userId }) : null);
 
-	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
-
-	const createInventory = useCallback(
-		async function createInventory({ name }: CreateInventoryParams)
-		{
-			if (!userId)
-			{
-				throw new Error('User ID is not available');
-			}
-
-			const optimistic: Inventory = {
-				id: crypto.randomUUID(),
-				name,
-				userId,
-			};
-
-			await mutate(
-				async (current = []) =>
-				{
-					const created = await InventoryServerActions.createInventory({
-						name,
-						userId,
-					});
-					return [...current, created];
-				},
-				{
-					optimisticData: (current: Inventory[] = []) => [...current, optimistic],
-					rollbackOnError: true,
-					revalidate: true,
-				},
-			);
-		},
-		[userId, mutate],
-	);
-
-	const updateInventory = useCallback(
-		async function updateInventory({ id, name }: UpdateInventoryParams)
-		{
-			if (!userId)
-			{
-				throw new Error('User ID is not available');
-			}
-
-			await mutate(
-				async (current = []) =>
-				{
-					const updated = await InventoryServerActions.updateInventory({
-						id: id,
-						name: name,
-					});
-
-					return current.map((inventory) => (inventory.id === id ? updated : inventory));
-				},
-				{
-					optimisticData: (current: Inventory[] = []) =>
-						current.map((inv) => (inv.id === id ? { ...inv, name } : inv)),
-					rollbackOnError: true,
-					revalidate: true,
-				},
-			);
-		},
-		[userId, mutate],
-	);
-
-	const deleteInventory = useCallback(
-		async function deleteInventory(id: DeleteInventoryParams)
-		{
-			await mutate(
-				async (current = []) =>
-				{
-					await InventoryServerActions.deleteInventory(id);
-					return current.filter((inv) => inv.id !== id);
-				},
-				{
-					optimisticData: (current: Inventory[] = []) => current.filter((inv) => inv.id !== id),
-					rollbackOnError: true,
-					revalidate: true,
-				},
-			);
-		},
-		[mutate],
-	);
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
 	return {
-		inventories: data ?? [],
-		createInventory,
-		updateInventory,
-		deleteInventory,
+		inventories: data,
+		isLoading,
+		isValidating,
 	};
 }

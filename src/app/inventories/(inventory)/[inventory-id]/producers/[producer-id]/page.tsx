@@ -2,26 +2,26 @@
 
 import { Header } from '@/components/sidebar';
 
-import { useTags } from '@/domain/tag';
+import { useTags } from '@/domain/inventory';
 import { useProducer, useProducerInputs, useProducerOutputs, useProducerTags } from '@/domain/producer';
 
 import { useParams } from 'next/navigation';
 
 export default function ProducerPage()
 {
+	// TODO: Add loading and validating states.
+
 	const params = useParams();
 	const producerId = params['producer-id'] as string;
 
-	const { producer } = useProducer(producerId);
-	const { inputs } = useProducerInputs(producerId);
-	const { outputs } = useProducerOutputs(producerId);
+	const { producer } = useProducer({ producerId });
+	const { inputs } = useProducerInputs({ producerId });
+	const { outputs } = useProducerOutputs({ producerId });
 
-	const { tags: producerTags } = useProducerTags(producerId);
-	const { tags: inventoryTags } = useTags({
-		inventoryId: producer.inventoryId,
-	});
+	const { tags: producerTags } = useProducerTags({ producerId });
+	const { tags: inventoryTags } = useTags({ inventoryId: producer?.inventoryId });
 
-	const tags = producerTags.map((tag) => inventoryTags.find((t) => t.id === tag.tagId));
+	const tags = producerTags?.map((tag) => inventoryTags?.find((t) => t.id === tag.tagId));
 
 	return (
 		<>

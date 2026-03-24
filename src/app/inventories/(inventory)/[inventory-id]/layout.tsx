@@ -2,11 +2,16 @@ import { InventorySidebar } from '@/components/sidebar/inventory-sidebar';
 
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
-import { getItems } from '@/domain/item';
 import { getInventoryById } from '@/domain/inventory';
-import { getProductionGraphs } from '@/domain/production-graph';
-import { getItemsTags, getProducersTags, getTags } from '@/domain/tag';
-import { getProducers, getProducersInputs, getProducersOutputs } from '@/domain/producer';
+import { getItemsTags, getProducersTags } from '@/domain/tag';
+import {
+	getProducers,
+	getProducersInputs,
+	getProducersOutputs,
+	getTags,
+	getGraphs,
+	getItems,
+} from '@/domain/inventory';
 
 import { cookies } from 'next/headers';
 import { SWRConfig, unstable_serialize } from 'swr';
@@ -22,27 +27,15 @@ export default async function InventoryLayout({ params, children }: LayoutProps<
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['inventory', inventoryId])]: getInventoryById(inventoryId),
-					[unstable_serialize(['inventory-tags', inventoryId])]: getTags({ inventoryId }),
-					[unstable_serialize(['inventory-items', inventoryId])]: getItems({
-						inventoryId,
-					}),
-					[unstable_serialize(['inventory-items-tags', inventoryId])]: getItemsTags({
-						inventoryId,
-					}),
-					[unstable_serialize(['inventory-producers', inventoryId])]: getProducers({
-						inventoryId,
-					}),
-					[unstable_serialize(['inventory-producers-inputs', inventoryId])]: getProducersInputs({
-						inventoryId,
-					}),
-					[unstable_serialize(['inventory-producers-outputs', inventoryId])]: getProducersOutputs({
-						inventoryId,
-					}),
-					[unstable_serialize(['inventory-producers-tags', inventoryId])]: getProducersTags({ inventoryId }),
-					[unstable_serialize(['inventory-production-graphs', inventoryId])]: getProductionGraphs({
-						inventoryId,
-					}),
+					[unstable_serialize(['inventory', inventoryId])]: getInventoryById({ inventoryId }),
+					[unstable_serialize(['tags', inventoryId])]: getTags({ inventoryId }),
+					[unstable_serialize(['items', inventoryId])]: getItems({ inventoryId }),
+					[unstable_serialize(['items-tags', inventoryId])]: getItemsTags({ inventoryId }),
+					[unstable_serialize(['producers', inventoryId])]: getProducers({ inventoryId }),
+					[unstable_serialize(['producers-inputs', inventoryId])]: getProducersInputs({ inventoryId }),
+					[unstable_serialize(['producers-outputs', inventoryId])]: getProducersOutputs({ inventoryId }),
+					[unstable_serialize(['producers-tags', inventoryId])]: getProducersTags({ inventoryId }),
+					[unstable_serialize(['graphs', inventoryId])]: getGraphs({ inventoryId }),
 				},
 			}}
 		>

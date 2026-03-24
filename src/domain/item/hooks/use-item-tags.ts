@@ -1,53 +1,23 @@
 'use client';
 
-import { Item, getItemTags, setItemTags } from '@/domain/item';
-
+import { Item, getItemTags } from '@/domain/item';
 import useSWR from 'swr';
-import { useCallback } from 'react';
 
-type SetTagsParams = Omit<Parameters<typeof setItemTags>[0], 'itemId'>;
-
-export function useItemTags(itemId: Item['id'])
+interface UseItemTagsParams
 {
-	const swrKey = ['item-tags', itemId];
-	const fetcher = () => getItemTags(itemId);
+	itemId?: Item['id'] | null;
+}
 
-	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
+export function useItemTags({ itemId }: UseItemTagsParams)
+{
+	const swrKey = itemId ? ['item-tags', itemId] : null;
+	const fetcher = () => (itemId ? getItemTags(itemId) : null);
 
-	const setTags = useCallback(
-		async function setTags({ tagIds }: SetTagsParams)
-		{
-			const optimistic = tagIds.map((tagId) => ({
-				tagId,
-				itemId,
-			}));
-
-			mutate(
-				async () =>
-				{
-					return await setItemTags({ itemId, tagIds });
-				},
-				{
-					optimisticData: optimistic,
-					rollbackOnError: true,
-					populateCache: true,
-				},
-			);
-		},
-		[itemId, mutate],
-	);
-
-	if (!data)
-	{
-		throw new Error(
-			'Item tags not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item tags data via SWR fallback.',
-		);
-	}
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
 	return {
 		tags: data,
-		setTags,
+		isLoading,
+		isValidating,
 	};
 }

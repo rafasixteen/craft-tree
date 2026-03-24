@@ -1,3 +1,9 @@
-import { itemsTable } from '@/db/schema';
+import z from 'zod';
 
-export type Item = typeof itemsTable.$inferSelect;
+export const ItemSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	inventoryId: z.string(),
+});
+
+export type Item = z.infer<typeof ItemSchema>;

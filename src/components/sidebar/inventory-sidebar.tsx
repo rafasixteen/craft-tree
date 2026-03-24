@@ -40,8 +40,8 @@ export function InventorySidebar({ inventoryId, ...props }: InventorySidebarProp
 					},
 					{ label: 'Tags', href: `${base}/tags`, icon: TagsIcon },
 					{
-						label: 'Production Graphs',
-						href: `${base}/production-graphs`,
+						label: 'Graphs',
+						href: `${base}/graphs`,
 						icon: WaypointsIcon,
 					},
 				]}

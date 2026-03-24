@@ -7,28 +7,45 @@ import { DataTable, DataTableFilter, DataTablePagination, useDataTable } from '@
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
-import { useTags } from '@/domain/tag';
+import { useTags } from '@/domain/inventory';
 
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { RefreshCw } from 'lucide-react';
 
 export default function TagsPage()
 {
 	const inventory = useCurrentInventory();
 
-	const { tags } = useTags({ inventoryId: inventory.id });
+	const { tags, isLoading, isValidating } = useTags({ inventoryId: inventory.id });
 
-	const tableData = useMemo(
-		() =>
-			tags.map((tag) => ({
-				...tag,
-			})),
-		[tags, tags],
-	);
+	const tableData = useMemo(() =>
+	{
+		return isLoading ? Array(16).fill({}) : (tags ?? []);
+	}, [isLoading, tags]);
+
+	const tableColumns = useMemo(() =>
+	{
+		if (isLoading)
+		{
+			return tagColumnns.map((column, index) => ({
+				...column,
+				cell: () => (
+					<div className={cn('flex', index === tagColumnns.length - 1 ? 'justify-center' : 'justify-start')}>
+						<Skeleton className="h-4 w-32" />
+					</div>
+				),
+			}));
+		}
+
+		return tagColumnns;
+	}, [isLoading]);
 
 	const table = useDataTable({
-		columns: tagColumnns,
+		columns: tableColumns,
 		data: tableData,
 	});
 
@@ -51,7 +68,15 @@ export default function TagsPage()
 			<Card className="m-2 flex-1 bg-transparent p-0">
 				<DataTable table={table} />
 			</Card>
-			<DataTablePagination table={table} />
+			<div className="relative">
+				{isValidating && !isLoading && (
+					<div className="absolute -top-16 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-lg border bg-background px-3 py-1.5 text-sm shadow-md">
+						<RefreshCw className="size-3.5 animate-spin text-muted-foreground" />
+						<span className="text-muted-foreground">Syncing tags...</span>
+					</div>
+				)}
+				<DataTablePagination table={table} />
+			</div>
 		</>
 	);
 }

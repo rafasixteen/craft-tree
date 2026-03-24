@@ -1,55 +1,20 @@
 'use client';
 
-import { Inventory } from '@/domain/inventory';
-import * as InventoryServerActions from '@/domain/inventory/server';
-
+import { getInventoryById } from '@/domain/inventory';
 import useSWR from 'swr';
-import { useCallback } from 'react';
 
-type UpdateInventoryParams = Omit<Parameters<typeof InventoryServerActions.updateInventory>[0], 'id'>;
+type UseInventoryParams = Partial<Parameters<typeof getInventoryById>[0]>;
 
-export function useInventory(inventoryId: Inventory['id'])
+export function useInventory({ inventoryId }: UseInventoryParams)
 {
-	const swrKey = ['inventory', inventoryId];
-	const fetcher = () => InventoryServerActions.getInventoryById(inventoryId);
+	const swrKey = inventoryId ? ['inventory', inventoryId] : null;
+	const fetcher = () => (inventoryId ? getInventoryById({ inventoryId }) : null);
 
-	const { data: inventory, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
-
-	if (!inventory)
-	{
-		throw new Error(
-			`Inventory with id ${inventoryId} not found. This hook must be used within a component wrapped by a <InventoryLayout> that provides the inventory data via SWR fallback.`,
-		);
-	}
-
-	const updateInventory = useCallback(
-		async function updateInventory({ name }: UpdateInventoryParams)
-		{
-			await mutate(
-				async () =>
-				{
-					return await InventoryServerActions.updateInventory({
-						id: inventory.id,
-						name,
-					});
-				},
-				{
-					optimisticData: (current) => ({
-						...current!,
-						name,
-					}),
-					rollbackOnError: true,
-					revalidate: true,
-				},
-			);
-		},
-		[inventory.id, inventory.userId, mutate],
-	);
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
 	return {
-		inventory: inventory,
-		updateInventory,
+		inventory: data,
+		isLoading,
+		isValidating,
 	};
 }

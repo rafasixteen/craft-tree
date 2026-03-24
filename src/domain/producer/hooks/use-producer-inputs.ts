@@ -1,54 +1,20 @@
 'use client';
 
-import { Producer, getProducerInputs, setProducerInputs } from '@/domain/producer';
-
+import { getProducerInputs } from '@/domain/producer';
 import useSWR from 'swr';
-import { useCallback } from 'react';
 
-type SetInputsParams = Omit<Parameters<typeof setProducerInputs>[0], 'producerId'>;
+type UseProducerInputsParams = Partial<Parameters<typeof getProducerInputs>[0]>;
 
-export function useProducerInputs(producerId: Producer['id'])
+export function useProducerInputs({ producerId }: UseProducerInputsParams)
 {
-	const swrKey = ['producer-inputs', producerId];
-	const fetcher = () => getProducerInputs(producerId);
+	const swrKey = producerId ? ['producer-inputs', producerId] : null;
+	const fetcher = () => (producerId ? getProducerInputs({ producerId }) : null);
 
-	const { data, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
-
-	const setInputs = useCallback(
-		async function setInputs({ inputs }: SetInputsParams)
-		{
-			const optimistic = inputs.map((input, index) => ({
-				id: `temp-${index}`,
-				...input,
-				producerId,
-			}));
-
-			await mutate(
-				async () =>
-				{
-					return await setProducerInputs({ producerId, inputs });
-				},
-				{
-					optimisticData: optimistic,
-					rollbackOnError: true,
-					revalidate: false,
-				},
-			);
-		},
-		[producerId, mutate],
-	);
-
-	if (!data)
-	{
-		throw new Error(
-			'Producer inputs not found. This hook must be used within a component wrapped by a <ProducerLayout> that provides the producer inputs data via SWR fallback.',
-		);
-	}
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
 	return {
 		inputs: data,
-		setInputs,
+		isLoading,
+		isValidating,
 	};
 }

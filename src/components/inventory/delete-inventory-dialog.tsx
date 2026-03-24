@@ -8,10 +8,7 @@ import {
 	ResourceMetaInfo,
 } from '@/components/confirmation-dialog';
 import { Inventory, deleteInventory } from '@/domain/inventory';
-import { useItems } from '@/domain/item';
-import { useProducers } from '@/domain/producer';
-import { useTags } from '@/domain/tag';
-import { useProductionGraphs } from '@/domain/production-graph';
+import { useItems, useProducers, useTags, useGraphs } from '@/domain/inventory';
 import { TrashIcon } from 'lucide-react';
 
 interface DeleteInventoryDialogProps
@@ -24,28 +21,30 @@ export function DeleteInventoryDialog({ inventory }: DeleteInventoryDialogProps)
 	const { items } = useItems({ inventoryId: inventory.id });
 	const { producers } = useProducers({ inventoryId: inventory.id });
 	const { tags } = useTags({ inventoryId: inventory.id });
-	const { productionGraphs } = useProductionGraphs({ inventoryId: inventory.id });
+	const { graphs } = useGraphs({ inventoryId: inventory.id });
+
+	// TODO: Add loading and validating states to the dialog, and disable the confirm button while loading/validating.
 
 	const target: DeleteTarget = {
 		resourceType: 'inventory',
 		resourceName: inventory.name,
 		references: buildInventoryReferences({
-			itemsCount: items.length,
-			producersCount: producers.length,
-			tagsCount: tags.length,
-			graphsCount: productionGraphs.length,
+			itemsCount: items?.length ?? 0,
+			producersCount: producers?.length ?? 0,
+			tagsCount: tags?.length ?? 0,
+			graphsCount: graphs?.length ?? 0,
 		}),
 	};
 
 	async function onConfirm()
 	{
-		await deleteInventory(inventory.id);
+		await deleteInventory({ inventoryId: inventory.id });
 	}
 
 	const meta: ResourceMetaInfo = {
 		icon: '©',
 		color: '#3cb87a',
-		description: (name) => `Production graph "${name}" stores complex graph data (jsonb) tied to this inventory.`,
+		description: (name) => `Graph "${name}" stores complex graph data (jsonb) tied to this inventory.`,
 		warningThreshold: 1,
 	};
 

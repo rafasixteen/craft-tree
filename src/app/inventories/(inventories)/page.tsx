@@ -10,14 +10,42 @@ import { Button } from '@/components/ui/button';
 import { useInventories } from '@/domain/inventory';
 
 import Link from 'next/link';
+import { useUser } from '@/domain/user';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { RefreshCw } from 'lucide-react';
 
 export default function InventoriesPage()
 {
-	const { inventories } = useInventories();
+	const user = useUser();
+	const { inventories, isValidating, isLoading } = useInventories({ userId: user?.id });
+
+	const tableData = useMemo(() =>
+	{
+		return isLoading ? Array(8).fill({}) : (inventories ?? []);
+	}, [isLoading, inventories]);
+
+	const tableColumns = useMemo(() =>
+	{
+		if (isLoading)
+		{
+			return inventoryColumnns.map((col, index) => ({
+				...col,
+				cell: () => (
+					<div className={cn('flex', index === inventoryColumnns.length - 1 && 'justify-center')}>
+						<Skeleton className="h-4 w-32" />
+					</div>
+				),
+			}));
+		}
+
+		return inventoryColumnns;
+	}, [isLoading]);
 
 	const table = useDataTable({
-		data: inventories,
-		columns: inventoryColumnns,
+		data: tableData,
+		columns: tableColumns,
 	});
 
 	return (
@@ -40,7 +68,15 @@ export default function InventoriesPage()
 			<Card className="m-2 flex-1 bg-transparent p-0">
 				<DataTable table={table} />
 			</Card>
-			<DataTablePagination table={table} />
+			<div className="relative">
+				{isValidating && !isLoading && (
+					<div className="absolute -top-16 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-lg border bg-background px-3 py-1.5 text-sm shadow-md">
+						<RefreshCw className="size-3.5 animate-spin text-muted-foreground" />
+						<span className="text-muted-foreground">Syncing inventories...</span>
+					</div>
+				)}
+				<DataTablePagination table={table} />
+			</div>
 		</>
 	);
 }

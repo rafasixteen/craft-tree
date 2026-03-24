@@ -1,55 +1,23 @@
 'use client';
 
-import { Item } from '@/domain/item';
-import * as ItemServerActions from '@/domain/item/server';
-
+import { getItemById, Item } from '@/domain/item';
 import useSWR from 'swr';
-import { useCallback } from 'react';
 
-type UpdateItemParams = Omit<Parameters<typeof ItemServerActions.updateItem>[0], 'id'>;
-
-export function useItem(itemId: Item['id'])
+interface UseItemParams
 {
-	const swrKey = ['item', itemId];
-	const fetcher = () => ItemServerActions.getItemById(itemId);
+	itemId?: Item['id'] | null;
+}
 
-	const { data: item, mutate } = useSWR(swrKey, fetcher, {
-		revalidateOnMount: true,
-	});
+export function useItem({ itemId }: UseItemParams)
+{
+	const swrKey = itemId ? ['item', itemId] : null;
+	const fetcher = () => (itemId ? getItemById(itemId) : null);
 
-	if (!item)
-	{
-		throw new Error(
-			'Item not found. This hook must be used within a component wrapped by a <ItemLayout> that provides the item data via SWR fallback.',
-		);
-	}
-
-	const updateItem = useCallback(
-		async function updateItem({ name }: UpdateItemParams)
-		{
-			await mutate(
-				async () =>
-				{
-					return await ItemServerActions.updateItem({
-						id: itemId,
-						name,
-					});
-				},
-				{
-					optimisticData: (current) => ({
-						...current!,
-						name,
-					}),
-					rollbackOnError: true,
-					revalidate: true,
-				},
-			);
-		},
-		[itemId, mutate],
-	);
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
 	return {
-		item: item,
-		updateItem,
+		item: data,
+		isLoading,
+		isValidating,
 	};
 }

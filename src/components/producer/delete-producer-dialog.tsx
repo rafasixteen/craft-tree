@@ -30,7 +30,7 @@ export function DeleteProducerDialog({ producer }: DeleteProducerDialogProps)
 
 	async function onConfirm()
 	{
-		await deleteProducer(producer.id);
+		await deleteProducer({ producerId: producer.id });
 	}
 
 	const meta: ResourceMetaInfo = {

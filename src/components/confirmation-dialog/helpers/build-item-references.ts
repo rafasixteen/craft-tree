@@ -11,7 +11,7 @@ export function buildItemReferences({
 	producerOutputsCount,
 }: BuildItemReferencesParams): ResourceReference[]
 {
-	// TODO: Add how many nodes in production graphs reference this item (as input or output).
+	// TODO: Add how many nodes in graphs reference this item (as input or output).
 
 	const refs: ResourceReference[] = [];
 

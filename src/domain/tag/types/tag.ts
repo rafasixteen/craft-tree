@@ -1,3 +1,9 @@
-import { tagsTable } from '@/db/schema';
+import z from 'zod';
 
-export type Tag = typeof tagsTable.$inferSelect;
+export const TagSchema = z.object({
+	id: z.string(),
+	name: z.string(),
+	inventoryId: z.string(),
+});
+
+export type Tag = z.infer<typeof TagSchema>;

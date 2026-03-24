@@ -1,17 +1,21 @@
 'use client';
 
-import { ItemTag } from '@/domain/item';
 import { getItemsTags } from '@/domain/tag';
 
 import useSWR from 'swr';
 
-type UseItemsTagsParams = Parameters<typeof getItemsTags>[0];
+type UseItemsTagsParams = Partial<Parameters<typeof getItemsTags>[0]>;
 
 export function useItemsTags({ inventoryId }: UseItemsTagsParams)
 {
-	const swrKey = ['inventory-items-tags', inventoryId];
-	const fetcher = () => getItemsTags({ inventoryId });
+	const swrKey = inventoryId ? ['items-tags', inventoryId] : null;
+	const fetcher = () => (inventoryId ? getItemsTags({ inventoryId }) : null);
 
-	const { data } = useSWR<ItemTag[]>(swrKey, fetcher);
-	return data ?? [];
+	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
+
+	return {
+		itemsTags: data,
+		isLoading,
+		isValidating,
+	};
 }

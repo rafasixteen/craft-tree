@@ -50,8 +50,8 @@ export function buildInventoryReferences({
 	if (graphsCount > 0)
 	{
 		refs.push({
-			type: 'production_graphs',
-			label: 'Production graphs',
+			type: 'graphs',
+			label: 'Graphs',
 			count: graphsCount,
 			critical: true,
 		});

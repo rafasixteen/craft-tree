@@ -15,7 +15,8 @@ import {
 	useComboboxAnchor,
 } from '@/components/ui/combobox';
 
-import { Tag, useTags } from '@/domain/tag';
+import { Tag } from '@/domain/tag';
+import { useTags } from '@/domain/inventory';
 
 import { useEffect, useState } from 'react';
 
@@ -38,6 +39,8 @@ export function TagsCombobox({ className, value, onIdsChange, maxChips }: TagsCo
 	const { tags } = useTags({ inventoryId: inventory.id });
 
 	const [expanded, setExpanded] = useState(false);
+
+	// TODO: Add loading and validating states.
 
 	// Maps for fast lookup
 	const idToTag = new Map(tags.map((t) => [t.id, t]));

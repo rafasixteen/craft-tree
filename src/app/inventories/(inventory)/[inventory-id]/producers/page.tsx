@@ -13,43 +13,83 @@ import {
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
-import { useProducers } from '@/domain/producer';
-import { useProducersTags, useTags } from '@/domain/tag';
+import { useProducers, useTags } from '@/domain/inventory';
+import { useProducersTags } from '@/domain/tag';
 
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { TagsIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { RefreshCw, TagsIcon } from 'lucide-react';
 
 export default function ProducersPage()
 {
 	const inventory = useCurrentInventory();
 
-	const { producers } = useProducers({ inventoryId: inventory.id });
+	const {
+		producers,
+		isLoading: areProducersLoading,
+		isValidating: areProducersValidating,
+	} = useProducers({ inventoryId: inventory.id });
 
-	const { tags } = useTags({ inventoryId: inventory.id });
-	const producersTags = useProducersTags({ inventoryId: inventory.id });
+	const { tags, isLoading: areTagsLoading, isValidating: areTagsValidating } = useTags({ inventoryId: inventory.id });
 
-	const tableData = useMemo(
-		() =>
-			producers.map((producer) => ({
-				...producer,
-				tags: producersTags
-					.filter((producerTag) => producerTag.producerId === producer.id)
-					.map((producerTag) => tags.find((tag) => tag.id === producerTag.tagId)?.name || ''),
-			})),
-		[producers, producersTags, tags],
-	);
+	const {
+		producersTags,
+		isLoading: areProducersTagsLoading,
+		isValidating: areProducersTagsValidating,
+	} = useProducersTags({ inventoryId: inventory.id });
 
-	const table = useDataTable({
-		columns: producerColumnns,
-		data: tableData,
-	});
-
-	const tagsOptions = tags.map((tag) => ({
+	const tagsOptions = tags?.map((tag) => ({
 		label: tag.name,
 		value: tag.name,
 	}));
+
+	const isLoading = areProducersLoading || areTagsLoading || areProducersTagsLoading;
+	const isValidating = areProducersValidating || areTagsValidating || areProducersTagsValidating;
+
+	const tableData = useMemo(() =>
+	{
+		if (isLoading || !producers || !tags || !producersTags)
+		{
+			return Array(32).fill({});
+		}
+
+		return producers.map((producer) => ({
+			...producer,
+			tags: producersTags
+				.filter((producerTag) => producerTag.producerId === producer.id)
+				.map((producerTag) => tags.find((tag) => tag.id === producerTag.tagId)?.name),
+		}));
+	}, [isLoading, producers, producersTags, tags]);
+
+	const tableColumns = useMemo(() =>
+	{
+		if (isLoading)
+		{
+			return producerColumnns.map((col, index) => ({
+				...col,
+				cell: () => (
+					<div
+						className={cn(
+							'flex',
+							index === producerColumnns.length - 1 ? 'justify-center' : 'justify-start',
+						)}
+					>
+						<Skeleton className="h-4 w-32" />
+					</div>
+				),
+			}));
+		}
+
+		return producerColumnns;
+	}, [isLoading]);
+
+	const table = useDataTable({
+		columns: tableColumns,
+		data: tableData,
+	});
 
 	return (
 		<>
@@ -65,7 +105,7 @@ export default function ProducersPage()
 					<DataTableFacetedFilter
 						column={table.getColumn('tags')}
 						title="Tags"
-						options={tagsOptions}
+						options={tagsOptions ?? []}
 						trigger={
 							<Button variant="secondary" size="icon-lg" className="h-8">
 								<TagsIcon className="size-3" />
@@ -80,7 +120,15 @@ export default function ProducersPage()
 			<Card className="m-2 flex-1 bg-transparent p-0">
 				<DataTable table={table} />
 			</Card>
-			<DataTablePagination table={table} />
+			<div className="relative">
+				{isValidating && !isLoading && (
+					<div className="absolute -top-16 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-lg border bg-background px-3 py-1.5 text-sm shadow-md">
+						<RefreshCw className="size-3.5 animate-spin text-muted-foreground" />
+						<span className="text-muted-foreground">Syncing producers...</span>
+					</div>
+				)}
+				<DataTablePagination table={table} />
+			</div>
 		</>
 	);
 }

@@ -1,3 +1,10 @@
-import { producerOutputsTable } from '@/db/schema';
+import z from 'zod';
 
-export type ProducerOutput = typeof producerOutputsTable.$inferSelect;
+export const ProducerOutputSchema = z.object({
+	id: z.string(),
+	itemId: z.string(),
+	producerId: z.string(),
+	quantity: z.number(),
+});
+
+export type ProducerOutput = z.infer<typeof ProducerOutputSchema>;

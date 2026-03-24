@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 
-import { useItems } from '@/domain/item';
+import { useItems } from '@/domain/inventory';
 
 import { cn } from '@/lib/utils';
 
