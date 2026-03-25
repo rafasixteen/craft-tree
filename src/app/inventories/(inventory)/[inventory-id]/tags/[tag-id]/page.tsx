@@ -11,7 +11,7 @@ export default function TagPage()
 	const params = useParams();
 	const tagId = params['tag-id'] as string;
 
-	const { tag } = useTag(tagId);
+	const { tag } = useTag({ tagId });
 
 	return (
 		<>

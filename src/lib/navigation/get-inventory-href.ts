@@ -1,7 +1,13 @@
 import { Inventory } from '@/domain/inventory';
 
-export function getInventoryHref(inventory: Inventory, path?: string[])
+interface GetInventoryHrefParams
 {
-	const base = `/inventories/${inventory.id}`;
-	return path ? `${base}/${path.join('/')}` : base;
+	inventoryId: Inventory['id'];
+	path?: string[];
+}
+
+export function getInventoryHref({ inventoryId, path = [] }: GetInventoryHrefParams)
+{
+	const base = `/inventories/${inventoryId}`;
+	return path.length > 0 ? `${base}/${path.join('/')}` : base;
 }

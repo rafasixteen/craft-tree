@@ -22,17 +22,15 @@ export function ItemNode({ id, data, selected }: NodeProps<ItemGraphNode>)
 	const invetory = useCurrentInventory();
 	const { items } = useItems({ inventoryId: invetory.id });
 
-	// TODO: Add loading and validation states.
-
 	const { itemId, rate } = data;
 
 	const onComboboxChange = useCallback(
 		function onComboboxChange(itemId: string | null)
 		{
-			const selectedItem = items.find((p) => p.id === itemId) ?? null;
+			const selectedItem = items?.find((p) => p.id === itemId);
 
 			updateNodeData(id, {
-				itemId: selectedItem?.id ?? null,
+				itemId: selectedItem?.id,
 			});
 		},
 		[id, items, updateNodeData],
@@ -51,7 +49,12 @@ export function ItemNode({ id, data, selected }: NodeProps<ItemGraphNode>)
 	return (
 		<BaseNode className={cn('p-0', selected && 'ring-2 ring-primary')}>
 			<BaseNodeHeader className="m-0 border-b">
-				<ItemCombobox items={items} value={itemId} onChange={onComboboxChange} className="nodrag w-full" />
+				<ItemCombobox
+					items={items ?? []}
+					value={itemId ?? null}
+					onChange={onComboboxChange}
+					className="nodrag w-full"
+				/>
 			</BaseNodeHeader>
 			<BaseNodeContent className="flex flex-row justify-between p-0 py-3">
 				<LabeledHandle

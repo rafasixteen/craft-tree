@@ -34,7 +34,7 @@ export function BillOfMaterialsOverlay(props: React.ComponentProps<typeof Panel>
 							<li key={item.id} className="flex items-center justify-between gap-4">
 								<LinkableName
 									name={item.name}
-									href={getItemHref(item)}
+									href={getItemHref({ itemId: item.id, inventoryId: item.inventoryId })}
 									className="text-xs font-semibold"
 								/>
 								<span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">
@@ -52,7 +52,7 @@ export function BillOfMaterialsOverlay(props: React.ComponentProps<typeof Panel>
 									<li key={item.id} className="flex items-center justify-between gap-4">
 										<LinkableName
 											name={item.name}
-											href={getItemHref(item)}
+											href={getItemHref({ itemId: item.id, inventoryId: item.inventoryId })}
 											className="text-xs font-semibold"
 										/>
 										<span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary">

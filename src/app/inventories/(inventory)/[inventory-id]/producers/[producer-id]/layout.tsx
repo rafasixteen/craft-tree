@@ -13,10 +13,10 @@ export default async function ProducerLayout({
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['producer', producerId])]: getProducerById(producerId),
-					[unstable_serialize(['producer-inputs', producerId])]: getProducerInputs(producerId),
-					[unstable_serialize(['producer-outputs', producerId])]: getProducerOutputs(producerId),
-					[unstable_serialize(['producer-tags', producerId])]: getProducerTags(producerId),
+					[unstable_serialize(['producer', producerId])]: getProducerById({ producerId }),
+					[unstable_serialize(['producer-inputs', producerId])]: getProducerInputs({ producerId }),
+					[unstable_serialize(['producer-outputs', producerId])]: getProducerOutputs({ producerId }),
+					[unstable_serialize(['producer-tags', producerId])]: getProducerTags({ producerId }),
 				},
 			}}
 		>

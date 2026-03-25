@@ -15,8 +15,8 @@ interface GetProducersByOutputItemParams
 
 export async function getProducersByOutputItem({ itemId }: GetProducersByOutputItemParams): Promise<Producer[]>
 {
-	return await db
-		.selectDistinct({
+	const result = await db
+		.select({
 			id: producersTable.id,
 			name: producersTable.name,
 			time: producersTable.time,
@@ -26,4 +26,6 @@ export async function getProducersByOutputItem({ itemId }: GetProducersByOutputI
 		.innerJoin(producerOutputsTable, eq(producerOutputsTable.producerId, producersTable.id))
 		.where(eq(producerOutputsTable.itemId, itemId))
 		.orderBy(asc(producersTable.name));
+
+	return result;
 }

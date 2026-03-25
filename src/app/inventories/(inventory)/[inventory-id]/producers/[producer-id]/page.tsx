@@ -3,7 +3,7 @@
 import { Header } from '@/components/sidebar';
 
 import { useTags } from '@/domain/inventory';
-import { useProducer, useProducerInputs, useProducerOutputs, useProducerTags } from '@/domain/producer';
+import { useProducer, useProducerTags } from '@/domain/producer';
 
 import { useParams } from 'next/navigation';
 
@@ -14,9 +14,7 @@ export default function ProducerPage()
 	const params = useParams();
 	const producerId = params['producer-id'] as string;
 
-	const { producer } = useProducer({ producerId });
-	const { inputs } = useProducerInputs({ producerId });
-	const { outputs } = useProducerOutputs({ producerId });
+	const { producer, inputs, outputs } = useProducer({ producerId, include: { inputs: true, outputs: true } });
 
 	const { tags: producerTags } = useProducerTags({ producerId });
 	const { tags: inventoryTags } = useTags({ inventoryId: producer?.inventoryId });

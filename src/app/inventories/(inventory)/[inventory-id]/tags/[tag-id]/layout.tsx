@@ -13,7 +13,7 @@ export default async function TagLayout({
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['tag', tagId])]: getTagById(tagId),
+					[unstable_serialize(['tag', tagId])]: getTagById({ tagId }),
 				},
 			}}
 		>

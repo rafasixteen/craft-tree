@@ -1,19 +1,46 @@
 'use client';
 
-import * as ProducerServerActions from '@/domain/producer/server';
 import useSWR from 'swr';
+import { getProducerById, getProducerInputs, getProducerOutputs, getProducerTags } from '@/domain/producer';
 
-type UseProducerParams = Partial<Parameters<typeof ProducerServerActions.getProducerById>[0]>;
-
-export function useProducer({ producerId }: UseProducerParams)
+interface UseProducerParams extends Partial<Parameters<typeof getProducerById>[0]>
 {
-	const swrKey = producerId ? ['producer', producerId] : null;
-	const fetcher = () => (producerId ? ProducerServerActions.getProducerById({ producerId }) : null);
+	include?: {
+		inputs?: boolean;
+		outputs?: boolean;
+		tags?: boolean;
+	};
+}
+
+export function useProducer({ producerId, include }: UseProducerParams)
+{
+	const withInputs = include?.inputs ?? false;
+	const withOutputs = include?.outputs ?? false;
+	const withTags = include?.tags ?? false;
+
+	const swrKey = producerId ? ['producer', producerId, withInputs, withOutputs, withTags] : null;
+	const fetcher = () =>
+	{
+		if (!producerId)
+		{
+			return null;
+		}
+
+		return Promise.all([
+			getProducerById({ producerId }),
+			withInputs ? getProducerInputs({ producerId }) : null,
+			withOutputs ? getProducerOutputs({ producerId }) : null,
+			withTags ? getProducerTags({ producerId }) : null,
+		]);
+	};
 
 	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 
 	return {
-		producer: data,
+		producer: data?.[0],
+		inputs: data?.[1],
+		outputs: data?.[2],
+		tags: data?.[3],
 		isLoading,
 		isValidating,
 	};

@@ -174,7 +174,7 @@ function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayPro
 	// Count how many rows are already in use, including empty ones
 	const rowCount = fieldValues.length;
 
-	const remainingItemsCount = items.length - rowCount;
+	const remainingItemsCount = items?.length ?? 0 - rowCount;
 
 	// Disable add button if no more items left
 	const disableAdd = remainingItemsCount <= 0;
@@ -212,7 +212,7 @@ function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayPro
 				{fieldArray.fields.map((field, index) =>
 				{
 					// Filter out already selected items except current row
-					const filteredItems = items.filter(
+					const filteredItems = items?.filter(
 						(item) => !usedItemIds.includes(item.id) || item.id === fieldValues[index].itemId,
 					);
 
@@ -228,7 +228,7 @@ function ItemPairsFieldArray({ name, form, description }: ItemPairsFieldArrayPro
 										<FieldContent>
 											<ItemCombobox
 												{...controllerField}
-												items={filteredItems}
+												items={filteredItems ?? []}
 												id={`${name}-item-${index}`}
 												aria-invalid={fieldState.invalid}
 											/>

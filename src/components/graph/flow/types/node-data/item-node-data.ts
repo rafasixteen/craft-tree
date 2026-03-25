@@ -3,6 +3,6 @@ import { ProductionRate } from '@/domain/graph';
 
 export interface ItemNodeData extends Record<string, unknown>
 {
-	itemId: Item['id'] | null;
+	itemId?: Item['id'];
 	rate: ProductionRate;
 }

@@ -4,8 +4,8 @@ import { ItemRate } from '@/domain/graph';
 
 export interface ProducerNodeData extends Record<string, unknown>
 {
-	itemId: Item['id'] | null;
-	producerId: Producer['id'] | null;
+	itemId?: Item['id'];
+	producerId?: Producer['id'];
 
 	producerCount: number;
 	inputRates: ItemRate[] | null;

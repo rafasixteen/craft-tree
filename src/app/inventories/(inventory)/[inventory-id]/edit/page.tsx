@@ -7,7 +7,7 @@ import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useInventory } from '@/domain/inventory';
+import { updateInventory, useInventory } from '@/domain/inventory';
 
 import { toast } from 'sonner';
 import { useCallback } from 'react';
@@ -22,7 +22,12 @@ export default function InventoryEditPage()
 	const params = useParams();
 	const inventoryId = params['inventory-id'] as string;
 
-	const { inventory, updateInventory } = useInventory(inventoryId);
+	const { inventory } = useInventory({ inventoryId });
+
+	if (!inventory)
+	{
+		throw new Error('Inventory is null.');
+	}
 
 	const form = useForm<InventoryFormValues>({
 		resolver: zodResolver(inventoryFormSchema),
@@ -39,17 +44,17 @@ export default function InventoryEditPage()
 			{
 				const { name } = values;
 
-				updateInventory({ name });
+				await updateInventory({ id: inventoryId, name });
 
 				toast.success(`Inventory '${name}' updated`);
-				router.push(`/inventories/${inventory.id}/items`);
+				router.push(`/inventories/${inventoryId}/items`);
 			}
 			catch
 			{
 				toast.error('Failed to update inventory');
 			}
 		},
-		[updateInventory, inventory.id, router],
+		[inventoryId, router],
 	);
 
 	return (

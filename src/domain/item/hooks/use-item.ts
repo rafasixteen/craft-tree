@@ -1,17 +1,14 @@
 'use client';
 
-import { getItemById, Item } from '@/domain/item';
+import { getItemById } from '@/domain/item';
 import useSWR from 'swr';
 
-interface UseItemParams
-{
-	itemId?: Item['id'] | null;
-}
+type UseItemParams = Partial<Parameters<typeof getItemById>[0]>;
 
 export function useItem({ itemId }: UseItemParams)
 {
 	const swrKey = itemId ? ['item', itemId] : null;
-	const fetcher = () => (itemId ? getItemById(itemId) : null);
+	const fetcher = () => (itemId ? getItemById({ itemId }) : null);
 
 	const { data, isLoading, isValidating } = useSWR(swrKey, fetcher);
 

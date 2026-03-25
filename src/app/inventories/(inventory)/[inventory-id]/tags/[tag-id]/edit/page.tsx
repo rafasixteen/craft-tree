@@ -7,7 +7,7 @@ import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useTag } from '@/domain/tag';
+import { updateTag, useTag } from '@/domain/tag';
 
 import { toast } from 'sonner';
 import { useCallback } from 'react';
@@ -18,11 +18,17 @@ import { useParams, useRouter } from 'next/navigation';
 export default function TagEditPage()
 {
 	const router = useRouter();
-
 	const params = useParams();
-	const tagId = params['tag-id'] as string;
 
-	const { tag, updateTag } = useTag(tagId);
+	const tagId = params['tag-id'] as string;
+	const inventoryId = params['inventory-id'] as string;
+
+	const { tag } = useTag({ tagId });
+
+	if (!tag)
+	{
+		throw new Error('Tag is null.');
+	}
 
 	const form = useForm<TagFormValues>({
 		resolver: zodResolver(tagFormSchema),
@@ -39,18 +45,18 @@ export default function TagEditPage()
 			{
 				const { name } = values;
 
-				updateTag({ name });
+				await updateTag({ id: tagId, name });
 
 				toast.success(`Tag '${name}' updated`);
 
-				router.push(`/inventories/${tag.inventoryId}/tags`);
+				router.push(`/inventories/${inventoryId}/tags`);
 			}
 			catch
 			{
 				toast.error('Failed to update tag');
 			}
 		},
-		[updateTag, tag.inventoryId, router],
+		[tagId, inventoryId, router],
 	);
 
 	return (

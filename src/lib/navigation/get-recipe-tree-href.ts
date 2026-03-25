@@ -1,8 +1,15 @@
 import { Item } from '@/domain/item';
 
 import { getItemHref } from './get-item-href';
+import { Inventory } from '@/domain';
 
-export function getRecipeTreeHref(item: Item)
+interface GetRecipeTreeHrefParams
 {
-	return getItemHref(item) + '/recipe-tree';
+	inventoryId: Inventory['id'];
+	itemId: Item['id'];
+}
+
+export function getRecipeTreeHref({ inventoryId, itemId }: GetRecipeTreeHrefParams)
+{
+	return getItemHref({ inventoryId, itemId, path: ['recipe-tree'] });
 }

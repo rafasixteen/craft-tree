@@ -1,7 +1,16 @@
+import { Inventory } from '@/domain';
 import { Item } from '@/domain/item';
+import { getInventoryHref } from '@/lib/navigation';
 
-export function getItemHref(item: Item, action?: string)
+interface GetItemHrefParams
 {
-	const base = `/inventories/${item.inventoryId}/items/${item.id}`;
-	return action ? `${base}/${action}` : base;
+	inventoryId: Inventory['id'];
+	itemId: Item['id'];
+	path?: string[];
+}
+
+export function getItemHref({ inventoryId, itemId, path = [] }: GetItemHrefParams)
+{
+	const base = getInventoryHref({ inventoryId, path: ['inventory', 'items', itemId] });
+	return path.length > 0 ? `${base}/${path.join('/')}` : base;
 }

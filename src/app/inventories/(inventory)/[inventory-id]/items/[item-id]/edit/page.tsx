@@ -7,7 +7,7 @@ import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useItem } from '@/domain/item';
+import { setItemTags, updateItem, useItem } from '@/domain/item';
 import { useItemTags } from '@/domain/item';
 
 import { toast } from 'sonner';
@@ -22,9 +22,15 @@ export default function ItemEditPage()
 	const params = useParams();
 
 	const itemId = params['item-id'] as string;
+	const inventoryId = params['inventory-id'] as string;
 
-	const { item, updateItem } = useItem(itemId);
-	const { tags, setTags } = useItemTags(itemId);
+	const { item } = useItem({ itemId });
+	const { tags } = useItemTags({ itemId });
+
+	if (!item || !tags)
+	{
+		throw new Error('Item or tags are null.');
+	}
 
 	const form = useForm<ItemFormValues>({
 		resolver: zodResolver(itemFormSchema),
@@ -42,18 +48,17 @@ export default function ItemEditPage()
 			{
 				const { name, tagIds } = values;
 
-				updateItem({ name });
-				setTags({ tagIds });
+				await Promise.all([updateItem({ id: item.id, name }), setItemTags({ itemId: item.id, tagIds })]);
 
 				toast.success(`Item '${name}' updated`);
-				router.push(`/inventories/${item.inventoryId}/items`);
+				router.push(`/inventories/${inventoryId}/items`);
 			}
 			catch
 			{
 				toast.error('Failed to update item');
 			}
 		},
-		[updateItem, setTags, item.inventoryId, router],
+		[item.id, inventoryId, router],
 	);
 
 	return (

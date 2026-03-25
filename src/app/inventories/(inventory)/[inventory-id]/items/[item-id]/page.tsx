@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 
 import { useTags } from '@/domain/inventory';
 import { useItem, useItemTags } from '@/domain/item';
+import { getRecipeTreeHref } from '@/lib/navigation';
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -15,12 +16,14 @@ export default function ItemPage()
 	// TODO: Add loading and validating states to the dialog, and disable the confirm button while loading/validating.
 
 	const params = useParams();
+
 	const itemId = params['item-id'] as string;
+	const inventoryId = params['inventory-id'] as string;
 
 	const { item } = useItem({ itemId });
 
 	const { tags: itemTags } = useItemTags({ itemId });
-	const { tags: inventoryTags } = useTags({ inventoryId: item?.inventoryId });
+	const { tags: inventoryTags } = useTags({ inventoryId });
 
 	const tags = itemTags?.map((tag) => inventoryTags?.find((t) => t.id === tag.tagId));
 
@@ -29,7 +32,7 @@ export default function ItemPage()
 			<Header />
 			<div className="mx-auto max-w-3xl px-6 py-8">
 				<Button className="mb-4" variant="outline" size="sm" asChild>
-					<Link href={`/inventories/${item.inventoryId}/items/${itemId}/recipe-tree`}>Recipe Tree</Link>
+					<Link href={getRecipeTreeHref({ inventoryId, itemId })}>Recipe Tree</Link>
 				</Button>
 
 				<section className="mb-8">

@@ -16,7 +16,7 @@ interface GetProducersByInputItemParams
 export async function getProducersByInputItem({ itemId }: GetProducersByInputItemParams): Promise<Producer[]>
 {
 	return await db
-		.selectDistinct({
+		.select({
 			id: producersTable.id,
 			name: producersTable.name,
 			time: producersTable.time,

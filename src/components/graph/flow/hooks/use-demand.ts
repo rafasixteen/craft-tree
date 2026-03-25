@@ -1,7 +1,7 @@
 import { GraphNode } from '@/components/graph/flow/types';
 
 import { ItemRate } from '@/domain/graph';
-import { useProducerInputs, useProducer } from '@/domain/producer';
+import { useProducer } from '@/domain/producer';
 
 import { useNodesData } from '@xyflow/react';
 
@@ -16,8 +16,7 @@ export function useDemand({ targetNodeId, targetHandleId }: UseDemandParams): It
 	const node = useNodesData<GraphNode>(targetNodeId ?? '');
 	const producerId = node?.type === 'producer' ? (node.data.producerId ?? undefined) : undefined;
 
-	const inputs = useProducerInputs({ producerId: producerId });
-	const producer = useProducer({ producerId: producerId });
+	const { producer, inputs } = useProducer({ producerId, include: { inputs: true } });
 
 	if (!node)
 	{

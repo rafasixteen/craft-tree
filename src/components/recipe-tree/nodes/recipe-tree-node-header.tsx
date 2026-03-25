@@ -20,7 +20,11 @@ export function RecipeTreeNodeHeader({ nodeId }: RecipeTreeNodeHeaderProps)
 	return (
 		<BaseNodeHeader className="flex items-center gap-2 border-b p-3">
 			<div className="min-w-0">
-				<LinkableName name={item.name} href={getItemHref(item)} className="text-sm font-semibold" />
+				<LinkableName
+					name={item.name}
+					href={getItemHref({ itemId: item.id, inventoryId: item.inventoryId })}
+					className="text-sm font-semibold"
+				/>
 				{selectedProducer && (
 					<LinkableName
 						name={selectedProducer.name}

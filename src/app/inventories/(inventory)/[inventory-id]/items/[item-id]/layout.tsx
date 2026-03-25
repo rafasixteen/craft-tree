@@ -13,8 +13,8 @@ export default async function ItemLayout({
 		<SWRConfig
 			value={{
 				fallback: {
-					[unstable_serialize(['item', itemId])]: getItemById(itemId),
-					[unstable_serialize(['item-tags', itemId])]: getItemTags(itemId),
+					[unstable_serialize(['item', itemId])]: getItemById({ itemId }),
+					[unstable_serialize(['item-tags', itemId])]: getItemTags({ itemId }),
 				},
 			}}
 		>

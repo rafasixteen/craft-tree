@@ -1,7 +1,6 @@
 'use client';
 
 import { Header } from '@/components/sidebar';
-import { useCurrentInventory } from '@/components/inventory';
 import { graphColumnns as graphColumnns } from '@/components/graph';
 import { DataTable, DataTableFilter, DataTablePagination, useDataTable } from '@/components/data-table';
 
@@ -16,12 +15,15 @@ import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { RefreshCw } from 'lucide-react';
 import { getInventoryHref } from '@/lib/navigation';
+import { useParams } from 'next/navigation';
 
 export default function GraphsPage()
 {
-	const inventory = useCurrentInventory();
+	const params = useParams();
 
-	const { graphs, isLoading, isValidating } = useGraphs({ inventoryId: inventory.id });
+	const inventoryId = params['inventory-id'] as string;
+
+	const { graphs, isLoading, isValidating } = useGraphs({ inventoryId });
 
 	const tableData = useMemo(() =>
 	{
@@ -64,7 +66,7 @@ export default function GraphsPage()
 						className="h-8 w-64"
 					/>
 					<Button variant="default" size="sm" className="h-8">
-						<Link href={getInventoryHref(inventory, ['graphs', 'add'])}>Add Graph</Link>
+						<Link href={getInventoryHref({ inventoryId, path: ['graphs', 'add'] })}>Add Graph</Link>
 					</Button>
 				</div>
 			</Header>

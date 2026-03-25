@@ -24,7 +24,7 @@ export const inventoryColumnns: ColumnDef<InventoryColumnData>[] = [
 		{
 			return (
 				<Link
-					href={getInventoryHref(row.original, ['items'])}
+					href={getInventoryHref({ inventoryId: row.original.id, path: ['graphs'] })}
 					className="ml-3 truncate font-medium hover:underline"
 				>
 					{row.original.name}
@@ -59,7 +59,7 @@ function Actions({ row }: ActionsProps)
 			<Button variant="outline" size="icon-sm" onClick={() => onExport(row.original)}>
 				<DownloadIcon className="size-3" />
 			</Button>
-			<Link href={getInventoryHref(row.original, ['edit'])}>
+			<Link href={getInventoryHref({ inventoryId: row.original.id, path: ['edit'] })}>
 				<PencilIcon className="size-3" />
 			</Link>
 			<DeleteInventoryDialog inventory={row.original} />

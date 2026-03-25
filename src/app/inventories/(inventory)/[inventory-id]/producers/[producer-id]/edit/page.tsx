@@ -7,8 +7,7 @@ import { Field } from '@/components/ui/field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
-import { useProducer } from '@/domain/producer';
-import { useProducerInputs, useProducerOutputs, useProducerTags } from '@/domain/producer';
+import { setProducerInputs, setProducerOutputs, setProducerTags, updateProducer, useProducer } from '@/domain/producer';
 
 import { toast } from 'sonner';
 import { useCallback } from 'react';
@@ -22,12 +21,17 @@ export default function ProducerEditPage()
 	const params = useParams();
 
 	const producerId = params['producer-id'] as string;
+	const inventoryId = params['inventory-id'] as string;
 
-	const { producer, updateProducer } = useProducer(producerId);
+	const { producer, inputs, outputs, tags } = useProducer({
+		producerId,
+		include: { inputs: true, outputs: true, tags: true },
+	});
 
-	const { inputs, setInputs } = useProducerInputs(producerId);
-	const { outputs, setOutputs } = useProducerOutputs(producerId);
-	const { tags, setTags } = useProducerTags(producerId);
+	if (!producer || !inputs || !outputs || !tags)
+	{
+		throw new Error('Producer, inputs, outputs, or tags is null.');
+	}
 
 	const form = useForm<ProducerFormValues>({
 		resolver: zodResolver(producerFormSchema),
@@ -48,20 +52,24 @@ export default function ProducerEditPage()
 			{
 				const { name, time, tagIds, inputs, outputs } = values;
 
-				updateProducer({ name, time });
-				setInputs({ inputs });
-				setOutputs({ outputs });
-				setTags({ tagIds });
+				// TODO: Implement a single server action that updates this using a transaction.
+
+				await Promise.all([
+					updateProducer({ id: producerId, name: name, time: time }),
+					setProducerInputs({ producerId: producerId, inputs: inputs }),
+					setProducerOutputs({ producerId: producerId, outputs: outputs }),
+					setProducerTags({ producerId: producerId, tagIds: tagIds }),
+				]);
 
 				toast.success(`Producer '${name}' updated`);
-				router.push(`/inventories/${producer.inventoryId}/producers`);
+				router.push(`/inventories/${inventoryId}/producers`);
 			}
 			catch
 			{
 				toast.error('Failed to update producer');
 			}
 		},
-		[updateProducer, setInputs, setOutputs, setTags, producer.inventoryId, router],
+		[producerId, inventoryId, router],
 	);
 
 	return (

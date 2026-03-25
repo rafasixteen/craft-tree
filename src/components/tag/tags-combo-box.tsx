@@ -36,7 +36,9 @@ export function TagsCombobox({ className, value, onIdsChange, maxChips }: TagsCo
 	const anchor = useComboboxAnchor();
 
 	const inventory = useCurrentInventory();
-	const { tags } = useTags({ inventoryId: inventory.id });
+	const { tags: rawTags } = useTags({ inventoryId: inventory.id });
+
+	const tags = rawTags ?? [];
 
 	const [expanded, setExpanded] = useState(false);
 
