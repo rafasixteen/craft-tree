@@ -11,8 +11,6 @@ type UpdateGraphParams = Pick<Graph, 'id'> & Partial<Omit<Graph, 'id' | 'invento
 
 export async function updateGraph({ id, name, data }: UpdateGraphParams): Promise<Graph>
 {
-	console.log('Updating graph with id:', id, 'name:', name, 'data:', data);
-
 	const [graph] = await db
 		.update(productionGraphsTable)
 		.set({ name, data })
