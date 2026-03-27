@@ -3,7 +3,18 @@ import { z } from 'zod';
 
 type SchemaMap = Record<string, z.ZodTypeAny>;
 
-type Infer<T extends SchemaMap | undefined> = T extends SchemaMap ? { [K in keyof T]: z.infer<T[K]> } : undefined;
+type IsAny<T> = 0 extends 1 & T ? true : false;
+
+type Infer<T extends SchemaMap | undefined> =
+	IsAny<T> extends true ? any : T extends SchemaMap ? { [K in keyof T]: z.infer<T[K]> } : undefined;
+
+export type AnyNodeDefinition = NodeDefinition<any, any, any>;
+
+export type InferNodeInputs<T extends AnyNodeDefinition> = Infer<T['inputs']>;
+
+export type InferNodeOutputs<T extends AnyNodeDefinition> = Infer<T['outputs']>;
+
+export type InferNodeConfig<T extends AnyNodeDefinition> = Infer<T['config']>;
 
 export type NodeDefinition<
 	TInputs extends SchemaMap | undefined,
@@ -17,9 +28,9 @@ export type NodeDefinition<
 };
 
 export function defineNode<
-	TInputs extends SchemaMap | undefined = undefined,
-	TOutputs extends SchemaMap | undefined = undefined,
-	TConfig extends SchemaMap | undefined = undefined,
+	TInputs extends SchemaMap | undefined,
+	TOutputs extends SchemaMap | undefined,
+	TConfig extends SchemaMap | undefined,
 >(def: NodeDefinition<TInputs, TOutputs, TConfig>)
 {
 	return def;

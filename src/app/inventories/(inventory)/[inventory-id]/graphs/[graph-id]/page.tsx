@@ -5,6 +5,7 @@ import { getGraphById } from '@/domain/graph';
 
 import { cookies } from 'next/headers';
 import { ReactFlowProvider } from '@xyflow/react';
+import { GraphFlowV2 } from '@/components/graph-v2';
 
 export default async function GraphPage({ params }: PageProps<'/inventories/[inventory-id]/graphs/[graph-id]'>)
 {
@@ -22,7 +23,7 @@ export default async function GraphPage({ params }: PageProps<'/inventories/[inv
 		<>
 			<Header />
 			<ReactFlowProvider>
-				<GraphFlow
+				<GraphFlowV2
 					initialTheme={initialTheme}
 					initialNodes={nodes}
 					initialEdges={edges}

@@ -70,7 +70,7 @@ export default function InventoriesPage()
 			</Card>
 			<div className="relative">
 				{isValidating && !isLoading && (
-					<div className="absolute -top-16 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-lg border bg-background px-3 py-1.5 text-sm shadow-md">
+					<div className="absolute -top-16 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-lg border bg-background px-3 py-1.5 text-sm shadow-md">
 						<RefreshCw className="size-3.5 animate-spin text-muted-foreground" />
 						<span className="text-muted-foreground">Syncing inventories...</span>
 					</div>

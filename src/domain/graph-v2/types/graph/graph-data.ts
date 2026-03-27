@@ -7,7 +7,7 @@ export const graphNodeSchema = z.object({
 		x: z.number(),
 		y: z.number(),
 	}),
-	data: z.record(z.string(), z.unknown()).optional(),
+	data: z.record(z.string(), z.unknown()),
 });
 
 export const graphEdgeSchema = z.object({
@@ -17,16 +17,16 @@ export const graphEdgeSchema = z.object({
 	sourceHandle: z.string(),
 	target: z.string(),
 	targetHandle: z.string(),
-	data: z.record(z.string(), z.unknown()).optional(),
+	data: z.record(z.string(), z.unknown()),
 });
 
 export const graphDataSchema = z.object({
-	nodes: z.array(graphNodeSchema),
-	edges: z.array(graphEdgeSchema),
+	nodes: z.array(graphNodeSchema).default([]),
+	edges: z.array(graphEdgeSchema).default([]),
 	viewport: z.object({
-		x: z.number(),
-		y: z.number(),
-		zoom: z.number(),
+		x: z.number().default(0),
+		y: z.number().default(0),
+		zoom: z.number().default(1),
 	}),
 });
 

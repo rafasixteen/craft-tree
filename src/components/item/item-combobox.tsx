@@ -17,7 +17,7 @@ interface ItemComboboxProps extends Omit<
 >
 {
 	items: Item[];
-	value: Item['id'] | null;
+	value?: Item['id'] | null;
 	onChange: (itemId: Item['id'] | null) => void;
 	className?: string;
 	'aria-invalid'?: boolean;

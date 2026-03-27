@@ -13,10 +13,13 @@ export const splitNodeDefinition = defineNode({
 	},
 	executor: (input, config) =>
 	{
+		const { rate } = input;
+		const { productionRates } = config;
+
 		return {
-			rates: config.productionRates.map((productionRate) => ({
+			rates: productionRates.map((productionRate) => ({
 				...productionRate,
-				itemId: input.rate.itemId,
+				itemId: rate.itemId,
 			})),
 		};
 	},

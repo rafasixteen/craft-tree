@@ -9,14 +9,16 @@ export const producerNodeDefinition = defineNode({
 		rates: z.array(ItemRateSchema),
 	},
 	config: {
+		itemId: z.string(),
 		producerId: z.string(),
+		producerCount: z.number().default(1),
 	},
 	executor: (inputs, config) =>
 	{
 		return {
 			rates: inputs.rates.map((rate) => ({
 				...rate,
-				amount: rate.amount * 2,
+				amount: rate.amount * config.producerCount,
 			})),
 		};
 	},

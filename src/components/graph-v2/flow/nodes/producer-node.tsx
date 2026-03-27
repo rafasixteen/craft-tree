@@ -1,37 +1,33 @@
 'use client';
 
-import { ItemCombobox } from '@/components/item';
-import { LabeledHandle } from '@/components/labeled-handle';
-import { useProducerInputs as useProducerInputPorts } from '@/components/graph/flow/hooks';
-import { ProducerGraphNode, ProducerNodeData } from '@/components/graph/flow/types';
-import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
-
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-
-import { Item, useGetItemName } from '@/domain/item';
-import { useItems } from '@/domain/inventory';
-import { ProductionRate, TimeUnit, convertProductionRate } from '@/domain/graph';
-import {
-	Producer,
-	getProducersByOutputItem,
-	useProducer,
-	useProducersByOutputItem,
-	ProducerInput,
-	ProducerOutput,
-} from '@/domain/producer';
-
-import { cn, formatNumber } from '@/lib/utils';
-
-import { memo, useCallback, useEffect } from 'react';
-import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { Edge, Node, NodeProps, Position, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { InferNodeConfig, producerNodeDefinition } from '@/domain/graph-v2';
 import { useParams } from 'next/navigation';
+import { useItems } from '@/domain/inventory';
+import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
+import { LabeledHandle } from '@/components/labeled-handle';
+import { cn, formatNumber } from '@/lib/utils';
 import { LinkableName } from '@/components/linkable-name';
 import { getItemHref, getProducerHref } from '@/lib/navigation';
+import {
+	getProducersByOutputItem,
+	Producer,
+	ProducerInput,
+	ProducerOutput,
+	useProducer,
+	useProducersByOutputItem,
+} from '@/domain/producer';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Item, useGetItemName } from '@/domain';
+import { Button } from '@/components/ui/button';
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
+import { useCallback, useEffect } from 'react';
+import { ItemCombobox } from '@/components/item';
+import { Input } from '@/components/ui/input';
 
-export const ProducerNode = memo(function ProducerNode({ id, data, selected }: NodeProps<ProducerGraphNode>)
+type Config = NonNullable<InferNodeConfig<typeof producerNodeDefinition>>;
+
+export function ProducerNode({ id, data, selected }: NodeProps<Node<Config>>)
 {
 	const params = useParams();
 
@@ -39,7 +35,7 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 	const { itemId, producerId, producerCount } = data;
 
 	const updateNodeInternals = useUpdateNodeInternals();
-	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
+	const { updateNodeData } = useReactFlow<Node, Edge>();
 
 	const { items } = useItems({ inventoryId });
 	const item = items?.find((i) => i.id === itemId);
@@ -48,8 +44,6 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 		producerId,
 		include: { inputs: true, outputs: true },
 	});
-
-	const inputRates = useProducerInputPorts();
 
 	const onItemComboboxChange = useCallback(
 		function onItemComboboxChange(itemId: string | null)
@@ -81,92 +75,18 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 				});
 			}
 		},
-		[id, updateNodeData],
+		[updateNodeData, id],
 	);
 
 	const onProducerCountChange = useCallback(
 		function onProducerCountChange(newCount: number)
 		{
-			updateNodeData(id, { producerCount: newCount });
+			updateNodeData(id, {
+				producerCount: newCount,
+			});
 		},
-		[id, updateNodeData],
+		[updateNodeData, id],
 	);
-
-	useEffect(() =>
-	{
-		updateNodeData(id, {
-			inputRates: inputRates,
-		});
-
-		if (!inputs || !outputs || !producer)
-		{
-			return;
-		}
-
-		// Build rate lookup
-		const rateMap = new Map<string, number>();
-
-		for (const itemRate of inputRates)
-		{
-			const rate: ProductionRate = {
-				amount: itemRate.amount,
-				per: itemRate.per,
-			};
-
-			const converted = convertProductionRate(rate, 'second');
-			rateMap.set(itemRate.itemId, converted.amount);
-		}
-
-		// ----------------------------
-		// 1️⃣ Calculate supply-limited cycles/sec
-		// ----------------------------
-		let supplyLimitedCycles = Infinity;
-
-		for (const input of inputs)
-		{
-			const suppliedPerSecond = rateMap.get(input.itemId);
-
-			if (!suppliedPerSecond)
-			{
-				supplyLimitedCycles = 0;
-				break;
-			}
-
-			const possibleCycles = suppliedPerSecond / input.quantity;
-
-			supplyLimitedCycles = Math.min(supplyLimitedCycles, possibleCycles);
-		}
-
-		// ----------------------------
-		// 2️⃣ Calculate machine-limited cycles/sec
-		// ----------------------------
-		const singleMachineMax = 1 / producer.time;
-		const machineLimitedCycles = producerCount * singleMachineMax;
-
-		// ----------------------------
-		// 3️⃣ Final production rate
-		// ----------------------------
-		const actualCycles = Math.min(supplyLimitedCycles, machineLimitedCycles);
-
-		if (actualCycles <= 0 || actualCycles === Infinity)
-		{
-			updateNodeData(id, { outputRates: null });
-			return;
-		}
-
-		// ----------------------------
-		// 4️⃣ Scale outputs
-		// ----------------------------
-		const outputRates = outputs.map((output) => ({
-			itemId: output.itemId,
-			amount: output.quantity * actualCycles,
-			per: 'second' as TimeUnit,
-		}));
-
-		updateNodeData(id, {
-			outputRates: outputRates,
-		});
-	}, [inputRates, producerCount]);
 
 	useEffect(() =>
 	{
@@ -199,7 +119,7 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 				<div className="flex w-full items-start justify-between gap-2 border-b p-2">
 					<ItemCombobox
 						items={items ?? []}
-						value={itemId ?? null}
+						value={itemId}
 						onChange={onItemComboboxChange}
 						className="nodrag w-[70%]"
 					/>
@@ -233,7 +153,7 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 			</BaseNodeFooter>
 		</BaseNode>
 	);
-});
+}
 
 interface ProducerPortsProps
 {
@@ -290,7 +210,7 @@ interface ProducerCarouselProps
 
 function ProducerCarousel({ nodeId, itemId, producerId }: ProducerCarouselProps)
 {
-	const { updateNodeData } = useReactFlow<Node<ProducerNodeData>, Edge>();
+	const { updateNodeData } = useReactFlow<Node<Config>, Edge>();
 
 	const { producers: rawProducers, isLoading } = useProducersByOutputItem({ itemId });
 

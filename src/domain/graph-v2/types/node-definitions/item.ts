@@ -1,16 +1,30 @@
-import { defineNode, ItemRateSchema } from '@/domain/graph-v2';
+import { defineNode, ItemRateSchema, ProductionRateSchema } from '@/domain/graph-v2';
+import { z } from 'zod';
 
 export const itemNodeDefinition = defineNode({
 	outputs: {
-		rate: ItemRateSchema,
+		itemRate: ItemRateSchema.nullable(),
 	},
 	config: {
-		rate: ItemRateSchema,
+		itemId: z.string().nullable(),
+		rate: ProductionRateSchema,
 	},
 	executor: (_, config) =>
 	{
+		const { itemId, rate } = config;
+
+		if (!itemId)
+		{
+			return {
+				itemRate: null,
+			};
+		}
+
 		return {
-			rate: config.rate,
+			itemRate: {
+				...rate,
+				itemId: itemId,
+			},
 		};
 	},
 });
