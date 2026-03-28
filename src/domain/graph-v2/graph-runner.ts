@@ -24,33 +24,48 @@ export async function runGraph(graph: GraphData): Promise<Result>
 		const node = queue.shift()!;
 		const def = nodeRegistry[node.type as NodeType];
 
-		if (!def) throw new Error(`Unknown node type: "${node.type}"`);
+		if (!def)
+		{
+			console.error(`[GraphRunner] ❌ Unknown node type: "${node.type}"`);
+			throw new Error(`Unknown node type: "${node.type}"`);
+		}
 
-		// Build this node's input from upstream outputs, keyed by targetHandle
 		const input: Record<string, unknown> = {};
+		const incomingEdges = graph.edges.filter((e) => e.target === node.id);
 
-		for (const edge of graph.edges.filter((e) => e.target === node.id))
+		console.group(`[GraphRunner] ▶ ${node.type} (${node.id})`);
+		console.log('  config:', node.data);
+		console.log('  incoming edges:', incomingEdges.length);
+
+		for (const edge of incomingEdges)
 		{
 			const sourceOutput = outputs.get(edge.source);
 
+			console.group(`  edge ${edge.source} → ${edge.target}`);
+			console.log('    sourceHandle:', edge.sourceHandle);
+			console.log('    targetHandle:', edge.targetHandle);
+			console.log('    sourceOutput:', sourceOutput);
+			console.log('    resolved value:', sourceOutput?.[edge.sourceHandle]);
+			console.groupEnd();
+
 			if (!sourceOutput)
 			{
+				console.error(`  ❌ No output found for source node "${edge.source}"`);
 				throw new Error(`Node "${edge.source}" has no output — possible cycle or missing node`);
 			}
 
-			// sourceHandle = key in the upstream node's output
-			// targetHandle = key in this node's input
 			input[edge.targetHandle] = sourceOutput[edge.sourceHandle];
 		}
 
-		console.log(`Executing node ${node.id} of type ${node.type} with input:`, input);
+		console.log('  final input:', input);
 
 		const output = await def.executor(input as any, node.data as any);
+
+		console.log('  output:', output);
+		console.groupEnd();
+
 		outputs.set(node.id, output as Record<string, unknown>);
 
-		console.log(`Node ${node.id} output:`, output);
-
-		// Decrement inDegree for dependents and enqueue newly unblocked ones
 		for (const dependentId of dependents.get(node.id) ?? [])
 		{
 			const next = (inDegree.get(dependentId) ?? 1) - 1;

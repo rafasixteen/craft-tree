@@ -17,7 +17,7 @@ export const graphEdgeSchema = z.object({
 	sourceHandle: z.string(),
 	target: z.string(),
 	targetHandle: z.string(),
-	data: z.record(z.string(), z.unknown()),
+	data: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const graphDataSchema = z.object({
