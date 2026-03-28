@@ -11,8 +11,8 @@ import {
 	toGraphData,
 	useGraph,
 } from '@/components/graph-v2';
-import { GraphData } from '@/domain/graph-v2';
-import { useCallback, useEffect, useState } from 'react';
+import { GraphData, GraphExecutionProvider } from '@/domain/graph-v2';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { updateGraph } from '@/domain/graph';
 import { useParams } from 'next/navigation';
 
@@ -97,27 +97,31 @@ export function GraphFlowV2({ initialTheme, data }: GraphFlowProps)
 	// TODO: Show some kind of "Saving..." indicator when changes are being saved.
 	// TODO: Add a shortcut for layouting the graph (e.g. Ctrl+L) and show a "Laying out..." indicator when the layout is being calculated.
 
+	const graph = useMemo(() => toGraphData(nodes, edges), [nodes, edges]);
+
 	return (
-		<div className="size-full">
-			<ReactFlow
-				{...graphConfig}
-				nodes={nodes}
-				edges={edges}
-				onNodesChange={onNodesChange}
-				onEdgesChange={onEdgesChange}
-				onConnect={onConnect}
-				onPaneContextMenu={openGraphContextMenu}
-				onNodeContextMenu={openNodeContextMenu}
-				onPaneClick={closeContextMenu}
-				onNodeClick={closeContextMenu}
-				onMove={closeContextMenu}
-				colorMode={theme === 'dark' ? 'dark' : 'light'}
-			>
-				{contextMenuState && <ContextMenu {...contextMenuState} />}
-				<Controls />
-				<Background gap={20} size={1} />
-			</ReactFlow>
-		</div>
+		<GraphExecutionProvider graph={graph}>
+			<div className="size-full">
+				<ReactFlow
+					{...graphConfig}
+					nodes={nodes}
+					edges={edges}
+					onNodesChange={onNodesChange}
+					onEdgesChange={onEdgesChange}
+					onConnect={onConnect}
+					onPaneContextMenu={openGraphContextMenu}
+					onNodeContextMenu={openNodeContextMenu}
+					onPaneClick={closeContextMenu}
+					onNodeClick={closeContextMenu}
+					onMove={closeContextMenu}
+					colorMode={theme === 'dark' ? 'dark' : 'light'}
+				>
+					{contextMenuState && <ContextMenu {...contextMenuState} />}
+					<Controls />
+					<Background gap={20} size={1} />
+				</ReactFlow>
+			</div>
+		</GraphExecutionProvider>
 	);
 }
 

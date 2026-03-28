@@ -1,7 +1,7 @@
 'use client';
 
 import { Edge, Node, NodeProps, Position, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
-import { InferNodeConfig, producerNodeDefinition } from '@/domain/graph-v2';
+import { InferNodeConfig, producerNodeDefinition, useNodeOutput } from '@/domain/graph-v2';
 import { useParams } from 'next/navigation';
 import { useItems } from '@/domain/inventory';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
@@ -41,7 +41,7 @@ export function ProducerNode({ id, data, selected }: NodeProps<Node<Config>>)
 	const item = items?.find((i) => i.id === itemId);
 
 	const { producer, inputs, outputs, isLoading } = useProducer({
-		producerId,
+		producerId: producerId ?? undefined,
 		include: { inputs: true, outputs: true },
 	});
 
@@ -149,7 +149,7 @@ export function ProducerNode({ id, data, selected }: NodeProps<Node<Config>>)
 				) : null}
 			</BaseNodeContent>
 			<BaseNodeFooter className="m-0 flex-col border-t p-1">
-				<ProducerCarousel nodeId={id} itemId={itemId} producerId={producerId} />
+				<ProducerCarousel nodeId={id} itemId={itemId ?? undefined} producerId={producerId ?? undefined} />
 			</BaseNodeFooter>
 		</BaseNode>
 	);

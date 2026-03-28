@@ -3,10 +3,10 @@ import { z } from 'zod';
 
 export const producerNodeDefinition = defineNode({
 	inputs: {
-		rates: z.array(ItemRateSchema),
+		rates: z.array(ItemRateSchema).nullable(),
 	},
 	outputs: {
-		rates: z.array(ItemRateSchema),
+		rates: z.array(ItemRateSchema).nullable(),
 	},
 	config: {
 		itemId: z.string().nullable(),
@@ -15,6 +15,13 @@ export const producerNodeDefinition = defineNode({
 	},
 	executor: (inputs, config) =>
 	{
+		if (!inputs.rates)
+		{
+			return {
+				rates: null,
+			};
+		}
+
 		return {
 			rates: inputs.rates.map((rate) => ({
 				...rate,
