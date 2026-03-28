@@ -23,11 +23,6 @@ export const graphEdgeSchema = z.object({
 export const graphDataSchema = z.object({
 	nodes: z.array(graphNodeSchema).default([]),
 	edges: z.array(graphEdgeSchema).default([]),
-	viewport: z.object({
-		x: z.number().default(0),
-		y: z.number().default(0),
-		zoom: z.number().default(1),
-	}),
 });
 
 export type GraphNode = z.infer<typeof graphNodeSchema>;

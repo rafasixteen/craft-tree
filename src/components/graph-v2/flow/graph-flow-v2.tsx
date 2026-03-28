@@ -1,49 +1,101 @@
 'use client';
 
-import { Background, Controls, ReactFlow } from '@xyflow/react';
+import { Background, Controls, Node, ReactFlow } from '@xyflow/react';
 import { useTheme } from 'next-themes';
-import { graphConfig, useGraph } from '@/components/graph-v2';
-import { GraphData as GraphDataOld } from '@/domain/graph';
-import { GraphData as GraphDataV2 } from '@/domain/graph-v2';
+import {
+	graphConfig,
+	GraphContextMenu,
+	GraphContextMenuProps,
+	NodeContextMenu,
+	NodeContextMenuProps,
+	toGraphData,
+	useGraph,
+} from '@/components/graph-v2';
+import { GraphData } from '@/domain/graph-v2';
+import { useCallback, useEffect, useState } from 'react';
+import { updateGraph } from '@/domain/graph';
+import { useParams } from 'next/navigation';
 
 interface GraphFlowProps
 {
 	initialTheme: 'light' | 'dark';
-	initialNodes: GraphDataOld['nodes'];
-	initialEdges: GraphDataOld['edges'];
-	initialViewport: GraphDataOld['viewport'];
+	data: GraphData;
 }
 
-export function GraphFlowV2({ initialTheme, initialNodes, initialEdges, initialViewport }: GraphFlowProps)
+export function GraphFlowV2({ initialTheme, data }: GraphFlowProps)
 {
-	const { resolvedTheme } = useTheme();
+	const params = useParams();
+	const graphId = params['graph-id'] as string;
 
+	const { resolvedTheme } = useTheme();
 	const theme = resolvedTheme ?? initialTheme;
 
-	const normalizedData: GraphDataV2 = {
-		nodes: initialNodes.map((node) => ({
-			id: node.id,
-			type: node.type,
-			position: node.position,
-			data: node.data ?? {},
-		})),
-		edges: initialEdges.map((edge) => ({
-			id: edge.id,
-			type: edge.type ?? 'default',
-			source: edge.source,
-			sourceHandle: edge.sourceHandle ?? '',
-			target: edge.target,
-			targetHandle: edge.targetHandle ?? '',
-			data: edge.data ?? {},
-		})),
-		viewport: initialViewport,
-	};
+	const [contextMenuState, setContextMenuState] = useState<GraphContextMenuProps | NodeContextMenuProps | null>(null);
 
-	const { nodes, edges, viewport, setViewport, onNodesChange, onEdgesChange, onConnect } = useGraph({
-		nodes: normalizedData.nodes,
-		edges: normalizedData.edges,
-		viewport: normalizedData.viewport,
+	const { nodes, edges, onNodesChange, onEdgesChange, onConnect } = useGraph({
+		nodes: data.nodes,
+		edges: data.edges,
 	});
+
+	const openGraphContextMenu = useCallback(
+		function openGraphContextMenu(event: MouseEvent | React.MouseEvent)
+		{
+			// Prevent native context menu from showing.
+			event.preventDefault();
+
+			setContextMenuState({
+				type: 'graph',
+				position: { x: event.clientX, y: event.clientY },
+				close: () => setContextMenuState(null),
+			});
+		},
+		[setContextMenuState],
+	);
+
+	const openNodeContextMenu = useCallback(
+		function openNodeContextMenu(event: MouseEvent | React.MouseEvent, node: Node)
+		{
+			// Prevent native context menu from showing.
+			event.preventDefault();
+
+			// Stop the event from propagating to the pane's context menu handler.
+			event.stopPropagation();
+
+			setContextMenuState({
+				type: 'node',
+				nodeId: node.id,
+				position: { x: event.clientX, y: event.clientY },
+				close: () => setContextMenuState(null),
+			});
+		},
+		[setContextMenuState],
+	);
+
+	const closeContextMenu = useCallback(
+		function closeContextMenu()
+		{
+			setContextMenuState(null);
+		},
+		[setContextMenuState],
+	);
+
+	useEffect(() =>
+	{
+		const saveIntervalMs = 500;
+
+		const timeout = setTimeout(() =>
+		{
+			updateGraph({
+				id: graphId,
+				data: toGraphData(nodes, edges),
+			});
+		}, saveIntervalMs);
+
+		return () => clearTimeout(timeout);
+	}, [nodes, edges]);
+
+	// TODO: Show some kind of "Saving..." indicator when changes are being saved.
+	// TODO: Add a shortcut for layouting the graph (e.g. Ctrl+L) and show a "Laying out..." indicator when the layout is being calculated.
 
 	return (
 		<div className="size-full">
@@ -51,16 +103,30 @@ export function GraphFlowV2({ initialTheme, initialNodes, initialEdges, initialV
 				{...graphConfig}
 				nodes={nodes}
 				edges={edges}
-				viewport={viewport}
-				onViewportChange={setViewport}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
+				onPaneContextMenu={openGraphContextMenu}
+				onNodeContextMenu={openNodeContextMenu}
+				onPaneClick={closeContextMenu}
+				onNodeClick={closeContextMenu}
+				onMove={closeContextMenu}
 				colorMode={theme === 'dark' ? 'dark' : 'light'}
 			>
+				{contextMenuState && <ContextMenu {...contextMenuState} />}
 				<Controls />
 				<Background gap={20} size={1} />
 			</ReactFlow>
 		</div>
 	);
+}
+
+function ContextMenu(props: GraphContextMenuProps | NodeContextMenuProps)
+{
+	if (props.type === 'graph')
+	{
+		return <GraphContextMenu {...props} />;
+	}
+
+	return <NodeContextMenu {...props} />;
 }

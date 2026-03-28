@@ -14,7 +14,6 @@ const fitViewOptions: FitViewOptions = {
 
 const defaultEdgeOptions: DefaultEdgeOptions = {
 	animated: true,
-	type: 'item-flow',
 };
 
 export const graphConfig = {

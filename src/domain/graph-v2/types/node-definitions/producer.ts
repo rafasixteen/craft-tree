@@ -9,8 +9,8 @@ export const producerNodeDefinition = defineNode({
 		rates: z.array(ItemRateSchema),
 	},
 	config: {
-		itemId: z.string(),
-		producerId: z.string(),
+		itemId: z.string().nullable(),
+		producerId: z.string().nullable(),
 		producerCount: z.number().default(1),
 	},
 	executor: (inputs, config) =>

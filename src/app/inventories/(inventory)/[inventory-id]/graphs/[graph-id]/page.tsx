@@ -1,5 +1,4 @@
 import { Header } from '@/components/sidebar';
-import { GraphFlow } from '@/components/graph/flow';
 
 import { getGraphById } from '@/domain/graph';
 
@@ -17,18 +16,11 @@ export default async function GraphPage({ params }: PageProps<'/inventories/[inv
 	const { 'graph-id': graphId } = await params;
 	const graph = await getGraphById({ graphId });
 
-	const { nodes, edges, viewport } = graph.data;
-
 	return (
 		<>
 			<Header />
 			<ReactFlowProvider>
-				<GraphFlowV2
-					initialTheme={initialTheme}
-					initialNodes={nodes}
-					initialEdges={edges}
-					initialViewport={viewport}
-				/>
+				<GraphFlowV2 initialTheme={initialTheme} data={graph.data} />
 			</ReactFlowProvider>
 		</>
 	);

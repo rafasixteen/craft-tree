@@ -1,7 +1,15 @@
+import { Inventory } from '@/domain/inventory';
 import { Graph } from '@/domain/graph';
+import { getInventoryHref } from '@/lib/navigation';
 
-export function getGraphHref(graph: Graph, action?: string)
+interface GetGraphHrefParams
 {
-	const base = `/inventories/${graph.inventoryId}/graphs/${graph.id}`;
-	return action ? `${base}/${action}` : base;
+	inventoryId: Inventory['id'];
+	graphId: Graph['id'];
+	path?: string[];
+}
+
+export function getGraphHref({ inventoryId, graphId, path }: GetGraphHrefParams)
+{
+	return getInventoryHref({ inventoryId, path: [...(path || []), 'graphs', graphId] });
 }

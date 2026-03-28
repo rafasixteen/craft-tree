@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useCallback, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { getGraphHref } from '@/lib/navigation';
 
 export default function GraphAddPage()
 {
@@ -40,16 +41,24 @@ export default function GraphAddPage()
 				{
 					const { name } = values;
 
-					await createGraph({
+					const graph = await createGraph({
 						name: name,
 						inventoryId: inventory.id,
 					});
 
 					toast.success(`Graph '${name}' created`);
 					form.reset();
+
+					router.push(
+						getGraphHref({
+							inventoryId: inventory.id,
+							graphId: graph.id,
+						}),
+					);
 				}
-				catch
+				catch (error)
 				{
+					console.error(error);
 					toast.error('Failed to create graph');
 				}
 			});

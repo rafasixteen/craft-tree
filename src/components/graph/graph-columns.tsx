@@ -21,7 +21,10 @@ export const graphColumnns: ColumnDef<GraphColumnData>[] = [
 		cell: ({ row }) =>
 		{
 			return (
-				<Link href={getGraphHref(row.original)} className="ml-3 truncate font-medium hover:underline">
+				<Link
+					href={getGraphHref({ inventoryId: row.original.inventoryId, graphId: row.original.id })}
+					className="ml-3 truncate font-medium hover:underline"
+				>
 					{row.original.name}
 				</Link>
 			);

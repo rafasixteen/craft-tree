@@ -7,7 +7,7 @@ export const itemNodeDefinition = defineNode({
 	},
 	config: {
 		itemId: z.string().nullable(),
-		rate: ProductionRateSchema,
+		rate: ProductionRateSchema.default({ amount: 1, per: 'second' }),
 	},
 	executor: (_, config) =>
 	{

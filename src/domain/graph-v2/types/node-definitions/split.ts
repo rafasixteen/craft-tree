@@ -9,7 +9,7 @@ export const splitNodeDefinition = defineNode({
 		rates: z.array(ItemRateSchema),
 	},
 	config: {
-		productionRates: z.array(ProductionRateSchema),
+		productionRates: z.array(ProductionRateSchema).default([{ amount: 1, per: 'second' }]),
 	},
 	executor: (input, config) =>
 	{

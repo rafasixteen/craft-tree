@@ -1,7 +1,7 @@
 import { NodeExecutor } from '@/domain/graph-v2';
 import { z } from 'zod';
 
-type SchemaMap = Record<string, z.ZodTypeAny>;
+export type SchemaMap = Record<string, z.ZodTypeAny>;
 
 type IsAny<T> = 0 extends 1 & T ? true : false;
 
@@ -26,12 +26,3 @@ export type NodeDefinition<
 	config?: TConfig;
 	executor: NodeExecutor<Infer<TInputs>, Infer<TOutputs>, Infer<TConfig>>;
 };
-
-export function defineNode<
-	TInputs extends SchemaMap | undefined,
-	TOutputs extends SchemaMap | undefined,
-	TConfig extends SchemaMap | undefined,
->(def: NodeDefinition<TInputs, TOutputs, TConfig>)
-{
-	return def;
-}
