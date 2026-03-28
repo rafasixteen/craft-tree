@@ -109,7 +109,7 @@ export function ProducerNode({ id, data, selected }: NodeProps<Node<Config>>)
 					{producer && (
 						<LinkableName
 							name={producer.name}
-							href={getProducerHref(producer)}
+							href={getProducerHref({ inventoryId, producerId: producer.id })}
 							className="text-xs text-muted-foreground"
 						/>
 					)}

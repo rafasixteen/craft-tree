@@ -21,7 +21,10 @@ export const producerColumnns: ColumnDef<ProducerColumnData>[] = [
 		cell: ({ row }) =>
 		{
 			return (
-				<Link href={getProducerHref(row.original)} className="ml-3 truncate font-medium hover:underline">
+				<Link
+					href={getProducerHref({ inventoryId: row.original.inventoryId, producerId: row.original.id })}
+					className="ml-3 truncate font-medium hover:underline"
+				>
 					{row.original.name}
 				</Link>
 			);
@@ -75,7 +78,13 @@ function Actions({ row }: ActionsProps)
 	return (
 		<div className="flex items-center justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={getProducerHref(row.original, 'edit')}>
+				<Link
+					href={getProducerHref({
+						inventoryId: row.original.inventoryId,
+						producerId: row.original.id,
+						path: ['edit'],
+					})}
+				>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>

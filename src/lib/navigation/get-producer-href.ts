@@ -1,7 +1,17 @@
+import { Inventory } from '@/domain/inventory';
 import { Producer } from '@/domain/producer';
+import { getInventoryHref } from '@/lib/navigation';
 
-export function getProducerHref(producer: Producer, action?: string)
+interface GetProducerHrefParams
 {
-	const base = `/inventories/${producer.inventoryId}/producers/${producer.id}`;
-	return action ? `${base}/${action}` : base;
+	inventoryId: Inventory['id'];
+	producerId: Producer['id'];
+	path?: string[];
+}
+
+export function getProducerHref({ inventoryId, producerId, path }: GetProducerHrefParams)
+{
+	const producerPath = ['producers', producerId];
+	const fullPath = [...producerPath, ...(path || [])];
+	return getInventoryHref({ inventoryId, path: fullPath });
 }

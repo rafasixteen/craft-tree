@@ -28,7 +28,10 @@ export function RecipeTreeNodeHeader({ nodeId }: RecipeTreeNodeHeaderProps)
 				{selectedProducer && (
 					<LinkableName
 						name={selectedProducer.name}
-						href={getProducerHref(selectedProducer)}
+						href={getProducerHref({
+							inventoryId: selectedProducer.inventoryId,
+							producerId: selectedProducer.id,
+						})}
 						className="text-xs text-muted-foreground"
 					/>
 				)}

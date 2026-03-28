@@ -189,7 +189,7 @@ export const ProducerNode = memo(function ProducerNode({ id, data, selected }: N
 					{producer && (
 						<LinkableName
 							name={producer.name}
-							href={getProducerHref(producer)}
+							href={getProducerHref({ inventoryId, producerId: producer.id })}
 							className="text-xs text-muted-foreground"
 						/>
 					)}

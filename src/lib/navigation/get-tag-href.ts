@@ -1,7 +1,17 @@
+import { Inventory } from '@/domain/inventory';
 import { Tag } from '@/domain/tag';
+import { getInventoryHref } from '@/lib/navigation';
 
-export function getTagHref(tag: Tag, action?: string)
+interface GetTagHrefParams
 {
-	const base = `/inventories/${tag.inventoryId}/tags/${tag.id}`;
-	return action ? `${base}/${action}` : base;
+	inventoryId: Inventory['id'];
+	tagId: Tag['id'];
+	path?: string[];
+}
+
+export function getTagHref({ inventoryId, tagId, path }: GetTagHrefParams)
+{
+	const tagPath = ['tags', tagId];
+	const fullPath = [...tagPath, ...(path || [])];
+	return getInventoryHref({ inventoryId, path: fullPath });
 }

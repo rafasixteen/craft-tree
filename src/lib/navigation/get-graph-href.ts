@@ -11,5 +11,7 @@ interface GetGraphHrefParams
 
 export function getGraphHref({ inventoryId, graphId, path }: GetGraphHrefParams)
 {
-	return getInventoryHref({ inventoryId, path: [...(path || []), 'graphs', graphId] });
+	const graphPath = ['graphs', graphId];
+	const fullPath = [...graphPath, ...(path || [])];
+	return getInventoryHref({ inventoryId, path: fullPath });
 }

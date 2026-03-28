@@ -11,6 +11,7 @@ interface GetItemHrefParams
 
 export function getItemHref({ inventoryId, itemId, path = [] }: GetItemHrefParams)
 {
-	const base = getInventoryHref({ inventoryId, path: ['inventory', 'items', itemId] });
-	return path.length > 0 ? `${base}/${path.join('/')}` : base;
+	const graphPath = ['items', itemId];
+	const fullPath = [...graphPath, ...(path || [])];
+	return getInventoryHref({ inventoryId, path: fullPath });
 }

@@ -49,7 +49,9 @@ function Actions({ row }: ActionsProps)
 	return (
 		<div className="flex justify-center gap-2">
 			<Button variant="outline" size="icon-sm">
-				<Link href={getTagHref(row.original)}>
+				<Link
+					href={getTagHref({ inventoryId: row.original.inventoryId, tagId: row.original.id, path: ['edit'] })}
+				>
 					<PencilIcon className="size-3" />
 				</Link>
 			</Button>

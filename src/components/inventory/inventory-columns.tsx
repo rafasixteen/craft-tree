@@ -24,7 +24,7 @@ export const inventoryColumnns: ColumnDef<InventoryColumnData>[] = [
 		{
 			return (
 				<Link
-					href={getInventoryHref({ inventoryId: row.original.id, path: ['graphs'] })}
+					href={getInventoryHref({ inventoryId: row.original.id, path: ['items'] })}
 					className="ml-3 truncate font-medium hover:underline"
 				>
 					{row.original.name}
