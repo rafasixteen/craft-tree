@@ -1,4 +1,4 @@
-import { NodeExecutor } from '@/domain/graph-v2';
+import { AnyNodeOutput } from '@/domain/graph-v2';
 import { z } from 'zod';
 
 export type SchemaMap = Record<string, z.ZodTypeAny>;
@@ -24,5 +24,6 @@ export type NodeDefinition<
 	inputs?: TInputs;
 	outputs?: TOutputs;
 	config?: TConfig;
-	executor: NodeExecutor<Infer<TInputs>, Infer<TOutputs>, Infer<TConfig>>;
+	parseInputs?: (upstreamOutputs: AnyNodeOutput[]) => Infer<TInputs>;
+	executor: (input: Infer<TInputs>, config: Infer<TConfig>) => Promise<Infer<TOutputs>> | Infer<TOutputs>;
 };

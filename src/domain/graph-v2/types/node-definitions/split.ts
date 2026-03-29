@@ -1,6 +1,14 @@
 import { defineNode, ItemRateSchema, ProductionRateSchema } from '@/domain/graph-v2';
 import { z } from 'zod';
 
+declare module '@/domain/graph-v2/registry'
+{
+	export interface NodeOutputRegistry
+	{
+		split: { rates: z.infer<typeof ItemRateSchema>[] | null };
+	}
+}
+
 export const splitNodeDefinition = defineNode({
 	inputs: {
 		rate: ItemRateSchema.nullable(),
