@@ -1,7 +1,6 @@
 'use client';
 
 import { Edge, Node, NodeProps, Position, useReactFlow } from '@xyflow/react';
-import { InferNodeConfig, itemNodeDefinition } from '@/domain/graph-v2';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
 import { cn } from '@/lib/utils';
 import { LabeledHandle } from '@/components/labeled-handle';
@@ -9,10 +8,10 @@ import { ItemCombobox } from '@/components/item';
 import { ProductionRateComponent } from '@/components/graph';
 import { useParams } from 'next/navigation';
 import { useItems } from '@/domain/inventory';
-import { ProductionRate } from '@/domain';
+import { NodeConfig, ProductionRate } from '@/domain';
 import { useCallback } from 'react';
 
-type Config = NonNullable<InferNodeConfig<typeof itemNodeDefinition>>;
+type Config = NodeConfig<'item'>;
 
 export function ItemNode({ id, data, selected }: NodeProps<Node<Config>>)
 {

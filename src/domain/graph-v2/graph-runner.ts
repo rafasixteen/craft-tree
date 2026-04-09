@@ -1,10 +1,10 @@
-import { GraphData, nodeRegistry, NodeType } from '@/domain/graph-v2';
+import { GraphData, getNodeDefinition, NodeType, NodeOutputs, NodeConfigs } from '@/domain/graph-v2';
 
-type NodeOutputs = Map<string, any>;
+type ExecutionOutputs = Map<string, NodeOutputs>;
 
-export async function runGraph(graph: GraphData): Promise<NodeOutputs>
+export async function runGraph(graph: GraphData): Promise<ExecutionOutputs>
 {
-	const outputs = new Map<string, any>();
+	const outputs: ExecutionOutputs = new Map();
 
 	const inDegree = new Map(graph.nodes.map((n) => [n.id, 0]));
 	const dependents = new Map<string, string[]>();
@@ -20,24 +20,21 @@ export async function runGraph(graph: GraphData): Promise<NodeOutputs>
 	while (queue.length > 0)
 	{
 		const node = queue.shift()!;
-		const def = nodeRegistry[node.type as NodeType];
+		const def = getNodeDefinition(node.type as NodeType);
 
 		if (!def) throw new Error(`Unknown node type: "${node.type}"`);
 
-		const rawInputs: any[] = graph.edges.filter((e) => e.target === node.id).map((e) => outputs.get(e.source));
+		const rawInputs = graph.edges
+			.filter((e) => e.target === node.id)
+			.map((e) => outputs.get(e.source))
+			.filter((o): o is NodeOutputs => o !== undefined);
+
+		// TODO: Fix this compilation error with input.
 
 		const input = def.parseInputs ? def.parseInputs(rawInputs) : (rawInputs[0] ?? {});
+		const output = await def.executor(input, node.data as NodeConfigs);
 
-		console.group(`[GraphRunner] ▶ ${node.type} (${node.id})`);
-		console.log('  config:', JSON.stringify(node.data, null, 2));
-		console.log('  input:', JSON.stringify(input, null, 2));
-
-		const output = await def.executor(input as any, node.data as any);
-
-		console.log('  output:', JSON.stringify(output, null, 2));
-		console.groupEnd();
-
-		outputs.set(node.id, { type: node.type, ...(output as any) });
+		outputs.set(node.id, { type: node.type, ...output } as NodeOutputs);
 
 		for (const dependentId of dependents.get(node.id) ?? [])
 		{

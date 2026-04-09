@@ -1,41 +1,69 @@
-import { defineNode, ItemRateSchema, ProductionRateSchema } from '@/domain/graph-v2';
-import { z } from 'zod';
+import { convertItemRate, convertProductionRate, ItemRate, ProductionRate, TimeUnit } from '@/domain/graph';
+import { defineNode } from '@/domain/graph-v2';
 
-declare module '@/domain/graph-v2/registry'
+declare module '@/domain/graph-v2/node-registry'
 {
-	export interface NodeOutputRegistry
+	export interface NodeRegistry
 	{
-		split: { rates: z.infer<typeof ItemRateSchema>[] | null };
+		split: {
+			input: {
+				itemRate: ItemRate | null;
+			};
+			output: {
+				itemRates: ItemRate[] | null;
+			};
+			config: {
+				productionRates: ProductionRate[];
+			};
+		};
 	}
 }
 
-export const splitNodeDefinition = defineNode({
-	inputs: {
-		rate: ItemRateSchema.nullable(),
-	},
-	outputs: {
-		rates: z.array(ItemRateSchema).nullable(),
-	},
-	config: {
-		productionRates: z.array(ProductionRateSchema).default([{ amount: 1, per: 'second' }]),
+defineNode({
+	type: 'split',
+	getDefaultConfig: () =>
+	{
+		return {
+			productionRates: [
+				{
+					amount: 1,
+					per: 'second' as TimeUnit,
+				},
+			],
+		};
 	},
 	executor: (input, config) =>
 	{
-		const { rate } = input;
+		const { itemRate } = input;
 		const { productionRates } = config;
 
-		if (!rate)
+		if (!itemRate)
 		{
 			return {
-				rates: null,
+				itemRates: null,
 			};
 		}
 
+		const totalInputPerSecond = convertItemRate(itemRate, 'second').amount;
+		const totalOutputPerSecond = productionRates.reduce(
+			(sum, rate) => sum + convertProductionRate(rate, 'second').amount,
+			0,
+		);
+
 		return {
-			rates: productionRates.map((productionRate) => ({
-				...productionRate,
-				itemId: rate.itemId,
-			})),
+			itemRates: productionRates.map((rate) =>
+			{
+				const outputPerSecond = convertProductionRate(rate, 'second').amount;
+
+				const proportion = totalOutputPerSecond > 0 ? outputPerSecond / totalOutputPerSecond : 0;
+				const clampedAmount = Math.min(outputPerSecond, totalInputPerSecond * proportion);
+
+				return {
+					itemId: itemRate.itemId,
+					amount: clampedAmount,
+					per: 'second' as TimeUnit,
+				};
+			}),
 		};
 	},
 });

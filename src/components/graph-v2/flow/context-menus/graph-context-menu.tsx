@@ -1,4 +1,4 @@
-import { nodeRegistry, NodeType } from '@/domain/graph-v2';
+import { getNodeDefinition, getNodeDefinitions, NodeType } from '@/domain/graph-v2';
 import { Node, useReactFlow } from '@xyflow/react';
 import {
 	DropdownMenu,
@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Plus, LayoutGrid } from 'lucide-react';
 import { useCallback } from 'react';
-import { getDefaultConfig } from '@/domain/graph-v2';
 import { useLayoutGraph } from '@/components/graph-v2';
+import { throwIfDisallowedDynamic } from 'next/dist/server/app-render/dynamic-rendering';
 
 export interface GraphContextMenuProps
 {
@@ -38,8 +38,14 @@ export function GraphContextMenu({ position, close }: GraphContextMenuProps)
 		function addNode(type: NodeType)
 		{
 			const id = crypto.randomUUID();
-			const nodeDef = nodeRegistry[type];
-			const data = getDefaultConfig(nodeDef);
+			const nodeDef = getNodeDefinition(type);
+
+			if (!nodeDef)
+			{
+				throw new Error(`Unknown node type: "${type}"`);
+			}
+
+			const data = nodeDef.getDefaultConfig();
 
 			const node: Node = {
 				id: `${type}-${id}`,
@@ -68,9 +74,12 @@ export function GraphContextMenu({ position, close }: GraphContextMenuProps)
 						Add Node
 					</DropdownMenuSubTrigger>
 					<DropdownMenuSubContent>
-						{Object.keys(nodeRegistry).map((type) => (
-							<DropdownMenuItem key={type} onClick={() => addNode(type as NodeType)}>
-								{type.charAt(0).toUpperCase() + type.slice(1)}
+						{getNodeDefinitions().map((definition) => (
+							<DropdownMenuItem
+								key={definition.type}
+								onClick={() => addNode(definition.type as NodeType)}
+							>
+								{definition.type.charAt(0).toUpperCase() + definition.type.slice(1)}
 							</DropdownMenuItem>
 						))}
 					</DropdownMenuSubContent>

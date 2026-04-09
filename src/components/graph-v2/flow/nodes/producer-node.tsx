@@ -1,7 +1,7 @@
 'use client';
 
 import { Edge, Node, NodeProps, Position, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
-import { InferNodeConfig, producerNodeDefinition, useNodeOutput } from '@/domain/graph-v2';
+import { NodeConfig} from '@/domain/graph-v2';
 import { useParams } from 'next/navigation';
 import { useItems } from '@/domain/inventory';
 import { BaseNode, BaseNodeContent, BaseNodeFooter, BaseNodeHeader } from '@/components/base-node';
@@ -25,7 +25,7 @@ import { useCallback, useEffect } from 'react';
 import { ItemCombobox } from '@/components/item';
 import { Input } from '@/components/ui/input';
 
-type Config = NonNullable<InferNodeConfig<typeof producerNodeDefinition>>;
+type Config = NodeConfig<'producer'>;
 
 export function ProducerNode({ id, data, selected }: NodeProps<Node<Config>>)
 {

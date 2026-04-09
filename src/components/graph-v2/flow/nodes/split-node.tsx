@@ -1,7 +1,7 @@
 'use client';
 
 import { Node, NodeProps, Position, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
-import { InferNodeConfig, splitNodeDefinition } from '@/domain/graph-v2';
+import { NodeConfig } from '@/domain/graph-v2';
 import { LabeledHandle } from '@/components/labeled-handle';
 import { BaseNode, BaseNodeContent, BaseNodeHeader } from '@/components/base-node';
 import { ProductionRateComponent } from '@/components/graph/flow/production-rate';
@@ -11,7 +11,7 @@ import { PlusIcon, XIcon } from 'lucide-react';
 import { ProductionRate } from '@/domain/graph';
 import { useCallback } from 'react';
 
-type Config = NonNullable<InferNodeConfig<typeof splitNodeDefinition>>;
+type Config = NodeConfig<'split'>;
 
 export function SplitNode({ id, data, selected }: NodeProps<Node<Config>>)
 {

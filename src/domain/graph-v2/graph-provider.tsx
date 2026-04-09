@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { GraphData, runGraph } from '@/domain/graph-v2';
 
-type GraphOutputs = Map<string, Record<string, unknown>>;
+type GraphOutputs = Awaited<ReturnType<typeof runGraph>>;
 
 const GraphExecutionContext = createContext<GraphOutputs>(new Map());
 
@@ -25,7 +25,7 @@ export function GraphExecutionProvider({ graph, children }: GraphExecutionProvid
 	return <GraphExecutionContext.Provider value={outputs}>{children}</GraphExecutionContext.Provider>;
 }
 
-export function useNodeOutput(nodeId: string): Record<string, unknown> | undefined
+export function useNodeOutput(nodeId: string)
 {
 	return useContext(GraphExecutionContext).get(nodeId);
 }

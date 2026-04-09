@@ -1,21 +1,33 @@
-import { defineNode, ItemRateSchema, ProductionRateSchema } from '@/domain/graph-v2';
-import { z } from 'zod';
+import { defineNode } from '@/domain/graph-v2';
+import { ItemRate, ProductionRate, TimeUnit } from '@/domain/graph';
 
-declare module '@/domain/graph-v2/registry'
+declare module '@/domain/graph-v2/node-registry'
 {
-	export interface NodeOutputRegistry
+	export interface NodeRegistry
 	{
-		item: { itemRate: z.infer<typeof ItemRateSchema> | null };
+		item: {
+			output: {
+				itemRate: ItemRate | null;
+			};
+			config: {
+				itemId: string | null;
+				rate: ProductionRate;
+			};
+		};
 	}
 }
 
-export const itemNodeDefinition = defineNode({
-	outputs: {
-		itemRate: ItemRateSchema.nullable(),
-	},
-	config: {
-		itemId: z.string().nullable(),
-		rate: ProductionRateSchema.default({ amount: 1, per: 'second' }),
+defineNode({
+	type: 'item',
+	getDefaultConfig: () =>
+	{
+		return {
+			itemId: null,
+			rate: {
+				amount: 1,
+				per: 'second' as TimeUnit,
+			},
+		};
 	},
 	executor: (_, config) =>
 	{
